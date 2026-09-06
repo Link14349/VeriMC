@@ -1,0 +1,9 @@
+.DS_Store
+simulator/build*/
+simulator/.cache/
+simulator/runtime/
+simulator/apps/web/node_modules/
+simulator/apps/web/dist/
+simulator/testResults/
+**/__pycache__/
+*.log

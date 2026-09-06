@@ -1,0 +1,9 @@
+#!/bin/sh
+python3 - "$1" <<'PY'
+import pathlib
+import sys
+message = pathlib.Path(sys.argv[1]).read_text(encoding='utf-8').strip()
+if not message or '\n' in message or len(message) > 20:
+    print('提交说明需为单行，简明说明功能或修复，且不超过20字。', file=sys.stderr)
+    sys.exit(1)
+PY
