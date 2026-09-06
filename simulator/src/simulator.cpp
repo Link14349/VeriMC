@@ -108,7 +108,7 @@ void Simulator::setBlock(BlockPos p, StateId id, unsigned flags, int depth) {
     world.set(p, id); changes[p] = id; ++revision; ++sequence; ++statistics.stateChanges;
     sampleAffected(p);
     if (oldState.type != state.type) {
-        runtime.erase(p);
+        if (!(oldState.device==Device::container && state.device==Device::container && isCopperChest(old) && isCopperChest(id))) runtime.erase(p);
         scheduledKeys.erase({p, oldState.type, 3, 0});
         if (auto motion = motions.find(p); motion != motions.end()) {
             scheduledKeys.erase({p, oldState.type, 2, motion->second.generation});

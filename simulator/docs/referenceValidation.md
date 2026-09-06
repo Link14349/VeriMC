@@ -45,3 +45,5 @@
 `captureDroppers.py` 增加第十组 GameTest，覆盖 31 刻 / 19 点。`runReferenceTool.py ExportDropperSlots <绝对输出路径>` 生成 600 次选槽。`ExportDropperMotion` 接受四个绝对路径参数：输出 JSON、缓存 captureWorld、缓存 fixturePacks、输出报告 XML；先运行任一 capture 脚本生成公共空结构。该工具在一次 GameTest 回调内分别重置原版随机源并立即读取实体，36 组位置/速度位模式对照通过，详细隔离条件见 [投掷器说明](droppers.md)。
 
 `captureTargets.py` 增加第十一组 GameTest：53 刻 / 26 点，六面命中、箭/其他投射物、重复命中、红石粉输出与带电标靶重放置。`runReferenceTool.py ExportTarget <绝对输出路径>` 直接调用原版强度计算，4,272 次样本覆盖各信号阈值相邻浮点数及正负/大坐标，详见 [标靶说明](targets.md)。
+
+`captureCopperChests.py` 增加第十二组 GameTest：25 刻 / 132 点，64 种铜箱配对、原版玩家放置、变体同步、库存保留及传输。`playerPlace` 在参考端调用方块原版放置方法，在独立内核调用编辑器放置方法；普通 `stateId` 命令仍是原始状态编辑，二者不混用。详见 [铜箱说明](copperChests.md)。

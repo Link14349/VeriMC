@@ -123,6 +123,19 @@ try:
     command('stimulate',pos=[0,1,0],stimulus={'arrows':0}); command('step',count=30)
     assert command('inspect',pos=[0,1,0])['properties']['powered']=='false'
     assert command('stimulate',pos=[0,1,0],stimulus={'arrows':0,'pressedArrows':1})['type']=='error'
+    command('new');command('place',pos=[0,0,0],name='oxidized_copper_chest')
+    command('stimulate',pos=[0,0,0],stimulus={'inventory':[{'slot':0,'item':'stone','count':8}]})
+    command('place',pos=[1,0,0],name='waxed_exposed_copper_chest')
+    copper=command('inspect',pos=[0,0,0])
+    assert copper['name']=='minecraft:exposed_copper_chest' and copper['inventorySize']==54
+    assert copper['inventory'][0]['count']==8
+    command('stimulate',pos=[0,0,0],stimulus={'viewers':1})
+    opened=command('save',checkpoint=True)
+    command('place',pos=[0,0,0],name='waxed_weathered_copper_chest',properties={'facing':'north','type':'left'})
+    assert command('inspect',pos=[1,0,0])['name']=='minecraft:waxed_weathered_copper_chest'
+    command('undo');assert command('inspect',pos=[0,0,0])['name']=='minecraft:exposed_copper_chest'
+    command('load',project=opened)
+    restored=command('inspect',pos=[0,0,0]);assert restored['inventory']==copper['inventory'] and restored['runtime']['viewers']==1
     assert client.frames > 0
     print(f'PASS: HTTP host validation, binary frames ({client.frames}), circuit editing, delay, probes, VCD, atomic errors, native undo/redo, checkpoint import')
 finally:

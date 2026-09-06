@@ -42,6 +42,14 @@ public class CaptureRedstone extends TestFunctionLoader {
         var level = helper.getLevel();
         if (command.has("stateId")) {
             var placed = Block.stateById(command.get("stateId").getAsInt());
+            if (command.has("playerPlace")) {
+                var player=helper.makeMockPlayer(GameType.CREATIVE);
+                player.setYRot(placed.getValue(ChestBlock.FACING).getOpposite().toYRot());
+                var hit=new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(pos.below()),Direction.UP,pos.below(),false);
+                var context=new net.minecraft.world.item.context.BlockPlaceContext(player,net.minecraft.world.InteractionHand.MAIN_HAND,new ItemStack(placed.getBlock().asItem()),hit);
+                placed=placed.getBlock().getStateForPlacement(context);
+                if(placed==null) throw new IllegalStateException("Reference placement failed");
+            }
             level.setBlock(pos, placed, 3);
             if (command.has("placedBy")) placed.getBlock().setPlacedBy(level, pos, placed, null, ItemStack.EMPTY);
             return;

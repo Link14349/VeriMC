@@ -182,6 +182,8 @@ private:
     std::size_t inventorySize(StateId state) const;
     std::vector<InventorySlot> containerSlots(BlockPos pos, bool ignoreBlockage = true) const;
     Direction chestConnection(StateId state) const;
+    bool isCopperChest(StateId state) const;
+    bool chestsConnect(StateId first, StateId second) const;
     StateId placedChest(BlockPos pos, StateId state) const;
     void updateChestShape(const Update& update);
     ItemStack stackAt(const InventorySlot& slot) const;

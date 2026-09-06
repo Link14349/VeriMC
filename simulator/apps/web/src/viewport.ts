@@ -205,9 +205,13 @@ export class CircuitViewport {
     } else if (name.endsWith('chest')) {
       const v = directionVectors[facing], opened = (cell.motion & 1024) !== 0;
       const width = p.type !== 'single' ? 1 : .875;
-      part([.5,.36,.5],[width,.6,.875],name === 'trapped_chest' ? 0x9a6446 : 0xab8550);
-      if (opened) part([.5-v[0]*.34,1.04,.5-v[2]*.34],[v[0] ? .25 : width,.78,v[2] ? .25 : width],0xc1995d);
-      else part([.5,.8,.5],[width,.27,.875],0xc1995d);
+      const sizeX=v[0] ? .875 : width,sizeZ=v[2] ? .875 : width;
+      const copper=name.includes('copper_chest');
+      const tint=copper?(name.includes('oxidized')?0x599885:name.includes('weathered')?0x69937a:name.includes('exposed')?0xa58d6e:0xb27755):name==='trapped_chest'?0x9a6446:0xab8550;
+      const lid=copper?tint:0xc1995d;
+      part([.5,.36,.5],[sizeX,.6,sizeZ],tint);
+      if (opened) part([.5-v[0]*.34,1.04,.5-v[2]*.34],[v[0] ? .25 : sizeX,.78,v[2] ? .25 : sizeZ],lid);
+      else part([.5,.8,.5],[sizeX,.27,sizeZ],lid);
       part([.5+v[0]*.45,.55,.5+v[2]*.45],[v[0] ? .06 : .13,.24,v[2] ? .06 : .13],name === 'trapped_chest' ? 0xc87f60 : 0xc8c3a1);
     } else if (name === 'barrel') {
       part([.5,.5,.5],[1,1,1],0xa18559);

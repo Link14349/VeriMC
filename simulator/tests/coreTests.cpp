@@ -180,7 +180,7 @@ int main() {
         try { restored.loadProject(invalid); } catch (...) { threw = true; }
         expect(threw && before == restored.saveProject("before", true), "invalid batch import changed world");
     });
-    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers", "java26_2Hoppers", "java26_2Torches", "java26_2Rails", "java26_2TickBatches", "java26_2Tripwire", "java26_2Buttons", "java26_2Droppers", "java26_2Targets"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
+    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers", "java26_2Hoppers", "java26_2Torches", "java26_2Rails", "java26_2TickBatches", "java26_2Tripwire", "java26_2Buttons", "java26_2Droppers", "java26_2Targets", "java26_2CopperChests"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
         std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/../tests/fixtures/" + fixtureName + ".json"); expect(static_cast<bool>(file), "missing vanilla reference fixture");
         auto fixture = Json::parse(file); auto origin = fixture["origin"].get<BlockPos>(); Simulator s(r);
         auto absolute = [&](const Json& p) { auto pos = p.get<BlockPos>(); return BlockPos{origin.x + pos.x, origin.y + pos.y, origin.z + pos.z}; };
@@ -188,7 +188,7 @@ int main() {
             Tick tick = frame["tick"]; s.advanceTo(tick);
             for (const auto& command : fixture["commands"]) if (command["tick"] == tick) {
                 auto p = absolute(command["pos"]);
-                if (command.contains("placedBy")) s.place(p, command["stateId"]);
+                if (command.contains("placedBy") || command.contains("playerPlace")) s.place(p, command["stateId"]);
                 else if (command.contains("stateId")) s.setBlock(p, command["stateId"]);
                 else if (command.contains("interact")) s.interact(p);
                 else s.stimulate(p, command["stimulus"]);
@@ -421,6 +421,25 @@ int main() {
         auto remaining=s.inspect({0,1,0})["inventory"]; expect(remaining.size()==1&&remaining[0]["item"]=="minecraft:wooden_sword","double-chest physical slot order");
         s.stimulate({0,1,0},{{"inventory",Json::array({{{"slot",0},{"count",0}}})}}); saved=s.saveProject("empty",true); restored.loadProject(saved);
         expect(saved==restored.saveProject("empty",true),"empty inventory snapshot diverged");
+    });
+    test("copper chest pairing and variant changes retain inventory and open state across checkpoint", [&] {
+        Simulator s(r);const BlockPos first{0,0,0},second{1,0,0};
+        s.place(first,r.state("oxidized_copper_chest",{{"facing","north"}}));
+        s.stimulate(first,{{"inventory",Json::array({{{"slot",0},{"item","stone"},{"count",8}}})}});
+        s.place(second,r.state("waxed_exposed_copper_chest",{{"facing","north"}}));
+        expect(r.type(s.world.get(first)).name=="minecraft:exposed_copper_chest" && r.type(s.world.get(second)).name=="minecraft:exposed_copper_chest","mixed wax pairing did not choose unwaxed lower oxidation");
+        expect(s.inspect(first)["inventorySize"]==54 && s.inventoryJson(first)[0]["slot"]==27,"paired inventory order or preservation failed");
+        s.stimulate(first,{{"viewers",2}});
+        const auto saved=s.saveProject("copper",true);Simulator restored(r);restored.loadProject(saved);
+        for(auto* sim:{&s,&restored}) {
+            sim->setBlock(first,r.state("waxed_weathered_copper_chest",{{"facing","north"},{"type","left"}}));
+            expect(r.type(sim->world.get(second)).name=="minecraft:waxed_weathered_copper_chest","shape update failed to synchronize variant");
+            expect(sim->viewerCount(first)==2 && sim->viewerCount(second)==2 && sim->inventoryJson(first)[0]["count"]==8,"variant conversion erased inventory or viewers");
+            sim->setBlock(second,r.state("chest",{{"facing","north"}}));
+            expect(sim->inspect(first)["inventorySize"]==27 && sim->inventoryJson(first)[0]["count"]==8,"unrelated chest connected or erased retained half");
+            expect(sim->viewerCount(second)==0,"unrelated replacement kept old viewer state");
+        }
+        expect(s.saveProject("copper",true)==restored.saveProject("copper",true),"copper conversion diverged after checkpoint");
     });
     test("invalid inventory edits reject the whole batch", [&] {
         Simulator s(r); s.place({0,0,0},r.state("barrel")); auto before=s.saveProject("before",true);

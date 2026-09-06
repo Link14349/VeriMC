@@ -25,13 +25,29 @@ std::size_t Simulator::inventorySize(StateId id) const {
 Direction Simulator::chestConnection(StateId state) const {
     return turn(registry[state].facing, registry.property(state, "type") == "left" ? 1 : -1);
 }
+bool Simulator::isCopperChest(StateId state) const {
+    const auto& name=registry.type(state).className;
+    return name=="CopperChestBlock" || name=="WeatheringCopperChestBlock";
+}
+bool Simulator::chestsConnect(StateId first, StateId second) const {
+    return isCopperChest(first) ? isCopperChest(second) : registry[first].type==registry[second].type;
+}
 
 StateId Simulator::placedChest(BlockPos pos, StateId state) const {
     if (!registry.has(state, "type") || registry.property(state, "type") != "single") return state;
     for (int step : {1, -1}) {
         auto adjacent = world.get(pos.relative(turn(registry[state].facing, step)));
-        if (registry[adjacent].type == registry[state].type && registry[adjacent].facing == registry[state].facing && registry.property(adjacent, "type") == "single")
-            return registry.with(state, "type", std::string(step == 1 ? "left" : "right"));
+        if (chestsConnect(state,adjacent) && registry[adjacent].facing == registry[state].facing && registry.property(adjacent, "type") == "single") {
+            auto paired=registry.with(state, "type", std::string(step == 1 ? "left" : "right"));
+            if (!isCopperChest(state)) return paired;
+            auto name=registry.type(state).name, other=registry.type(adjacent).name;
+            if (name.starts_with("minecraft:waxed_")!=other.starts_with("minecraft:waxed_")) {
+                if(name.starts_with("minecraft:waxed_")) name.erase(10,6);
+                if(other.starts_with("minecraft:waxed_")) other.erase(10,6);
+            }
+            auto age=[](const std::string& value) {return value.find("oxidized")!=std::string::npos?3:value.find("weathered")!=std::string::npos?2:value.find("exposed")!=std::string::npos?1:0;};
+            return registry.state(age(name)<=age(other)?name:other,registry.describe(paired).at("properties"));
+        }
     }
     return state;
 }
@@ -39,13 +55,17 @@ StateId Simulator::placedChest(BlockPos pos, StateId state) const {
 void Simulator::updateChestShape(const Update& update) {
     auto id = world.get(update.pos), neighbor = update.neighborState;
     auto type = registry.property(id, "type");
-    if (registry[id].type == registry[neighbor].type && axis(update.direction) != 0) {
+    auto next=id;
+    if (chestsConnect(id,neighbor) && axis(update.direction) != 0) {
         auto otherType = registry.property(neighbor, "type");
         if (type == "single" && otherType != "single" && registry[id].facing == registry[neighbor].facing && chestConnection(neighbor) == opposite(update.direction))
-            setBlock(update.pos, registry.with(id, "type", std::string(otherType == "left" ? "right" : "left")), update.flags, update.depth);
+            next=registry.with(id, "type", std::string(otherType == "left" ? "right" : "left"));
     } else if (chestConnection(id) == update.direction) {
-        setBlock(update.pos, registry.with(id, "type", std::string("single")), update.flags, update.depth);
+        next=registry.with(id, "type", std::string("single"));
     }
+    if(isCopperChest(id) && isCopperChest(neighbor) && registry.property(next,"type")!="single" && chestConnection(next)==update.direction)
+        next=registry.state(registry.type(neighbor).name,registry.describe(next).at("properties"));
+    setBlock(update.pos,next,update.flags,update.depth);
 }
 
 std::vector<Simulator::InventorySlot> Simulator::containerSlots(BlockPos pos, bool ignoreBlockage) const {
