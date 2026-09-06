@@ -22,7 +22,8 @@ void Simulator::restore(const Simulator& snapshot) {
     recentTorchToggles = snapshot.recentTorchToggles; torchToggleCounts = snapshot.torchToggleCounts;
     probes = snapshot.probes; probeDependencies = snapshot.probeDependencies; trace = snapshot.trace;
     currentTick = snapshot.currentTick; nextOrder = snapshot.nextOrder; sequence = snapshot.sequence; nextProbeId = snapshot.nextProbeId;
-    traceDropped = snapshot.traceDropped; traceCapacity = snapshot.traceCapacity; updateBudget = snapshot.updateBudget; statistics = snapshot.statistics;
+    traceDropped = snapshot.traceDropped; traceCapacity = snapshot.traceCapacity; traceAtomicReserve = snapshot.traceAtomicReserve; updateBudget = snapshot.updateBudget; statistics = snapshot.statistics;
+    if (retainedTrace) retainedTrace = traceDropped;
     breakRequested = snapshot.breakRequested; faulted = snapshot.faulted; pauseReason = snapshot.pauseReason; changes.clear(); ++revision;
 }
 Json Simulator::saveProject(const std::string& name, bool checkpoint) const {
@@ -79,7 +80,7 @@ void Simulator::loadProject(const Json& data) {
     bool checkpoint = data.at("kind") == "checkpoint";
     if (!checkpoint && data.at("kind") != "circuit") throw std::invalid_argument("未知工程类型");
     if (data.at("blocks").size() > 2000000) throw std::invalid_argument("工程超过 200 万方块限制");
-    Simulator candidate(registry); candidate.traceCapacity = traceCapacity; candidate.updateBudget = updateBudget;
+    Simulator candidate(registry); candidate.traceCapacity = traceCapacity; candidate.traceAtomicReserve = traceAtomicReserve; candidate.updateBudget = updateBudget;
     std::unordered_set<BlockPos, PosHash> occupied;
     for (const auto& row : data.at("blocks")) {
         auto p = row.at("pos").get<BlockPos>(); auto id = registry.state(row.at("name"), row.at("properties"));
@@ -180,7 +181,8 @@ void Simulator::loadProject(const Json& data) {
     }
     if (checkpoint) {
         candidate.nextProbeId = data.at("nextProbeId"); candidate.rebuildProbeDependencies(); candidate.trace.clear();
-        for (const auto& e : data.at("trace")) { if (candidate.trace.size() >= candidate.traceCapacity) candidate.trace.pop_front(); candidate.trace.push_back({e.at(0), e.at(1), e.at(2), e.at(3)}); }
+        if (data.at("trace").size() > candidate.traceCapacity + candidate.traceAtomicReserve) throw std::invalid_argument("快照采样量超过当前历史容量与安全余量，请增大容量后重试");
+        for (const auto& e : data.at("trace")) candidate.trace.push_back({e.at(0), e.at(1), e.at(2), e.at(3)});
         candidate.traceDropped = data.at("traceDropped");
     }
     using std::swap;
@@ -190,6 +192,7 @@ void Simulator::loadProject(const Json& data) {
     swap(recentTorchToggles, candidate.recentTorchToggles); swap(torchToggleCounts, candidate.torchToggleCounts);
     swap(probes, candidate.probes); swap(probeDependencies, candidate.probeDependencies); swap(trace, candidate.trace);
     currentTick = candidate.currentTick; nextOrder = candidate.nextOrder; sequence = candidate.sequence; nextProbeId = candidate.nextProbeId; traceDropped = candidate.traceDropped;
+    if (retainedTrace) retainedTrace = traceDropped;
     statistics = {}; changes.clear(); breakRequested = false; faulted = false; pauseReason.clear(); ++revision;
 }
 std::string Simulator::exportVcd() const {

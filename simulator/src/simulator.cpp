@@ -432,6 +432,7 @@ void Simulator::executeTick(const ScheduledEvent& event) {
 }
 bool Simulator::stepEvent() {
     if (faulted) throw std::runtime_error("当前执行已中止，请从有效快照恢复");
+    if (traceBlocked()) { breakRequested = true; pauseReason = "探针缓冲等待浏览器确认，仿真已暂停以保留全部边沿"; }
     pruneEvents();
     if (pendingEvents() == 0 || breakRequested) return false;
     ScheduledEvent event;
@@ -479,6 +480,7 @@ void Simulator::pruneEvents() {
 std::size_t Simulator::advanceTo(Tick target, std::size_t eventBudget, std::chrono::microseconds wallBudget) {
     if (faulted) throw std::runtime_error("当前执行已中止，请从有效快照恢复");
     if (target < currentTick) throw std::invalid_argument("不能倒退时间，请加载运行快照");
+    if (traceBlocked()) { breakRequested = true; pauseReason = "探针缓冲等待浏览器确认，仿真已暂停以保留全部边沿"; return 0; }
     auto start = std::chrono::steady_clock::now(); std::size_t count = 0;
     pruneEvents();
     while (pendingEvents() != 0 && nextTick() <= target && !breakRequested && count < eventBudget) {
@@ -519,27 +521,50 @@ void Simulator::clear() {
     recentTorchToggles.clear(); torchToggleCounts.clear();
     world.clear(); runtime.clear(); motions.clear(); hoppers.clear(); entityOrders.clear(); nextEntityOrder = 0; scheduled = {}; scheduledKeys.clear(); blockTicks = {}; changes.clear(); currentTick = 0; nextOrder = 0; sequence = 0; currentPhase = 4;
     probes.clear(); probeDependencies.clear(); nextProbeId = 1; trace.clear(); traceDropped = 0; statistics = {}; breakRequested = false; faulted = false; pauseReason.clear(); ++revision;
+    if (retainedTrace) retainedTrace = 0;
 }
 std::vector<Cell> Simulator::takeChanges() { std::vector<Cell> result; result.reserve(changes.size()); for (const auto& [p, id] : changes) result.push_back({p, id}); changes.clear(); return result; }
 void Simulator::rebuildProbeDependencies() {
     probeDependencies.clear();
-    for (const auto& probe : probes) {
+    for (std::size_t index = 0; index < probes.size(); ++index) {
+        const auto& probe = probes[index];
         std::unordered_set<BlockPos, PosHash> affected{probe.pos};
         for (auto a : directions) { auto q = probe.pos.relative(a); affected.insert(q); for (auto b : directions) affected.insert(q.relative(b)); }
-        for (auto p : affected) probeDependencies[p].push_back(probe.id);
+        for (auto p : affected) probeDependencies[p].push_back(static_cast<std::uint32_t>(index));
     }
+}
+void Simulator::trimTrace() {
+    while (trace.size() > traceCapacity && (!retainedTrace || traceDropped < *retainedTrace)) { trace.pop_front(); ++traceDropped; }
+}
+void Simulator::retainTraceFrom(std::optional<std::uint64_t> firstUnacknowledged) {
+    if (firstUnacknowledged && (*firstUnacknowledged < traceDropped || *firstUnacknowledged > traceDropped + trace.size()))
+        throw std::invalid_argument("探针确认游标超出保留历史范围");
+    retainedTrace = firstUnacknowledged;
+    trimTrace();
+}
+bool Simulator::traceBlocked() const {
+    return retainedTrace && traceDropped + trace.size() - *retainedTrace >= traceCapacity;
 }
 void Simulator::sampleProbe(Probe& probe) {
     int value = probe.mode == "input" ? bestSignal(probe.pos) : probe.mode == "direction" ? signal(probe.pos, probe.direction) : displayValue(probe.pos);
     if (value == probe.lastValue) return;
     bool trigger = (probe.trigger == "rising" && probe.lastValue == 0 && value > 0) || (probe.trigger == "falling" && probe.lastValue > 0 && value == 0) || (probe.trigger == "value" && value == probe.triggerValue && probe.lastValue >= 0);
-    if (trace.size() >= traceCapacity) { trace.pop_front(); ++traceDropped; }
     trace.push_back({probe.id, currentTick, sequence, static_cast<std::uint8_t>(value)}); probe.lastValue = value;
+    trimTrace();
+    if (traceBlocked()) {
+        breakRequested = true;
+        pauseReason = "探针缓冲等待浏览器确认，仿真已暂停以保留全部边沿";
+        if (trace.size() - traceCapacity > traceAtomicReserve) {
+            faulted = true;
+            pauseReason = "单次器件更新的探针边沿超过安全余量，本次执行中止；请减少探针或恢复快照";
+            throw std::runtime_error(pauseReason);
+        }
+    }
     if (trigger) { breakRequested = true; pauseReason = "探针「" + probe.name + "」触发断点"; }
 }
 void Simulator::sampleAffected(BlockPos p) {
     auto found = probeDependencies.find(p); if (found == probeDependencies.end()) return;
-    for (auto id : found->second) for (auto& probe : probes) if (probe.id == id) { sampleProbe(probe); break; }
+    for (auto index : found->second) sampleProbe(probes[index]);
 }
 std::uint32_t Simulator::addProbe(BlockPos p, const std::string& name, const std::string& mode, Direction direction) {
     if (probes.size() >= 256) throw std::invalid_argument("最多支持 256 个探针");
@@ -551,7 +576,7 @@ void Simulator::configureProbe(std::uint32_t id, const Json& config) {
     for (auto& p : probes) if (p.id == id) { p.name = config.value("name", p.name); p.trigger = config.value("trigger", p.trigger); p.triggerValue = config.value("triggerValue", p.triggerValue); return; }
     throw std::invalid_argument("探针不存在");
 }
-void Simulator::clearTrace() { trace.clear(); traceDropped = 0; for (auto& probe : probes) { probe.lastValue = -1; sampleProbe(probe); } }
+void Simulator::clearTrace() { trace.clear(); traceDropped = 0; if (retainedTrace) retainedTrace = 0; for (auto& probe : probes) { probe.lastValue = -1; sampleProbe(probe); } }
 Json Simulator::inspect(BlockPos p) const {
     auto id = world.get(p); auto result = registry.describe(id);
     result["pos"] = p; result["value"] = displayValue(p); result["input"] = bestSignal(p); result["analog"] = analogOutput(p);

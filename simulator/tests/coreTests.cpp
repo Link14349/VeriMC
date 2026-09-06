@@ -155,6 +155,56 @@ int main() {
     test("copper bulb toggles on each rising edge", [&] { Simulator s(r); s.place({0, 0, 0}, r.state("copper_bulb")); s.place({1, 0, 0}, r.state("redstone_block")); expect(s.at({0, 0, 0}).lit, "first edge"); s.setBlock({1, 0, 0}, 0); expect(s.at({0, 0, 0}).lit, "falling edge toggled"); s.place({1, 0, 0}, r.state("redstone_block")); expect(!s.at({0, 0, 0}).lit, "second edge"); });
     test("comparator analog source and subtraction", [&] { Simulator s(r); floor(s); s.place({0, 1, 0}, r.state("copper_bulb", {{"lit", "true"}})); s.place({1, 1, 0}, r.state("comparator", {{"facing", "west"}})); s.advanceTo(2); expect(s.analogOutput({1, 1, 0}) == 15, "analog source"); s.place({1, 1, 1}, r.state("redstone_block")); s.interact({1, 1, 0}); expect(s.analogOutput({1, 1, 0}) == 0 && !s.at({1, 1, 0}).powered, "subtract equality"); });
     test("button duration, trace and exact checkpoint continuation", [&] { Simulator s(r); floor(s); s.place({0, 1, 0}, r.state("stone_button", {{"face", "floor"}})); s.addProbe({0, 1, 0}, "button"); s.interact({0, 1, 0}); s.advanceTo(7); auto saved = s.saveProject("test", true); Simulator other(r); other.loadProject(saved); s.advanceTo(20); other.advanceTo(20); expect(!s.at({0, 1, 0}).powered, "button did not release"); expect(s.saveProject("test", true) == other.saveProject("test", true), "checkpoint lost runtime state"); expect(s.exportVcd().find("#1000") != std::string::npos, "VCD game-tick scale"); });
+    test("trace backpressure completes atomic edges and resumes without loss", [&] {
+        Simulator s(r); s.place({0,0,0}, r.state("observer", {{"facing","east"}}));
+        for (int i = 0; i < 8; ++i) s.addProbe({0,0,0});
+        s.schedule({0,0,0}, 2); s.traceCapacity = 10; s.retainTraceFrom(0);
+        auto baseline = s.clone(); baseline->traceCapacity = 100;
+        s.advanceTo(100);
+        expect(s.currentTick == 2 && s.getTrace().size() == 16 && s.traceDropped == 0, "atomic edge batch dropped or time advanced");
+        expect(s.traceBlocked() && s.breakRequested && !s.faulted, "soft capacity did not pause");
+        const auto pending = s.pendingEvents(); const auto events = s.statistics.scheduledEvents;
+        s.breakRequested = false; expect(!s.stepEvent() && s.pendingEvents() == pending && s.statistics.scheduledEvents == events, "blocked event was consumed");
+        s.breakRequested = false; s.advanceTo(100); expect(s.currentTick == 2, "blocked advance bypassed protection");
+        const auto snapshot = s.saveProject("trace", true);
+        Simulator restored(r); restored.traceCapacity = 10; restored.loadProject(snapshot);
+        expect(restored.saveProject("trace", true) == snapshot, "snapshot truncated atomic trace reserve");
+        std::vector<TraceEdge> received(s.getTrace().begin(), s.getTrace().end());
+        s.retainTraceFrom(16); expect(s.traceDropped == 6 && !s.traceBlocked(), "ACK failed to release history");
+        s.breakRequested = false; s.advanceTo(100);
+        for (std::uint64_t i = 16; i < s.traceDropped + s.getTrace().size(); ++i) received.push_back(s.getTrace()[i - s.traceDropped]);
+        baseline->advanceTo(100);
+        expect(received.size() == baseline->getTrace().size(), "edge count changed across pause");
+        for (std::size_t i = 0; i < received.size(); ++i) {
+            const auto& a = received[i]; const auto& b = baseline->getTrace()[i];
+            expect(a.probeId == b.probeId && a.tick == b.tick && a.sequence == b.sequence && a.value == b.value, "edge changed across pause");
+        }
+        bool threw = false; try { s.retainTraceFrom(0); } catch (...) { threw = true; }
+        expect(threw, "expired ACK cursor accepted");
+    });
+    test("trace safety reserve faults explicitly and idle time cannot bypass pause", [&] {
+        Simulator idle(r); idle.addProbe({0,0,0}); idle.traceCapacity = 1; idle.retainTraceFrom(0);
+        idle.breakRequested = false; idle.advanceTo(100); expect(idle.currentTick == 0 && idle.breakRequested, "idle time bypassed full trace");
+        Simulator s(r); s.place({0,0,0}, r.state("observer"));
+        for (int i = 0; i < 8; ++i) s.addProbe({0,0,0});
+        s.traceCapacity = 10; s.traceAtomicReserve = 2; s.retainTraceFrom(0); s.schedule({0,0,0},2);
+        bool threw = false; try { s.stepEvent(); } catch (...) { threw = true; }
+        expect(threw && s.faulted && s.traceDropped == 0, "reserve exhaustion silently lost edges");
+        s.retainTraceFrom(s.getTrace().size()); s.breakRequested = false;
+        threw = false; try { s.stepEvent(); } catch (...) { threw = true; }
+        expect(threw, "faulted trace execution resumed");
+    });
+    test("probe dependency indices survive deletion and snapshot cloning", [&] {
+        Simulator s(r); s.place({0,0,0}, r.state("observer"));
+        const auto removed = s.addProbe({0,0,0}), kept = s.addProbe({0,0,0});
+        s.removeProbe(removed); auto cloned = s.clone();
+        for (auto* sim : {&s, cloned.get()}) {
+            sim->clearTrace(); sim->schedule({0,0,0},2); sim->advanceTo(4);
+            expect(sim->getTrace().size() == 3, "shifted probe missed edges");
+            for (const auto& edge : sim->getTrace()) expect(edge.probeId == kept, "sampled removed probe");
+        }
+        expect(s.saveProject("probe",true) == cloned->saveProject("probe",true), "cloned indices diverged");
+    });
     test("invalid project import leaves current world intact", [&] { Simulator s(r); s.place({0, 0, 0}, r.state("stone")); auto before = s.saveProject("test", true); auto bad = before; bad["blocks"][0]["name"] = "minecraft:not_a_block"; bool threw = false; try { s.loadProject(bad); } catch (...) { threw = true; } expect(threw && before == s.saveProject("test", true), "load not atomic"); });
     test("piston motion checkpoint continues across event phases", [&] { Simulator s(r); s.place({0,0,0},r.state("sticky_piston",{{"facing","east"}})); s.place({1,0,0},r.state("stone")); s.place({-1,0,0},r.state("redstone_block")); s.advanceTo(1); expect(s.at({2,0,0}).device == Device::movingPiston, "missing moving block"); auto snapshot=s.saveProject("moving",true); Simulator restored(r); restored.loadProject(snapshot); s.advanceTo(4); restored.advanceTo(4); expect(s.saveProject("moving",true)==restored.saveProject("moving",true),"motion checkpoint diverged"); expect(s.at({2,0,0}).device==Device::solid,"push failed"); s.setBlock({-1,0,0},0); s.advanceTo(8); expect(s.world.get({1,0,0})==r.state("stone") && s.world.get({2,0,0})==0,"sticky pull failed"); });
     test("update budget abort cannot resume after discarding updates", [&] { Simulator s(r); s.world.set({1,-1,0},r.state("stone")); s.place({1,0,0},r.state("redstone_wire")); auto before = s.clone(); s.updateBudget=1; bool threw=false; try { s.place({0,0,0},r.state("redstone_block")); } catch (...) { threw=true; } expect(threw&&s.faulted,"budget did not abort"); s.breakRequested=false; threw=false; try { s.advanceTo(1); } catch (...) { threw=true; } expect(threw,"faulted run resumed"); s.restore(*before); expect(!s.faulted&&s.world.size()==before->world.size(),"snapshot failed to recover"); });

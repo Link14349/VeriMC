@@ -32,6 +32,8 @@ struct Hub {
     double speed{20};
     double fractionalTicks{};
     std::uint32_t frameId{};
+    std::uint64_t traceEpoch{};
+    bool pendingFull{};
     std::string token, host;
     std::string projectName{"未命名电路"};
     Clock::time_point lastPump{Clock::now()}, lastPublish{Clock::now()};
@@ -49,6 +51,7 @@ struct Hub {
     void demo(const std::string& kind = "basic");
     void start();
     void publish(bool full = false);
+    void protectTrace();
     void command(const std::shared_ptr<Client>& client, const Json& message);
 };
 class Client : public std::enable_shared_from_this<Client> {
@@ -63,14 +66,15 @@ public:
     std::uint32_t outstandingFrame{};
     Clock::time_point sentAt{Clock::now()};
     std::uint64_t traceCursor{};
+    std::uint64_t traceAcknowledged{}, outstandingTraceEnd{}, traceEpoch{};
     std::unordered_set<StateId> knownStates;
     Client(Tcp::socket transport, Hub& owner) : socket(std::move(transport)), hub(owner) {}
     void accept(http::request<http::string_body> request) {
         socket.set_option(ws::stream_base::timeout::suggested(beast::role_type::server)); socket.read_message_max(64 * 1024 * 1024);
         socket.async_accept(request, [self = shared_from_this()](beast::error_code ec) {
             if (ec) { self->alive = false; return; }
-            self->hub.clients.push_back(self); self->sendJson({{"type", "ready"}, {"version", "26.2"}, {"protocolVersion", 2}, {"catalog", self->hub.registry.catalog()}, {"items", self->hub.registry.itemCatalog()}});
-            self->frame(self->hub.sim.world.cells(), true, ++self->hub.frameId); self->sendJson(self->hub.status()); self->read();
+            self->hub.clients.push_back(self); self->sendJson({{"type", "ready"}, {"version", "26.2"}, {"protocolVersion", 3}, {"catalog", self->hub.registry.catalog()}, {"items", self->hub.registry.itemCatalog()}});
+            self->frame(self->hub.sim.world.cells(), true, ++self->hub.frameId); self->hub.protectTrace(); self->sendJson(self->hub.status()); self->read();
         });
     }
     void sendJson(const Json& value) { send(value.dump(), false); }
@@ -96,6 +100,9 @@ public:
         });
     }
     void frame(const std::vector<Cell>& cells, bool full, std::uint32_t id) {
+        const auto& trace = hub.sim.getTrace(); const auto first = hub.sim.traceDropped;
+        if (full) { traceCursor = first; traceAcknowledged = first; traceEpoch = hub.traceEpoch; }
+        if (traceCursor < first || traceCursor > first + trace.size()) throw std::logic_error("探针发送游标越界，不能跳过未送达的边沿");
         Json definitions = Json::array(); for (const auto& cell : cells) { if (knownStates.insert(cell.state).second) definitions.push_back(hub.registry.describe(cell.state)); if (auto motion = hub.sim.motionAt(cell.pos); motion && knownStates.insert(motion->movedState).second) definitions.push_back(hub.registry.describe(motion->movedState)); }
         if (!definitions.empty()) sendJson({{"type", "states"}, {"states", definitions}});
         std::string binary; binary.reserve(32 + cells.size() * 28);
@@ -111,13 +118,14 @@ public:
             u32(flags);
         }
         awaitingAck = true; outstandingFrame = id; sentAt = Clock::now(); send(std::move(binary), true);
-        const auto& trace = hub.sim.getTrace(); const auto first = hub.sim.traceDropped;
         Json edges = Json::array();
-        if (traceCursor < first) traceCursor = first;
-        if (traceCursor > first + trace.size()) traceCursor = first;
+        const auto from = traceCursor;
         for (std::uint64_t i = traceCursor - first; i < trace.size(); ++i) { const auto& e = trace[static_cast<std::size_t>(i)]; edges.push_back({e.probeId, e.tick, e.sequence, e.value}); }
         traceCursor = first + trace.size();
-        if (!edges.empty() || full) sendJson({{"type", "trace"}, {"reset", full}, {"edges", edges}, {"dropped", first}});
+        outstandingTraceEnd = traceCursor;
+        // This terminates the frame, including empty traces. The client ACKs
+        // only after both the scene and all trace edges have been processed.
+        sendJson({{"type", "trace"}, {"frameId", id}, {"epoch", traceEpoch}, {"from", from}, {"next", traceCursor}, {"reset", full}, {"edges", edges}, {"dropped", first}});
     }
 };
 void Hub::demo(const std::string& kind) {
@@ -220,6 +228,7 @@ void Hub::start() {
             connected = true; if (c->awaitingAck && now - c->sentAt > std::chrono::seconds(2)) stalled = true; ++it;
         }
         if (running && (!connected || stalled)) { running = false; sim.pauseReason = connected ? "浏览器未确认数据，仿真已暂停以保留记录" : "浏览器已断开，仿真已暂停"; }
+        protectTrace();
         if (running) {
             try {
                 Tick target = sim.currentTick;
@@ -235,20 +244,47 @@ void Hub::start() {
     });
 }
 void Hub::publish(bool full) {
+    if (full) { ++traceEpoch; pendingFull = true; }
     std::vector<std::shared_ptr<Client>> active;
     for (const auto& weak : clients) if (auto c = weak.lock(); c && c->alive) active.push_back(c);
-    if (!full && std::any_of(active.begin(), active.end(), [](const auto& c) { return c->awaitingAck; })) return;
+    protectTrace();
+    if (std::any_of(active.begin(), active.end(), [](const auto& c) { return c->awaitingAck; })) return;
+    full = pendingFull; pendingFull = false;
     auto cells = full ? sim.world.cells() : sim.takeChanges();
     if (full) sim.takeChanges();
-    for (auto& c : active) { if (full) c->traceCursor = sim.traceDropped; c->frame(cells, full, ++frameId); c->sendJson(status()); }
+    for (auto& c : active) { c->frame(cells, full, ++frameId); c->sendJson(status()); }
+    protectTrace();
+}
+void Hub::protectTrace() {
+    std::optional<std::uint64_t> first;
+    for (const auto& weak : clients) if (auto c = weak.lock(); c && c->alive) {
+        auto acknowledged = c->traceEpoch == traceEpoch ? c->traceAcknowledged : sim.traceDropped;
+        first = first ? std::min(*first, acknowledged) : acknowledged;
+    }
+    sim.retainTraceFrom(first);
 }
 void Hub::command(const std::shared_ptr<Client>& client, const Json& message) {
     std::string cmd = message.at("cmd"); auto requestId = message.value("requestId", 0);
-    if (cmd == "ack") { if (message.at("frameId") == client->outstandingFrame) client->awaitingAck = false; return; }
+    if (cmd == "ack") {
+        if (client->awaitingAck && message.at("frameId") == client->outstandingFrame && message.value("epoch", UINT64_MAX) == client->traceEpoch && message.value("traceEnd", UINT64_MAX) == client->outstandingTraceEnd) {
+            client->awaitingAck = false; client->traceAcknowledged = client->outstandingTraceEnd; protectTrace();
+        }
+        return;
+    }
+    protectTrace();
+    if (sim.traceBlocked() && (cmd == "play" || cmd == "step" || cmd == "stepEvent" || cmd == "place" || cmd == "remove" || cmd == "edit" || cmd == "interact" || cmd == "stimulate" || cmd == "probe")) {
+        running = false;
+        throw std::invalid_argument("探针缓冲等待浏览器确认，请稍后继续，或清除历史采样后重新运行");
+    }
     Json result = Json::object(); bool full = false;
     if (cmd == "play") { if (sim.faulted) throw std::invalid_argument("执行已中止，请先撤销或加载快照"); sim.breakRequested = false; sim.pauseReason.clear(); if (!runStart) runStart = sim.clone(); running = true; fractionalTicks = 0; lastPump = Clock::now(); }
     else if (cmd == "pause") { running = false; }
     else if (cmd == "speed") { double next = message.at("value"); if (!std::isfinite(next) || next < 0 || next > 1000000) throw std::invalid_argument("无效运行速度"); speed = next; }
+    else if (cmd == "traceBudget") {
+        auto capacity = message.at("capacity").get<std::size_t>();
+        if (capacity < 256 || capacity > 500000) throw std::invalid_argument("探针历史容量范围为 256–500000 条");
+        sim.traceCapacity = capacity; protectTrace();
+    }
     else if (cmd == "step" || cmd == "stepEvent") { running = false; sim.breakRequested = false; sim.pauseReason.clear(); if (!runStart) runStart = sim.clone(); if (cmd == "stepEvent") sim.stepEvent(); else { int count = message.value("count", 1); if (count < 1 || count > 10000) throw std::invalid_argument("单步范围为 1–10000 gt"); sim.advanceTo(sim.currentTick + static_cast<Tick>(count), 100000, std::chrono::milliseconds(40)); } }
     else if (cmd == "inspect") { result = sim.inspect(message.at("pos").get<BlockPos>()); }
     else if (cmd == "save") { result = sim.saveProject(projectName, message.value("checkpoint", false)); }
@@ -256,7 +292,7 @@ void Hub::command(const std::shared_ptr<Client>& client, const Json& message) {
     else if (cmd == "probe") { result["id"] = sim.addProbe(message.at("pos").get<BlockPos>(), message.value("name", std::string()), message.value("mode", std::string("output"))); }
     else if (cmd == "removeProbe") sim.removeProbe(message.at("id"));
     else if (cmd == "configureProbe") sim.configureProbe(message.at("id"), message);
-    else if (cmd == "clearTrace") { sim.clearTrace(); for (auto& weak : clients) if (auto c = weak.lock()) c->traceCursor = 0; full = true; }
+    else if (cmd == "clearTrace") { sim.clearTrace(); full = true; }
     else if (cmd == "undo" || cmd == "redo") {
         running = false; auto& from = cmd == "undo" ? undo : redo; auto& to = cmd == "undo" ? redo : undo;
         if (!from.empty()) { to.push_back({projectName, sim.clone()}); auto saved = std::move(from.back()); from.pop_back(); sim.restore(*saved.state); projectName = saved.name; runStart.reset(); full = true; }

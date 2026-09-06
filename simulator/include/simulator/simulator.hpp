@@ -32,6 +32,12 @@ public:
     std::size_t updateBudget{1000000};
     std::size_t traceCapacity{500000};
     std::uint64_t traceDropped{};
+    // History is trimmed only after consumers acknowledge it. A single atomic
+    // event may use the reserve; exceeding it faults explicitly instead of
+    // silently overwriting undelivered edges.
+    std::size_t traceAtomicReserve{65536};
+    void retainTraceFrom(std::optional<std::uint64_t> firstUnacknowledged);
+    bool traceBlocked() const;
     std::uint64_t revision{};
     const BlockState& at(BlockPos p) const { return registry[world.get(p)]; }
     void setBlock(BlockPos pos, StateId state, unsigned flags = 3, int depth = 512);
@@ -98,6 +104,7 @@ private:
     std::vector<Probe> probes;
     std::unordered_map<BlockPos, std::vector<std::uint32_t>, PosHash> probeDependencies;
     std::deque<TraceEdge> trace;
+    std::optional<std::uint64_t> retainedTrace;
     std::uint32_t nextProbeId{1};
     std::uint64_t nextOrder{}, sequence{};
     std::uint64_t nextEntityOrder{}, currentEntityOrder{};
@@ -129,6 +136,7 @@ private:
     void refreshComparator(BlockPos pos);
     void sampleAffected(BlockPos pos);
     void sampleProbe(Probe& probe);
+    void trimTrace();
     void rebuildProbeDependencies();
     struct PistonPlan { bool valid{}; std::vector<BlockPos> push, destroy; };
     bool pistonPowered(BlockPos pos) const;

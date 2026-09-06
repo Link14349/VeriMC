@@ -29,6 +29,7 @@ python3 simulator/runSimulator.py --no-build
 - `1` 选择；`3` 移除；`4` 放置探针；`5` 操作拉杆、按钮等。Space 运行/暂停，`S` 前进一个游戏刻。
 - 属性面板检查坐标、方块状态和信号强度；中继器、比较器的朝向属性指向输入。
 - 波形支持缩放、跟随、双游标和触发暂停；探针菜单的 `↑` 或 `↓` 设置边沿断点。Shift 单击波形放置 B 游标。
+- 浏览器接收滞后、未确认采样满额时自动暂停并保留后续事件；接收完成后可继续运行。历史截断会显示数量，具体预算和极端中止条件见 [采样传输](docs/traceTransport.md)。
 - 工程菜单导出/导入 JSON 电路或运行快照。快照包含计划事件、器件内部状态与探针历史。VCD 一个游戏刻对应 50 ms，同刻边沿保留順序，不虚构物理子刻时间。
 - Cmd/Ctrl+Z 撤销、Shift+Cmd/Ctrl+Z 重做，采用原生内存快照并控制历史预算。Cmd/Ctrl+C、Cmd/Ctrl+V 复制/粘贴当前器件。
 
@@ -54,6 +55,8 @@ ctest --preset debug
 
 # 服务启动后，验证 HTTP / WebSocket 完整流程
 python3 tests/serverTests.py
+python3 tests/backpressureTests.py
+node tests/webTests.mjs
 
 # 有实际驱动的中继器链基准
 ./build/simulatorCli --benchmark 1000
