@@ -15,7 +15,7 @@ int main() {
         std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/blockStates.json"); auto source = Json::parse(file);
         for (const auto& block : source["blocks"]) for (const auto& state : block["states"]) expect(r.state(block["name"], state["properties"]) == state["id"].get<StateId>(), "state mismatch: " + block["name"].get<std::string>());
     });
-    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers", "java26_2Hoppers"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
+    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers", "java26_2Hoppers", "java26_2Torches"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
         std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/../tests/fixtures/" + fixtureName + ".json"); expect(static_cast<bool>(file), "missing vanilla reference fixture");
         auto fixture = Json::parse(file); auto origin = fixture["origin"].get<BlockPos>(); Simulator s(r);
         auto absolute = [&](const Json& p) { auto pos = p.get<BlockPos>(); return BlockPos{origin.x + pos.x, origin.y + pos.y, origin.z + pos.z}; };
@@ -160,6 +160,27 @@ int main() {
         s.addProbe({0, 1, 0}); s.advanceTo(8);
         expect(s.getTrace().size() > 8, "transient extraction notifications were lost");
         expect(s.inventoryJson({0, 1, 0})[0]["count"] == 1, "failed extraction lost item");
+    });
+    test("removed torch retains world burnout history across checkpoint", [&] {
+        Simulator s(r); floor(s); const BlockPos torch{0,1,0}, lever{-1,0,0};
+        s.place(torch, r.state("redstone_torch"));
+        s.place(lever, r.state("lever", {{"face","wall"},{"facing","west"}}));
+        for (int cycle = 0; cycle < 7; ++cycle) {
+            s.interact(lever); s.advanceTo(s.currentTick + 2);
+            s.interact(lever); s.advanceTo(s.currentTick + 2);
+        }
+        expect(s.currentTick == 28 && s.at(torch).lit, "seven-cycle preparation");
+        s.setBlock(torch, 0); auto checkpoint = s.saveProject("removed torch", true);
+        expect(checkpoint["torchToggles"].size() == 7, "removal discarded world history");
+        Simulator restored(r); restored.loadProject(checkpoint);
+        for (auto* sim : {&s, &restored}) {
+            sim->place(torch, r.state("redstone_torch")); sim->interact(lever); sim->advanceTo(30);
+            sim->interact(lever); sim->advanceTo(32);
+            expect(!sim->at(torch).lit, "replacement bypassed burnout");
+            sim->advanceTo(189); expect(!sim->at(torch).lit, "burnout restarted early");
+            sim->advanceTo(190); expect(sim->at(torch).lit, "burnout did not recover");
+        }
+        expect(s.saveProject("torch", true) == restored.saveProject("torch", true), "torch history continuation diverged");
     });
     std::cout << passed << " passed, " << failed << " failed\n"; return failed ? 1 : 0;
 }

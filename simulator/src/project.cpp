@@ -10,6 +10,7 @@ void Simulator::restore(const Simulator& snapshot) {
     if (&registry != &snapshot.registry) throw std::invalid_argument("运行快照的注册表不匹配");
     world = snapshot.world; runtime = snapshot.runtime; motions = snapshot.motions; scheduled = snapshot.scheduled; scheduledKeys = snapshot.scheduledKeys;
     hoppers = snapshot.hoppers; entityOrders = snapshot.entityOrders; nextEntityOrder = snapshot.nextEntityOrder;
+    recentTorchToggles = snapshot.recentTorchToggles; torchToggleCounts = snapshot.torchToggleCounts;
     probes = snapshot.probes; probeDependencies = snapshot.probeDependencies; trace = snapshot.trace;
     currentTick = snapshot.currentTick; nextOrder = snapshot.nextOrder; sequence = snapshot.sequence; nextProbeId = snapshot.nextProbeId;
     traceDropped = snapshot.traceDropped; traceCapacity = snapshot.traceCapacity; updateBudget = snapshot.updateBudget; statistics = snapshot.statistics;
@@ -27,7 +28,7 @@ Json Simulator::saveProject(const std::string& name, bool checkpoint) const {
     for (const auto& [pos, state] : runtime) {
         Json row{{"pos", pos}, {"values", state.values}};
         if (inventorySize(world.get(pos))) row["inventory"] = inventoryJson(pos, false);
-        if (checkpoint) { row["output"] = state.output; row["torchToggles"] = state.torchToggles; }
+        if (checkpoint) row["output"] = state.output;
         data["blockData"].push_back(std::move(row));
     }
     auto positionOrder = [](const Json& a, const Json& b) { return a.at("pos") < b.at("pos"); };
@@ -39,6 +40,8 @@ Json Simulator::saveProject(const std::string& name, bool checkpoint) const {
     for (const auto& [rank, pos] : orderedEntities) data["entityOrder"].push_back({{"pos", pos}, {"order", rank}});
     data["nextEntityOrder"] = nextEntityOrder;
     if (checkpoint) {
+        data["torchToggles"] = Json::array();
+        for (const auto& toggle : recentTorchToggles) data["torchToggles"].push_back({{"pos", toggle.pos}, {"tick", toggle.tick}});
         data["faulted"] = faulted;
         data["tick"] = currentTick; data["nextOrder"] = nextOrder; data["sequence"] = sequence; data["nextProbeId"] = nextProbeId;
         data["events"] = Json::array(); auto queue = scheduled;
@@ -82,12 +85,21 @@ void Simulator::loadProject(const Json& data) {
         auto p = row.at("pos").get<BlockPos>();
         if (candidate.world.get(p) == 0) throw std::invalid_argument("器件数据对应位置没有方块");
         auto& state = candidate.runtime[p]; state.values = row.at("values");
-        if (checkpoint) { state.output = row.at("output"); state.torchToggles = row.at("torchToggles").get<std::deque<Tick>>(); }
+        if (checkpoint) {
+            state.output = row.at("output");
+            if (!data.contains("torchToggles")) for (auto tick : row.value("torchToggles", std::vector<Tick>{})) candidate.recentTorchToggles.push_back({p, tick});
+        }
         if (row.contains("inventory")) candidate.setInventory(p, row.at("inventory"), false, false);
         candidate.validateRuntime(p);
     }
     if (checkpoint) {
         candidate.currentTick = data.at("tick"); candidate.nextOrder = data.at("nextOrder"); candidate.sequence = data.at("sequence");
+        if (data.contains("torchToggles")) for (const auto& row : data.at("torchToggles")) candidate.recentTorchToggles.push_back({row.at("pos").get<BlockPos>(), row.at("tick").get<Tick>()});
+        std::stable_sort(candidate.recentTorchToggles.begin(), candidate.recentTorchToggles.end(), [](const auto& a, const auto& b) { return a.tick < b.tick; });
+        for (const auto& toggle : candidate.recentTorchToggles) {
+            if (toggle.tick > candidate.currentTick) throw std::invalid_argument("火把历史包含未来事件");
+            ++candidate.torchToggleCounts[toggle.pos];
+        }
         if (data.at("events").size() > 2000000) throw std::invalid_argument("工程计划事件过多");
         for (const auto& row : data.at("events")) {
             ScheduledEvent e{row.at("tick"), row.at("priority"), row.at("order"), row.at("pos").get<BlockPos>(), row.at("type"), row.value("phase", std::uint8_t{0}), row.value("data", std::uint64_t{0})};
@@ -138,6 +150,7 @@ void Simulator::loadProject(const Json& data) {
     using std::swap;
     swap(world, candidate.world); swap(runtime, candidate.runtime); swap(motions, candidate.motions); swap(scheduled, candidate.scheduled); swap(scheduledKeys, candidate.scheduledKeys);
     swap(hoppers, candidate.hoppers); swap(entityOrders, candidate.entityOrders); nextEntityOrder = candidate.nextEntityOrder;
+    swap(recentTorchToggles, candidate.recentTorchToggles); swap(torchToggleCounts, candidate.torchToggleCounts);
     swap(probes, candidate.probes); swap(probeDependencies, candidate.probeDependencies); swap(trace, candidate.trace);
     currentTick = candidate.currentTick; nextOrder = candidate.nextOrder; sequence = candidate.sequence; nextProbeId = candidate.nextProbeId; traceDropped = candidate.traceDropped;
     statistics = {}; changes.clear(); breakRequested = false; faulted = false; pauseReason.clear(); ++revision;

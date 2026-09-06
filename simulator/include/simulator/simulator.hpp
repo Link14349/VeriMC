@@ -18,7 +18,8 @@ struct EventKeyHash { std::size_t operator()(const EventKey& k) const { return P
 struct TraceEdge { std::uint32_t probeId{}; Tick tick{}; std::uint64_t sequence{}; std::uint8_t value{}; };
 struct Probe { std::uint32_t id{}; BlockPos pos{}; std::string name; std::string mode{"output"}; Direction direction{Direction::up}; int lastValue{-1}; std::string trigger{"none"}; int triggerValue{15}; };
 struct ItemStack { std::uint32_t item{}; std::uint16_t count{}; bool operator==(const ItemStack&) const = default; };
-struct RuntimeData { int output{}; std::deque<Tick> torchToggles; Json values = Json::object(); std::vector<ItemStack> inventory; };
+struct RuntimeData { int output{}; Json values = Json::object(); std::vector<ItemStack> inventory; };
+struct TorchToggle { BlockPos pos; Tick tick; };
 struct PistonMotion { StateId movedState{}; Direction facing{}; bool extending{}, source{}; unsigned progress{}, previousProgress{}; Tick lastTicked{}; std::uint64_t generation{}; };
 struct HopperState {
     Tick readyAt{}, firstTick{}, wakeAt{UINT64_MAX};
@@ -75,8 +76,8 @@ public:
     void restore(const Simulator& snapshot);
     std::size_t estimatedBytes() const {
         auto bytes = world.storageBytes() + trace.size() * sizeof(TraceEdge) + runtime.size() * 512 + scheduled.size() * 128 + hoppers.size() * 96 + entityOrders.size() * 64;
-        for (const auto& [pos, data] : runtime) { (void)pos; bytes += data.inventory.capacity() * sizeof(ItemStack) + (data.torchToggles.empty() ? 0 : 4096); }
-        return bytes;
+        for (const auto& [pos, data] : runtime) { (void)pos; bytes += data.inventory.capacity() * sizeof(ItemStack); }
+        return bytes + recentTorchToggles.size() * sizeof(TorchToggle) + torchToggleCounts.size() * 64;
     }
     const PistonMotion* motionAt(BlockPos pos) const { auto it = motions.find(pos); return it == motions.end() ? nullptr : &it->second; }
 private:
@@ -88,6 +89,8 @@ private:
     std::priority_queue<ScheduledEvent, std::vector<ScheduledEvent>, EventLater> scheduled;
     std::unordered_set<EventKey, EventKeyHash> scheduledKeys;
     std::unordered_map<BlockPos, RuntimeData, PosHash> runtime;
+    std::deque<TorchToggle> recentTorchToggles;
+    std::unordered_map<BlockPos, unsigned, PosHash> torchToggleCounts;
     std::unordered_map<BlockPos, PistonMotion, PosHash> motions;
     std::unordered_map<BlockPos, HopperState, PosHash> hoppers;
     std::unordered_map<BlockPos, std::uint64_t, PosHash> entityOrders;

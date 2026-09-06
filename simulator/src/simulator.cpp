@@ -118,7 +118,7 @@ void Simulator::setBlock(BlockPos p, StateId id, unsigned flags, int depth) {
         entityOrders.erase(p);
         if ((flags & 1u) != 0 && (flags & 64u) == 0) onRemove(p, old);
     }
-    onPlace(p, id, old);
+    if ((flags & 512u) == 0) onPlace(p, id, old);
     if (world.get(p) != id) return;
     if ((flags & 1u) != 0) { updateNeighbors(p, -1, old); if (state.analogSource) updateComparatorNeighbors(p); }
     if ((flags & 16u) == 0 && depth > 0) {
@@ -174,10 +174,10 @@ void Simulator::place(BlockPos p, StateId id) {
 void Simulator::onPlace(BlockPos p, StateId id, StateId old) {
     const auto& s = registry[id];
     if (isDiode(s.device)) { notifyFront(p, s.facing); return; }
+    if (s.device == Device::torch || s.device == Device::wallTorch) { for (auto d : directions) updateNeighbors(p.relative(d)); return; }
     if (registry[old].type == s.type) return;
     switch (s.device) {
     case Device::wire: updateWire(p, id); updateNeighbors(p.relative(Direction::up)); updateNeighbors(p.relative(Direction::down)); wireCorners(p); break;
-    case Device::torch: case Device::wallTorch: for (auto d : directions) updateNeighbors(p.relative(d)); break;
     case Device::observer: if (s.powered && !hasScheduled(p)) { setBlock(p, registry.withBool(id, "powered", false), 18); notifyFront(p, s.facing); } break;
     case Device::bulb: executeNeighbor(p); break;
     case Device::daylight: schedulePhase(p, currentTick + 20 - currentTick % 20, 2, 0); break;
@@ -372,11 +372,20 @@ void Simulator::executeTick(const ScheduledEvent& event) {
     case Device::observer: setBlock(p, registry.withBool(id, "powered", !s.powered), 2); if (!s.powered) schedule(p, 2); notifyFront(p, s.facing); break;
     case Device::lamp: if (s.lit && bestSignal(p) == 0) setBlock(p, registry.withBool(id, "lit", false), 2); break;
     case Device::torch: case Device::wallTorch: {
-        auto& toggles = runtime[p].torchToggles;
-        while (!toggles.empty() && currentTick - toggles.front() > 60) toggles.pop_front();
+        while (!recentTorchToggles.empty() && currentTick - recentTorchToggles.front().tick > 60) {
+            auto found = torchToggleCounts.find(recentTorchToggles.front().pos);
+            if (--found->second == 0) torchToggleCounts.erase(found);
+            recentTorchToggles.pop_front();
+        }
         bool input = torchInput(p);
-        if (s.lit && input) { setBlock(p, registry.withBool(id, "lit", false)); toggles.push_back(currentTick); if (toggles.size() >= 8) schedule(p, 160); }
-        else if (!s.lit && !input && toggles.size() < 8) setBlock(p, registry.withBool(id, "lit", true));
+        if (s.lit && input) {
+            setBlock(p, registry.withBool(id, "lit", false));
+            recentTorchToggles.push_back({p, currentTick});
+            if (++torchToggleCounts[p] >= 8) schedule(p, 160);
+        } else if (!s.lit && !input) {
+            auto found = torchToggleCounts.find(p);
+            if (found == torchToggleCounts.end() || found->second < 8) setBlock(p, registry.withBool(id, "lit", true));
+        }
         break;
     }
     case Device::button: if (s.powered) { setBlock(p, registry.withBool(id, "powered", false)); notifyAttached(p, s.connectedDirection); } break;
@@ -456,6 +465,7 @@ void Simulator::stimulate(BlockPos p, const Json& input) {
     throw std::invalid_argument("该器件尚不支持这类环境刺激");
 }
 void Simulator::clear() {
+    recentTorchToggles.clear(); torchToggleCounts.clear();
     world.clear(); runtime.clear(); motions.clear(); hoppers.clear(); entityOrders.clear(); nextEntityOrder = 0; scheduled = {}; scheduledKeys.clear(); changes.clear(); currentTick = 0; nextOrder = 0; sequence = 0; currentPhase = 3;
     probes.clear(); probeDependencies.clear(); nextProbeId = 1; trace.clear(); traceDropped = 0; statistics = {}; breakRequested = false; faulted = false; pauseReason.clear(); ++revision;
 }

@@ -65,6 +65,10 @@ setBlock(0, (2,2,46), 'piston', facing='east')
 for x in range(3,16): setBlock(0, (x,2,46), 'stone')
 setBlock(0, (1,2,46), 'redstone_block'); watch += [[2,2,46],[3,2,46],[15,2,46]]
 def runCapture(commands, watch, endTick=24, fixtureName='java26_2Redstone'):
+    instancePath = packDir / 'data/simulator/test_instance/capture.json'
+    instance = json.loads(instancePath.read_text())
+    instance['max_ticks'] = max(100, endTick + 20)
+    instancePath.write_text(json.dumps(instance))
     scenarioPath = cacheDir / 'redstoneScenario.json'
     scenarioPath.write_text(json.dumps({'endTick': endTick, 'commands': commands, 'watch': watch}, indent=2))
     outputPath = rootDir / ('tests/fixtures/' + fixtureName + '.json')
