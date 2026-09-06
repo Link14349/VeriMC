@@ -47,6 +47,7 @@ void Simulator::updateBookshelfSlot(const InventorySlot& slot) {
     runtime[slot.pos].values["lastInteractedSlot"]=slot.index;
     for(std::size_t i=0;i<6;++i) id=registry.withBool(id,"slot_"+std::to_string(i)+"_occupied",stackAt({slot.pos,i}).count>0);
     setBlock(slot.pos,id);
+    emitGameEvent("block_change",slot.pos,{false,false,false,id});
     runtimeChanged(slot.pos,false);
 }
 
@@ -201,8 +202,13 @@ void Simulator::setViewers(BlockPos pos, int viewers) {
     std::set<BlockPos> visited;
     for (const auto& slot : slots) if (visited.insert(slot.pos).second) {
         auto id = world.get(slot.pos);
+        const auto previous=viewerCount(slot.pos);
         runtime[slot.pos].values["viewers"] = viewers;
-        if (registry.type(id).className == "BarrelBlock") setBlock(slot.pos, registry.withBool(id, "open", viewers > 0));
+        if((previous==0)!=(viewers==0)) {
+            if(registry.property(id,"type")!="left") (void)worldRandom.nextFloat();
+            if (registry.type(id).className == "BarrelBlock") setBlock(slot.pos, registry.withBool(id, "open", viewers > 0));
+            emitGameEvent(viewers?"container_open":"container_close",slot.pos);
+        }
         runtimeChanged(slot.pos);
         if (registry.type(id).name == "minecraft:trapped_chest") notifyAttached(slot.pos, Direction::up);
     }

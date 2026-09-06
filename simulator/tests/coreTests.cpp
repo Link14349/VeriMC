@@ -180,7 +180,7 @@ int main() {
         try { restored.loadProject(invalid); } catch (...) { threw = true; }
         expect(threw && before == restored.saveProject("before", true), "invalid batch import changed world");
     });
-    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers", "java26_2Hoppers", "java26_2Torches", "java26_2Rails", "java26_2TickBatches", "java26_2Tripwire", "java26_2Buttons", "java26_2Droppers", "java26_2Targets", "java26_2CopperChests", "java26_2Bookshelves", "java26_2Pots"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
+    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers", "java26_2Hoppers", "java26_2Torches", "java26_2Rails", "java26_2TickBatches", "java26_2Tripwire", "java26_2Buttons", "java26_2Droppers", "java26_2Targets", "java26_2CopperChests", "java26_2Bookshelves", "java26_2Pots", "java26_2Vibrations", "java26_2DeviceVibrations"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
         std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/../tests/fixtures/" + fixtureName + ".json"); expect(static_cast<bool>(file), "missing vanilla reference fixture");
         auto fixture = Json::parse(file); auto origin = fixture["origin"].get<BlockPos>(); Simulator s(r);
         auto absolute = [&](const Json& p) { auto pos = p.get<BlockPos>(); return BlockPos{origin.x + pos.x, origin.y + pos.y, origin.z + pos.z}; };
@@ -200,6 +200,52 @@ int main() {
                 if (frame.contains("inventories")) expect(s.inventoryJson(p, false) == frame["inventories"][i], "inventory mismatch at " + std::to_string(tick) + " " + fixture["watch"][i].dump() + " expected " + frame["inventories"][i].dump() + " got " + s.inventoryJson(p, false).dump());
             }
         }
+    });
+    test("vibration travel, block-distance power and pending checkpoints", [&] {
+        Simulator s(r);const BlockPos pos{-17,2,-17};s.place(pos,r.state("sculk_sensor"));s.advanceTo(3);
+        s.stimulate({-9,2,-17},{{"gameEvent","step"},{"offset",Json::array({.999,.5,.5})}});
+        auto pending=s.saveProject("pending",true);Simulator selected(r);selected.loadProject(pending);
+        expect(pending==selected.saveProject("pending",true),"candidate snapshot changed");
+        s.advanceTo(5);selected.advanceTo(5);auto flying=s.saveProject("flying",true);Simulator restored(r);restored.loadProject(flying);auto clone=s.clone();
+        expect(s.saveProject("flying",true)==selected.saveProject("flying",true),"candidate continuation changed");
+        bool rejected=false;try{(void)s.saveProject("design",false);}catch(...){rejected=true;}expect(rejected,"travelling vibration exported without queue");
+        for(auto* world:{&s,&selected,&restored,clone.get()}) {
+            world->advanceTo(10);expect(world->displayValue(pos)==0,"vibration arrived early");
+            world->advanceTo(11);expect(world->displayValue(pos)==1 && world->analogOutput(pos)==1,"integer radius power or float travel mismatch");
+            world->advanceTo(41);expect(world->displayValue(pos)==0 && r.property(world->world.get(pos),"sculk_sensor_phase")=="cooldown","active interval mismatch");
+            world->advanceTo(51);expect(r.property(world->world.get(pos),"sculk_sensor_phase")=="inactive","cooldown mismatch");
+            expect(world->saveProject("done",true)["randomSource"]["draws"]=="2","sensor sound pitch random consumption mismatch");
+        }
+        expect(s.saveProject("done",true)==restored.saveProject("done",true) && s.saveProject("done",true)==clone->saveProject("done",true),"travelling snapshot/clone divergence");
+        auto invalid=flying;invalid["sensors"][0]["current"]["distance"]=1;auto before=restored.saveProject("before",true);rejected=false;
+        try{restored.loadProject(invalid);}catch(...){rejected=true;}expect(rejected && before==restored.saveProject("before",true),"invalid vibration snapshot was not atomic");
+    });
+    test("vibration candidates prioritize distance then frequency and keep first tick", [&] {
+        Simulator s(r);const BlockPos pos{0,0,0};s.place(pos,r.state("calibrated_sculk_sensor",{{"waterlogged","true"}}));
+        s.stimulate({4,0,0},{{"gameEvent","explode"}});s.stimulate({2,0,0},{{"gameEvent","step"}});s.stimulate({-2,0,0},{{"gameEvent","eat"}});
+        s.advanceTo(1);s.stimulate({1,0,0},{{"gameEvent","explode"}});s.advanceTo(2);
+        expect(s.analogOutput(pos)==8 && s.displayValue(pos)==14,"selection ignored nearest/highest frequency rule");
+        s.advanceTo(22);expect(s.saveProject("wet",true)["randomSource"]["draws"]=="0","waterlogged sensor consumed dry sound randomness");
+        s.stimulate({0,0,0},{{"gameEvent","block_place"}});s.stimulate({0,0,0},{{"gameEvent","block_destroy"}});
+        s.stimulate({1,0,0},{{"gameEvent","step"},{"source",{{"sneaking",true}}}});
+        s.stimulate({1,0,0},{{"gameEvent","explode"},{"source",{{"spectator",true}}}});
+        s.stimulate({1,0,0},{{"gameEvent","explode"},{"source",{{"dampensVibrations",true}}}});
+        s.stimulate({1,0,0},{{"gameEvent","block_change"},{"affectedBlock",{{"name","white_carpet"}}}});
+        expect(s.pendingEvents()==0,"excluded vibration scheduled");
+        auto before=s.saveProject("before",true);bool threw=false;
+        try{s.stimulate({1,0,0},{{"gameEvent","explode"},{"offset",Json::array({.5,2,.5})}});}catch(...){threw=true;}
+        expect(threw && before==s.saveProject("before",true),"invalid source position changed world");
+        s.stimulate({1,0,0},{{"gameEvent","block_change"},{"source",{{"sneaking",true}}}});s.advanceTo(23);
+        expect(s.analogOutput(pos)==11,"sneaking suppressed an allowed event");
+    });
+    test("idle sensors do no tick work and removal cancels travelling state", [&] {
+        Simulator s(r);for(int i=0;i<5000;++i)s.place({i*32,0,0},r.state("sculk_sensor"));
+        s.advanceTo(1000000);expect(s.pendingEvents()==0 && s.statistics.scheduledEvents==0,"idle sensor polling");
+        s.stimulate({4,0,0},{{"gameEvent","step"}});s.advanceTo(1000001);
+        s.place({0,0,0},r.state("stone"));s.place({0,0,0},r.state("sculk_sensor"));s.advanceTo(1000020);
+        expect(s.displayValue({0,0,0})==0 && s.pendingEvents()==0,"removed listener retained vibration");
+        s.stimulate({4,0,0},{{"gameEvent","eat"}});s.advanceTo(1000024);expect(s.analogOutput({0,0,0})==8,"replacement listener not registered");
+        s.clear();s.stimulate({4,0,0},{{"gameEvent","step"}});expect(s.pendingEvents()==0,"clear retained listeners");
     });
     test("target world-coordinate rounding matches 4272 original hit strengths", [&] {
         std::ifstream file(std::string(SIMULATOR_DATA_DIR)+"/../tests/fixtures/java26_2TargetStrength.json");

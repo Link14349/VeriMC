@@ -73,7 +73,7 @@ public:
         socket.set_option(ws::stream_base::timeout::suggested(beast::role_type::server)); socket.read_message_max(64 * 1024 * 1024);
         socket.async_accept(request, [self = shared_from_this()](beast::error_code ec) {
             if (ec) { self->alive = false; return; }
-            self->hub.clients.push_back(self); self->sendJson({{"type", "ready"}, {"version", "26.2"}, {"protocolVersion", 3}, {"catalog", self->hub.registry.catalog()}, {"items", self->hub.registry.itemCatalog()}});
+            self->hub.clients.push_back(self); self->sendJson({{"type", "ready"}, {"version", "26.2"}, {"protocolVersion", 3}, {"catalog", self->hub.registry.catalog()}, {"items", self->hub.registry.itemCatalog()}, {"gameEvents",self->hub.registry.gameEventCatalog()}});
             self->frame(self->hub.sim.world.cells(), true, ++self->hub.frameId); self->hub.protectTrace(); self->sendJson(self->hub.status()); self->read();
         });
     }
@@ -130,6 +130,18 @@ public:
 };
 void Hub::demo(const std::string& kind) {
     sim.clear(); projectName = "脉冲与记忆 · 入门电路";
+    if(kind=="vibrations") {
+        projectName="振动实验 · 传播、隔绝与共振";
+        for(int x=-1;x<=17;++x)for(int z=-1;z<=21;++z)sim.world.set({x,0,z},registry.state(z==0 || z==20?"white_concrete":"stone"));
+        sim.place({0,1,0},registry.state("stone_button",{{"face","floor"}}));
+        sim.place({4,1,0},registry.state("sculk_sensor"));sim.place({5,1,0},registry.state("amethyst_block"));
+        sim.place({13,1,0},registry.state("sculk_sensor"));sim.place({14,1,0},registry.state("comparator",{{"facing","west"}}));
+        sim.place({15,1,0},registry.state("redstone_wire"));sim.place({16,1,0},registry.state("redstone_lamp"));
+        sim.place({0,1,20},registry.state("lever",{{"face","floor"}}));sim.place({2,1,20},registry.state("white_wool"));
+        sim.place({4,1,20},registry.state("calibrated_sculk_sensor",{{"facing","north"}}));
+        sim.addProbe({4,1,0},"初级信号");sim.addProbe({13,1,0},"共振信号");sim.addProbe({13,1,0},"共振频率","analog");sim.addProbe({4,1,20},"羊毛隔绝");
+        runStart=sim.clone();return;
+    }
     if (kind == "droppers") {
         projectName = "投掷器实验 · 入库与抛出";
         for (int x = -2; x <= 4; ++x) for (int z = -1; z <= 5; ++z) sim.world.set({x,0,z},registry.state("white_concrete"));

@@ -53,3 +53,10 @@ body{overflow-x:auto}
 .targetPresets button{flex:1;border:1px solid var(--border);border-radius:5px;padding:5px}
 
 .inventoryGrid.bookshelfGrid{grid-template-columns:repeat(3,minmax(0,1fr))}
+
+.vibrationCoordinates { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin:10px 0; }
+.vibrationCoordinates>span { grid-column:1/-1;font-size:10px;color:var(--muted); }
+.vibrationCoordinates label { font-size:10px;min-width:0; }
+.vibrationCoordinates input { box-sizing:border-box;width:100%;min-width:0;padding:5px 2px; }
+.vibrationControls details { margin:12px 0;font-size:11px; }
+.vibrationControls summary { cursor:pointer; }

@@ -13,6 +13,7 @@ export class SimulatorConnection extends EventTarget {
   states = new Map<number, BlockDef>();
   catalog: CatalogItem[] = [];
   items: { name: string; maxStack: number; bookshelfBook?: boolean }[] = [];
+  gameEvents: { name: string; frequency: number; radius: number; listenable: boolean; ignoreSneaking: boolean }[] = [];
   trace = new TraceHistory();
   connected = false;
   status: Status = { tick: 0, running: false, speed: 20, eventsPerSecond: 0, blocks: 0, pending: 0, updates: 0, events: 0, storageBytes: 0, traceDropped: 0, pauseReason: '', pendingActions: [], actionsDropped: 0, revision: 0, probes: [], canUndo: false, canRedo: false, name: '连接本地内核…' };
@@ -56,7 +57,7 @@ export class SimulatorConnection extends EventTarget {
     }
     const message = JSON.parse(data);
     if (message.type === 'states') { for (const state of message.states) this.states.set(state.stateId, state); }
-    else if (message.type === 'ready') { if (message.protocolVersion !== 3) throw new Error('内核协议版本不同，请重启内核并刷新界面'); this.frame = undefined; this.catalog = message.catalog; this.items = message.items ?? []; this.dispatchEvent(new Event('catalog')); }
+    else if (message.type === 'ready') { if (message.protocolVersion !== 3) throw new Error('内核协议版本不同，请重启内核并刷新界面'); this.frame = undefined; this.catalog = message.catalog; this.items = message.items ?? []; this.gameEvents=message.gameEvents??[];this.dispatchEvent(new Event('catalog')); }
     else if (message.type === 'status') { this.status = message; this.trace.retainProbes(message.probes.map((p: Probe) => p.id)); this.dispatchEvent(new Event('status')); }
     else if (message.type === 'trace') {
       if (!this.frame || message.frameId !== this.frame.id || message.reset !== this.frame.full) throw new Error('波形与场景帧不匹配，已停止接收');

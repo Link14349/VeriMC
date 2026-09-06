@@ -59,4 +59,5 @@ enum class Device : std::uint8_t {
     tripwire, tripwireHook, lectern, analog, unsupported
 };
 constexpr bool isRail(Device device) { return device >= Device::rail && device <= Device::activatorRail; }
+constexpr bool isSensor(Device device) { return device == Device::sculkSensor || device == Device::calibratedSensor; }
 }

@@ -19,6 +19,15 @@ struct HopperState {
     Tick readyAt{}, firstTick{}, wakeAt{UINT64_MAX};
     std::uint64_t generation{};
 };
+using Vec3 = std::array<double,3>;
+struct VibrationContext { bool spectator{}, sneaking{}, dampens{}; StateId affectedState{UINT32_MAX}; };
+struct VibrationInfo { std::uint16_t event{}; Vec3 origin{}; float distance{}; VibrationContext context; };
+struct SensorState {
+    std::optional<VibrationInfo> candidate, current;
+    Tick candidateTick{}, wakeAt{UINT64_MAX};
+    int remaining{};
+    std::uint64_t generation{};
+};
 struct Statistics { std::uint64_t updates{}, scheduledEvents{}, stateChanges{}; std::uint64_t simulationMicros{}; };
 class Simulator {
 public:
@@ -90,13 +99,25 @@ public:
     std::size_t estimatedBytes() const {
         auto bytes = world.storageBytes() + trace.size() * sizeof(TraceEdge) + runtime.size() * 512 + scheduled.size() * 128 + hoppers.size() * 96 + entityOrders.size() * 64 + blockTicks.estimatedBytes();
         for (const auto& [pos, data] : runtime) { (void)pos; bytes += data.inventory.capacity() * sizeof(ItemStack); }
-        return bytes + recentTorchToggles.size() * sizeof(TorchToggle) + torchToggleCounts.size() * 64 + environmentActions.size() * 2048;
+        return bytes + recentTorchToggles.size() * sizeof(TorchToggle) + torchToggleCounts.size() * 64 + environmentActions.size() * 2048 + sensors.size() * 384 + sensorSections.size() * 96;
     }
     const PistonMotion* motionAt(BlockPos pos) const { auto it = motions.find(pos); return it == motions.end() ? nullptr : &it->second; }
 private:
     LegacyRandom worldRandom;
     std::uint64_t randomSeed{};
     void dispenseDropper(BlockPos pos);
+    void startSensor(BlockPos pos);
+    void removeSensor(BlockPos pos, std::uint16_t oldType);
+    void rebuildSensorIndex();
+    void stimulateVibration(BlockPos pos, const Json& input);
+    void emitGameEvent(std::uint16_t event, const Vec3& origin, VibrationContext context = {});
+    void emitGameEvent(const std::string& event, BlockPos pos, VibrationContext context = {});
+    bool vibrationOccluded(const Vec3& origin, BlockPos destination) const;
+    void tickVibration(const ScheduledEvent& event);
+    void tickSensor(BlockPos pos);
+    void activateSensor(BlockPos pos, const VibrationInfo& vibration);
+    std::unordered_map<BlockPos, SensorState, PosHash> sensors;
+    std::unordered_map<BlockPos, std::vector<BlockPos>, PosHash> sensorSections;
     std::deque<Json> environmentActions;
     std::unordered_set<std::uint64_t> pendingActionIds;
     std::uint64_t nextActionId{1}, actionsDropped{};

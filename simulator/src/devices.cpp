@@ -65,6 +65,7 @@ void Simulator::updatePressurePlate(BlockPos pos) {
         setBlock(pos, next, 2);
         notifyAttached(pos, Direction::up);
     }
+    if((oldPower==0)!=(power==0))emitGameEvent(power?"block_activate":"block_deactivate",pos);
     // Occupancy is supplied after spectator/trigger filtering. While powered,
     // both removal and additional arrivals are observed only at the next poll.
     if (power > 0) schedule(pos, state.device == Device::weightedPlate ? 10 : 20);
@@ -82,6 +83,7 @@ void Simulator::updateButton(BlockPos pos) {
     if (pressed != state.powered) {
         setBlock(pos, registry.withBool(id, "powered", pressed));
         notifyAttached(pos, state.connectedDirection);
+        emitGameEvent(pressed?"block_activate":"block_deactivate",pos);
     }
     if (pressed) schedule(pos, 30);
     // setBlock queues contact with the released shape, including shallow arrows
@@ -117,6 +119,7 @@ bool Simulator::interactDevice(BlockPos pos) {
     if (state.device == Device::door || state.device == Device::trapdoor || state.device == Device::fenceGate) {
         if (name == "minecraft:iron_door" || name == "minecraft:iron_trapdoor") throw std::invalid_argument("铁门和铁活板门需要红石信号驱动");
         setBlock(pos, registry.withBool(id, "open", registry.property(id, "open") != "true"), state.device == Device::trapdoor ? 2 : 10);
+        (void)worldRandom.nextFloat();emitGameEvent(registry.property(id,"open")=="true"?"block_close":"block_open",pos);
         return true;
     }
     if (state.device == Device::container) {
@@ -189,6 +192,8 @@ bool Simulator::stimulateDevice(BlockPos pos, const Json& stimulus) {
         if (stimulus.contains("shear")) {
             if (stimulus.size() != 1 || stimulus.at("shear") != true) throw std::invalid_argument("剪断输入必须为 shear: true");
             setBlock(pos, registry.withBool(id, "disarmed", true), 260);
+            emitGameEvent("shear",pos);
+            emitGameEvent("block_destroy",pos,{false,false,false,id});
             setBlock(pos, 0);
         } else {
             if (stimulus.size() != 1 || !stimulus.contains("entities")) throw std::invalid_argument("绊线输入需要 entities 实体数量");
@@ -261,6 +266,7 @@ void Simulator::validateRuntime(BlockPos pos) const {
     const auto& data = runtime.at(pos);
     if (!data.values.is_object() || data.output < 0 || data.output > 15) throw std::invalid_argument("无效器件内部状态");
     auto device = at(pos).device;
+    if(isSensor(device)) integerInRange(data.values,"lastVibrationFrequency",0,15);
     if(isBookshelf(world.get(pos)) && data.values.contains("lastInteractedSlot")) {
         const auto& last=data.values.at("lastInteractedSlot");
         if(!last.is_number_integer() || last < -1 || last > 5) throw std::invalid_argument("无效雕纹书架最后操作槽位");

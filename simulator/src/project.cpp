@@ -1,6 +1,7 @@
 #include "simulator/simulator.hpp"
 #include <sstream>
 #include <cctype>
+#include <cmath>
 
 namespace simulator {
 namespace {
@@ -16,6 +17,29 @@ std::uint64_t unsignedDecimal(const Json& value) {
     if (text.empty() || !std::all_of(text.begin(), text.end(), [](unsigned char c) { return c >= '0' && c <= '9'; })) throw std::invalid_argument("无效的无符号十进制字符串");
     return std::stoull(text);
 }
+Json vibrationJson(const VibrationInfo& value,const BlockRegistry& registry) {
+    Json result{{"event",registry.gameEvent(value.event).name},{"origin",value.origin},{"distance",value.distance},
+        {"source",{{"spectator",value.context.spectator},{"sneaking",value.context.sneaking},{"dampensVibrations",value.context.dampens}}}};
+    if(value.context.affectedState!=UINT32_MAX) {auto block=registry.describe(value.context.affectedState);block.erase("stateId");result["affectedBlock"]=block;}
+    return result;
+}
+VibrationInfo readVibration(const Json& row,const BlockRegistry& registry,BlockPos destination) {
+    VibrationInfo value;value.event=registry.gameEventId(row.at("event"));
+    const auto& origin=row.at("origin");
+    if(!origin.is_array() || origin.size()!=3)throw std::invalid_argument("无效振动来源位置");
+    for(std::size_t i=0;i<3;++i) {
+        if(!origin[i].is_number())throw std::invalid_argument("无效振动来源坐标");
+        value.origin[i]=origin[i];if(!std::isfinite(value.origin[i]) || value.origin[i]<-29999984 || value.origin[i]>29999985)throw std::invalid_argument("振动来源坐标越界");
+    }
+    const double x=value.origin[0]-(destination.x+.5),y=value.origin[1]-(destination.y+.5),z=value.origin[2]-(destination.z+.5);
+    value.distance=row.at("distance");
+    if(!std::isfinite(value.distance) || value.distance!=static_cast<float>(std::sqrt(x*x+y*y+z*z)) || value.distance>18)throw std::invalid_argument("振动传播距离不一致");
+    const auto& source=row.at("source");
+    value.context.spectator=source.at("spectator").get<bool>();value.context.sneaking=source.at("sneaking").get<bool>();value.context.dampens=source.at("dampensVibrations").get<bool>();
+    if(row.contains("affectedBlock")) {const auto& block=row.at("affectedBlock");value.context.affectedState=registry.state(block.at("name"),block.at("properties"));}
+    if(!registry.gameEvent(value.event).frequency)throw std::invalid_argument("无效振动事件频率");
+    return value;
+}
 }
 std::unique_ptr<Simulator> Simulator::clone() const {
     auto result = std::make_unique<Simulator>(registry); result->restore(*this); return result;
@@ -27,6 +51,7 @@ void Simulator::restore(const Simulator& snapshot) {
     environmentActions = snapshot.environmentActions; pendingActionIds = snapshot.pendingActionIds; nextActionId = snapshot.nextActionId; actionsDropped = snapshot.actionsDropped;
     blockTicks = snapshot.blockTicks;
     hoppers = snapshot.hoppers; entityOrders = snapshot.entityOrders; nextEntityOrder = snapshot.nextEntityOrder;
+    sensors = snapshot.sensors; sensorSections = snapshot.sensorSections;
     recentTorchToggles = snapshot.recentTorchToggles; torchToggleCounts = snapshot.torchToggleCounts;
     probes = snapshot.probes; probeDependencies = snapshot.probeDependencies; trace = snapshot.trace;
     currentTick = snapshot.currentTick; nextOrder = snapshot.nextOrder; sequence = snapshot.sequence; nextProbeId = snapshot.nextProbeId;
@@ -37,6 +62,8 @@ void Simulator::restore(const Simulator& snapshot) {
 Json Simulator::saveProject(const std::string& name, bool checkpoint) const {
     if (!checkpoint && !motions.empty()) throw std::invalid_argument("活塞正在运动，请导出运行快照，或等待动作完成后导出电路");
     if (!checkpoint && hasPendingActions()) throw std::invalid_argument("仍有待处理的外部动作，请导出运行快照，或先确认环境反馈");
+    if(!checkpoint) for(const auto& [pos,sensor]:sensors)
+        if(sensor.candidate || sensor.current || registry.property(world.get(pos),"sculk_sensor_phase")!="inactive")throw std::invalid_argument("感测体正在接收振动或冷却，请保存运行快照，或等待空闲后导出电路");
     Json data{{"format", "verimc.simulator"}, {"formatVersion", 1}, {"minecraftVersion", "26.2"}, {"edition", "java"}, {"kind", checkpoint ? "checkpoint" : "circuit"}, {"name", name}};
     data["profile"] = {{"experimentalRedstone", false}, {"naturalRandomTicks", false}, {"loadedRegionOnly", true}};
     data["randomSource"] = {{"algorithm", "javaLegacy48"}, {"seed", std::to_string(randomSeed)}};
@@ -76,6 +103,14 @@ Json Simulator::saveProject(const std::string& name, bool checkpoint) const {
         data["hoppers"] = Json::array();
         for (const auto& [pos, h] : hoppers) data["hoppers"].push_back({{"pos", pos}, {"readyAt", h.readyAt}, {"firstTick", h.firstTick}, {"wakeAt", h.wakeAt}, {"generation", h.generation}});
         std::sort(data["hoppers"].begin(), data["hoppers"].end(), positionOrder);
+        data["sensors"]=Json::array();
+        for(const auto& [pos,sensor]:sensors) {
+            Json row{{"pos",pos},{"candidateTick",sensor.candidateTick},{"wakeAt",sensor.wakeAt},{"remaining",sensor.remaining},{"generation",sensor.generation}};
+            if(sensor.candidate)row["candidate"]=vibrationJson(*sensor.candidate,registry);
+            if(sensor.current)row["current"]=vibrationJson(*sensor.current,registry);
+            data["sensors"].push_back(std::move(row));
+        }
+        std::sort(data["sensors"].begin(),data["sensors"].end(),positionOrder);
         data["motions"] = Json::array();
         for (const auto& [p, m] : motions) data["motions"].push_back({{"pos", p}, {"movedState", m.movedState}, {"facing", static_cast<unsigned>(m.facing)}, {"extending", m.extending}, {"source", m.source}, {"progress", m.progress}, {"previousProgress", m.previousProgress}, {"lastTicked", m.lastTicked}, {"generation", m.generation}});
         std::sort(data["motions"].begin(), data["motions"].end(), positionOrder);
@@ -108,6 +143,7 @@ void Simulator::loadProject(const Json& data) {
         auto p = row.at("pos").get<BlockPos>(); auto id = registry.state(row.at("name"), row.at("properties"));
         if (registry.type(id).supportLevel == "unimplemented") throw std::invalid_argument("工程包含尚未支持的器件：" + registry.type(id).name);
         if (!checkpoint && registry[id].device == Device::movingPiston) throw std::invalid_argument("运动中的活塞需要包含内部状态的运行快照");
+        if(!checkpoint && isSensor(registry[id].device) && (registry.property(id,"sculk_sensor_phase")!="inactive" || registry[id].power))throw std::invalid_argument("非空闲感测体需要运行快照");
         if (!occupied.insert(p).second) throw std::invalid_argument("工程包含重复坐标");
         candidate.world.set(p, id);
     }
@@ -116,7 +152,7 @@ void Simulator::loadProject(const Json& data) {
     for (const auto& row : data.value("entityOrder", Json::array())) {
         auto pos = row.at("pos").get<BlockPos>(); auto rank = row.at("order").get<std::uint64_t>();
         auto device = candidate.at(pos).device;
-        if ((device != Device::hopper && device != Device::daylight && device != Device::movingPiston) || rank >= candidate.nextEntityOrder || !usedRanks.insert(rank).second || !candidate.entityOrders.emplace(pos, rank).second) throw std::invalid_argument("无效方块实体执行顺序");
+        if ((device != Device::hopper && device != Device::daylight && device != Device::movingPiston && !isSensor(device)) || rank >= candidate.nextEntityOrder || !usedRanks.insert(rank).second || !candidate.entityOrders.emplace(pos, rank).second) throw std::invalid_argument("无效方块实体执行顺序");
     }
     for (const auto& row : data.value("blockData", Json::array())) {
         auto p = row.at("pos").get<BlockPos>();
@@ -185,6 +221,35 @@ void Simulator::loadProject(const Json& data) {
             auto hopper = candidate.hoppers.find(event.pos);
             if (hopper == candidate.hoppers.end() || event.data != hopper->second.generation || event.tick != hopper->second.wakeAt) throw std::invalid_argument("漏斗冷却与唤醒队列不一致");
         }
+        for(const auto& row:data.value("sensors",Json::array())) {
+            auto pos=row.at("pos").get<BlockPos>();SensorState sensor;
+            if(!isSensor(candidate.at(pos).device) || !candidate.entityOrders.contains(pos))throw std::invalid_argument("无效感测体运行位置或顺序");
+            for(const auto* field:{"candidateTick","wakeAt","remaining","generation"})if(!row.at(field).is_number_integer() || row.at(field)<0)throw std::invalid_argument("无效感测体运行字段");
+            if(row.at("remaining")>18)throw std::invalid_argument("振动传播剩余时间越界");
+            sensor.candidateTick=row.at("candidateTick");sensor.wakeAt=row.at("wakeAt");sensor.remaining=row.at("remaining");sensor.generation=row.at("generation");
+            if(row.contains("candidate"))sensor.candidate=readVibration(row.at("candidate"),registry,pos);
+            if(row.contains("current"))sensor.current=readVibration(row.at("current"),registry,pos);
+            for(const auto* pending:{&sensor.candidate,&sensor.current})if(*pending) {
+                const auto& value=**pending;const auto& info=registry.gameEvent(value.event);
+                const double x=std::floor(value.origin[0])-pos.x,y=std::floor(value.origin[1])-pos.y,z=std::floor(value.origin[2])-pos.z;
+                const int radius=candidate.at(pos).device==Device::calibratedSensor?16:8;
+                if(x*x+y*y+z*z>radius*radius || !info.listenable || value.context.spectator || value.context.dampens || (value.context.sneaking && info.ignoreSneaking)
+                    || (value.context.affectedState!=UINT32_MAX && registry.type(value.context.affectedState).dampensVibrations))throw std::invalid_argument("无效感测体待接收事件");
+            }
+            const bool busy=sensor.candidate.has_value() || sensor.current.has_value();
+            if(sensor.remaining<0 || sensor.remaining>18 || sensor.candidateTick>candidate.currentTick || (sensor.candidate && sensor.current) || (!sensor.current && sensor.remaining!=0)
+                || (sensor.current && (sensor.remaining==0 || sensor.remaining>=static_cast<int>(std::floor(sensor.current->distance))))
+                || (busy && (sensor.wakeAt<candidate.currentTick || sensor.wakeAt==UINT64_MAX || sensor.generation>=candidate.nextOrder)) || (!busy && sensor.wakeAt!=UINT64_MAX))throw std::invalid_argument("感测体传播与唤醒状态不一致");
+            if(busy && !candidate.scheduledKeys.contains({pos,candidate.at(pos).type,2,sensor.generation}))throw std::invalid_argument("快照缺少感测体唤醒事件");
+            if(!candidate.sensors.emplace(pos,sensor).second)throw std::invalid_argument("重复感测体运行数据");
+        }
+        auto sensorQueue=candidate.scheduled;
+        while(!sensorQueue.empty()) {
+            const auto event=sensorQueue.top();sensorQueue.pop();if(event.phase!=2 || !isSensor(candidate.at(event.pos).device))continue;
+            const auto found=candidate.sensors.find(event.pos);
+            if(found==candidate.sensors.end() || found->second.wakeAt!=event.tick || found->second.generation!=event.data)throw std::invalid_argument("感测体与运行事件不一致");
+        }
+        candidate.rebuildSensorIndex();
         for (const auto& row : data.value("motions", Json::array())) {
             auto p = row.at("pos").get<BlockPos>(); auto direction = row.at("facing").get<unsigned>(); auto moved = row.at("movedState").get<StateId>();
             if (direction > 5 || moved >= registry.stateCount() || candidate.at(p).device != Device::movingPiston || row.at("progress").get<unsigned>() > 2 || row.at("previousProgress").get<unsigned>() > 2) throw std::invalid_argument("无效活塞运动状态");
@@ -192,6 +257,7 @@ void Simulator::loadProject(const Json& data) {
         }
         for (const auto& cell : candidate.world.cells()) if (registry[cell.state].device == Device::movingPiston && !candidate.motions.contains(cell.pos)) throw std::invalid_argument("运行快照缺少活塞运动数据");
         for (const auto& cell : candidate.world.cells()) if (registry[cell.state].device == Device::hopper && !candidate.hoppers.contains(cell.pos)) throw std::invalid_argument("运行快照缺少漏斗数据");
+        for(const auto& cell:candidate.world.cells())if(isSensor(registry[cell.state].device) && !candidate.sensors.contains(cell.pos))throw std::invalid_argument("运行快照缺少感测体数据");
     } else {
         for (const auto& cell : candidate.world.cells()) candidate.onPlace(cell.pos, cell.state, 0);
         for (const auto& cell : candidate.world.cells()) candidate.neighborChanged(cell.pos);
@@ -212,6 +278,7 @@ void Simulator::loadProject(const Json& data) {
     swap(world, candidate.world); swap(runtime, candidate.runtime); swap(motions, candidate.motions); swap(scheduled, candidate.scheduled); swap(scheduledKeys, candidate.scheduledKeys);
     swap(blockTicks, candidate.blockTicks);
     swap(hoppers, candidate.hoppers); swap(entityOrders, candidate.entityOrders); nextEntityOrder = candidate.nextEntityOrder;
+    swap(sensors,candidate.sensors);swap(sensorSections,candidate.sensorSections);
     swap(recentTorchToggles, candidate.recentTorchToggles); swap(torchToggleCounts, candidate.torchToggleCounts);
     swap(probes, candidate.probes); swap(probeDependencies, candidate.probeDependencies); swap(trace, candidate.trace);
     currentTick = candidate.currentTick; nextOrder = candidate.nextOrder; sequence = candidate.sequence; nextProbeId = candidate.nextProbeId; traceDropped = candidate.traceDropped;

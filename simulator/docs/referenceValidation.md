@@ -51,3 +51,5 @@
 `captureBookshelves.py` 增加第十三组 GameTest：57 刻 / 11 点，书籍标签、操作次序、最后槽位读数、漏斗预检查及投掷器过滤，详见 [书架说明](bookshelves.md)。`exportItems.py` 同时从固定 JAR 导出书架物品标签。
 
 `capturePots.py` 增加第十四组 GameTest：73 刻 / 26 点，单槽物品上限、六向插入、漏斗失败通知与唤醒、清空和移除，详见 [陶罐说明](decoratedPots.md)。
+
+`exportVibrations.py` 从固定 JAR 的注册表和标签导出 61 种游戏事件、频率、潜行过滤与羊毛/地毯/共振材质。`captureVibrations.py` 和 `captureDeviceVibrations.py` 增加第十五、十六组 GameTest，分别为 161 刻 / 13 点和 155 刻 / 31 点。前者对照显式事件，后者由原版器件自行产生事件；详细机制和未覆盖来源见 [振动说明](vibrations.md)。

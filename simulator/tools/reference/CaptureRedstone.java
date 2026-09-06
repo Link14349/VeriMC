@@ -58,12 +58,33 @@ public class CaptureRedstone extends TestFunctionLoader {
         try {
             if (command.has("interact")) {
                 if (state.getBlock() instanceof DoorBlock door) door.setOpen(null, level, state, pos, !state.getValue(DoorBlock.OPEN));
+                else if (state.getBlock() instanceof LeverBlock lever) lever.pull(state, level, pos, null);
                 else if (state.getBlock() instanceof ButtonBlock button) { if (!state.getValue(ButtonBlock.POWERED)) button.press(state, level, pos, null); }
                 else throw new IllegalArgumentException("Unsupported reference interaction");
                 return;
             }
             var input = command.getAsJsonObject("stimulus");
-            if (state.getBlock() instanceof TargetBlock) {
+            if (input.has("gameEvent")) {
+                var event=BuiltInRegistries.GAME_EVENT.get(Identifier.parse(input.get("gameEvent").getAsString())).orElseThrow();
+                var offset=input.has("offset")?input.getAsJsonArray("offset"):JsonParser.parseString("[0.5,0.5,0.5]").getAsJsonArray();
+                var location=new net.minecraft.world.phys.Vec3(pos.getX()+offset.get(0).getAsDouble(),pos.getY()+offset.get(1).getAsDouble(),pos.getZ()+offset.get(2).getAsDouble());
+                Entity source=null;
+                if(input.has("source")) {
+                    var flags=input.getAsJsonObject("source");
+                    source=new ArmorStand(level,pos.getX(),pos.getY(),pos.getZ()) {
+                        public boolean isSpectator(){return flags.has("spectator") && flags.get("spectator").getAsBoolean();}
+                        public boolean isSteppingCarefully(){return flags.has("sneaking") && flags.get("sneaking").getAsBoolean();}
+                        public boolean dampensVibrations(){return flags.has("dampensVibrations") && flags.get("dampensVibrations").getAsBoolean();}
+                    };
+                }
+                BlockState affected=null;
+                if(input.has("affectedBlock")) {
+                    var block=input.getAsJsonObject("affectedBlock");
+                    if(block.has("properties") && block.getAsJsonObject("properties").size()!=0)throw new IllegalArgumentException("Reference event affected properties not supported");
+                    affected=BuiltInRegistries.BLOCK.getValue(Identifier.parse(block.get("name").getAsString())).defaultBlockState();
+                }
+                level.gameEvent(event,location,new net.minecraft.world.level.gameevent.GameEvent.Context(source,affected));
+            } else if (state.getBlock() instanceof TargetBlock) {
                 var values=input.getAsJsonArray("hit");
                 var location=new net.minecraft.world.phys.Vec3(pos.getX()+values.get(0).getAsDouble(),pos.getY()+values.get(1).getAsDouble(),pos.getZ()+values.get(2).getAsDouble());
                 var direction=Direction.byName(input.get("face").getAsString());
@@ -200,6 +221,13 @@ public class CaptureRedstone extends TestFunctionLoader {
         result.addProperty("reference", "Minecraft Java 26.2 GameTest, nonexperimental redstone");
         result.add("origin", coordinates(helper.absolutePos(BlockPos.ZERO)));
         JsonArray frames = new JsonArray(); result.add("frames", frames);
+        if(scenario.has("forceLoadedNeighborhood") && scenario.get("forceLoadedNeighborhood").getAsBoolean()) {
+            var base=helper.absolutePos(BlockPos.ZERO);
+            for(int x=Math.floorDiv(base.getX(),16)-1;x<=Math.floorDiv(base.getX()+48,16)+1;++x)
+                for(int z=Math.floorDiv(base.getZ(),16)-1;z<=Math.floorDiv(base.getZ()+48,16)+1;++z) {
+                    helper.getLevel().getChunk(x,z);helper.getLevel().setChunkForced(x,z,true);
+                }
+        }
         for (int x = 0; x < 48; ++x) for (int y = 0; y < 6; ++y) for (int z = 0; z < 48; ++z) helper.getLevel().setBlock(helper.absolutePos(new BlockPos(x,y,z)), Block.stateById(0), 18);
         int end = scenario.get("endTick").getAsInt();
         for (int t = 0; t <= end; ++t) {

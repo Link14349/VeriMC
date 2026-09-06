@@ -106,7 +106,7 @@ bool Simulator::movePistonBlocks(BlockPos pos, Direction facing, bool extending)
     auto movement = extending ? facing : opposite(facing);
     std::vector<Cell> originals, removed;
     for (auto p : plan.push) originals.push_back({p, world.get(p)});
-    for (auto it = plan.destroy.rbegin(); it != plan.destroy.rend(); ++it) { removed.push_back({*it, world.get(*it)}); setBlock(*it, 0, 18); }
+    for (auto it = plan.destroy.rbegin(); it != plan.destroy.rend(); ++it) { const auto old=world.get(*it);removed.push_back({*it,old}); setBlock(*it, 0, 18);emitGameEvent("block_destroy",*it,{false,false,false,old}); }
     std::vector<Cell> toClear = originals;
     for (auto it = originals.rbegin(); it != originals.rend(); ++it) {
         auto destination = it->pos.relative(movement);
@@ -138,19 +138,27 @@ void Simulator::pistonEvent(const ScheduledEvent& event) {
     bool powered = pistonPowered(pos);
     if (powered && code != 0) { setBlock(pos, extended, 2); return; }
     if (!powered && code == 0) return;
-    if (code == 0) { if (movePistonBlocks(pos, facing, true)) setBlock(pos, extended, 67); return; }
+    if (code == 0) {
+        if (movePistonBlocks(pos, facing, true)) {setBlock(pos, extended, 67);(void)worldRandom.nextFloat();emitGameEvent("block_activate",pos,{false,false,false,extended});}
+        return;
+    }
     const auto arm = pos.relative(facing); finishMotion(arm, true);
     auto moving = registry.state("moving_piston", {{"facing", directionNames[static_cast<unsigned>(facing)]}, {"type", sticky ? "sticky" : "normal"}});
     auto retracted = registry.withBool(id, "extended", false);
     retracted = registry.with(retracted, "facing", std::string(directionNames[static_cast<unsigned>((event.data >> 2) & 7u)]));
     setBlock(pos, moving, 276); addMotion(pos, retracted, facing, false, true);
     updateNeighbors(pos); for (auto d : shapeOrder) enqueue({UpdateKind::shape, pos.relative(d), opposite(d), moving});
-    if (!sticky) { setBlock(arm, 0); return; }
-    auto twoAhead = pos.relative(facing, 2); auto motion = motionAt(twoAhead);
-    if (motion && motion->facing == facing && motion->extending) { finishMotion(twoAhead, true); return; }
-    const auto& next = at(twoAhead);
-    if (code == 1 && world.get(twoAhead) != 0 && pushable(twoAhead, opposite(facing), false, facing) && (next.pushReaction == 0 || next.device == Device::piston)) movePistonBlocks(pos, facing, false);
-    else setBlock(arm, 0);
+    if (!sticky) setBlock(arm, 0);
+    else {
+        auto twoAhead = pos.relative(facing, 2); auto motion = motionAt(twoAhead);
+        if (motion && motion->facing == facing && motion->extending) finishMotion(twoAhead, true);
+        else {
+            const auto& next = at(twoAhead);
+            if (code == 1 && world.get(twoAhead) != 0 && pushable(twoAhead, opposite(facing), false, facing) && (next.pushReaction == 0 || next.device == Device::piston)) movePistonBlocks(pos, facing, false);
+            else setBlock(arm, 0);
+        }
+    }
+    (void)worldRandom.nextFloat();emitGameEvent("block_deactivate",pos,{false,false,false,moving});
 }
 void Simulator::finishMotion(BlockPos pos, bool force) {
     auto found = motions.find(pos); if (found == motions.end()) return;

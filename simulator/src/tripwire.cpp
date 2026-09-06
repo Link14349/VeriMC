@@ -57,12 +57,20 @@ void Simulator::calculateTripwire(BlockPos pos, StateId state, bool destroying, 
         updateNeighbors(hook, -1, state);
         updateNeighbors(hook.relative(opposite(facing)), -1, state);
     };
+    auto emitHook=[&](BlockPos hook) {
+        if(powered && !registry[state].powered)emitGameEvent("block_activate",hook);
+        else if(!powered && registry[state].powered)emitGameEvent("block_deactivate",hook);
+        else if(attached && !wasAttached)emitGameEvent("block_attach",hook);
+        else if(!attached && wasAttached) {(void)worldRandom.nextFloat();emitGameEvent("block_detach",hook);}
+    };
     if (receiver > 0) {
         auto other = pos.relative(direction, receiver);
         setBlock(other, registry.with(next, "facing", std::string(directionNames[static_cast<unsigned>(opposite(direction))])));
         notifyHook(other, opposite(direction));
         if (at(pos).device != Device::tripwireHook) { removeTripwireHook(pos, next); return; }
+        emitHook(other);
     }
+    emitHook(pos);
     if (!destroying) {
         setBlock(pos, registry.with(next, "facing", std::string(directionNames[static_cast<unsigned>(direction)])));
         if (notify) notifyHook(pos, direction);

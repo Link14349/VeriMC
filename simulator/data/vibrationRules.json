@@ -1,0 +1,488 @@
+{
+  "version": "26.2",
+  "events": [
+    {
+      "name": "minecraft:block_activate",
+      "radius": 16,
+      "frequency": 10,
+      "listenable": true,
+      "ignoreSneaking": false
+    },
+    {
+      "name": "minecraft:block_attach",
+      "radius": 16,
+      "frequency": 10,
+      "listenable": true,
+      "ignoreSneaking": false
+    },
+    {
+      "name": "minecraft:block_change",
+      "radius": 16,
+      "frequency": 11,
+      "listenable": true,
+      "ignoreSneaking": false
+    },
+    {
+      "name": "minecraft:block_close",
+      "radius": 16,
+      "frequency": 9,
+      "listenable": true,
+      "ignoreSneaking": false
+    },
+    {
+      "name": "minecraft:block_deactivate",
+      "radius": 16,
+      "frequency": 9,
+      "listenable": true,
+      "ignoreSneaking": false
+    },
+    {
+      "name": "minecraft:block_destroy",
+      "radius": 16,
+      "frequency": 12,
+      "listenable": true,
+      "ignoreSneaking": false
+    },
+    {
+      "name": "minecraft:block_detach",
+      "radius": 16,
+      "frequency": 9,
+      "listenable": true,
+      "ignoreSneaking": false
+    },
+    {
+      "name": "minecraft:block_open",
+      "radius": 16,
+      "frequency": 10,
+      "listenable": true,
+      "ignoreSneaking": false
+    },
+    {
+      "name": "minecraft:block_place",
+      "radius": 16,
+      "frequency": 13,
+      "listenable": true,
+      "ignoreSneaking": false
+    },
+    {
+      "name": "minecraft:bounce",
+      "radius": 16,
+      "frequency": 2,
+      "listenable": true,
+      "ignoreSneaking": false
+    },
+    {
+      "name": "minecraft:container_close",
+      "radius": 16,
+      "frequency": 9,
+      "listenable": true,
+      "ignoreSneaking": false
+    },
+    {
+      "name": "minecraft:container_open",
+      "radius": 16,
+      "frequency": 10,
+      "listenable": true,
+      "ignoreSneaking": false
+    },
+    {
+      "name": "minecraft:drink",
+      "radius": 16,
+      "frequency": 8,
+      "listenable": true,
+      "ignoreSneaking": false
+    },
+    {
+      "name": "minecraft:eat",
+      "radius": 16,
+      "frequency": 8,
+      "listenable": true,
+      "ignoreSneaking": false
+    },
+    {
+      "name": "minecraft:elytra_glide",
+      "radius": 16,
+      "frequency": 4,
+      "listenable": true,
+      "ignoreSneaking": false
+    },
+    {
+      "name": "minecraft:entity_damage",
+      "radius": 16,
+      "frequency": 7,
+      "listenable": true,
+      "ignoreSneaking": false
+    },
+    {
+      "name": "minecraft:entity_die",
+      "radius": 16,
+      "frequency": 15,
+      "listenable": true,
+      "ignoreSneaking": false
+    },
+    {
+      "name": "minecraft:entity_dismount",
+      "radius": 16,
+      "frequency": 5,
+      "listenable": true,
+      "ignoreSneaking": false
+    },
+    {
+      "name": "minecraft:entity_interact",
+      "radius": 16,
+      "frequency": 6,
+      "listenable": true,
+      "ignoreSneaking": false
+    },
+    {
+      "name": "minecraft:entity_mount",
+      "radius": 16,
+      "frequency": 6,
+      "listenable": true,
+      "ignoreSneaking": false
+    },
+    {
+      "name": "minecraft:entity_place",
+      "radius": 16,
+      "frequency": 14,
+      "listenable": true,
+      "ignoreSneaking": false
+    },
+    {
+      "name": "minecraft:entity_action",
+      "radius": 16,
+      "frequency": 4,
+      "listenable": true,
+      "ignoreSneaking": false
+    },
+    {
+      "name": "minecraft:equip",
+      "radius": 16,
+      "frequency": 5,
+      "listenable": true,
+      "ignoreSneaking": false
+    },
+    {
+      "name": "minecraft:explode",
+      "radius": 16,
+      "frequency": 15,
+      "listenable": true,
+      "ignoreSneaking": false
+    },
+    {
+      "name": "minecraft:flap",
+      "radius": 16,
+      "frequency": 1,
+      "listenable": true,
+      "ignoreSneaking": false
+    },
+    {
+      "name": "minecraft:fluid_pickup",
+      "radius": 16,
+      "frequency": 12,
+      "listenable": true,
+      "ignoreSneaking": false
+    },
+    {
+      "name": "minecraft:fluid_place",
+      "radius": 16,
+      "frequency": 13,
+      "listenable": true,
+      "ignoreSneaking": false
+    },
+    {
+      "name": "minecraft:hit_ground",
+      "radius": 16,
+      "frequency": 2,
+      "listenable": true,
+      "ignoreSneaking": true
+    },
+    {
+      "name": "minecraft:instrument_play",
+      "radius": 16,
+      "frequency": 3,
+      "listenable": true,
+      "ignoreSneaking": false
+    },
+    {
+      "name": "minecraft:item_interact_finish",
+      "radius": 16,
+      "frequency": 3,
+      "listenable": true,
+      "ignoreSneaking": true
+    },
+    {
+      "name": "minecraft:item_interact_start",
+      "radius": 16,
+      "frequency": 0,
+      "listenable": false,
+      "ignoreSneaking": true
+    },
+    {
+      "name": "minecraft:jukebox_play",
+      "radius": 10,
+      "frequency": 0,
+      "listenable": false,
+      "ignoreSneaking": false
+    },
+    {
+      "name": "minecraft:jukebox_stop_play",
+      "radius": 10,
+      "frequency": 0,
+      "listenable": false,
+      "ignoreSneaking": false
+    },
+    {
+      "name": "minecraft:lightning_strike",
+      "radius": 16,
+      "frequency": 14,
+      "listenable": true,
+      "ignoreSneaking": false
+    },
+    {
+      "name": "minecraft:note_block_play",
+      "radius": 16,
+      "frequency": 10,
+      "listenable": true,
+      "ignoreSneaking": false
+    },
+    {
+      "name": "minecraft:prime_fuse",
+      "radius": 16,
+      "frequency": 10,
+      "listenable": true,
+      "ignoreSneaking": false
+    },
+    {
+      "name": "minecraft:projectile_land",
+      "radius": 16,
+      "frequency": 2,
+      "listenable": true,
+      "ignoreSneaking": false
+    },
+    {
+      "name": "minecraft:projectile_shoot",
+      "radius": 16,
+      "frequency": 3,
+      "listenable": true,
+      "ignoreSneaking": true
+    },
+    {
+      "name": "minecraft:sculk_sensor_tendrils_clicking",
+      "radius": 16,
+      "frequency": 0,
+      "listenable": false,
+      "ignoreSneaking": false
+    },
+    {
+      "name": "minecraft:shear",
+      "radius": 16,
+      "frequency": 6,
+      "listenable": true,
+      "ignoreSneaking": false
+    },
+    {
+      "name": "minecraft:shriek",
+      "radius": 32,
+      "frequency": 0,
+      "listenable": false,
+      "ignoreSneaking": false
+    },
+    {
+      "name": "minecraft:splash",
+      "radius": 16,
+      "frequency": 2,
+      "listenable": true,
+      "ignoreSneaking": false
+    },
+    {
+      "name": "minecraft:step",
+      "radius": 16,
+      "frequency": 1,
+      "listenable": true,
+      "ignoreSneaking": true
+    },
+    {
+      "name": "minecraft:swim",
+      "radius": 16,
+      "frequency": 1,
+      "listenable": true,
+      "ignoreSneaking": true
+    },
+    {
+      "name": "minecraft:teleport",
+      "radius": 16,
+      "frequency": 14,
+      "listenable": true,
+      "ignoreSneaking": false
+    },
+    {
+      "name": "minecraft:unequip",
+      "radius": 16,
+      "frequency": 4,
+      "listenable": true,
+      "ignoreSneaking": false
+    },
+    {
+      "name": "minecraft:resonate_1",
+      "radius": 16,
+      "frequency": 1,
+      "listenable": true,
+      "ignoreSneaking": false
+    },
+    {
+      "name": "minecraft:resonate_2",
+      "radius": 16,
+      "frequency": 2,
+      "listenable": true,
+      "ignoreSneaking": false
+    },
+    {
+      "name": "minecraft:resonate_3",
+      "radius": 16,
+      "frequency": 3,
+      "listenable": true,
+      "ignoreSneaking": false
+    },
+    {
+      "name": "minecraft:resonate_4",
+      "radius": 16,
+      "frequency": 4,
+      "listenable": true,
+      "ignoreSneaking": false
+    },
+    {
+      "name": "minecraft:resonate_5",
+      "radius": 16,
+      "frequency": 5,
+      "listenable": true,
+      "ignoreSneaking": false
+    },
+    {
+      "name": "minecraft:resonate_6",
+      "radius": 16,
+      "frequency": 6,
+      "listenable": true,
+      "ignoreSneaking": false
+    },
+    {
+      "name": "minecraft:resonate_7",
+      "radius": 16,
+      "frequency": 7,
+      "listenable": true,
+      "ignoreSneaking": false
+    },
+    {
+      "name": "minecraft:resonate_8",
+      "radius": 16,
+      "frequency": 8,
+      "listenable": true,
+      "ignoreSneaking": false
+    },
+    {
+      "name": "minecraft:resonate_9",
+      "radius": 16,
+      "frequency": 9,
+      "listenable": true,
+      "ignoreSneaking": false
+    },
+    {
+      "name": "minecraft:resonate_10",
+      "radius": 16,
+      "frequency": 10,
+      "listenable": true,
+      "ignoreSneaking": false
+    },
+    {
+      "name": "minecraft:resonate_11",
+      "radius": 16,
+      "frequency": 11,
+      "listenable": true,
+      "ignoreSneaking": false
+    },
+    {
+      "name": "minecraft:resonate_12",
+      "radius": 16,
+      "frequency": 12,
+      "listenable": true,
+      "ignoreSneaking": false
+    },
+    {
+      "name": "minecraft:resonate_13",
+      "radius": 16,
+      "frequency": 13,
+      "listenable": true,
+      "ignoreSneaking": false
+    },
+    {
+      "name": "minecraft:resonate_14",
+      "radius": 16,
+      "frequency": 14,
+      "listenable": true,
+      "ignoreSneaking": false
+    },
+    {
+      "name": "minecraft:resonate_15",
+      "radius": 16,
+      "frequency": 15,
+      "listenable": true,
+      "ignoreSneaking": false
+    }
+  ],
+  "occludes_vibration_signals": [
+    "minecraft:black_wool",
+    "minecraft:blue_wool",
+    "minecraft:brown_wool",
+    "minecraft:cyan_wool",
+    "minecraft:gray_wool",
+    "minecraft:green_wool",
+    "minecraft:light_blue_wool",
+    "minecraft:light_gray_wool",
+    "minecraft:lime_wool",
+    "minecraft:magenta_wool",
+    "minecraft:orange_wool",
+    "minecraft:pink_wool",
+    "minecraft:purple_wool",
+    "minecraft:red_wool",
+    "minecraft:white_wool",
+    "minecraft:yellow_wool"
+  ],
+  "dampens_vibrations": [
+    "minecraft:black_carpet",
+    "minecraft:black_wool",
+    "minecraft:blue_carpet",
+    "minecraft:blue_wool",
+    "minecraft:brown_carpet",
+    "minecraft:brown_wool",
+    "minecraft:cyan_carpet",
+    "minecraft:cyan_wool",
+    "minecraft:gray_carpet",
+    "minecraft:gray_wool",
+    "minecraft:green_carpet",
+    "minecraft:green_wool",
+    "minecraft:light_blue_carpet",
+    "minecraft:light_blue_wool",
+    "minecraft:light_gray_carpet",
+    "minecraft:light_gray_wool",
+    "minecraft:lime_carpet",
+    "minecraft:lime_wool",
+    "minecraft:magenta_carpet",
+    "minecraft:magenta_wool",
+    "minecraft:orange_carpet",
+    "minecraft:orange_wool",
+    "minecraft:pink_carpet",
+    "minecraft:pink_wool",
+    "minecraft:purple_carpet",
+    "minecraft:purple_wool",
+    "minecraft:red_carpet",
+    "minecraft:red_wool",
+    "minecraft:white_carpet",
+    "minecraft:white_wool",
+    "minecraft:yellow_carpet",
+    "minecraft:yellow_wool"
+  ],
+  "vibration_resonators": [
+    "minecraft:amethyst_block"
+  ],
+  "reference": "Fixed Java 26.2 registry, VibrationSystem frequencies and built-in tags"
+}

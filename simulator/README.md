@@ -52,6 +52,8 @@ python3 simulator/runSimulator.py --no-build
 
 饰纹陶罐支持单槽库存、容量读数和六向传输，详见 [陶罐说明](docs/decoratedPots.md)。
 
+幽匿感测体和校频感测体支持振动传播、遮挡、频率筛选和紫水晶共振，提供“振动实验”及频率探针。现有按钮、门、容器等来源会自动发出事件，未接入的来源可显式输入；完整边界见 [振动说明](docs/vibrations.md)。
+
 ## 验证
 
 ```sh
@@ -70,6 +72,7 @@ python3 tests/backpressureTests.py
 python3 tests/runControlTests.py
 python3 tests/dropperTests.py
 python3 tests/targetTests.py
+python3 tests/vibrationTests.py
 node tests/webTests.mjs
 
 # 有实际驱动的中继器链基准

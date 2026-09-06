@@ -190,6 +190,21 @@ export class CircuitViewport {
         part([.5,.24,.5],[.8,.16,.8],0x465155);
         for (const edge of [.14,.86]) { part([edge,.48,.5],[.12,.38,.84],0x9ba7a8); part([.5,.48,edge],[.6,.38,.12],0x9ba7a8); }
       }
+    } else if (name === 'sculk_sensor' || name === 'calibrated_sculk_sensor') {
+      const active=p.sculk_sensor_phase==='active',cooling=p.sculk_sensor_phase==='cooldown';
+      part([.5,.25,.5],[1,.5,1],0x224b50);
+      part([.5,.48,.5],[.82,.06,.82],0x427478);
+      for(const a of [.18,.82])for(const b of [.18,.82]) {
+        part([a,.66,b],[.09,.4,.09],active?0xefd28d:cooling?0x557576:0x69c8ba);
+        part([a,.86,b],[.18,.09,.18],active?0xf5b968:0x83d5c7);
+      }
+      if(name==='calibrated_sculk_sensor') {
+        const back=directionVectors[facing];
+        part([.5-back[0]*.35,.38,.5-back[2]*.35],[back[0]?.2:.45,.5,back[2]?.2:.45],0x9c86b7);
+        part([.5,.7,.5],[.26,.4,.26],0xc1abe3,'box',Math.PI/4);
+      }
+    } else if (name.endsWith('_carpet')) {
+      part([.5,.03125,.5],[1,.0625,1],0xd1cdbd);
     } else if (name === 'decorated_pot') {
       part([.5,.43,.5],[.875,.86,.875],0x9a5d42);
       part([.5,.89,.5],[.49,.12,.49],0xa96d4c);

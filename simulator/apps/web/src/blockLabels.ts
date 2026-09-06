@@ -13,3 +13,5 @@ export const favorites = ['redstone_wire','repeater','comparator','redstone_torc
 Object.assign(valueLabels, {north_south:'南北直轨',east_west:'东西直轨',ascending_east:'向东上坡',ascending_west:'向西上坡',ascending_north:'向北上坡',ascending_south:'向南上坡',south_east:'东南弯轨',south_west:'西南弯轨',north_west:'西北弯轨',north_east:'东北弯轨'});
 
 for (let slot=0;slot<6;++slot) propertyLabels[`slot_${slot}_occupied`]=`槽位 ${slot+1} 已占用`;
+
+Object.assign(propertyLabels,{sculk_sensor_phase:'感测阶段'});Object.assign(valueLabels,{inactive:'空闲',active:'激活',cooldown:'冷却'});Object.assign(labels,{amethyst_block:'紫水晶块',white_carpet:'白色地毯'});

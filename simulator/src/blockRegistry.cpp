@@ -47,6 +47,14 @@ BlockRegistry::BlockRegistry(const std::string& path) {
         itemNames.emplace(row.at("name").get<std::string>(), static_cast<std::uint32_t>(items.size()));
         items.push_back({row.at("name"), row.at("maxStack"), row.value("bookshelfBook",false)});
     }
+    std::ifstream vibrationFile(std::filesystem::path(path).parent_path() / "vibrationRules.json");
+    if(!vibrationFile) throw std::runtime_error("找不到振动规则 vibrationRules.json");
+    const auto vibrationData=Json::parse(vibrationFile);
+    if(vibrationData.at("version")!="26.2") throw std::runtime_error("Vibration registry version mismatch");
+    for(const auto& row:vibrationData.at("events")) {
+        gameEventNames.emplace(row.at("name").get<std::string>(),static_cast<std::uint16_t>(gameEvents.size()));
+        gameEvents.push_back({row.at("name"),row.at("radius"),row.at("frequency"),row.at("listenable"),row.at("ignoreSneaking")});
+    }
     const Json data = Json::parse(file);
     if (data.at("version") != "26.2") throw std::runtime_error("需要 Minecraft 26.2 数据");
     for (const auto& b : data.at("blocks")) {
@@ -54,6 +62,10 @@ BlockRegistry::BlockRegistry(const std::string& path) {
         typeInfo.name = b.at("name"); typeInfo.className = b.at("className");
         typeInfo.defaultState = b.at("defaultState"); typeInfo.firstState = b.at("states")[0].at("id");
         typeInfo.device = classify(typeInfo.name, typeInfo.className);
+        for(const auto& name:vibrationData.at("occludes_vibration_signals")) if(name==typeInfo.name) typeInfo.occludesVibrations=true;
+        for(const auto& name:vibrationData.at("dampens_vibrations")) if(name==typeInfo.name) typeInfo.dampensVibrations=true;
+        for(const auto& name:vibrationData.at("vibration_resonators")) if(name==typeInfo.name) typeInfo.vibrationResonator=true;
+        if(typeInfo.occludesVibrations || typeInfo.dampensVibrations || typeInfo.vibrationResonator) typeInfo.device=Device::solid;
         typeInfo.supportLevel = (typeInfo.device <= Device::movingPiston || typeInfo.device == Device::target) ? "implemented" : "unimplemented";
         if (typeInfo.device == Device::door || typeInfo.device == Device::trapdoor || typeInfo.device == Device::fenceGate) typeInfo.supportLevel = "implemented";
         if (typeInfo.device == Device::pressurePlate || typeInfo.device == Device::weightedPlate || typeInfo.device == Device::lightningRod || typeInfo.device == Device::daylight || typeInfo.device == Device::lectern) typeInfo.supportLevel = "externalStimulus";
@@ -65,6 +77,7 @@ BlockRegistry::BlockRegistry(const std::string& path) {
         if (typeInfo.device == Device::dropper) typeInfo.supportLevel = "partial";
         if (typeInfo.className == "ChiseledBookShelfBlock") typeInfo.supportLevel = "partial";
         if (typeInfo.className == "DecoratedPotBlock") typeInfo.supportLevel = "partial";
+        if (typeInfo.device == Device::sculkSensor || typeInfo.device == Device::calibratedSensor) typeInfo.supportLevel = "partial";
         if (typeInfo.device == Device::target) typeInfo.supportLevel = "externalStimulus";
         if (typeInfo.device == Device::rail || typeInfo.device == Device::poweredRail || typeInfo.device == Device::activatorRail) typeInfo.supportLevel = "implemented";
         if (typeInfo.device == Device::detectorRail) typeInfo.supportLevel = "externalStimulus";
@@ -115,6 +128,17 @@ BlockRegistry::BlockRegistry(const std::string& path) {
             for (std::size_t i = 0; i < 4; ++i) { auto side = val(directionNames[static_cast<unsigned>(horizontal[i])], "none"); st.wireSides[i] = side == "up" ? 2 : side == "side" ? 1 : 0; }
         }
     }
+}
+std::uint16_t BlockRegistry::gameEventId(const std::string& name) const {
+    auto key=name.find(':')==std::string::npos?"minecraft:"+name:name;
+    const auto found=gameEventNames.find(key);
+    if(found==gameEventNames.end()) throw std::invalid_argument("未知游戏事件："+name);
+    return found->second;
+}
+Json BlockRegistry::gameEventCatalog() const {
+    Json result=Json::array();
+    for(const auto& event:gameEvents) result.push_back({{"name",event.name},{"radius",event.radius},{"frequency",event.frequency},{"listenable",event.listenable},{"ignoreSneaking",event.ignoreSneaking}});
+    return result;
 }
 std::uint32_t BlockRegistry::itemId(const std::string& name) const {
     auto key = name.find(':') == std::string::npos ? "minecraft:" + name : name;
