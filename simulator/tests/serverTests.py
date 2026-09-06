@@ -140,6 +140,18 @@ try:
     assert command('inspect', pos=[0,0,0])['inventory'][1]['item'] == 'minecraft:wooden_sword'
     assert command('stimulate', pos=[0,0,0], stimulus={'inventory': [{'slot': 0, 'item': 'wooden_sword', 'count': 64}]})['type'] == 'error'
     assert command('inspect', pos=[0,0,0])['inventory'][0]['count'] == 64
+    command('new')
+    command('place', pos=[0,0,0], name='hopper', properties={'facing': 'east'})
+    command('place', pos=[1,0,0], name='barrel')
+    command('stimulate', pos=[0,0,0], stimulus={'inventory': [{'slot': 0, 'item': 'stone', 'count': 2}]})
+    command('step', count=1)
+    assert command('inspect', pos=[1,0,0])['inventory'][0]['count'] == 1
+    hopper = command('save', checkpoint=True)
+    command('step', count=8)
+    assert command('inspect', pos=[1,0,0])['inventory'][0]['count'] == 2
+    command('load', project=hopper)
+    command('step', count=8)
+    assert command('inspect', pos=[1,0,0])['inventory'][0]['count'] == 2
     assert frames > 0
     print(f'PASS: HTTP host validation, binary frames ({frames}), circuit editing, delay, probes, VCD, atomic errors, native undo/redo, checkpoint import')
 finally:

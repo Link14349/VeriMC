@@ -3,9 +3,9 @@ import { connection, posKey, type Pos, type BlockCell } from './api';
 import { shortName } from './blockLabels';
 
 type Stack = { slot: number; item: string; count: number };
-type Props = { pos: Pos; command: (cmd: string, body?: Record<string, unknown>) => Promise<Record<string, unknown> | undefined> };
+type Props = { pos: Pos; hopper?: boolean; command: (cmd: string, body?: Record<string, unknown>) => Promise<Record<string, unknown> | undefined> };
 
-export function InventoryControls({ pos, command }: Props) {
+export function InventoryControls({ pos, hopper = false, command }: Props) {
   const [slots, setSlots] = useState<Stack[]>([]), [size, setSize] = useState(27), [slot, setSlot] = useState(0);
   const [item, setItem] = useState('minecraft:stone'), [count, setCount] = useState(64), [analog, setAnalog] = useState(0), [viewers, setViewers] = useState(0);
   const key = posKey(pos);
@@ -47,7 +47,7 @@ export function InventoryControls({ pos, command }: Props) {
     <label className="propertyRow"><span>数量 / {info?.maxStack ?? '—'}</span><input aria-label="物品数量" type="number" min={0} max={info?.maxStack ?? 99} value={count} onChange={e => setCount(Number(e.target.value))}/></label>
     <button className="wideButton accentOutline" onClick={() => update([{ slot, item, count }])}>写入所选槽位</button>
     <button className="wideButton" onClick={() => update([{ slot, item, count: 0 }])}>清空所选槽位</button>
-    <button className="wideButton" onClick={() => command('stimulate', { pos, stimulus: { viewers: viewers ? 0 : 1 } })}>{viewers ? '关闭容器' : '打开容器'}</button>
-    <p className="subtleText">当前查看人数 {viewers}。支持默认物品；自定义组件仍在开发中。</p>
+    {!hopper && <button className="wideButton" onClick={() => command('stimulate', { pos, stimulus: { viewers: viewers ? 0 : 1 } })}>{viewers ? '关闭容器' : '打开容器'}</button>}
+    <p className="subtleText">{hopper ? '先推出，再从上方吸入；红石供电时锁定。' : `当前查看人数 ${viewers}。`}支持默认物品；自定义组件仍在开发中。</p>
   </div>;
 }

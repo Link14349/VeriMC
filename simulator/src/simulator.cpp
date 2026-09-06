@@ -106,7 +106,16 @@ void Simulator::setBlock(BlockPos p, StateId id, unsigned flags, int depth) {
     sampleAffected(p);
     if (oldState.type != state.type) {
         runtime.erase(p);
-        motions.erase(p);
+        if (auto motion = motions.find(p); motion != motions.end()) {
+            scheduledKeys.erase({p, oldState.type, 2, motion->second.generation});
+            motions.erase(motion);
+        }
+        if (oldState.device == Device::daylight) scheduledKeys.erase({p, oldState.type, 2, 0});
+        if (auto hopper = hoppers.find(p); hopper != hoppers.end()) {
+            scheduledKeys.erase({p, oldState.type, 2, hopper->second.generation});
+            hoppers.erase(hopper);
+        }
+        entityOrders.erase(p);
         if ((flags & 1u) != 0 && (flags & 64u) == 0) onRemove(p, old);
     }
     onPlace(p, id, old);
@@ -118,6 +127,7 @@ void Simulator::setBlock(BlockPos p, StateId id, unsigned flags, int depth) {
         for (auto dir : shapeOrder) enqueue({UpdateKind::shape, p.relative(dir), opposite(dir), id, 0, -1, depth - 1, nextFlags});
         indirectShapes(p, id, nextFlags, depth - 1);
     }
+    if (!hoppers.empty()) wakeHoppers(p);
 }
 bool Simulator::survives(BlockPos p, StateId id) const {
     const auto& s = registry[id]; const auto& below = at(p.relative(Direction::down));
@@ -171,6 +181,7 @@ void Simulator::onPlace(BlockPos p, StateId id, StateId old) {
     case Device::observer: if (s.powered && !hasScheduled(p)) { setBlock(p, registry.withBool(id, "powered", false), 18); notifyFront(p, s.facing); } break;
     case Device::bulb: executeNeighbor(p); break;
     case Device::daylight: schedulePhase(p, currentTick + 20 - currentTick % 20, 2, 0); break;
+    case Device::hopper: executeNeighbor(p); startHopper(p); break;
     case Device::piston: checkPiston(p); break;
     default: break;
     }
@@ -186,7 +197,7 @@ void Simulator::onRemove(BlockPos p, StateId old) {
     case Device::pressurePlate: case Device::weightedPlate: if (s.powered || s.power > 0) { updateNeighbors(p, -1, old); updateNeighbors(p.relative(Direction::down), -1, old); } break;
     case Device::lightningRod: if (s.powered) updateNeighbors(p.relative(opposite(s.facing)), -1, old); break;
     case Device::lectern: if (s.powered) updateNeighbors(p.relative(Direction::down), -1, old); break;
-    case Device::container: updateComparatorNeighbors(p); break;
+    case Device::container: case Device::hopper: updateComparatorNeighbors(p); break;
     case Device::pistonHead: { auto base = p.relative(opposite(s.facing)); if (at(base).device == Device::piston && at(base).extended && at(base).facing == s.facing) setBlock(base, 0); break; }
     default: break;
     }
@@ -334,6 +345,11 @@ void Simulator::executeNeighbor(BlockPos p, StateId source) {
     }
     case Device::piston: checkPiston(p); break;
     case Device::pistonHead: if (survives(p, id)) neighborChanged(p.relative(opposite(s.facing))); break;
+    case Device::hopper: {
+        bool enabled = bestSignal(p) == 0;
+        if ((registry.property(id, "enabled") == "true") != enabled) setBlock(p, registry.withBool(id, "enabled", enabled), 2);
+        break;
+    }
     default: break;
     }
 }
@@ -373,23 +389,41 @@ void Simulator::executeTick(const ScheduledEvent& event) {
 }
 bool Simulator::stepEvent() {
     if (faulted) throw std::runtime_error("当前执行已中止，请从有效快照恢复");
+    pruneEvents();
     if (scheduled.empty() || breakRequested) return false;
     auto event = scheduled.top(); scheduled.pop(); scheduledKeys.erase({event.pos, event.type, event.phase, event.data});
     currentTick = std::max(currentTick, event.tick); ++sequence;
     currentPhase = event.phase;
+    currentEntityOrder = event.entityOrder;
     try {
-        if (at(event.pos).type == event.type) { if (event.phase == 1) pistonEvent(event); else if (event.phase == 2) { if (at(event.pos).device == Device::daylight) updateDaylight(event.pos); else tickMotion(event); } else executeTick(event); ++statistics.scheduledEvents; }
+        if (at(event.pos).type == event.type) {
+            if (event.phase == 1) pistonEvent(event);
+            else if (event.phase == 2) {
+                if (at(event.pos).device == Device::daylight) updateDaylight(event.pos);
+                else if (at(event.pos).device == Device::hopper) tickHopper(event);
+                else tickMotion(event);
+            } else executeTick(event);
+            ++statistics.scheduledEvents;
+        }
     } catch (...) { currentPhase = 3; throw; }
     currentPhase = 3;
     return true;
+}
+void Simulator::pruneEvents() {
+    while (!scheduled.empty()) {
+        const auto& e = scheduled.top();
+        if (scheduledKeys.contains({e.pos, e.type, e.phase, e.data})) break;
+        scheduled.pop();
+    }
 }
 std::size_t Simulator::advanceTo(Tick target, std::size_t eventBudget, std::chrono::microseconds wallBudget) {
     if (faulted) throw std::runtime_error("当前执行已中止，请从有效快照恢复");
     if (target < currentTick) throw std::invalid_argument("不能倒退时间，请加载运行快照");
     auto start = std::chrono::steady_clock::now(); std::size_t count = 0;
+    pruneEvents();
     while (!scheduled.empty() && scheduled.top().tick <= target && !breakRequested && count < eventBudget) {
         if ((count & 63u) == 0 && std::chrono::steady_clock::now() - start >= wallBudget) break;
-        stepEvent(); ++count;
+        stepEvent(); ++count; pruneEvents();
     }
     if (!breakRequested && (scheduled.empty() || scheduled.top().tick > target)) currentTick = target;
     statistics.simulationMicros += static_cast<std::uint64_t>(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - start).count());
@@ -422,7 +456,7 @@ void Simulator::stimulate(BlockPos p, const Json& input) {
     throw std::invalid_argument("该器件尚不支持这类环境刺激");
 }
 void Simulator::clear() {
-    world.clear(); runtime.clear(); motions.clear(); scheduled = {}; scheduledKeys.clear(); changes.clear(); currentTick = 0; nextOrder = 0; sequence = 0; currentPhase = 3;
+    world.clear(); runtime.clear(); motions.clear(); hoppers.clear(); entityOrders.clear(); nextEntityOrder = 0; scheduled = {}; scheduledKeys.clear(); changes.clear(); currentTick = 0; nextOrder = 0; sequence = 0; currentPhase = 3;
     probes.clear(); probeDependencies.clear(); nextProbeId = 1; trace.clear(); traceDropped = 0; statistics = {}; breakRequested = false; faulted = false; pauseReason.clear(); ++revision;
 }
 std::vector<Cell> Simulator::takeChanges() { std::vector<Cell> result; result.reserve(changes.size()); for (const auto& [p, id] : changes) result.push_back({p, id}); changes.clear(); return result; }

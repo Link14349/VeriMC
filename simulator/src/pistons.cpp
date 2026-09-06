@@ -71,7 +71,12 @@ Simulator::PistonPlan Simulator::resolvePiston(BlockPos pos, Direction facing, b
 }
 void Simulator::schedulePhase(BlockPos pos, Tick when, std::uint8_t phase, std::uint64_t data) {
     auto type = at(pos).type;
-    if (scheduledKeys.insert({pos, type, phase, data}).second) scheduled.push({when, 0, nextOrder++, pos, type, phase, data});
+    if (scheduledKeys.insert({pos, type, phase, data}).second) scheduled.push({when, 0, nextOrder++, pos, type, phase, data, phase == 2 ? registerEntity(pos) : 0});
+}
+std::uint64_t Simulator::registerEntity(BlockPos pos) {
+    auto [found, added] = entityOrders.try_emplace(pos, nextEntityOrder);
+    if (added) ++nextEntityOrder;
+    return found->second;
 }
 void Simulator::checkPiston(BlockPos pos) {
     const auto& state = at(pos); if (state.device != Device::piston) return;
@@ -86,6 +91,7 @@ void Simulator::checkPiston(BlockPos pos) {
     }
 }
 void Simulator::addMotion(BlockPos pos, StateId state, Direction facing, bool extending, bool source) {
+    if (auto old = motions.find(pos); old != motions.end()) scheduledKeys.erase({pos, at(pos).type, 2, old->second.generation});
     PistonMotion motion{state, facing, extending, source, 0, 0, 0, nextOrder++};
     motions[pos] = motion;
     schedulePhase(pos, currentTick + (currentPhase < 2 ? 0 : 1), 2, motion.generation);
@@ -150,6 +156,7 @@ void Simulator::finishMotion(BlockPos pos, bool force) {
     auto found = motions.find(pos); if (found == motions.end()) return;
     const auto motion = found->second;
     if (force && motion.previousProgress >= 2) return;
+    scheduledKeys.erase({pos, at(pos).type, 2, motion.generation});
     motions.erase(pos);
     if (at(pos).device != Device::movingPiston) return;
     auto next = force && motion.source ? 0 : motion.movedState;

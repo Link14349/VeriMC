@@ -115,6 +115,18 @@ public:
 };
 void Hub::demo(const std::string& kind) {
     sim.clear(); projectName = "脉冲与记忆 · 入门电路";
+    if (kind == "inventory") {
+        projectName = "漏斗实验 · 传输与锁定";
+        for (int x = -1; x <= 7; ++x) for (int z = -1; z <= 4; ++z) sim.world.set({x,0,z}, registry.state("white_concrete"));
+        for (int x = 0; x < 5; ++x) sim.place({x,1,0}, registry.state("hopper", {{"facing","east"}}));
+        sim.place({0,2,0}, registry.state("chest")); sim.place({5,1,0}, registry.state("barrel"));
+        sim.stimulate({0,2,0}, {{"inventory", Json::array({{{"slot",0},{"item","stone"},{"count",16}}})}});
+        sim.place({2,1,1}, registry.state("lever", {{"face","floor"}}));
+        sim.place({5,1,1}, registry.state("comparator", {{"facing","north"}}));
+        sim.place({5,1,2}, registry.state("redstone_wire")); sim.place({5,1,3}, registry.state("redstone_lamp"));
+        sim.addProbe({0,1,0}, "首级漏斗"); sim.addProbe({2,1,0}, "锁定漏斗"); sim.addProbe({5,1,1}, "到货读数");
+        runStart = sim.clone(); return;
+    }
     if (kind == "environment") {
         projectName = "环境实验 · 感测与读数";
         for (int x = -1; x <= 10; ++x) for (int z = -1; z <= 9; ++z) sim.world.set({x,0,z},registry.state("white_concrete"));

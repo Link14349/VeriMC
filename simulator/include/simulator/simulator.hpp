@@ -9,8 +9,8 @@
 namespace simulator {
 struct ScheduledEvent {
     Tick tick{}; int priority{}; std::uint64_t order{}; BlockPos pos{}; std::uint16_t type{};
-    std::uint8_t phase{}; std::uint64_t data{};
-    auto key() const { return std::tuple(tick, phase, priority, order); }
+    std::uint8_t phase{}; std::uint64_t data{}, entityOrder{};
+    auto key() const { return std::tuple(tick, phase, priority, phase == 2 ? entityOrder : order, order); }
 };
 struct EventLater { bool operator()(const ScheduledEvent& a, const ScheduledEvent& b) const { return a.key() > b.key(); } };
 struct EventKey { BlockPos pos; std::uint16_t type; std::uint8_t phase{}; std::uint64_t data{}; bool operator==(const EventKey&) const = default; };
@@ -20,6 +20,10 @@ struct Probe { std::uint32_t id{}; BlockPos pos{}; std::string name; std::string
 struct ItemStack { std::uint32_t item{}; std::uint16_t count{}; bool operator==(const ItemStack&) const = default; };
 struct RuntimeData { int output{}; std::deque<Tick> torchToggles; Json values = Json::object(); std::vector<ItemStack> inventory; };
 struct PistonMotion { StateId movedState{}; Direction facing{}; bool extending{}, source{}; unsigned progress{}, previousProgress{}; Tick lastTicked{}; std::uint64_t generation{}; };
+struct HopperState {
+    Tick readyAt{}, firstTick{}, wakeAt{UINT64_MAX};
+    std::uint64_t generation{};
+};
 struct Statistics { std::uint64_t updates{}, scheduledEvents{}, stateChanges{}; std::uint64_t simulationMicros{}; };
 class Simulator {
 public:
@@ -52,8 +56,8 @@ public:
     bool hasScheduled(BlockPos pos) const;
     bool stepEvent();
     std::size_t advanceTo(Tick target, std::size_t eventBudget = 1000000, std::chrono::microseconds wallBudget = std::chrono::seconds(10));
-    std::size_t pendingEvents() const { return scheduled.size(); }
-    Tick nextTick() const { return scheduled.empty() ? currentTick : scheduled.top().tick; }
+    std::size_t pendingEvents() const { return scheduledKeys.size(); }
+    Tick nextTick() { pruneEvents(); return scheduled.empty() ? currentTick : scheduled.top().tick; }
     void clear();
     std::uint32_t addProbe(BlockPos pos, const std::string& name = "", const std::string& mode = "output", Direction direction = Direction::up);
     void removeProbe(std::uint32_t id);
@@ -63,12 +67,17 @@ public:
     void clearTrace();
     std::vector<Cell> takeChanges();
     Json inspect(BlockPos pos) const;
+    Json inventoryJson(BlockPos pos, bool combined = true) const;
     Json saveProject(const std::string& name = "未命名电路", bool checkpoint = false) const;
     void loadProject(const Json& data);
     std::string exportVcd() const;
     std::unique_ptr<Simulator> clone() const;
     void restore(const Simulator& snapshot);
-    std::size_t estimatedBytes() const { return world.storageBytes() + trace.size() * sizeof(TraceEdge) + runtime.size() * 512 + scheduled.size() * 96; }
+    std::size_t estimatedBytes() const {
+        auto bytes = world.storageBytes() + trace.size() * sizeof(TraceEdge) + runtime.size() * 512 + scheduled.size() * 128 + hoppers.size() * 96 + entityOrders.size() * 64;
+        for (const auto& [pos, data] : runtime) { (void)pos; bytes += data.inventory.capacity() * sizeof(ItemStack) + (data.torchToggles.empty() ? 0 : 4096); }
+        return bytes;
+    }
     const PistonMotion* motionAt(BlockPos pos) const { auto it = motions.find(pos); return it == motions.end() ? nullptr : &it->second; }
 private:
     enum class UpdateKind { neighbor, shape, multi };
@@ -80,12 +89,15 @@ private:
     std::unordered_set<EventKey, EventKeyHash> scheduledKeys;
     std::unordered_map<BlockPos, RuntimeData, PosHash> runtime;
     std::unordered_map<BlockPos, PistonMotion, PosHash> motions;
+    std::unordered_map<BlockPos, HopperState, PosHash> hoppers;
+    std::unordered_map<BlockPos, std::uint64_t, PosHash> entityOrders;
     std::unordered_map<BlockPos, StateId, PosHash> changes;
     std::vector<Probe> probes;
     std::unordered_map<BlockPos, std::vector<std::uint32_t>, PosHash> probeDependencies;
     std::deque<TraceEdge> trace;
     std::uint32_t nextProbeId{1};
     std::uint64_t nextOrder{}, sequence{};
+    std::uint64_t nextEntityOrder{}, currentEntityOrder{};
     std::uint8_t currentPhase{3};
     void enqueue(Update update);
     void executeNeighbor(BlockPos pos, StateId source = 0);
@@ -123,6 +135,8 @@ private:
     void tickMotion(const ScheduledEvent& event);
     void finishMotion(BlockPos pos, bool force);
     void schedulePhase(BlockPos pos, Tick when, std::uint8_t phase, std::uint64_t data);
+    std::uint64_t registerEntity(BlockPos pos);
+    void pruneEvents();
     void updateComparatorNeighbors(BlockPos pos);
     void runtimeChanged(BlockPos pos);
     void updatePressurePlate(BlockPos pos);
@@ -138,8 +152,16 @@ private:
     void updateChestShape(const Update& update);
     ItemStack stackAt(const InventorySlot& slot) const;
     int containerAnalog(BlockPos pos) const;
-    Json inventoryJson(BlockPos pos, bool combined = true) const;
     void setInventory(BlockPos pos, const Json& slots, bool combined = true, bool notify = true);
     void setViewers(BlockPos pos, int viewers);
+    void writeStack(const InventorySlot& slot, ItemStack stack, bool notify = true);
+    void containerChanged(BlockPos pos);
+    bool inventoryEmpty(BlockPos pos) const;
+    bool inventoryFull(BlockPos pos) const;
+    bool transferItem(BlockPos from, BlockPos to, bool pulling = false);
+    void wakeHopper(BlockPos pos);
+    void wakeHoppers(BlockPos changed);
+    void tickHopper(const ScheduledEvent& event);
+    void startHopper(BlockPos pos);
 };
 }

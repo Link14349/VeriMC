@@ -11,7 +11,7 @@
 5. `python3 tools/reference/captureRedstone.py`：用本项目原创输入场景运行原版 GameTest，生成 `tests/fixtures/java26_2Redstone.json`。测试世界仅位于忽略的 `.cache/reference/captureWorld/`，重跑时替换该缓存世界。
 6. 构建后执行 `ctest --preset release`，独立 C++ 内核按相同绝对坐标、放置顺序和游戏刻逐帧比较状态 ID 与比较器内部输出。
 
-扩展数据与场景：生成报告后运行 `python3 tools/reference/exportItems.py` 导出默认物品堆叠上限；`captureDevices.py` 和 `captureContainers.py` 分别生成环境器件、库存场景。`runReferenceTool.py ExportDaylight <绝对输出路径>` 生成阳光探测器数值对照。三种 GameTest 生成脚本共享缓存世界，请顺序运行。
+扩展数据与场景：生成报告后运行 `python3 tools/reference/exportItems.py` 导出默认物品堆叠上限；`captureDevices.py`、`captureContainers.py` 和 `captureHoppers.py` 分别生成环境器件、库存与传输场景。`runReferenceTool.py ExportDaylight <绝对输出路径>` 生成阳光探测器数值对照。四种 GameTest 生成脚本共享缓存世界，请顺序运行。
 
 正常构建、启动、仿真和测试不依赖 Java 或 Minecraft 安装；注册表和场景观测结果随项目提供。JAR、反编译参考源码、游戏资源和缓存世界不进入 Git。
 
@@ -28,6 +28,6 @@
 
 当前差分覆盖粉线衰减、中继器短脉冲、锁定/解锁、侦测器、铜灯、火把/灯状态和比较器读出/减法，以及普通活塞推动、黏性回拉、短脉冲吐块、准连接需通知才触发、黏液分支、蜂蜜隔离和 13 方块阻塞。共 25 刻、47 个观测点。另验证活塞运动中保存/恢复后继续运行。没有证据的复杂场景不能因基本测试通过而自动标为兼容。
 
-当前队列使用游戏刻、执行阶段、优先级和加入序号；区分计划刻、活塞方块事件与运动实体更新。跨区块同刻事件的原版批量收集细节尚需专项差分。立即更新预算耗尽会使本次运行报错并停止，禁止继续执行该部分更新过的状态；可撤销或加载有效快照。
+当前队列使用游戏刻、执行阶段、优先级和加入序号；方块实体阶段使用固定注册序号；区分计划刻、活塞方块事件与运动实体更新。跨区块同刻事件的原版批量收集细节尚需专项差分。立即更新预算耗尽会使本次运行报错并停止，禁止继续执行该部分更新过的状态；可撤销或加载有效快照。
 
-扩展差分覆盖另有 29 刻 / 32 点环境器件和 17 刻 / 14 点容器；详细机制与边界见 [环境输入](environmentInputs.md) 和 [库存模型](inventoryModel.md)。阳光公式的 11,536 个数值样本不等于世界光照仿真测试。
+扩展差分覆盖另有 29 刻 / 32 点环境器件和 17 刻 / 14 点容器，以及 65 刻 / 25 点漏斗槽位传输；详细机制与边界见 [环境输入](environmentInputs.md) 和 [库存模型](inventoryModel.md)。阳光公式的 11,536 个数值样本不等于世界光照仿真测试。

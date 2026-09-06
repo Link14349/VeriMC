@@ -113,15 +113,21 @@ public class CaptureRedstone extends TestFunctionLoader {
                     var absolute = helper.absolutePos(pos(command.getAsJsonArray("pos")));
                     applyCommand(helper, absolute, command);
                 }
-                JsonObject frame = new JsonObject(); frame.addProperty("tick", tick); JsonArray states = new JsonArray(); JsonArray analogs = new JsonArray();
+                JsonObject frame = new JsonObject(); frame.addProperty("tick", tick); JsonArray states = new JsonArray(); JsonArray analogs = new JsonArray(); JsonArray inventories = new JsonArray();
                 for (var value : scenario.getAsJsonArray("watch")) {
                     var absolute = helper.absolutePos(pos(value.getAsJsonArray()));
                     states.add(Block.getId(helper.getLevel().getBlockState(absolute)));
                     var entity = helper.getLevel().getBlockEntity(absolute);
                     var state = helper.getLevel().getBlockState(absolute);
                     analogs.add(entity instanceof ComparatorBlockEntity comparator ? comparator.getOutputSignal() : state.hasAnalogOutputSignal() ? state.getAnalogOutputSignal(helper.getLevel(), absolute, Direction.NORTH) : -1);
+                    JsonArray inventory = new JsonArray();
+                    if (entity instanceof Container container) for (int slot = 0; slot < container.getContainerSize(); ++slot) {
+                        var stack = container.getItem(slot);
+                        if (!stack.isEmpty()) { var row = new JsonObject(); row.addProperty("slot", slot); row.addProperty("item", BuiltInRegistries.ITEM.getKey(stack.getItem()).toString()); row.addProperty("count", stack.getCount()); inventory.add(row); }
+                    }
+                    inventories.add(inventory);
                 }
-                frame.add("states", states); frame.add("analogs", analogs); frames.add(frame);
+                frame.add("states", states); frame.add("analogs", analogs); frame.add("inventories", inventories); frames.add(frame);
                 if (tick == end) {
                     try { Files.writeString(output, new GsonBuilder().setPrettyPrinting().create().toJson(result)); }
                     catch (Exception e) { throw new RuntimeException(e); }

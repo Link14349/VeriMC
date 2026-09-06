@@ -133,6 +133,13 @@ export class CircuitViewport {
         if (!open || (moving && source && !extending)) { const headOffset = moving ? 1-progress : 0; pistonPart(.37+headOffset,.25,.99,sticky?0x8da96a:0xbb9f70); if(moving)pistonPart(headOffset*.5,.8,.22,0xaaa58e); }
         for (const offset of [-.25,0,.25]) part([.5,.995,.5+offset],[.77,.01,.045],0x48534f);
       }
+    } else if (name === 'hopper') {
+      const tint = p.enabled === 'false' ? 0x596369 : 0x788487;
+      for (const edge of [.0625,.9375]) { part([edge,.8,.5],[.125,.4,1],tint); part([.5,.8,edge],[.75,.4,.125],tint); }
+      part([.5,.51,.5],[.75,.18,.75],tint); part([.5,.3,.5],[.42,.3,.42],tint);
+      const v = directionVectors[facing];
+      part([.5+v[0]*.28,.19+v[1]*.08,.5+v[2]*.28],[v[0] ? .56 : .25,v[1] ? .38 : .25,v[2] ? .56 : .25],tint);
+      part([.5,.605,.5],[.73,.012,.73],0x283135);
     } else if (name.endsWith('chest')) {
       const v = directionVectors[facing], opened = (cell.motion & 1024) !== 0;
       const width = p.type !== 'single' ? 1 : .875;

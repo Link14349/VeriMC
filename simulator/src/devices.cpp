@@ -44,6 +44,7 @@ void Simulator::runtimeChanged(BlockPos pos) {
     changes[pos] = world.get(pos);
     sampleAffected(pos);
     updateComparatorNeighbors(pos);
+    if (!hoppers.empty()) wakeHoppers(pos);
 }
 
 void Simulator::updatePressurePlate(BlockPos pos) {
@@ -127,9 +128,9 @@ bool Simulator::stimulateDevice(BlockPos pos, const Json& stimulus) {
     if (!stimulus.is_object()) throw std::invalid_argument("环境输入必须是对象");
     auto id = world.get(pos);
     const auto& state = registry[id];
-    if (state.device == Device::container) {
+    if (state.device == Device::container || state.device == Device::hopper) {
         if (stimulus.contains("inventory")) setInventory(pos, stimulus.at("inventory"));
-        else if (stimulus.contains("viewers")) setViewers(pos, integerInRange(stimulus, "viewers", 0, 1000000));
+        else if (state.device == Device::container && stimulus.contains("viewers")) setViewers(pos, integerInRange(stimulus, "viewers", 0, 1000000));
         else throw std::invalid_argument("Container input requires inventory or viewers");
         return true;
     }

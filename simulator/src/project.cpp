@@ -9,6 +9,7 @@ std::unique_ptr<Simulator> Simulator::clone() const {
 void Simulator::restore(const Simulator& snapshot) {
     if (&registry != &snapshot.registry) throw std::invalid_argument("运行快照的注册表不匹配");
     world = snapshot.world; runtime = snapshot.runtime; motions = snapshot.motions; scheduled = snapshot.scheduled; scheduledKeys = snapshot.scheduledKeys;
+    hoppers = snapshot.hoppers; entityOrders = snapshot.entityOrders; nextEntityOrder = snapshot.nextEntityOrder;
     probes = snapshot.probes; probeDependencies = snapshot.probeDependencies; trace = snapshot.trace;
     currentTick = snapshot.currentTick; nextOrder = snapshot.nextOrder; sequence = snapshot.sequence; nextProbeId = snapshot.nextProbeId;
     traceDropped = snapshot.traceDropped; traceCapacity = snapshot.traceCapacity; updateBudget = snapshot.updateBudget; statistics = snapshot.statistics;
@@ -31,11 +32,20 @@ Json Simulator::saveProject(const std::string& name, bool checkpoint) const {
     }
     auto positionOrder = [](const Json& a, const Json& b) { return a.at("pos") < b.at("pos"); };
     std::sort(data["blockData"].begin(), data["blockData"].end(), positionOrder);
+    data["entityOrder"] = Json::array();
+    std::vector<std::pair<std::uint64_t, BlockPos>> orderedEntities;
+    for (const auto& [pos, rank] : entityOrders) orderedEntities.push_back({rank, pos});
+    std::sort(orderedEntities.begin(), orderedEntities.end());
+    for (const auto& [rank, pos] : orderedEntities) data["entityOrder"].push_back({{"pos", pos}, {"order", rank}});
+    data["nextEntityOrder"] = nextEntityOrder;
     if (checkpoint) {
         data["faulted"] = faulted;
         data["tick"] = currentTick; data["nextOrder"] = nextOrder; data["sequence"] = sequence; data["nextProbeId"] = nextProbeId;
         data["events"] = Json::array(); auto queue = scheduled;
-        while (!queue.empty()) { const auto e = queue.top(); queue.pop(); data["events"].push_back({{"tick", e.tick}, {"priority", e.priority}, {"order", e.order}, {"pos", e.pos}, {"type", e.type}, {"phase", e.phase}, {"data", e.data}}); }
+        while (!queue.empty()) { const auto e = queue.top(); queue.pop(); if (scheduledKeys.contains({e.pos, e.type, e.phase, e.data})) data["events"].push_back({{"tick", e.tick}, {"priority", e.priority}, {"order", e.order}, {"pos", e.pos}, {"type", e.type}, {"phase", e.phase}, {"data", e.data}, {"entityOrder", e.entityOrder}}); }
+        data["hoppers"] = Json::array();
+        for (const auto& [pos, h] : hoppers) data["hoppers"].push_back({{"pos", pos}, {"readyAt", h.readyAt}, {"firstTick", h.firstTick}, {"wakeAt", h.wakeAt}, {"generation", h.generation}});
+        std::sort(data["hoppers"].begin(), data["hoppers"].end(), positionOrder);
         data["motions"] = Json::array();
         for (const auto& [p, m] : motions) data["motions"].push_back({{"pos", p}, {"movedState", m.movedState}, {"facing", static_cast<unsigned>(m.facing)}, {"extending", m.extending}, {"source", m.source}, {"progress", m.progress}, {"previousProgress", m.previousProgress}, {"lastTicked", m.lastTicked}, {"generation", m.generation}});
         std::sort(data["motions"].begin(), data["motions"].end(), positionOrder);
@@ -61,6 +71,13 @@ void Simulator::loadProject(const Json& data) {
         if (!occupied.insert(p).second) throw std::invalid_argument("工程包含重复坐标");
         candidate.world.set(p, id);
     }
+    std::unordered_set<std::uint64_t> usedRanks;
+    candidate.nextEntityOrder = data.value("nextEntityOrder", std::uint64_t{0});
+    for (const auto& row : data.value("entityOrder", Json::array())) {
+        auto pos = row.at("pos").get<BlockPos>(); auto rank = row.at("order").get<std::uint64_t>();
+        auto device = candidate.at(pos).device;
+        if ((device != Device::hopper && device != Device::daylight && device != Device::movingPiston) || rank >= candidate.nextEntityOrder || !usedRanks.insert(rank).second || !candidate.entityOrders.emplace(pos, rank).second) throw std::invalid_argument("无效方块实体执行顺序");
+    }
     for (const auto& row : data.value("blockData", Json::array())) {
         auto p = row.at("pos").get<BlockPos>();
         if (candidate.world.get(p) == 0) throw std::invalid_argument("器件数据对应位置没有方块");
@@ -74,9 +91,28 @@ void Simulator::loadProject(const Json& data) {
         if (data.at("events").size() > 2000000) throw std::invalid_argument("工程计划事件过多");
         for (const auto& row : data.at("events")) {
             ScheduledEvent e{row.at("tick"), row.at("priority"), row.at("order"), row.at("pos").get<BlockPos>(), row.at("type"), row.value("phase", std::uint8_t{0}), row.value("data", std::uint64_t{0})};
+            if (e.phase == 2) {
+                if (!row.contains("entityOrder")) throw std::invalid_argument("旧版快照缺少方块实体执行顺序，请使用电路工程重新开始运行");
+                e.entityOrder = row.at("entityOrder");
+                auto rank = candidate.entityOrders.find(e.pos);
+                if (rank == candidate.entityOrders.end() || rank->second != e.entityOrder || candidate.at(e.pos).type != e.type) throw std::invalid_argument("运行事件的方块实体顺序不一致");
+            }
             if (e.phase == 1 && ((e.data & 3u) > 2 || (e.data >> 2) > 5)) throw std::invalid_argument("无效活塞方块事件");
             if (e.tick < candidate.currentTick || e.priority < -3 || e.priority > 3 || e.phase > 2 || e.order >= candidate.nextOrder || !candidate.scheduledKeys.insert({e.pos, e.type, e.phase, e.data}).second) throw std::invalid_argument("无效的运行队列");
             candidate.scheduled.push(e);
+        }
+        for (const auto& row : data.value("hoppers", Json::array())) {
+            auto pos = row.at("pos").get<BlockPos>();
+            HopperState hopper{row.at("readyAt"), row.at("firstTick"), row.at("wakeAt"), row.at("generation")};
+            if (candidate.at(pos).device != Device::hopper || !candidate.entityOrders.contains(pos) || hopper.generation >= candidate.nextOrder || (hopper.wakeAt != UINT64_MAX && hopper.wakeAt < candidate.currentTick) || !candidate.hoppers.emplace(pos, hopper).second) throw std::invalid_argument("无效漏斗运行状态");
+            if (hopper.wakeAt != UINT64_MAX && !candidate.scheduledKeys.contains({pos, candidate.at(pos).type, 2, hopper.generation})) throw std::invalid_argument("快照缺少漏斗唤醒事件");
+        }
+        auto hopperQueue = candidate.scheduled;
+        while (!hopperQueue.empty()) {
+            const auto event = hopperQueue.top(); hopperQueue.pop();
+            if (event.phase != 2 || candidate.at(event.pos).device != Device::hopper) continue;
+            auto hopper = candidate.hoppers.find(event.pos);
+            if (hopper == candidate.hoppers.end() || event.data != hopper->second.generation || event.tick != hopper->second.wakeAt) throw std::invalid_argument("漏斗冷却与唤醒队列不一致");
         }
         for (const auto& row : data.value("motions", Json::array())) {
             auto p = row.at("pos").get<BlockPos>(); auto direction = row.at("facing").get<unsigned>(); auto moved = row.at("movedState").get<StateId>();
@@ -84,6 +120,7 @@ void Simulator::loadProject(const Json& data) {
             candidate.motions[p] = {moved, static_cast<Direction>(direction), row.at("extending"), row.at("source"), row.at("progress"), row.at("previousProgress"), row.at("lastTicked"), row.at("generation")};
         }
         for (const auto& cell : candidate.world.cells()) if (registry[cell.state].device == Device::movingPiston && !candidate.motions.contains(cell.pos)) throw std::invalid_argument("运行快照缺少活塞运动数据");
+        for (const auto& cell : candidate.world.cells()) if (registry[cell.state].device == Device::hopper && !candidate.hoppers.contains(cell.pos)) throw std::invalid_argument("运行快照缺少漏斗数据");
     } else {
         for (const auto& cell : candidate.world.cells()) candidate.onPlace(cell.pos, cell.state, 0);
         for (const auto& cell : candidate.world.cells()) candidate.neighborChanged(cell.pos);
@@ -100,6 +137,7 @@ void Simulator::loadProject(const Json& data) {
     }
     using std::swap;
     swap(world, candidate.world); swap(runtime, candidate.runtime); swap(motions, candidate.motions); swap(scheduled, candidate.scheduled); swap(scheduledKeys, candidate.scheduledKeys);
+    swap(hoppers, candidate.hoppers); swap(entityOrders, candidate.entityOrders); nextEntityOrder = candidate.nextEntityOrder;
     swap(probes, candidate.probes); swap(probeDependencies, candidate.probeDependencies); swap(trace, candidate.trace);
     currentTick = candidate.currentTick; nextOrder = candidate.nextOrder; sequence = candidate.sequence; nextProbeId = candidate.nextProbeId; traceDropped = candidate.traceDropped;
     statistics = {}; changes.clear(); breakRequested = false; faulted = false; pauseReason.clear(); ++revision;

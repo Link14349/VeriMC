@@ -60,6 +60,7 @@ BlockRegistry::BlockRegistry(const std::string& path) {
         static const std::vector<std::string> environmentReadouts{"CauldronBlock", "LayeredCauldronBlock", "LavaCauldronBlock", "RespawnAnchorBlock", "BeehiveBlock", "EndPortalFrameBlock", "CopperGolemStatueBlock", "WeatheringCopperGolemStatueBlock"};
         if (std::find(environmentReadouts.begin(), environmentReadouts.end(), typeInfo.className) != environmentReadouts.end()) typeInfo.supportLevel = "externalStimulus";
         if (typeInfo.className == "ChestBlock" || typeInfo.className == "TrappedChestBlock" || typeInfo.className == "BarrelBlock") typeInfo.supportLevel = "implemented";
+        if (typeInfo.device == Device::hopper) typeInfo.supportLevel = "implemented";
         auto typeId = static_cast<std::uint16_t>(types.size());
         names.emplace(typeInfo.name, typeId);
         for (const auto& s : b.at("states")) for (const auto& [key, value] : s.at("properties").items()) {

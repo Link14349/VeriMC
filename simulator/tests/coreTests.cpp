@@ -15,7 +15,7 @@ int main() {
         std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/blockStates.json"); auto source = Json::parse(file);
         for (const auto& block : source["blocks"]) for (const auto& state : block["states"]) expect(r.state(block["name"], state["properties"]) == state["id"].get<StateId>(), "state mismatch: " + block["name"].get<std::string>());
     });
-    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
+    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers", "java26_2Hoppers"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
         std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/../tests/fixtures/" + fixtureName + ".json"); expect(static_cast<bool>(file), "missing vanilla reference fixture");
         auto fixture = Json::parse(file); auto origin = fixture["origin"].get<BlockPos>(); Simulator s(r);
         auto absolute = [&](const Json& p) { auto pos = p.get<BlockPos>(); return BlockPos{origin.x + pos.x, origin.y + pos.y, origin.z + pos.z}; };
@@ -31,6 +31,7 @@ int main() {
                 auto p = absolute(fixture["watch"][i]); auto expected = frame["states"][i].get<StateId>();
                 expect(s.world.get(p) == expected, "tick " + std::to_string(tick) + " position " + fixture["watch"][i].dump() + " expected " + r.describe(expected).dump() + " got " + r.describe(s.world.get(p)).dump());
                 if (frame["analogs"][i] != -1) expect(s.analogOutput(p) == frame["analogs"][i].get<int>(), "analog mismatch at " + std::to_string(tick) + " " + fixture["watch"][i].dump());
+                if (frame.contains("inventories")) expect(s.inventoryJson(p, false) == frame["inventories"][i], "inventory mismatch at " + std::to_string(tick) + " " + fixture["watch"][i].dump() + " expected " + frame["inventories"][i].dump() + " got " + s.inventoryJson(p, false).dump());
             }
         }
     });
@@ -95,6 +96,55 @@ int main() {
         expect(threw&&s.saveProject("before",true)==before,"partial invalid inventory edit");
         s.stimulate({0,0,0},{{"inventory",Json::array({{{"slot",0},{"item","ender_pearl"},{"count",16}}})}});
         expect(s.analogOutput({0,0,0})==1,"item-specific stack capacity");
+    });
+    test("idle hoppers skip empty ticks and wake on inventory or topology", [&] {
+        Simulator s(r);
+        for (int i = 0; i < 5000; ++i) s.place({i * 2, 0, 0}, r.state("hopper"));
+        s.advanceTo(1); auto events = s.statistics.scheduledEvents;
+        expect(events == 5000 && s.pendingEvents() == 0, "initial empty hopper checks");
+        s.advanceTo(1000000);
+        expect(s.statistics.scheduledEvents == events, "empty hoppers kept ticking");
+        s.place({0, -1, 0}, r.state("barrel"));
+        s.stimulate({0, 0, 0}, {{"inventory", Json::array({{{"slot", 0}, {"item", "stone"}, {"count", 2}}})}});
+        s.advanceTo(1000001);
+        expect(s.inventoryJson({0, -1, 0})[0]["count"] == 1, "sleeping hopper did not wake");
+        s.place({1, 0, 0}, r.state("redstone_block")); s.advanceTo(1000020);
+        expect(s.inventoryJson({0, -1, 0})[0]["count"] == 1, "locked hopper transferred");
+        s.setBlock({1, 0, 0}, 0); s.advanceTo(1000021);
+        expect(s.inventoryJson({0, -1, 0})[0]["count"] == 2, "unlock did not wake hopper");
+    });
+    test("hopper checkpoints preserve cooldown and persistent entity order", [&] {
+        Simulator s(r);
+        for (int x = 3; x >= 0; --x) s.place({x, 0, 0}, r.state("hopper", {{"facing", "east"}}));
+        s.place({4, 0, 0}, r.state("barrel"));
+        s.stimulate({0, 0, 0}, {{"inventory", Json::array({{{"slot", 0}, {"item", "stone"}, {"count", 8}}})}});
+        auto circuit = s.saveProject("order"); Simulator design(r); design.loadProject(circuit);
+        expect(design.saveProject("order")["entityOrder"] == circuit["entityOrder"], "circuit lost ticker registration order");
+        for (int event = 0; event < 48 && s.pendingEvents(); ++event) {
+            auto checkpoint = s.saveProject("hopper", true); Simulator restored(r); restored.loadProject(checkpoint);
+            expect(restored.saveProject("hopper", true) == checkpoint, "checkpoint changed queue or inventory");
+            s.stepEvent(); restored.stepEvent();
+            expect(s.saveProject("hopper", true) == restored.saveProject("hopper", true), "resuming inside block entity phase diverged");
+        }
+        s.advanceTo(100); design.advanceTo(100);
+        expect(s.inventoryJson({4, 0, 0}) == design.inventoryJson({4, 0, 0}), "design execution lost transfer order");
+        expect(s.inventoryJson({4, 0, 0})[0]["count"] == 8, "chain lost or duplicated items");
+        Simulator invalid(r); invalid.place({0,0,0},r.state("hopper"));
+        auto before = invalid.saveProject("before", true), bad = before;
+        bad["hoppers"][0]["wakeAt"] = 42;
+        bool threw = false; try { invalid.loadProject(bad); } catch (...) { threw = true; }
+        expect(threw && invalid.saveProject("before",true) == before, "inconsistent hopper checkpoint was accepted");
+    });
+    test("failed container extraction retains observable retry updates", [&] {
+        Simulator s(r); s.place({0, 0, 0}, r.state("hopper", {{"facing", "east"}}));
+        s.place({0, 1, 0}, r.state("barrel"));
+        Json slots = Json::array(); for (int i = 0; i < 4; ++i) slots.push_back({{"slot", i}, {"item", "stone"}, {"count", 64}});
+        slots.push_back({{"slot", 4}, {"item", "ender_pearl"}, {"count", 15}});
+        s.stimulate({0, 0, 0}, {{"inventory", slots}});
+        s.stimulate({0, 1, 0}, {{"inventory", Json::array({{{"slot", 0}, {"item", "wooden_sword"}, {"count", 1}}})}});
+        s.addProbe({0, 1, 0}); s.advanceTo(8);
+        expect(s.getTrace().size() > 8, "transient extraction notifications were lost");
+        expect(s.inventoryJson({0, 1, 0})[0]["count"] == 1, "failed extraction lost item");
     });
     std::cout << passed << " passed, " << failed << " failed\n"; return failed ? 1 : 0;
 }
