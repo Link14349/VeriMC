@@ -41,6 +41,7 @@ int Simulator::analogOutput(BlockPos pos) const {
     auto it = runtime.find(pos);
     if (state.device == Device::comparator) return it == runtime.end() ? 0 : it->second.output;
     if (state.device == Device::bulb) return state.lit ? 15 : 0;
+    if (inventorySize(id)) return containerAnalog(pos);
     if (state.device == Device::analog) return state.staticAnalog;
     if (state.device == Device::lectern) {
         if (registry.property(id, "has_book") != "true" || it == runtime.end()) return 0;
@@ -55,6 +56,7 @@ int Simulator::displayValue(BlockPos pos) const {
     if (state.device == Device::wire || state.device == Device::target || state.device == Device::daylight || state.device == Device::weightedPlate) return state.power;
     if (state.device == Device::comparator || state.device == Device::analog) return analogOutput(pos);
     if (state.device == Device::lamp || state.device == Device::bulb || state.device == Device::torch || state.device == Device::wallTorch) return state.lit ? 15 : 0;
+    if (inventorySize(world.get(pos)) && registry.type(world.get(pos)).name != "minecraft:trapped_chest") return containerAnalog(pos);
     if (state.device == Device::piston) return state.extended ? 15 : 0;
     if (state.device == Device::door || state.device == Device::trapdoor || state.device == Device::fenceGate) return registry.property(world.get(pos), "open") == "true" ? 15 : 0;
     int value = 0; for (auto d : directions) value = std::max(value, signal(pos, d));
@@ -154,6 +156,7 @@ void Simulator::place(BlockPos p, StateId id) {
         bool powered = bestSignal(p) > 0;
         id = registry.withBool(registry.withBool(id, "powered", powered), "open", powered);
     }
+    if (registry[id].device == Device::container && at(p).type != registry[id].type) id = placedChest(p, id);
     if (registry[id].device == Device::lamp) id = registry.withBool(id, "lit", bestSignal(p) != 0);
     setBlock(p, id);
     if (isDiode(registry[id].device) && (registry[id].device == Device::comparator ? comparatorInput(p) : diodeInput(p)) > 0) schedule(p, 1);
@@ -183,6 +186,7 @@ void Simulator::onRemove(BlockPos p, StateId old) {
     case Device::pressurePlate: case Device::weightedPlate: if (s.powered || s.power > 0) { updateNeighbors(p, -1, old); updateNeighbors(p.relative(Direction::down), -1, old); } break;
     case Device::lightningRod: if (s.powered) updateNeighbors(p.relative(opposite(s.facing)), -1, old); break;
     case Device::lectern: if (s.powered) updateNeighbors(p.relative(Direction::down), -1, old); break;
+    case Device::container: updateComparatorNeighbors(p); break;
     case Device::pistonHead: { auto base = p.relative(opposite(s.facing)); if (at(base).device == Device::piston && at(base).extended && at(base).facing == s.facing) setBlock(base, 0); break; }
     default: break;
     }
@@ -260,6 +264,7 @@ void Simulator::executeShape(const Update& u) {
         setBlock(u.pos, next, u.flags, u.depth);
         return;
     }
+    if (s.device == Device::container && registry.has(id, "type")) { updateChestShape(u); return; }
     if (!survives(u.pos, id)) { setBlock(u.pos, 0, u.flags, u.depth); return; }
     if (s.device == Device::observer && u.direction == s.facing && !s.powered && !hasScheduled(u.pos)) schedule(u.pos, 2);
     if (s.device == Device::repeater && axis(u.direction) != 0 && axis(u.direction) != axis(s.facing)) setBlock(u.pos, registry.withBool(id, "locked", diodeSideInput(u.pos) > 0), u.flags, u.depth);
@@ -391,6 +396,7 @@ std::size_t Simulator::advanceTo(Tick target, std::size_t eventBudget, std::chro
     return count;
 }
 void Simulator::interact(BlockPos p) {
+    if (faulted) throw std::runtime_error("当前执行已中止，请从有效快照恢复");
     auto id = world.get(p); const auto& s = registry[id];
     switch (s.device) {
     case Device::lever: setBlock(p, registry.withBool(id, "powered", !s.powered)); notifyAttached(p, s.connectedDirection); break;
@@ -407,6 +413,7 @@ void Simulator::interact(BlockPos p) {
     }
 }
 void Simulator::stimulate(BlockPos p, const Json& input) {
+    if (faulted) throw std::runtime_error("当前执行已中止，请从有效快照恢复");
     auto id = world.get(p); const auto& s = registry[id];
     if (stimulateDevice(p, input)) return;
     const int value = input.value("value", 0);
@@ -454,6 +461,7 @@ Json Simulator::inspect(BlockPos p) const {
     auto id = world.get(p); auto result = registry.describe(id);
     result["pos"] = p; result["value"] = displayValue(p); result["input"] = bestSignal(p); result["analog"] = analogOutput(p);
     result["supportLevel"] = registry.type(id).supportLevel;
+    if (inventorySize(id)) { result["inventory"] = inventoryJson(p); result["inventorySize"] = containerSlots(p).size(); }
     auto it = runtime.find(p); result["runtime"] = it == runtime.end() ? Json::object() : it->second.values;
     if (auto motion = motionAt(p)) result["motion"] = {{"movedBlock", registry.describe(motion->movedState)}, {"progress", motion->progress * 0.5}, {"extending", motion->extending}, {"source", motion->source}};
     return result;

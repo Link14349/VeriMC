@@ -25,6 +25,7 @@ Json Simulator::saveProject(const std::string& name, bool checkpoint) const {
     data["blockData"] = Json::array();
     for (const auto& [pos, state] : runtime) {
         Json row{{"pos", pos}, {"values", state.values}};
+        if (inventorySize(world.get(pos))) row["inventory"] = inventoryJson(pos, false);
         if (checkpoint) { row["output"] = state.output; row["torchToggles"] = state.torchToggles; }
         data["blockData"].push_back(std::move(row));
     }
@@ -65,6 +66,7 @@ void Simulator::loadProject(const Json& data) {
         if (candidate.world.get(p) == 0) throw std::invalid_argument("器件数据对应位置没有方块");
         auto& state = candidate.runtime[p]; state.values = row.at("values");
         if (checkpoint) { state.output = row.at("output"); state.torchToggles = row.at("torchToggles").get<std::deque<Tick>>(); }
+        if (row.contains("inventory")) candidate.setInventory(p, row.at("inventory"), false, false);
         candidate.validateRuntime(p);
     }
     if (checkpoint) {

@@ -96,6 +96,11 @@ bool Simulator::interactDevice(BlockPos pos) {
         setBlock(pos, registry.withBool(id, "open", registry.property(id, "open") != "true"), state.device == Device::trapdoor ? 2 : 10);
         return true;
     }
+    if (state.device == Device::container) {
+        int viewers = runtime.contains(pos) ? runtime.at(pos).values.value("viewers", 0) : 0;
+        setViewers(pos, viewers > 0 ? 0 : 1);
+        return true;
+    }
     if (state.device == Device::daylight) {
         setBlock(pos, registry.withBool(id, "inverted", registry.property(id, "inverted") != "true"), 2);
         updateDaylight(pos);
@@ -122,6 +127,12 @@ bool Simulator::stimulateDevice(BlockPos pos, const Json& stimulus) {
     if (!stimulus.is_object()) throw std::invalid_argument("环境输入必须是对象");
     auto id = world.get(pos);
     const auto& state = registry[id];
+    if (state.device == Device::container) {
+        if (stimulus.contains("inventory")) setInventory(pos, stimulus.at("inventory"));
+        else if (stimulus.contains("viewers")) setViewers(pos, integerInRange(stimulus, "viewers", 0, 1000000));
+        else throw std::invalid_argument("Container input requires inventory or viewers");
+        return true;
+    }
     if (state.device == Device::pressurePlate || state.device == Device::weightedPlate) {
         int count = integerInRange(stimulus, "entities", 0, 1000000);
         int living = integerInRange(stimulus, "livingEntities", count, 1000000);
@@ -177,6 +188,7 @@ void Simulator::validateRuntime(BlockPos pos) const {
     const auto& data = runtime.at(pos);
     if (!data.values.is_object() || data.output < 0 || data.output > 15) throw std::invalid_argument("无效器件内部状态");
     auto device = at(pos).device;
+    if (inventorySize(world.get(pos))) integerInRange(data.values, "viewers", 0, 1000000);
     if (device == Device::pressurePlate || device == Device::weightedPlate) {
         int entities = integerInRange(data.values, "entities", 0, 1000000);
         if (integerInRange(data.values, "livingEntities", 0, 1000000) > entities) throw std::invalid_argument("无效压力板实体数量");

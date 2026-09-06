@@ -17,7 +17,8 @@ struct EventKey { BlockPos pos; std::uint16_t type; std::uint8_t phase{}; std::u
 struct EventKeyHash { std::size_t operator()(const EventKey& k) const { return PosHash{}(k.pos) ^ (static_cast<std::size_t>(k.type) * 65537) ^ (static_cast<std::size_t>(k.phase) * 31) ^ static_cast<std::size_t>(k.data * 16777619); } };
 struct TraceEdge { std::uint32_t probeId{}; Tick tick{}; std::uint64_t sequence{}; std::uint8_t value{}; };
 struct Probe { std::uint32_t id{}; BlockPos pos{}; std::string name; std::string mode{"output"}; Direction direction{Direction::up}; int lastValue{-1}; std::string trigger{"none"}; int triggerValue{15}; };
-struct RuntimeData { int output{}; std::deque<Tick> torchToggles; Json values = Json::object(); };
+struct ItemStack { std::uint32_t item{}; std::uint16_t count{}; bool operator==(const ItemStack&) const = default; };
+struct RuntimeData { int output{}; std::deque<Tick> torchToggles; Json values = Json::object(); std::vector<ItemStack> inventory; };
 struct PistonMotion { StateId movedState{}; Direction facing{}; bool extending{}, source{}; unsigned progress{}, previousProgress{}; Tick lastTicked{}; std::uint64_t generation{}; };
 struct Statistics { std::uint64_t updates{}, scheduledEvents{}, stateChanges{}; std::uint64_t simulationMicros{}; };
 class Simulator {
@@ -44,6 +45,7 @@ public:
     int bestSignal(BlockPos receiver, bool includeWire = true) const;
     int analogOutput(BlockPos pos) const;
     int displayValue(BlockPos pos) const;
+    int viewerCount(BlockPos pos) const { auto found = runtime.find(pos); return found == runtime.end() ? 0 : found->second.values.value("viewers", 0); }
     void updateNeighbors(BlockPos pos, int skip = -1, StateId source = UINT32_MAX);
     void neighborChanged(BlockPos pos, StateId source = 0);
     void schedule(BlockPos pos, Tick delay, int priority = 0);
@@ -128,5 +130,16 @@ private:
     bool interactDevice(BlockPos pos);
     bool stimulateDevice(BlockPos pos, const Json& stimulus);
     void validateRuntime(BlockPos pos) const;
+    struct InventorySlot { BlockPos pos; std::size_t index; };
+    std::size_t inventorySize(StateId state) const;
+    std::vector<InventorySlot> containerSlots(BlockPos pos, bool ignoreBlockage = true) const;
+    Direction chestConnection(StateId state) const;
+    StateId placedChest(BlockPos pos, StateId state) const;
+    void updateChestShape(const Update& update);
+    ItemStack stackAt(const InventorySlot& slot) const;
+    int containerAnalog(BlockPos pos) const;
+    Json inventoryJson(BlockPos pos, bool combined = true) const;
+    void setInventory(BlockPos pos, const Json& slots, bool combined = true, bool notify = true);
+    void setViewers(BlockPos pos, int viewers);
 };
 }

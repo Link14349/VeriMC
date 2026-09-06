@@ -24,12 +24,17 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.WritableBookContent;
 import net.minecraft.server.network.Filterable;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.GameType;
+import net.minecraft.core.registries.BuiltInRegistries;
 
 /** Executes our input timeline inside the unmodified Java 26.2 GameTest world. */
 public class CaptureRedstone extends TestFunctionLoader {
     static JsonObject scenario;
     static Path output;
     static Map<BlockPos, List<Entity>> occupants = new HashMap<>();
+    static Map<BlockPos, List<Player>> viewers = new HashMap<>();
     static BlockPos pos(JsonArray p) { return new BlockPos(p.get(0).getAsInt(), p.get(1).getAsInt(), p.get(2).getAsInt()); }
     static JsonArray coordinates(BlockPos p) { JsonArray a = new JsonArray(); a.add(p.getX()); a.add(p.getY()); a.add(p.getZ()); return a; }
     static void applyCommand(GameTestHelper helper, BlockPos pos, JsonObject command) {
@@ -43,7 +48,22 @@ public class CaptureRedstone extends TestFunctionLoader {
                 return;
             }
             var input = command.getAsJsonObject("stimulus");
-            if (state.getBlock() instanceof BasePressurePlateBlock plate) {
+            if (level.getBlockEntity(pos) instanceof Container localContainer) {
+                Container container = state.getBlock() instanceof ChestBlock chest ? ChestBlock.getContainer(chest, state, level, pos, true) : localContainer;
+                if (input.has("inventory")) {
+                    for (var value : input.getAsJsonArray("inventory")) {
+                        var row = value.getAsJsonObject(); int count = row.get("count").getAsInt();
+                        var stack = count == 0 ? ItemStack.EMPTY : new ItemStack(BuiltInRegistries.ITEM.getValue(Identifier.parse(row.get("item").getAsString())), count);
+                        container.setItem(row.get("slot").getAsInt(), stack);
+                    }
+                    container.setChanged();
+                } else if (input.has("viewers")) {
+                    var players = viewers.computeIfAbsent(pos, key -> new ArrayList<>());
+                    int target = input.get("viewers").getAsInt();
+                    while (players.size() < target) { var player = helper.makeMockPlayer(GameType.CREATIVE); players.add(player); container.startOpen(player); }
+                    while (players.size() > target) container.stopOpen(players.removeLast());
+                } else throw new IllegalArgumentException("Unknown inventory input");
+            } else if (state.getBlock() instanceof BasePressurePlateBlock plate) {
                 for (var entity : occupants.getOrDefault(pos, List.of())) entity.discard();
                 var list = new ArrayList<Entity>(); occupants.put(pos, list);
                 int count = input.get("entities").getAsInt(), living = input.has("livingEntities") ? input.get("livingEntities").getAsInt() : count;

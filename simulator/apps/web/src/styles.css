@@ -4,3 +4,5 @@
 @media(max-height:800px){.waveform{height:255px}.paletteItem{min-height:43px}.inspectorHero{padding:5px 10px 13px}.inspectorSection{padding:11px 13px}.appHeader{height:48px}.toolbar{height:45px}.largeGlyph{font-size:36px}.viewportBottom{bottom:8px}}
 
 .environmentControls .miniLabel{display:flex;align-items:center;gap:6px}.propertyRow input{width:83px;padding:5px 7px;color:#d4e0de;background:#172126;border:1px solid #37464d;border-radius:4px;font:inherit}.environmentControls .subtleText{line-height:1.7}.inspectorSection{flex-shrink:0}
+
+.inventoryGrid{display:grid;grid-template-columns:repeat(9,1fr);gap:2px;margin-top:12px}.inventoryGrid button{height:27px;position:relative;padding:0;background:#172126;border:1px solid #34464c;border-radius:3px;font-size:7px;color:#9dafab}.inventoryGrid button.selected{border-color:#dfbd81;background:#3f4136}.inventoryGrid button b{position:absolute;bottom:1px;right:2px;font-size:8px;color:#edd9b5}.itemInput{width:100%;margin:8px 0 12px;padding:7px;background:#172126;color:#d4dfdb;border:1px solid #35464b;border-radius:4px;font:10px monospace}

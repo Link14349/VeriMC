@@ -11,6 +11,7 @@ export class SimulatorConnection extends EventTarget {
   cells = new Map<string, BlockCell>();
   states = new Map<number, BlockDef>();
   catalog: CatalogItem[] = [];
+  items: { name: string; maxStack: number }[] = [];
   edges: Edge[] = [];
   connected = false;
   status: Status = { tick: 0, running: false, speed: 20, measuredTps: 0, blocks: 0, pending: 0, updates: 0, events: 0, storageBytes: 0, traceDropped: 0, pauseReason: '', revision: 0, probes: [], canUndo: false, canRedo: false, name: '连接本地内核…' };
@@ -52,7 +53,7 @@ export class SimulatorConnection extends EventTarget {
     }
     const message = JSON.parse(data);
     if (message.type === 'states') { for (const state of message.states) this.states.set(state.stateId, state); }
-    else if (message.type === 'ready') { this.catalog = message.catalog; this.dispatchEvent(new Event('catalog')); }
+    else if (message.type === 'ready') { this.catalog = message.catalog; this.items = message.items ?? []; this.dispatchEvent(new Event('catalog')); }
     else if (message.type === 'status') { this.status = message; this.dispatchEvent(new Event('status')); }
     else if (message.type === 'trace') { if (message.reset) this.edges = []; this.edges = this.edges.concat(message.edges); if (this.edges.length > 500000) this.edges.splice(0, this.edges.length - 500000); this.dispatchEvent(new Event('trace')); }
     else if (message.type === 'error') { this.error(message.message); const p = this.pending.get(message.requestId); if (p) { clearTimeout(p.timer); p.reject(new Error(message.message)); this.pending.delete(message.requestId); } }

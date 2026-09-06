@@ -1,5 +1,6 @@
 #include "simulator/blockRegistry.hpp"
 #include <fstream>
+#include <filesystem>
 #include <algorithm>
 
 namespace simulator {
@@ -38,6 +39,14 @@ Device classify(const std::string& name, const std::string& c) {
 BlockRegistry::BlockRegistry(const std::string& path) {
     std::ifstream file(path);
     if (!file) throw std::runtime_error("找不到方块注册表：" + path);
+    std::ifstream itemFile(std::filesystem::path(path).parent_path() / "itemDefinitions.json");
+    if (!itemFile) throw std::runtime_error("找不到物品注册表 itemDefinitions.json");
+    const auto itemData = Json::parse(itemFile);
+    if (itemData.at("version") != "26.2") throw std::runtime_error("Item registry version mismatch");
+    for (const auto& row : itemData.at("items")) {
+        itemNames.emplace(row.at("name").get<std::string>(), static_cast<std::uint32_t>(items.size()));
+        items.push_back({row.at("name"), row.at("maxStack")});
+    }
     const Json data = Json::parse(file);
     if (data.at("version") != "26.2") throw std::runtime_error("需要 Minecraft 26.2 数据");
     for (const auto& b : data.at("blocks")) {
@@ -50,6 +59,7 @@ BlockRegistry::BlockRegistry(const std::string& path) {
         if (typeInfo.device == Device::pressurePlate || typeInfo.device == Device::weightedPlate || typeInfo.device == Device::lightningRod || typeInfo.device == Device::daylight || typeInfo.device == Device::lectern) typeInfo.supportLevel = "externalStimulus";
         static const std::vector<std::string> environmentReadouts{"CauldronBlock", "LayeredCauldronBlock", "LavaCauldronBlock", "RespawnAnchorBlock", "BeehiveBlock", "EndPortalFrameBlock", "CopperGolemStatueBlock", "WeatheringCopperGolemStatueBlock"};
         if (std::find(environmentReadouts.begin(), environmentReadouts.end(), typeInfo.className) != environmentReadouts.end()) typeInfo.supportLevel = "externalStimulus";
+        if (typeInfo.className == "ChestBlock" || typeInfo.className == "TrappedChestBlock" || typeInfo.className == "BarrelBlock") typeInfo.supportLevel = "implemented";
         auto typeId = static_cast<std::uint16_t>(types.size());
         names.emplace(typeInfo.name, typeId);
         for (const auto& s : b.at("states")) for (const auto& [key, value] : s.at("properties").items()) {
@@ -95,6 +105,17 @@ BlockRegistry::BlockRegistry(const std::string& path) {
             for (std::size_t i = 0; i < 4; ++i) { auto side = val(directionNames[static_cast<unsigned>(horizontal[i])], "none"); st.wireSides[i] = side == "up" ? 2 : side == "side" ? 1 : 0; }
         }
     }
+}
+std::uint32_t BlockRegistry::itemId(const std::string& name) const {
+    auto key = name.find(':') == std::string::npos ? "minecraft:" + name : name;
+    auto found = itemNames.find(key);
+    if (found == itemNames.end()) throw std::invalid_argument("Unknown item: " + name);
+    return found->second;
+}
+Json BlockRegistry::itemCatalog() const {
+    Json result = Json::array();
+    for (const auto& info : items) result.push_back({{"name", info.name}, {"maxStack", info.maxStack}});
+    return result;
 }
 StateId BlockRegistry::state(const std::string& name, const Json& props) const {
     std::string key = name.find(':') == std::string::npos ? "minecraft:" + name : name;

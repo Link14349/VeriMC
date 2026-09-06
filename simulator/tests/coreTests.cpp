@@ -15,7 +15,7 @@ int main() {
         std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/blockStates.json"); auto source = Json::parse(file);
         for (const auto& block : source["blocks"]) for (const auto& state : block["states"]) expect(r.state(block["name"], state["properties"]) == state["id"].get<StateId>(), "state mismatch: " + block["name"].get<std::string>());
     });
-    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
+    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
         std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/../tests/fixtures/" + fixtureName + ".json"); expect(static_cast<bool>(file), "missing vanilla reference fixture");
         auto fixture = Json::parse(file); auto origin = fixture["origin"].get<BlockPos>(); Simulator s(r);
         auto absolute = [&](const Json& p) { auto pos = p.get<BlockPos>(); return BlockPos{origin.x + pos.x, origin.y + pos.y, origin.z + pos.z}; };
@@ -75,6 +75,26 @@ int main() {
         auto invalid=saved; for(auto& row:invalid["blockData"]) if(row["values"].contains("pages")) row["values"]["page"]=500;
         auto before=restored.saveProject("before",true); bool threw=false; try {restored.loadProject(invalid);}catch(...){threw=true;}
         expect(threw&&restored.saveProject("before",true)==before,"invalid runtime import was not atomic");
+    });
+    test("paired inventory capacity, split order and snapshot round-trip", [&] {
+        Simulator s(r); floor(s); s.place({0,1,0},r.state("chest")); s.place({1,1,0},r.state("chest"));
+        expect(s.inspect({0,1,0})["inventorySize"]==54,"chests did not pair");
+        Json inventory=Json::array(); for(int i=0;i<27;++i) inventory.push_back({{"slot",i},{"item","stone"},{"count",64}});
+        inventory.push_back({{"slot",27},{"item","wooden_sword"},{"count",1}});
+        s.stimulate({0,1,0},{{"inventory",inventory}}); expect(s.analogOutput({0,1,0})==8,"double-chest fullness");
+        auto saved=s.saveProject("inventory",true); Simulator restored(r); restored.loadProject(saved);
+        expect(saved==restored.saveProject("inventory",true),"inventory snapshot diverged");
+        s.setBlock({1,1,0},0); expect(s.inspect({0,1,0})["inventorySize"]==27,"chest did not split");
+        auto remaining=s.inspect({0,1,0})["inventory"]; expect(remaining.size()==1&&remaining[0]["item"]=="minecraft:wooden_sword","double-chest physical slot order");
+        s.stimulate({0,1,0},{{"inventory",Json::array({{{"slot",0},{"count",0}}})}}); saved=s.saveProject("empty",true); restored.loadProject(saved);
+        expect(saved==restored.saveProject("empty",true),"empty inventory snapshot diverged");
+    });
+    test("invalid inventory edits reject the whole batch", [&] {
+        Simulator s(r); s.place({0,0,0},r.state("barrel")); auto before=s.saveProject("before",true);
+        bool threw=false; try { s.stimulate({0,0,0},{{"inventory",Json::array({{{"slot",0},{"item","stone"},{"count",64}},{{"slot",1},{"item","wooden_sword"},{"count",2}}})}}); } catch(...) {threw=true;}
+        expect(threw&&s.saveProject("before",true)==before,"partial invalid inventory edit");
+        s.stimulate({0,0,0},{{"inventory",Json::array({{{"slot",0},{"item","ender_pearl"},{"count",16}}})}});
+        expect(s.analogOutput({0,0,0})==1,"item-specific stack capacity");
     });
     std::cout << passed << " passed, " << failed << " failed\n"; return failed ? 1 : 0;
 }

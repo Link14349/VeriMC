@@ -128,6 +128,18 @@ try:
     assert command('inspect', pos=[7,1,0])['value'] == 15
     command('step', count=8)
     assert command('inspect', pos=[7,1,0])['value'] == 0
+    command('new')
+    command('place', pos=[0,0,0], name='chest')
+    command('place', pos=[1,0,0], name='chest')
+    assert command('inspect', pos=[0,0,0])['inventorySize'] == 54
+    command('stimulate', pos=[0,0,0], stimulus={'inventory': [{'slot': 0, 'item': 'stone', 'count': 64}, {'slot': 27, 'item': 'wooden_sword', 'count': 1}]})
+    inventory = command('save', checkpoint=True)
+    command('interact', pos=[0,0,0])
+    assert command('inspect', pos=[1,0,0])['runtime']['viewers'] == 1
+    command('load', project=inventory)
+    assert command('inspect', pos=[0,0,0])['inventory'][1]['item'] == 'minecraft:wooden_sword'
+    assert command('stimulate', pos=[0,0,0], stimulus={'inventory': [{'slot': 0, 'item': 'wooden_sword', 'count': 64}]})['type'] == 'error'
+    assert command('inspect', pos=[0,0,0])['inventory'][0]['count'] == 64
     assert frames > 0
     print(f'PASS: HTTP host validation, binary frames ({frames}), circuit editing, delay, probes, VCD, atomic errors, native undo/redo, checkpoint import')
 finally:

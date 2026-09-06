@@ -69,7 +69,7 @@ public:
         socket.set_option(ws::stream_base::timeout::suggested(beast::role_type::server)); socket.read_message_max(64 * 1024 * 1024);
         socket.async_accept(request, [self = shared_from_this()](beast::error_code ec) {
             if (ec) { self->alive = false; return; }
-            self->hub.clients.push_back(self); self->sendJson({{"type", "ready"}, {"version", "26.2"}, {"protocolVersion", 2}, {"catalog", self->hub.registry.catalog()}});
+            self->hub.clients.push_back(self); self->sendJson({{"type", "ready"}, {"version", "26.2"}, {"protocolVersion", 2}, {"catalog", self->hub.registry.catalog()}, {"items", self->hub.registry.itemCatalog()}});
             self->frame(self->hub.sim.world.cells(), true, ++self->hub.frameId); self->sendJson(self->hub.status()); self->read();
         });
     }
@@ -102,7 +102,7 @@ public:
         auto u32 = [&](std::uint32_t value) { for (int byte = 0; byte < 4; ++byte) binary.push_back(static_cast<char>((value >> (byte * 8)) & 255u)); };
         auto u64 = [&](std::uint64_t value) { u32(static_cast<std::uint32_t>(value)); u32(static_cast<std::uint32_t>(value >> 32)); };
         u32(0x32434d56); u32(full ? 1 : 2); u32(id); u32(static_cast<std::uint32_t>(cells.size())); u64(hub.sim.currentTick); u64(hub.sim.revision);
-        for (const auto& cell : cells) { u32(static_cast<std::uint32_t>(cell.pos.x)); u32(static_cast<std::uint32_t>(cell.pos.y)); u32(static_cast<std::uint32_t>(cell.pos.z)); u32(cell.state); u32(static_cast<std::uint32_t>(hub.sim.displayValue(cell.pos))); auto motion = hub.sim.motionAt(cell.pos); u32(motion ? motion->movedState : cell.state); u32(motion ? 1u | (motion->extending ? 2u : 0u) | (motion->source ? 4u : 0u) | (static_cast<unsigned>(motion->facing) << 3) | (motion->progress << 6) | (motion->previousProgress << 8) : 0u); }
+        for (const auto& cell : cells) { u32(static_cast<std::uint32_t>(cell.pos.x)); u32(static_cast<std::uint32_t>(cell.pos.y)); u32(static_cast<std::uint32_t>(cell.pos.z)); u32(cell.state); u32(static_cast<std::uint32_t>(hub.sim.displayValue(cell.pos))); auto motion = hub.sim.motionAt(cell.pos); u32(motion ? motion->movedState : cell.state); u32(motion ? 1u | (motion->extending ? 2u : 0u) | (motion->source ? 4u : 0u) | (static_cast<unsigned>(motion->facing) << 3) | (motion->progress << 6) | (motion->previousProgress << 8) : hub.sim.viewerCount(cell.pos) > 0 ? 1024u : 0u); }
         awaitingAck = true; outstandingFrame = id; sentAt = Clock::now(); send(std::move(binary), true);
         const auto& trace = hub.sim.getTrace(); const auto first = hub.sim.traceDropped;
         Json edges = Json::array();

@@ -6,6 +6,7 @@
 
 namespace simulator {
 struct PropertyInfo { std::vector<std::string> values; std::uint32_t stride{}; };
+struct ItemInfo { std::string name; std::uint16_t maxStack{}; };
 struct BlockType {
     std::string name, className;
     StateId defaultState{}, firstState{};
@@ -39,9 +40,14 @@ public:
     Json catalog() const;
     bool has(StateId id, const std::string& property) const { return type(id).properties.contains(property); }
     std::size_t stateCount() const { return states.size(); }
+    std::uint32_t itemId(const std::string& name) const;
+    const ItemInfo& item(std::uint32_t id) const { return items.at(id); }
+    Json itemCatalog() const;
 private:
     std::vector<BlockState> states;
     std::vector<BlockType> types;
     std::unordered_map<std::string, std::uint16_t> names;
+    std::vector<ItemInfo> items;
+    std::unordered_map<std::string, std::uint32_t> itemNames;
 };
 }

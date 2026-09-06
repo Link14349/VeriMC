@@ -133,6 +133,17 @@ export class CircuitViewport {
         if (!open || (moving && source && !extending)) { const headOffset = moving ? 1-progress : 0; pistonPart(.37+headOffset,.25,.99,sticky?0x8da96a:0xbb9f70); if(moving)pistonPart(headOffset*.5,.8,.22,0xaaa58e); }
         for (const offset of [-.25,0,.25]) part([.5,.995,.5+offset],[.77,.01,.045],0x48534f);
       }
+    } else if (name.endsWith('chest')) {
+      const v = directionVectors[facing], opened = (cell.motion & 1024) !== 0;
+      const width = p.type !== 'single' ? 1 : .875;
+      part([.5,.36,.5],[width,.6,.875],name === 'trapped_chest' ? 0x9a6446 : 0xab8550);
+      if (opened) part([.5-v[0]*.34,1.04,.5-v[2]*.34],[v[0] ? .25 : width,.78,v[2] ? .25 : width],0xc1995d);
+      else part([.5,.8,.5],[width,.27,.875],0xc1995d);
+      part([.5+v[0]*.45,.55,.5+v[2]*.45],[v[0] ? .06 : .13,.24,v[2] ? .06 : .13],name === 'trapped_chest' ? 0xc87f60 : 0xc8c3a1);
+    } else if (name === 'barrel') {
+      part([.5,.5,.5],[1,1,1],0xa18559);
+      for (const height of [.15,.85]) { part([.5,height,.005],[1,.1,.02],0x4e5957); part([.5,height,.995],[1,.1,.02],0x4e5957); part([.005,height,.5],[.02,.1,1],0x4e5957); part([.995,height,.5],[.02,.1,1],0x4e5957); }
+      const v = directionVectors[facing]; part([.5+v[0]*.505,.5+v[1]*.505,.5+v[2]*.505],[v[0] ? .02 : .7,v[1] ? .02 : .7,v[2] ? .02 : .7],p.open === 'true' ? 0x2a302c : 0xbba071);
     } else if (name.endsWith('_door') || name.endsWith('_trapdoor')) {
       const trap = name.endsWith('_trapdoor'), opened = p.open === 'true';
       const tint = name.includes('iron') ? 0xc1c7c2 : name.includes('copper') ? 0xb27a5b : 0xb39b69;
