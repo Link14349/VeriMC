@@ -1,0 +1,789 @@
+{
+  "reference": "Minecraft Java 26.2 NoteBlock.triggerEvent; seed reset immediately before each isolated call",
+  "cases": [
+    {
+      "seedBits": "0",
+      "instrument": "harp",
+      "custom": false,
+      "played": true,
+      "randomState": 234029835660143
+    },
+    {
+      "seedBits": "0",
+      "instrument": "basedrum",
+      "custom": false,
+      "played": true,
+      "randomState": 234029835660143
+    },
+    {
+      "seedBits": "0",
+      "instrument": "snare",
+      "custom": false,
+      "played": true,
+      "randomState": 234029835660143
+    },
+    {
+      "seedBits": "0",
+      "instrument": "hat",
+      "custom": false,
+      "played": true,
+      "randomState": 234029835660143
+    },
+    {
+      "seedBits": "0",
+      "instrument": "bass",
+      "custom": false,
+      "played": true,
+      "randomState": 234029835660143
+    },
+    {
+      "seedBits": "0",
+      "instrument": "flute",
+      "custom": false,
+      "played": true,
+      "randomState": 234029835660143
+    },
+    {
+      "seedBits": "0",
+      "instrument": "bell",
+      "custom": false,
+      "played": true,
+      "randomState": 234029835660143
+    },
+    {
+      "seedBits": "0",
+      "instrument": "guitar",
+      "custom": false,
+      "played": true,
+      "randomState": 234029835660143
+    },
+    {
+      "seedBits": "0",
+      "instrument": "chime",
+      "custom": false,
+      "played": true,
+      "randomState": 234029835660143
+    },
+    {
+      "seedBits": "0",
+      "instrument": "xylophone",
+      "custom": false,
+      "played": true,
+      "randomState": 234029835660143
+    },
+    {
+      "seedBits": "0",
+      "instrument": "iron_xylophone",
+      "custom": false,
+      "played": true,
+      "randomState": 234029835660143
+    },
+    {
+      "seedBits": "0",
+      "instrument": "cow_bell",
+      "custom": false,
+      "played": true,
+      "randomState": 234029835660143
+    },
+    {
+      "seedBits": "0",
+      "instrument": "didgeridoo",
+      "custom": false,
+      "played": true,
+      "randomState": 234029835660143
+    },
+    {
+      "seedBits": "0",
+      "instrument": "bit",
+      "custom": false,
+      "played": true,
+      "randomState": 234029835660143
+    },
+    {
+      "seedBits": "0",
+      "instrument": "banjo",
+      "custom": false,
+      "played": true,
+      "randomState": 234029835660143
+    },
+    {
+      "seedBits": "0",
+      "instrument": "pling",
+      "custom": false,
+      "played": true,
+      "randomState": 234029835660143
+    },
+    {
+      "seedBits": "0",
+      "instrument": "trumpet",
+      "custom": false,
+      "played": true,
+      "randomState": 234029835660143
+    },
+    {
+      "seedBits": "0",
+      "instrument": "trumpet_exposed",
+      "custom": false,
+      "played": true,
+      "randomState": 234029835660143
+    },
+    {
+      "seedBits": "0",
+      "instrument": "trumpet_oxidized",
+      "custom": false,
+      "played": true,
+      "randomState": 234029835660143
+    },
+    {
+      "seedBits": "0",
+      "instrument": "trumpet_weathered",
+      "custom": false,
+      "played": true,
+      "randomState": 234029835660143
+    },
+    {
+      "seedBits": "0",
+      "instrument": "zombie",
+      "custom": false,
+      "played": true,
+      "randomState": 234029835660143
+    },
+    {
+      "seedBits": "0",
+      "instrument": "skeleton",
+      "custom": false,
+      "played": true,
+      "randomState": 234029835660143
+    },
+    {
+      "seedBits": "0",
+      "instrument": "creeper",
+      "custom": false,
+      "played": true,
+      "randomState": 234029835660143
+    },
+    {
+      "seedBits": "0",
+      "instrument": "dragon",
+      "custom": false,
+      "played": true,
+      "randomState": 234029835660143
+    },
+    {
+      "seedBits": "0",
+      "instrument": "wither_skeleton",
+      "custom": false,
+      "played": true,
+      "randomState": 234029835660143
+    },
+    {
+      "seedBits": "0",
+      "instrument": "piglin",
+      "custom": false,
+      "played": true,
+      "randomState": 234029835660143
+    },
+    {
+      "seedBits": "0",
+      "instrument": "custom_head",
+      "custom": false,
+      "played": false,
+      "randomState": 25214903917
+    },
+    {
+      "seedBits": "0",
+      "instrument": "custom_head",
+      "custom": true,
+      "played": true,
+      "randomState": 234029835660143
+    },
+    {
+      "seedBits": "1",
+      "instrument": "harp",
+      "custom": false,
+      "played": true,
+      "randomState": 28280696119558
+    },
+    {
+      "seedBits": "1",
+      "instrument": "basedrum",
+      "custom": false,
+      "played": true,
+      "randomState": 28280696119558
+    },
+    {
+      "seedBits": "1",
+      "instrument": "snare",
+      "custom": false,
+      "played": true,
+      "randomState": 28280696119558
+    },
+    {
+      "seedBits": "1",
+      "instrument": "hat",
+      "custom": false,
+      "played": true,
+      "randomState": 28280696119558
+    },
+    {
+      "seedBits": "1",
+      "instrument": "bass",
+      "custom": false,
+      "played": true,
+      "randomState": 28280696119558
+    },
+    {
+      "seedBits": "1",
+      "instrument": "flute",
+      "custom": false,
+      "played": true,
+      "randomState": 28280696119558
+    },
+    {
+      "seedBits": "1",
+      "instrument": "bell",
+      "custom": false,
+      "played": true,
+      "randomState": 28280696119558
+    },
+    {
+      "seedBits": "1",
+      "instrument": "guitar",
+      "custom": false,
+      "played": true,
+      "randomState": 28280696119558
+    },
+    {
+      "seedBits": "1",
+      "instrument": "chime",
+      "custom": false,
+      "played": true,
+      "randomState": 28280696119558
+    },
+    {
+      "seedBits": "1",
+      "instrument": "xylophone",
+      "custom": false,
+      "played": true,
+      "randomState": 28280696119558
+    },
+    {
+      "seedBits": "1",
+      "instrument": "iron_xylophone",
+      "custom": false,
+      "played": true,
+      "randomState": 28280696119558
+    },
+    {
+      "seedBits": "1",
+      "instrument": "cow_bell",
+      "custom": false,
+      "played": true,
+      "randomState": 28280696119558
+    },
+    {
+      "seedBits": "1",
+      "instrument": "didgeridoo",
+      "custom": false,
+      "played": true,
+      "randomState": 28280696119558
+    },
+    {
+      "seedBits": "1",
+      "instrument": "bit",
+      "custom": false,
+      "played": true,
+      "randomState": 28280696119558
+    },
+    {
+      "seedBits": "1",
+      "instrument": "banjo",
+      "custom": false,
+      "played": true,
+      "randomState": 28280696119558
+    },
+    {
+      "seedBits": "1",
+      "instrument": "pling",
+      "custom": false,
+      "played": true,
+      "randomState": 28280696119558
+    },
+    {
+      "seedBits": "1",
+      "instrument": "trumpet",
+      "custom": false,
+      "played": true,
+      "randomState": 28280696119558
+    },
+    {
+      "seedBits": "1",
+      "instrument": "trumpet_exposed",
+      "custom": false,
+      "played": true,
+      "randomState": 28280696119558
+    },
+    {
+      "seedBits": "1",
+      "instrument": "trumpet_oxidized",
+      "custom": false,
+      "played": true,
+      "randomState": 28280696119558
+    },
+    {
+      "seedBits": "1",
+      "instrument": "trumpet_weathered",
+      "custom": false,
+      "played": true,
+      "randomState": 28280696119558
+    },
+    {
+      "seedBits": "1",
+      "instrument": "zombie",
+      "custom": false,
+      "played": true,
+      "randomState": 28280696119558
+    },
+    {
+      "seedBits": "1",
+      "instrument": "skeleton",
+      "custom": false,
+      "played": true,
+      "randomState": 28280696119558
+    },
+    {
+      "seedBits": "1",
+      "instrument": "creeper",
+      "custom": false,
+      "played": true,
+      "randomState": 28280696119558
+    },
+    {
+      "seedBits": "1",
+      "instrument": "dragon",
+      "custom": false,
+      "played": true,
+      "randomState": 28280696119558
+    },
+    {
+      "seedBits": "1",
+      "instrument": "wither_skeleton",
+      "custom": false,
+      "played": true,
+      "randomState": 28280696119558
+    },
+    {
+      "seedBits": "1",
+      "instrument": "piglin",
+      "custom": false,
+      "played": true,
+      "randomState": 28280696119558
+    },
+    {
+      "seedBits": "1",
+      "instrument": "custom_head",
+      "custom": false,
+      "played": false,
+      "randomState": 25214903916
+    },
+    {
+      "seedBits": "1",
+      "instrument": "custom_head",
+      "custom": true,
+      "played": true,
+      "randomState": 28280696119558
+    },
+    {
+      "seedBits": "ffffffffffffffff",
+      "instrument": "harp",
+      "custom": false,
+      "played": true,
+      "randomState": 123725706106780
+    },
+    {
+      "seedBits": "ffffffffffffffff",
+      "instrument": "basedrum",
+      "custom": false,
+      "played": true,
+      "randomState": 123725706106780
+    },
+    {
+      "seedBits": "ffffffffffffffff",
+      "instrument": "snare",
+      "custom": false,
+      "played": true,
+      "randomState": 123725706106780
+    },
+    {
+      "seedBits": "ffffffffffffffff",
+      "instrument": "hat",
+      "custom": false,
+      "played": true,
+      "randomState": 123725706106780
+    },
+    {
+      "seedBits": "ffffffffffffffff",
+      "instrument": "bass",
+      "custom": false,
+      "played": true,
+      "randomState": 123725706106780
+    },
+    {
+      "seedBits": "ffffffffffffffff",
+      "instrument": "flute",
+      "custom": false,
+      "played": true,
+      "randomState": 123725706106780
+    },
+    {
+      "seedBits": "ffffffffffffffff",
+      "instrument": "bell",
+      "custom": false,
+      "played": true,
+      "randomState": 123725706106780
+    },
+    {
+      "seedBits": "ffffffffffffffff",
+      "instrument": "guitar",
+      "custom": false,
+      "played": true,
+      "randomState": 123725706106780
+    },
+    {
+      "seedBits": "ffffffffffffffff",
+      "instrument": "chime",
+      "custom": false,
+      "played": true,
+      "randomState": 123725706106780
+    },
+    {
+      "seedBits": "ffffffffffffffff",
+      "instrument": "xylophone",
+      "custom": false,
+      "played": true,
+      "randomState": 123725706106780
+    },
+    {
+      "seedBits": "ffffffffffffffff",
+      "instrument": "iron_xylophone",
+      "custom": false,
+      "played": true,
+      "randomState": 123725706106780
+    },
+    {
+      "seedBits": "ffffffffffffffff",
+      "instrument": "cow_bell",
+      "custom": false,
+      "played": true,
+      "randomState": 123725706106780
+    },
+    {
+      "seedBits": "ffffffffffffffff",
+      "instrument": "didgeridoo",
+      "custom": false,
+      "played": true,
+      "randomState": 123725706106780
+    },
+    {
+      "seedBits": "ffffffffffffffff",
+      "instrument": "bit",
+      "custom": false,
+      "played": true,
+      "randomState": 123725706106780
+    },
+    {
+      "seedBits": "ffffffffffffffff",
+      "instrument": "banjo",
+      "custom": false,
+      "played": true,
+      "randomState": 123725706106780
+    },
+    {
+      "seedBits": "ffffffffffffffff",
+      "instrument": "pling",
+      "custom": false,
+      "played": true,
+      "randomState": 123725706106780
+    },
+    {
+      "seedBits": "ffffffffffffffff",
+      "instrument": "trumpet",
+      "custom": false,
+      "played": true,
+      "randomState": 123725706106780
+    },
+    {
+      "seedBits": "ffffffffffffffff",
+      "instrument": "trumpet_exposed",
+      "custom": false,
+      "played": true,
+      "randomState": 123725706106780
+    },
+    {
+      "seedBits": "ffffffffffffffff",
+      "instrument": "trumpet_oxidized",
+      "custom": false,
+      "played": true,
+      "randomState": 123725706106780
+    },
+    {
+      "seedBits": "ffffffffffffffff",
+      "instrument": "trumpet_weathered",
+      "custom": false,
+      "played": true,
+      "randomState": 123725706106780
+    },
+    {
+      "seedBits": "ffffffffffffffff",
+      "instrument": "zombie",
+      "custom": false,
+      "played": true,
+      "randomState": 123725706106780
+    },
+    {
+      "seedBits": "ffffffffffffffff",
+      "instrument": "skeleton",
+      "custom": false,
+      "played": true,
+      "randomState": 123725706106780
+    },
+    {
+      "seedBits": "ffffffffffffffff",
+      "instrument": "creeper",
+      "custom": false,
+      "played": true,
+      "randomState": 123725706106780
+    },
+    {
+      "seedBits": "ffffffffffffffff",
+      "instrument": "dragon",
+      "custom": false,
+      "played": true,
+      "randomState": 123725706106780
+    },
+    {
+      "seedBits": "ffffffffffffffff",
+      "instrument": "wither_skeleton",
+      "custom": false,
+      "played": true,
+      "randomState": 123725706106780
+    },
+    {
+      "seedBits": "ffffffffffffffff",
+      "instrument": "piglin",
+      "custom": false,
+      "played": true,
+      "randomState": 123725706106780
+    },
+    {
+      "seedBits": "ffffffffffffffff",
+      "instrument": "custom_head",
+      "custom": false,
+      "played": false,
+      "randomState": 281449761806738
+    },
+    {
+      "seedBits": "ffffffffffffffff",
+      "instrument": "custom_head",
+      "custom": true,
+      "played": true,
+      "randomState": 123725706106780
+    },
+    {
+      "seedBits": "8000000000000000",
+      "instrument": "harp",
+      "custom": false,
+      "played": true,
+      "randomState": 234029835660143
+    },
+    {
+      "seedBits": "8000000000000000",
+      "instrument": "basedrum",
+      "custom": false,
+      "played": true,
+      "randomState": 234029835660143
+    },
+    {
+      "seedBits": "8000000000000000",
+      "instrument": "snare",
+      "custom": false,
+      "played": true,
+      "randomState": 234029835660143
+    },
+    {
+      "seedBits": "8000000000000000",
+      "instrument": "hat",
+      "custom": false,
+      "played": true,
+      "randomState": 234029835660143
+    },
+    {
+      "seedBits": "8000000000000000",
+      "instrument": "bass",
+      "custom": false,
+      "played": true,
+      "randomState": 234029835660143
+    },
+    {
+      "seedBits": "8000000000000000",
+      "instrument": "flute",
+      "custom": false,
+      "played": true,
+      "randomState": 234029835660143
+    },
+    {
+      "seedBits": "8000000000000000",
+      "instrument": "bell",
+      "custom": false,
+      "played": true,
+      "randomState": 234029835660143
+    },
+    {
+      "seedBits": "8000000000000000",
+      "instrument": "guitar",
+      "custom": false,
+      "played": true,
+      "randomState": 234029835660143
+    },
+    {
+      "seedBits": "8000000000000000",
+      "instrument": "chime",
+      "custom": false,
+      "played": true,
+      "randomState": 234029835660143
+    },
+    {
+      "seedBits": "8000000000000000",
+      "instrument": "xylophone",
+      "custom": false,
+      "played": true,
+      "randomState": 234029835660143
+    },
+    {
+      "seedBits": "8000000000000000",
+      "instrument": "iron_xylophone",
+      "custom": false,
+      "played": true,
+      "randomState": 234029835660143
+    },
+    {
+      "seedBits": "8000000000000000",
+      "instrument": "cow_bell",
+      "custom": false,
+      "played": true,
+      "randomState": 234029835660143
+    },
+    {
+      "seedBits": "8000000000000000",
+      "instrument": "didgeridoo",
+      "custom": false,
+      "played": true,
+      "randomState": 234029835660143
+    },
+    {
+      "seedBits": "8000000000000000",
+      "instrument": "bit",
+      "custom": false,
+      "played": true,
+      "randomState": 234029835660143
+    },
+    {
+      "seedBits": "8000000000000000",
+      "instrument": "banjo",
+      "custom": false,
+      "played": true,
+      "randomState": 234029835660143
+    },
+    {
+      "seedBits": "8000000000000000",
+      "instrument": "pling",
+      "custom": false,
+      "played": true,
+      "randomState": 234029835660143
+    },
+    {
+      "seedBits": "8000000000000000",
+      "instrument": "trumpet",
+      "custom": false,
+      "played": true,
+      "randomState": 234029835660143
+    },
+    {
+      "seedBits": "8000000000000000",
+      "instrument": "trumpet_exposed",
+      "custom": false,
+      "played": true,
+      "randomState": 234029835660143
+    },
+    {
+      "seedBits": "8000000000000000",
+      "instrument": "trumpet_oxidized",
+      "custom": false,
+      "played": true,
+      "randomState": 234029835660143
+    },
+    {
+      "seedBits": "8000000000000000",
+      "instrument": "trumpet_weathered",
+      "custom": false,
+      "played": true,
+      "randomState": 234029835660143
+    },
+    {
+      "seedBits": "8000000000000000",
+      "instrument": "zombie",
+      "custom": false,
+      "played": true,
+      "randomState": 234029835660143
+    },
+    {
+      "seedBits": "8000000000000000",
+      "instrument": "skeleton",
+      "custom": false,
+      "played": true,
+      "randomState": 234029835660143
+    },
+    {
+      "seedBits": "8000000000000000",
+      "instrument": "creeper",
+      "custom": false,
+      "played": true,
+      "randomState": 234029835660143
+    },
+    {
+      "seedBits": "8000000000000000",
+      "instrument": "dragon",
+      "custom": false,
+      "played": true,
+      "randomState": 234029835660143
+    },
+    {
+      "seedBits": "8000000000000000",
+      "instrument": "wither_skeleton",
+      "custom": false,
+      "played": true,
+      "randomState": 234029835660143
+    },
+    {
+      "seedBits": "8000000000000000",
+      "instrument": "piglin",
+      "custom": false,
+      "played": true,
+      "randomState": 234029835660143
+    },
+    {
+      "seedBits": "8000000000000000",
+      "instrument": "custom_head",
+      "custom": false,
+      "played": false,
+      "randomState": 25214903917
+    },
+    {
+      "seedBits": "8000000000000000",
+      "instrument": "custom_head",
+      "custom": true,
+      "played": true,
+      "randomState": 234029835660143
+    }
+  ]
+}

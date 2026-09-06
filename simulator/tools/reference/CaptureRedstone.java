@@ -60,6 +60,12 @@ public class CaptureRedstone extends TestFunctionLoader {
                 if (state.getBlock() instanceof DoorBlock door) door.setOpen(null, level, state, pos, !state.getValue(DoorBlock.OPEN));
                 else if (state.getBlock() instanceof LeverBlock lever) lever.pull(state, level, pos, null);
                 else if (state.getBlock() instanceof ButtonBlock button) { if (!state.getValue(ButtonBlock.POWERED)) button.press(state, level, pos, null); }
+                else if (state.getBlock() instanceof NoteBlock note) {
+                    var player=helper.makeMockPlayer(GameType.CREATIVE);
+                    var hit=new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(pos),Direction.UP,pos,false);
+                    var method=NoteBlock.class.getDeclaredMethod("useWithoutItem",BlockState.class,Level.class,BlockPos.class,Player.class,net.minecraft.world.phys.BlockHitResult.class);
+                    method.setAccessible(true);method.invoke(note,state,level,pos,player,hit);
+                }
                 else throw new IllegalArgumentException("Unsupported reference interaction");
                 return;
             }
@@ -84,6 +90,10 @@ public class CaptureRedstone extends TestFunctionLoader {
                     affected=BuiltInRegistries.BLOCK.getValue(Identifier.parse(block.get("name").getAsString())).defaultBlockState();
                 }
                 level.gameEvent(event,location,new net.minecraft.world.level.gameevent.GameEvent.Context(source,affected));
+            } else if (state.getBlock() instanceof NoteBlock note) {
+                var player=helper.makeMockPlayer(GameType.CREATIVE);
+                var method=NoteBlock.class.getDeclaredMethod("attack",BlockState.class,Level.class,BlockPos.class,Player.class);
+                method.setAccessible(true);method.invoke(note,state,level,pos,player);
             } else if (state.getBlock() instanceof TargetBlock) {
                 var values=input.getAsJsonArray("hit");
                 var location=new net.minecraft.world.phys.Vec3(pos.getX()+values.get(0).getAsDouble(),pos.getY()+values.get(1).getAsDouble(),pos.getZ()+values.get(2).getAsDouble());

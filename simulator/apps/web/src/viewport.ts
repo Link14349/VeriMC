@@ -190,6 +190,16 @@ export class CircuitViewport {
         part([.5,.24,.5],[.8,.16,.8],0x465155);
         for (const edge of [.14,.86]) { part([edge,.48,.5],[.12,.38,.84],0x9ba7a8); part([.5,.48,edge],[.6,.38,.12],0x9ba7a8); }
       }
+    } else if (name === 'note_block') {
+      part([.5,.5,.5],[1,1,1],0x79523b);
+      part([.5,1.006,.5],[.88,.015,.88],p.powered==='true'?0xd4a675:0xad8056);
+      for(const line of [.2,.4,.6,.8])part([line,1.018,.5],[.055,.015,.78],0x533d2d);
+    } else if (name.endsWith('_head') || name.endsWith('_skull')) {
+      const wall=name.includes('_wall_'),v=directionVectors[facing];
+      const headColor=name.startsWith('zombie')?0x73965c:name.startsWith('creeper')?0x78a251:name.startsWith('dragon')||name.startsWith('wither')?0x393c40:0xc5b598;
+      const cx=wall?.5-v[0]*.25:.5,cy=wall?.75:.25,cz=wall?.5-v[2]*.25:.5;
+      part([cx,cy,cz],[.5,.5,.5],headColor);
+      for(const eye of [-.12,.12])part([cx+(v[0]===0?eye:v[0]*.26),cy+.04,cz+(v[2]===0?eye:v[2]*.26)],[v[0]===0?.11:.025,.09,v[2]===0?.11:.025],0x30373a);
     } else if (name === 'sculk_sensor' || name === 'calibrated_sculk_sensor') {
       const active=p.sculk_sensor_phase==='active',cooling=p.sculk_sensor_phase==='cooldown';
       part([.5,.25,.5],[1,.5,1],0x224b50);

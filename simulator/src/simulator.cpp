@@ -174,6 +174,7 @@ void Simulator::place(BlockPos p, StateId id) {
         setBlock(above, registry.with(id, "half", std::string("upper")));
         return;
     }
+    if(registry[id].device==Device::noteBlock && at(p).type!=registry[id].type)id=noteInstrument(p,id);
     if (!survives(p, id)) throw std::invalid_argument("这个位置缺少器件所需的支撑面");
     if (registry[id].device == Device::tripwire) {
         for (auto d : horizontal) id = registry.withBool(id, directionNames[static_cast<unsigned>(d)], connectsTripwire(world.get(p.relative(d)), d));
@@ -209,6 +210,7 @@ void Simulator::onPlace(BlockPos p, StateId id, StateId old) {
     case Device::daylight: schedulePhase(p, currentTick + 20 - currentTick % 20, 2, 0); break;
     case Device::hopper: executeNeighbor(p); startHopper(p); break;
     case Device::rail: case Device::poweredRail: case Device::activatorRail: case Device::detectorRail: placeRail(p); break;
+    case Device::noteBlock: {bool powered=bestSignal(p)>0;if(powered!=s.powered){if(powered)playNote(p,id);setBlock(p,registry.withBool(id,"powered",powered));}break;}
     case Device::piston: checkPiston(p); break;
     case Device::tripwire:
         updateTripwireSource(p, id);
@@ -306,6 +308,7 @@ void Simulator::indirectShapes(BlockPos p, StateId id, unsigned flags, int depth
 }
 void Simulator::executeShape(const Update& u) {
     auto id = world.get(u.pos); const auto& s = registry[id];
+    if(s.device==Device::noteBlock && axis(u.direction)==0) {setBlock(u.pos,noteInstrument(u.pos,id),u.flags,u.depth);return;}
     if (isRail(s.device)) return; // Rail support is checked by neighborChanged.
     if (s.device == Device::tripwireHook) {
         if (opposite(u.direction) == s.facing && !survives(u.pos, id)) setBlock(u.pos, 0, 3, u.depth);
@@ -403,6 +406,7 @@ void Simulator::executeNeighbor(BlockPos p, StateId source) {
         }
         break;
     }
+    case Device::noteBlock: {bool powered=bestSignal(p)>0;if(powered!=s.powered){if(powered)playNote(p,id);setBlock(p,registry.withBool(id,"powered",powered));}break;}
     case Device::piston: checkPiston(p); break;
     case Device::pistonHead: if (survives(p, id)) neighborChanged(p.relative(opposite(s.facing))); break;
     case Device::rail: case Device::poweredRail: case Device::activatorRail: case Device::detectorRail: updateRail(p, source); break;
@@ -486,7 +490,7 @@ bool Simulator::stepEvent() {
     currentEntityOrder = event.entityOrder;
     try {
         if (at(event.pos).type == event.type) {
-            if (event.phase == 1) pistonEvent(event);
+            if (event.phase == 1) {if(at(event.pos).device==Device::noteBlock)noteEvent(event.pos);else pistonEvent(event);}
             else if (event.phase == 3) {
                 if (at(event.pos).device == Device::button) buttonContact(event.pos);
                 else tripwireContact(event.pos);
@@ -541,6 +545,7 @@ void Simulator::interact(BlockPos p) {
     if (faulted) throw std::runtime_error("当前执行已中止，请从有效快照恢复");
     auto id = world.get(p); const auto& s = registry[id];
     switch (s.device) {
+    case Device::noteBlock: {auto next=registry.with(id,"note",(std::stoi(registry.property(id,"note"))+1)%25);setBlock(p,next);playNote(p,next);break;}
     case Device::lever: setBlock(p, registry.withBool(id, "powered", !s.powered)); notifyAttached(p, s.connectedDirection); emitGameEvent(s.powered?"block_deactivate":"block_activate",p);break;
     case Device::button: if (!s.powered) { setBlock(p, registry.withBool(id, "powered", true)); notifyAttached(p, s.connectedDirection); const auto& name = registry.type(id).name; schedule(p, name == "minecraft:stone_button" || name == "minecraft:polished_blackstone_button" ? 20 : 30); emitGameEvent("block_activate",p); } break;
     case Device::repeater: setBlock(p, registry.with(id, "delay", s.delay % 4 + 1)); break;
@@ -557,6 +562,8 @@ void Simulator::interact(BlockPos p) {
 void Simulator::stimulate(BlockPos p, const Json& input) {
     if (faulted) throw std::runtime_error("当前执行已中止，请从有效快照恢复");
     if(input.contains("gameEvent")) {stimulateVibration(p,input);return;}
+    if (!input.is_object())throw std::invalid_argument("环境输入必须是对象");
+    if(stimulateNote(p,input))return;
     if (stimulateDevice(p, input)) return;
     throw std::invalid_argument("该器件尚不支持这类环境刺激");
 }

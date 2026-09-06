@@ -266,6 +266,7 @@ void Simulator::validateRuntime(BlockPos pos) const {
     const auto& data = runtime.at(pos);
     if (!data.values.is_object() || data.output < 0 || data.output > 15) throw std::invalid_argument("无效器件内部状态");
     auto device = at(pos).device;
+    validateNoteRuntime(pos);
     if(isSensor(device)) integerInRange(data.values,"lastVibrationFrequency",0,15);
     if(isBookshelf(world.get(pos)) && data.values.contains("lastInteractedSlot")) {
         const auto& last=data.values.at("lastInteractedSlot");

@@ -27,3 +27,5 @@ ctest --test-dir simulator/build --output-on-failure
 Release 与 ASAN/UBSAN 共 51 项测试通过，包括 6,000 次逐位随机对照、周期性恢复、错误参数校验、十组 GameTest、600 次投掷器选槽和 36 次实际弹出。声音和游戏事件的完整随机消耗仍待实现，投掷器范围见 [投掷器说明](droppers.md)。
 
 振动批次区分 `Level.random` 与原版用于声音包种子的独立 `soundSeedGenerator`：音高公式从世界源取样，声音包种子不能额外消耗世界源。新增干燥感测体激活/冷却结束各一次、含水跳过的专项；Release 与 ASAN/UBSAN 当前共 66 项通过。各器件的游戏事件已按[振动说明](vibrations.md)列出的范围接入，仍未完成全世界随机调用顺序的覆盖。
+
+音符盒是另一种声音调用路径：`NoteBlock.triggerEvent` 显式从世界随机源调用 `nextLong`，每次正常演奏消耗两次基础取样，玩家头颅缺少自定义声音时跳过。112 次原版隔离调用验证全乐器与四种种子；事件去重和执行时读取音符分别保留，详见[音符盒说明](notes.md)。

@@ -5,6 +5,7 @@ import { shortName } from './blockLabels';
 import { TargetControls } from './targetControls';
 import { createCoalescedRefresh } from './coalescedRefresh';
 import { VibrationControls } from './vibrationControls';
+import { NoteControls } from './noteControls';
 
 type Props = { pos: Pos; block: BlockDef; command: (cmd: string, body?: Record<string, unknown>) => Promise<Record<string, unknown> | undefined> };
 
@@ -17,8 +18,9 @@ export function EnvironmentControls({ pos, block, command }: Props) {
   const lectern = name === 'lectern', rod = name.endsWith('lightning_rod'), target = name === 'target';
   const detector = name === 'detector_rail', tripwire = name === 'tripwire';
   const sensor=name==='sculk_sensor'||name==='calibrated_sculk_sensor';
+  const note=name==='note_block',head=name==='player_head'||name==='player_wall_head';
   const button = name.endsWith('_button'), stoneButton = name === 'stone_button' || name === 'polished_blackstone_button';
-  const supported = plate || daylight || lectern || rod || target || detector || tripwire || button || sensor;
+  const supported = plate || daylight || lectern || rod || target || detector || tripwire || button || sensor || note || head;
   const key = posKey(pos);
   useEffect(() => {
     if (!supported) return;
@@ -40,6 +42,7 @@ export function EnvironmentControls({ pos, block, command }: Props) {
     <label className="propertyRow"><span>{label}</span><input aria-label={label} type="number" min={minimum} max={maximum} value={value} onChange={e => change(Number(e.target.value))}/></label>;
   return <div className="inspectorSection environmentControls"><label className="miniLabel"><Zap size={12}/>环境输入</label>
     {sensor&&<VibrationControls key={key} pos={pos} inspection={inspection} command={command}/>}
+    {(note||head)&&<NoteControls key={key} pos={pos} head={head} inspection={inspection} command={command}/>}
     {button && <>
       <button className="wideButton accentOutline" onClick={() => stimulus({arrows:1})}>箭留在按钮内</button>
       <button className="wideButton" onClick={() => stimulus({arrows:1, pressedArrows:0})}>箭只触及弹起部分</button>

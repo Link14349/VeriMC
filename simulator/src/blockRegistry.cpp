@@ -29,6 +29,9 @@ Device classify(const std::string& name, const std::string& c) {
     if (name == "minecraft:activator_rail") return Device::activatorRail;
     if (auto it = classes.find(c); it != classes.end()) return it->second;
     if (name == "minecraft:redstone_block") return Device::source;
+    static const std::vector<std::string> noteBases{"clay","gold_block","packed_ice","bone_block","iron_block","soul_sand","pumpkin","emerald_block","hay_block","copper_block","exposed_copper","weathered_copper","oxidized_copper","waxed_copper_block","waxed_exposed_copper","waxed_weathered_copper","waxed_oxidized_copper"};
+    if(std::find(noteBases.begin(),noteBases.end(),name.substr(10))!=noteBases.end())return Device::solid;
+    if(c=="WitherSkullBlock" || c=="WitherWallSkullBlock" || c=="SkullBlock" || c=="WallSkullBlock" || c=="PlayerHeadBlock" || c=="PlayerWallHeadBlock")return Device::solid;
     static const std::vector<std::string> analogClasses{"ComposterBlock", "CakeBlock", "CandleCakeBlock", "CauldronBlock", "LayeredCauldronBlock", "LavaCauldronBlock", "ChiseledBookShelfBlock", "DecoratedPotBlock", "JukeboxBlock", "CopperGolemStatueBlock", "WeatheringCopperGolemStatueBlock", "RespawnAnchorBlock", "BeehiveBlock", "EndPortalFrameBlock"};
     if (std::find(analogClasses.begin(), analogClasses.end(), c) != analogClasses.end()) return Device::analog;
     // The palette admits a deliberate structural whitelist. Unknown behavior stays explicit.
@@ -56,12 +59,19 @@ BlockRegistry::BlockRegistry(const std::string& path) {
         gameEvents.push_back({row.at("name"),row.at("radius"),row.at("frequency"),row.at("listenable"),row.at("ignoreSneaking")});
     }
     const Json data = Json::parse(file);
+    std::ifstream noteFile(std::filesystem::path(path).parent_path()/"noteRules.json");
+    if(!noteFile)throw std::runtime_error("找不到音符盒规则 noteRules.json");
+    const auto noteData=Json::parse(noteFile);
+    if(noteData.at("version")!="26.2")throw std::runtime_error("Note registry version mismatch");
+    for(const auto& row:noteData.at("instruments"))instruments.push_back({row.at("name"),row.at("sound"),row.at("tunable"),row.at("above"),row.at("custom")});
+    notePitches=noteData.at("pitches").get<std::array<float,25>>();
     if (data.at("version") != "26.2") throw std::runtime_error("需要 Minecraft 26.2 数据");
     for (const auto& b : data.at("blocks")) {
         BlockType typeInfo;
         typeInfo.name = b.at("name"); typeInfo.className = b.at("className");
         typeInfo.defaultState = b.at("defaultState"); typeInfo.firstState = b.at("states")[0].at("id");
         typeInfo.device = classify(typeInfo.name, typeInfo.className);
+        typeInfo.instrument=instrumentId(noteData.at("blocks").at(typeInfo.name));
         for(const auto& name:vibrationData.at("occludes_vibration_signals")) if(name==typeInfo.name) typeInfo.occludesVibrations=true;
         for(const auto& name:vibrationData.at("dampens_vibrations")) if(name==typeInfo.name) typeInfo.dampensVibrations=true;
         for(const auto& name:vibrationData.at("vibration_resonators")) if(name==typeInfo.name) typeInfo.vibrationResonator=true;
@@ -75,6 +85,7 @@ BlockRegistry::BlockRegistry(const std::string& path) {
         if (typeInfo.className == "CopperChestBlock" || typeInfo.className == "WeatheringCopperChestBlock") typeInfo.supportLevel = "implemented";
         if (typeInfo.device == Device::hopper) typeInfo.supportLevel = "implemented";
         if (typeInfo.device == Device::dropper) typeInfo.supportLevel = "partial";
+        if(typeInfo.device==Device::noteBlock || typeInfo.className.find("SkullBlock")!=std::string::npos || typeInfo.className=="PlayerHeadBlock" || typeInfo.className=="PlayerWallHeadBlock")typeInfo.supportLevel="partial";
         if (typeInfo.className == "ChiseledBookShelfBlock") typeInfo.supportLevel = "partial";
         if (typeInfo.className == "DecoratedPotBlock") typeInfo.supportLevel = "partial";
         if (typeInfo.device == Device::sculkSensor || typeInfo.device == Device::calibratedSensor) typeInfo.supportLevel = "partial";
@@ -128,6 +139,10 @@ BlockRegistry::BlockRegistry(const std::string& path) {
             for (std::size_t i = 0; i < 4; ++i) { auto side = val(directionNames[static_cast<unsigned>(horizontal[i])], "none"); st.wireSides[i] = side == "up" ? 2 : side == "side" ? 1 : 0; }
         }
     }
+}
+std::uint8_t BlockRegistry::instrumentId(const std::string& name) const {
+    for(std::size_t i=0;i<instruments.size();++i)if(instruments[i].name==name)return static_cast<std::uint8_t>(i);
+    throw std::invalid_argument("未知乐器："+name);
 }
 std::uint16_t BlockRegistry::gameEventId(const std::string& name) const {
     auto key=name.find(':')==std::string::npos?"minecraft:"+name:name;

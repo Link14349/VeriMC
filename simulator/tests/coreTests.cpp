@@ -180,7 +180,7 @@ int main() {
         try { restored.loadProject(invalid); } catch (...) { threw = true; }
         expect(threw && before == restored.saveProject("before", true), "invalid batch import changed world");
     });
-    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers", "java26_2Hoppers", "java26_2Torches", "java26_2Rails", "java26_2TickBatches", "java26_2Tripwire", "java26_2Buttons", "java26_2Droppers", "java26_2Targets", "java26_2CopperChests", "java26_2Bookshelves", "java26_2Pots", "java26_2Vibrations", "java26_2DeviceVibrations"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
+    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers", "java26_2Hoppers", "java26_2Torches", "java26_2Rails", "java26_2TickBatches", "java26_2Tripwire", "java26_2Buttons", "java26_2Droppers", "java26_2Targets", "java26_2CopperChests", "java26_2Bookshelves", "java26_2Pots", "java26_2Vibrations", "java26_2DeviceVibrations", "java26_2Notes"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
         std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/../tests/fixtures/" + fixtureName + ".json"); expect(static_cast<bool>(file), "missing vanilla reference fixture");
         auto fixture = Json::parse(file); auto origin = fixture["origin"].get<BlockPos>(); Simulator s(r);
         auto absolute = [&](const Json& p) { auto pos = p.get<BlockPos>(); return BlockPos{origin.x + pos.x, origin.y + pos.y, origin.z + pos.z}; };
@@ -200,6 +200,54 @@ int main() {
                 if (frame.contains("inventories")) expect(s.inventoryJson(p, false) == frame["inventories"][i], "inventory mismatch at " + std::to_string(tick) + " " + fixture["watch"][i].dump() + " expected " + frame["inventories"][i].dump() + " got " + s.inventoryJson(p, false).dump());
             }
         }
+    });
+    test("notes preserve event deduplication, execution-time state and checkpoint random draws", [&] {
+        Simulator s(r);s.place({0,0,0},r.state("note_block"));s.setRandomSeed(17);
+        s.stimulate({0,0,0},{{"playNote",true}});s.interact({0,0,0});s.interact({0,0,0});
+        expect(s.pendingEvents()==1,"note block events were not deduplicated");
+        auto pending=s.saveProject("notes",true);Simulator restored(r);restored.loadProject(pending);
+        bool threw=false;try{(void)s.saveProject("notes",false);}catch(...){threw=true;}expect(threw,"pending note was lost by circuit export");
+        // Obstruction after scheduling does not cancel triggerEvent.
+        s.place({0,1,0},r.state("glass"));restored.place({0,1,0},r.state("glass"));
+        s.advanceTo(1);restored.advanceTo(1);expect(s.saveProject("notes",true)==restored.saveProject("notes",true),"note checkpoint diverged");
+        auto info=s.inspect({0,0,0})["runtime"];expect(info["playCount"]==1 && info["lastPlayed"]["note"]==2,"queued event did not read latest note");
+        LegacyRandom expected(17);expected.nextLong();expect(s.saveProject("notes",true)["randomSource"]["state"]==expected.state(),"note sound consumed wrong random state");
+        s.stimulate({0,0,0},{{"playNote",true}});expect(s.pendingEvents()==0,"blocked note scheduled sound");
+        auto bad=s.saveProject("notes",true);for(auto& row:bad["blockData"])if(row["pos"]==Json::array({0,0,0}))row["values"]["lastPlayed"]["pitch"]=100;
+        auto before=s.saveProject("notes",true);threw=false;try{s.loadProject(bad);}catch(...){threw=true;}expect(threw && before==s.saveProject("notes",true),"invalid note history not rejected atomically");
+        auto design=s.saveProject("design",false);Simulator clean(r);clean.loadProject(design);expect(!clean.inspect({0,0,0})["runtime"].contains("lastPlayed"),"design retained previous run diagnostics");
+    });
+    test("note block event random stream matches original across all instruments", [&] {
+        std::ifstream file(std::string(SIMULATOR_DATA_DIR)+"/../tests/fixtures/java26_2NoteRandom.json");auto fixture=Json::parse(file);
+        for(const auto& row:fixture.at("cases")) {
+            Simulator s(r);const auto instrument=row.at("instrument").get<std::string>();
+            s.setBlock({0,0,0},r.state("note_block",{{"instrument",instrument},{"note","17"}}));
+            if(row.at("custom")) {s.place({0,1,0},r.state("player_head"));s.stimulate({0,1,0},{{"customSound","simulator:test/bell"}});}
+            s.setRandomSeed(std::stoull(row.at("seedBits").get<std::string>(),nullptr,16));
+            s.stimulate({0,0,0},{{"playNote",true}});s.advanceTo(1);
+            expect(s.saveProject("note",true)["randomSource"]["state"]==row.at("randomState"),"note RNG differs for "+instrument);
+            expect((s.inspect({0,0,0})["runtime"].value("playCount",0)==1)==row.at("played").get<bool>(),"note sound result differs for "+instrument);
+        }
+        for(const auto* head:{"skeleton_skull","wither_skeleton_skull","zombie_head","creeper_head","dragon_head","piglin_head","player_head"}) {
+            Simulator s(r);s.place({0,0,0},r.state("note_block"));s.place({0,1,0},r.state(head));
+            expect(r.instrument(r.instrumentId(r.property(s.world.get({0,0,0}),"instrument"))).above,"head instrument missing");
+        }
+    });
+    test("head note overrides, missing custom sound and explicit custom sound", [&] {
+        Simulator s(r);s.place({0,-1,0},r.state("gold_block"));s.place({0,0,0},r.state("note_block"));
+        expect(r.property(s.world.get({0,0,0}),"instrument")=="bell","placement ignored base instrument");
+        s.place({0,1,0},r.state("zombie_head"));s.interact({0,0,0});s.advanceTo(1);
+        expect(s.inspect({0,0,0})["runtime"]["lastPlayed"]["instrument"]=="zombie","head did not override instrument");
+        s.place({0,1,0},r.state("player_head"));s.setRandomSeed(9);s.stimulate({0,0,0},{{"playNote",true}});s.advanceTo(2);
+        expect(s.saveProject("note",true)["randomSource"]["draws"]=="0","head without custom sound consumed random");
+        auto before=s.saveProject("note",true);bool threw=false;try{s.stimulate({0,1,0},{{"customSound","bad:UPPER CASE"}});}catch(...){threw=true;}
+        expect(threw && before==s.saveProject("note",true),"invalid head edit was not atomic");
+        s.stimulate({0,1,0},{{"customSound","simulator:test/bell"}});s.stimulate({0,0,0},{{"playNote",true}});
+        auto checkpoint=s.saveProject("note",true);Simulator restored(r);restored.loadProject(checkpoint);restored.advanceTo(3);s.advanceTo(3);
+        expect(s.saveProject("note",true)==restored.saveProject("note",true),"custom head checkpoint changed");
+        expect(s.inspect({0,0,0})["runtime"]["lastPlayed"]["sound"]=="simulator:test/bell" && s.saveProject("note",true)["randomSource"]["draws"]=="2","custom head play did not use configured sound");
+        s.setBlock({0,1,0},0);expect(r.property(s.world.get({0,0,0}),"instrument")=="bell","head removal ignored base");
+        s.place({0,-1,0},r.state("skeleton_skull"));expect(r.property(s.world.get({0,0,0}),"instrument")=="harp","head below should choose harp");
     });
     test("vibration travel, block-distance power and pending checkpoints", [&] {
         Simulator s(r);const BlockPos pos{-17,2,-17};s.place(pos,r.state("sculk_sensor"));s.advanceTo(3);

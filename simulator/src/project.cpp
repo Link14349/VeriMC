@@ -64,6 +64,8 @@ Json Simulator::saveProject(const std::string& name, bool checkpoint) const {
     if (!checkpoint && hasPendingActions()) throw std::invalid_argument("仍有待处理的外部动作，请导出运行快照，或先确认环境反馈");
     if(!checkpoint) for(const auto& [pos,sensor]:sensors)
         if(sensor.candidate || sensor.current || registry.property(world.get(pos),"sculk_sensor_phase")!="inactive")throw std::invalid_argument("感测体正在接收振动或冷却，请保存运行快照，或等待空闲后导出电路");
+    if(!checkpoint) for(const auto& event:scheduledKeys)
+        if(event.phase==1 && event.type==registry[registry.state("note_block")].type)throw std::invalid_argument("音符盒等待演奏，请保存运行快照，或执行方块事件后导出电路");
     Json data{{"format", "verimc.simulator"}, {"formatVersion", 1}, {"minecraftVersion", "26.2"}, {"edition", "java"}, {"kind", checkpoint ? "checkpoint" : "circuit"}, {"name", name}};
     data["profile"] = {{"experimentalRedstone", false}, {"naturalRandomTicks", false}, {"loadedRegionOnly", true}};
     data["randomSource"] = {{"algorithm", "javaLegacy48"}, {"seed", std::to_string(randomSeed)}};
@@ -75,6 +77,7 @@ Json Simulator::saveProject(const std::string& name, bool checkpoint) const {
     data["blockData"] = Json::array();
     for (const auto& [pos, state] : runtime) {
         Json row{{"pos", pos}, {"values", state.values}};
+        if(!checkpoint && at(pos).device==Device::noteBlock) {row["values"].erase("lastPlayed");row["values"].erase("playCount");}
         if (inventorySize(world.get(pos))) row["inventory"] = inventoryJson(pos, false);
         if (checkpoint) row["output"] = state.output;
         data["blockData"].push_back(std::move(row));
@@ -186,6 +189,7 @@ void Simulator::loadProject(const Json& data) {
                 if (rank == candidate.entityOrders.end() || rank->second != e.entityOrder || candidate.at(e.pos).type != e.type) throw std::invalid_argument("运行事件的方块实体顺序不一致");
             }
             if (e.phase == 1 && ((e.data & 3u) > 2 || (e.data >> 2) > 5)) throw std::invalid_argument("无效活塞方块事件");
+            if(e.phase==1 && e.type==registry[registry.state("note_block")].type && e.data!=0)throw std::invalid_argument("无效音符盒方块事件");
             if (e.phase == 3 && (candidate.at(e.pos).type != e.type || (candidate.at(e.pos).device != Device::tripwire && candidate.at(e.pos).device != Device::button) || e.data != 0 || e.entityOrder != 0)) throw std::invalid_argument("无效的环境接触事件");
             if ((e.phase != 0 && e.tick < candidate.currentTick) || e.type >= registry.typeCount() || e.priority < -3 || e.priority > 3 || e.phase > 3 || e.order >= candidate.nextOrder || !usedOrders.insert(e.order).second) throw std::invalid_argument("无效的运行队列");
             if (e.phase == 0) {

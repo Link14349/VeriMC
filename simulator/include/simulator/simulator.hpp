@@ -106,6 +106,12 @@ private:
     LegacyRandom worldRandom;
     std::uint64_t randomSeed{};
     void dispenseDropper(BlockPos pos);
+    StateId noteInstrument(BlockPos pos, StateId state) const;
+    void playNote(BlockPos pos, StateId state);
+    void noteEvent(BlockPos pos);
+    bool stimulateNote(BlockPos pos, const Json& input);
+    static std::string soundId(const Json& value);
+    void validateNoteRuntime(BlockPos pos) const;
     void startSensor(BlockPos pos);
     void removeSensor(BlockPos pos, std::uint16_t oldType);
     void rebuildSensorIndex();

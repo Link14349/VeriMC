@@ -130,6 +130,15 @@ public:
 };
 void Hub::demo(const std::string& kind) {
     sim.clear(); projectName = "脉冲与记忆 · 入门电路";
+    if(kind=="notes") {
+        projectName="音符实验 · 材质、演奏与振动";
+        for(int x=-2;x<=8;++x)for(int z=-2;z<=3;++z)sim.world.set({x,0,z},registry.state("white_concrete"));
+        sim.place({0,0,0},registry.state("copper_block"));sim.place({0,1,0},registry.state("note_block"));
+        sim.place({-1,1,0},registry.state("lever",{{"face","floor"}}));
+        sim.place({4,1,0},registry.state("sculk_sensor"));sim.place({5,1,0},registry.state("comparator",{{"facing","west"}}));sim.place({6,1,0},registry.state("redstone_lamp"));
+        sim.addProbe({4,1,0},"振动强度");sim.addProbe({4,1,0},"演奏频率","analog");
+        runStart=sim.clone();return;
+    }
     if(kind=="vibrations") {
         projectName="振动实验 · 传播、隔绝与共振";
         for(int x=-1;x<=17;++x)for(int z=-1;z<=21;++z)sim.world.set({x,0,z},registry.state(z==0 || z==20?"white_concrete":"stone"));

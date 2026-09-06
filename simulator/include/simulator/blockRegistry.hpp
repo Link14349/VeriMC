@@ -8,6 +8,7 @@ namespace simulator {
 struct PropertyInfo { std::vector<std::string> values; std::uint32_t stride{}; };
 struct ItemInfo { std::string name; std::uint16_t maxStack{}; bool bookshelfBook{}; };
 struct GameEventInfo { std::string name; int radius{}, frequency{}; bool listenable{}, ignoreSneaking{}; };
+struct InstrumentInfo { std::string name, sound; bool tunable{}, above{}, custom{}; };
 struct BlockType {
     std::string name, className;
     StateId defaultState{}, firstState{};
@@ -15,6 +16,7 @@ struct BlockType {
     std::map<std::string, PropertyInfo> properties;
     std::string supportLevel{"unimplemented"};
     bool occludesVibrations{}, dampensVibrations{}, vibrationResonator{};
+    std::uint8_t instrument{};
 };
 struct BlockState {
     std::uint16_t type{};
@@ -49,6 +51,9 @@ public:
     std::uint16_t gameEventId(const std::string& name) const;
     const GameEventInfo& gameEvent(std::uint16_t id) const { return gameEvents.at(id); }
     Json gameEventCatalog() const;
+    const InstrumentInfo& instrument(std::uint8_t id) const { return instruments.at(id); }
+    std::uint8_t instrumentId(const std::string& name) const;
+    float notePitch(int note) const { return notePitches.at(static_cast<std::size_t>(note)); }
 private:
     std::vector<BlockState> states;
     std::vector<BlockType> types;
@@ -57,5 +62,7 @@ private:
     std::unordered_map<std::string, std::uint32_t> itemNames;
     std::vector<GameEventInfo> gameEvents;
     std::unordered_map<std::string, std::uint16_t> gameEventNames;
+    std::vector<InstrumentInfo> instruments;
+    std::array<float,25> notePitches{};
 };
 }
