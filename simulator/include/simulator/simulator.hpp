@@ -44,8 +44,8 @@ public:
     int bestSignal(BlockPos receiver, bool includeWire = true) const;
     int analogOutput(BlockPos pos) const;
     int displayValue(BlockPos pos) const;
-    void updateNeighbors(BlockPos pos, int skip = -1);
-    void neighborChanged(BlockPos pos);
+    void updateNeighbors(BlockPos pos, int skip = -1, StateId source = UINT32_MAX);
+    void neighborChanged(BlockPos pos, StateId source = 0);
     void schedule(BlockPos pos, Tick delay, int priority = 0);
     bool hasScheduled(BlockPos pos) const;
     bool stepEvent();
@@ -86,7 +86,7 @@ private:
     std::uint64_t nextOrder{}, sequence{};
     std::uint8_t currentPhase{3};
     void enqueue(Update update);
-    void executeNeighbor(BlockPos pos);
+    void executeNeighbor(BlockPos pos, StateId source = 0);
     void executeShape(const Update& update);
     void executeTick(const ScheduledEvent& event);
     void onPlace(BlockPos pos, StateId state, StateId oldState);
@@ -121,5 +121,12 @@ private:
     void tickMotion(const ScheduledEvent& event);
     void finishMotion(BlockPos pos, bool force);
     void schedulePhase(BlockPos pos, Tick when, std::uint8_t phase, std::uint64_t data);
+    void updateComparatorNeighbors(BlockPos pos);
+    void runtimeChanged(BlockPos pos);
+    void updatePressurePlate(BlockPos pos);
+    void updateDaylight(BlockPos pos);
+    bool interactDevice(BlockPos pos);
+    bool stimulateDevice(BlockPos pos, const Json& stimulus);
+    void validateRuntime(BlockPos pos) const;
 };
 }

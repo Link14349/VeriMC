@@ -1,0 +1,64 @@
+import { useEffect, useState } from 'react';
+import { Zap } from 'lucide-react';
+import { connection, posKey, type BlockDef, type Pos, type BlockCell } from './api';
+import { shortName } from './blockLabels';
+
+type Props = { pos: Pos; block: BlockDef; command: (cmd: string, body?: Record<string, unknown>) => Promise<Record<string, unknown> | undefined> };
+
+export function EnvironmentControls({ pos, block, command }: Props) {
+  const [entities, setEntities] = useState(1), [living, setLiving] = useState(1);
+  const [sky, setSky] = useState(15), [angle, setAngle] = useState(0);
+  const [pages, setPages] = useState(15), [page, setPage] = useState(1), [strength, setStrength] = useState(15);
+  const [inspection, setInspection] = useState<Record<string, unknown>>({});
+  const name = shortName(block.name), plate = name.endsWith('pressure_plate'), daylight = name === 'daylight_detector';
+  const lectern = name === 'lectern', rod = name.endsWith('lightning_rod'), target = name === 'target';
+  const supported = plate || daylight || lectern || rod || target;
+  const key = posKey(pos);
+  useEffect(() => {
+    let active = true, requesting = false;
+    const refresh = async () => {
+      if (!supported || requesting) return;
+      requesting = true;
+      const info = await command('inspect', { pos });
+      if (active && info) setInspection(info);
+      requesting = false;
+    };
+    const onCells = (event: Event) => {
+      const detail = (event as CustomEvent<{ full: boolean; changes: BlockCell[] }>).detail;
+      if (detail.full || detail.changes.some(cell => posKey(cell.pos) === key)) refresh();
+    };
+    refresh(); connection.addEventListener('cells', onCells);
+    return () => { active = false; connection.removeEventListener('cells', onCells); };
+  }, [key, block.name]);
+  if (!supported) return null;
+  const stimulus = (values: Record<string, unknown>) => command('stimulate', { pos, stimulus: values });
+  const runtime = (inspection.runtime ?? {}) as Record<string, number>;
+  const numberField = (label: string, value: number, change: (next: number) => void, maximum: number, minimum = 0) =>
+    <label className="propertyRow"><span>{label}</span><input aria-label={label} type="number" min={minimum} max={maximum} value={value} onChange={e => change(Number(e.target.value))}/></label>;
+  return <div className="inspectorSection environmentControls"><label className="miniLabel"><Zap size={12}/>环境输入</label>
+    {plate && <>
+      <p className="subtleText">输入触及压力板的实体数量，已排除旁观者和不触发方块的实体。</p>
+      {numberField('实体总数', entities, setEntities, 1000000)}
+      {numberField('其中生物', living, setLiving, entities)}
+      <button className="wideButton accentOutline" onClick={() => stimulus({ entities, livingEntities: living })}>应用占用数量</button>
+      <button className="wideButton" onClick={() => stimulus({ entities: 0, livingEntities: 0 })}>全部离开</button>
+      <p className="subtleText">当前占用 {runtime.entities ?? 0} · 生物 {runtime.livingEntities ?? 0}。释放在器件下一次检测时生效。</p>
+    </>}
+    {daylight && <>
+      {numberField('有效天空亮度', sky, setSky, 15)}
+      {numberField('太阳角度 / 度', angle, setAngle, 360)}
+      <button className="wideButton accentOutline" onClick={() => stimulus({ skyBrightness: sky, sunAngle: angle })}>应用天空输入</button>
+      <p className="subtleText">在下一个 20 gt 边界检测。当前天空亮度 {runtime.skyBrightness ?? 0}，太阳角度 {runtime.sunAngle ?? 0}°。操作器件可切换反向模式。</p>
+    </>}
+    {lectern && <>
+      {numberField('书本总页数', pages, setPages, 100, 1)}
+      <button className="wideButton" onClick={() => stimulus({ pages })}>放入书本 / 回到首页</button>
+      {numberField('翻到第几页', page, setPage, runtime.pages || 100, 1)}
+      <button className="wideButton accentOutline" onClick={() => stimulus({ page: page - 1 })}>翻页</button>
+      <button className="wideButton" onClick={() => stimulus({ pages: 0 })}>取出书本</button>
+      <p className="subtleText">{runtime.pages ? `第 ${(runtime.page ?? 0) + 1} / ${runtime.pages} 页` : '尚未放入书本'} · 比较器读数 {Number(inspection.analog ?? 0)}。翻页脉冲持续 2 gt。</p>
+    </>}
+    {rod && <><button className="wideButton accentOutline" onClick={() => stimulus({})}>施加雷击</button><p className="subtleText">产生 8 gt 红石脉冲。天气、火焰和实体伤害不在当前环境模型内。</p></>}
+    {target && <>{numberField('命中强度', strength, setStrength, 15, 1)}<button className="wideButton accentOutline" onClick={() => stimulus({ value: strength, arrow: true })}>箭命中 · 20 gt</button><button className="wideButton" onClick={() => stimulus({ value: strength, arrow: false })}>其他投射物 · 8 gt</button></>}
+  </div>;
+}

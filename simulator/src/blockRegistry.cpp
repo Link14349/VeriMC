@@ -46,6 +46,10 @@ BlockRegistry::BlockRegistry(const std::string& path) {
         typeInfo.defaultState = b.at("defaultState"); typeInfo.firstState = b.at("states")[0].at("id");
         typeInfo.device = classify(typeInfo.name, typeInfo.className);
         typeInfo.supportLevel = (typeInfo.device <= Device::movingPiston || typeInfo.device == Device::target) ? "implemented" : "unimplemented";
+        if (typeInfo.device == Device::door || typeInfo.device == Device::trapdoor || typeInfo.device == Device::fenceGate) typeInfo.supportLevel = "implemented";
+        if (typeInfo.device == Device::pressurePlate || typeInfo.device == Device::weightedPlate || typeInfo.device == Device::lightningRod || typeInfo.device == Device::daylight || typeInfo.device == Device::lectern) typeInfo.supportLevel = "externalStimulus";
+        static const std::vector<std::string> environmentReadouts{"CauldronBlock", "LayeredCauldronBlock", "LavaCauldronBlock", "RespawnAnchorBlock", "BeehiveBlock", "EndPortalFrameBlock", "CopperGolemStatueBlock", "WeatheringCopperGolemStatueBlock"};
+        if (std::find(environmentReadouts.begin(), environmentReadouts.end(), typeInfo.className) != environmentReadouts.end()) typeInfo.supportLevel = "externalStimulus";
         auto typeId = static_cast<std::uint16_t>(types.size());
         names.emplace(typeInfo.name, typeId);
         for (const auto& s : b.at("states")) for (const auto& [key, value] : s.at("properties").items()) {
@@ -77,6 +81,16 @@ BlockRegistry::BlockRegistry(const std::string& path) {
             st.powered = val("powered", "false") == "true"; st.lit = val("lit", "false") == "true";
             st.locked = val("locked", "false") == "true"; st.extended = val("extended", "false") == "true";
             st.subtract = val("mode", "compare") == "subtract"; st.sticky = typeInfo.name == "minecraft:sticky_piston";
+            const auto& className = typeInfo.className;
+            if (className == "LayeredCauldronBlock") st.staticAnalog = static_cast<std::uint8_t>(std::stoi(val("level", "0")));
+            if (className == "LavaCauldronBlock") st.staticAnalog = 3;
+            if (className == "BeehiveBlock") st.staticAnalog = static_cast<std::uint8_t>(std::stoi(val("honey_level", "0")));
+            if (className == "RespawnAnchorBlock") st.staticAnalog = static_cast<std::uint8_t>(std::stoi(val("charges", "0")) * 15 / 4);
+            if (className == "EndPortalFrameBlock") st.staticAnalog = val("eye", "false") == "true" ? 15 : 0;
+            if (className == "CopperGolemStatueBlock" || className == "WeatheringCopperGolemStatueBlock") {
+                const auto& poses = typeInfo.properties.at("copper_golem_pose").values;
+                st.staticAnalog = static_cast<std::uint8_t>(std::find(poses.begin(), poses.end(), val("copper_golem_pose", "standing")) - poses.begin() + 1);
+            }
             auto face = val("face", "floor"); st.connectedDirection = face == "floor" ? Direction::up : face == "ceiling" ? Direction::down : st.facing;
             for (std::size_t i = 0; i < 4; ++i) { auto side = val(directionNames[static_cast<unsigned>(horizontal[i])], "none"); st.wireSides[i] = side == "up" ? 2 : side == "side" ? 1 : 0; }
         }

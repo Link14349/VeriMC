@@ -133,10 +133,53 @@ export class CircuitViewport {
         if (!open || (moving && source && !extending)) { const headOffset = moving ? 1-progress : 0; pistonPart(.37+headOffset,.25,.99,sticky?0x8da96a:0xbb9f70); if(moving)pistonPart(headOffset*.5,.8,.22,0xaaa58e); }
         for (const offset of [-.25,0,.25]) part([.5,.995,.5+offset],[.77,.01,.045],0x48534f);
       }
+    } else if (name.endsWith('_door') || name.endsWith('_trapdoor')) {
+      const trap = name.endsWith('_trapdoor'), opened = p.open === 'true';
+      const tint = name.includes('iron') ? 0xc1c7c2 : name.includes('copper') ? 0xb27a5b : 0xb39b69;
+      if (trap && !opened) part([.5,p.half === 'top' ? .90625 : .09375,.5],[1,.1875,1],tint);
+      else {
+        const directions = ['north','east','south','west'];
+        const side = directions[(directions.indexOf(facing) + (!trap && opened ? p.hinge === 'right' ? 3 : 1 : 0)) % 4];
+        const v = directionVectors[side], cx = .5-v[0]*.40625, cz = .5-v[2]*.40625;
+        part([cx,.5,cz],[v[0] ? .1875 : 1,1,v[2] ? .1875 : 1],tint);
+        part([cx+v[2]*.28,.5,cz-v[0]*.28],[v[0] ? .2 : .09,.09,v[2] ? .2 : .09],0x484b40);
+      }
+    } else if (name.endsWith('_fence_gate')) {
+      const v = directionVectors[facing], tint = 0xb39b69;
+      for (const sign of [-1,1]) {
+        part([.5+v[2]*.42*sign,.5,.5+v[0]*.42*sign],[.15,1,.15],tint);
+        for (const height of [.35,.75]) {
+          if (p.open === 'true') part([.5+v[2]*.4*sign+v[0]*.2,height,.5+v[0]*.4*sign+v[2]*.2],v[0] ? [.55,.13,.12] : [.12,.13,.55],tint);
+          else part([.5+v[2]*.2*sign,height,.5+v[0]*.2*sign],v[0] ? [.12,.13,.4] : [.4,.13,.12],tint);
+        }
+      }
+    } else if (name.endsWith('pressure_plate')) {
+      const height = cell.value > 0 ? .03125 : .0625;
+      const tint = name.startsWith('light_weighted') ? 0xd2b362 : name.startsWith('heavy_weighted') ? 0xb8c2c5 : name.includes('stone') ? 0x929d99 : 0xb4996a;
+      part([.5,height/2,.5],[.875,height,.875],tint);
+    } else if (name.endsWith('lightning_rod')) {
+      const v = directionVectors[facing], tint = name.includes('oxidized') ? 0x679583 : 0xbb805d;
+      part([.5-v[0]*.05,.5-v[1]*.05,.5-v[2]*.05],[v[0] ? .9 : .12,v[1] ? .9 : .12,v[2] ? .9 : .12],tint);
+      part([.5+v[0]*.34,.5+v[1]*.34,.5+v[2]*.34],[.26,.26,.26],cell.value ? 0xffd292 : tint);
+    } else if (name === 'daylight_detector') {
+      part([.5,.1875,.5],[1,.375,1],0xa58a62);
+      for (const dx of [.18,.5,.82]) for (const dz of [.18,.5,.82]) part([dx,.378,dz],[.27,.012,.27],p.inverted === 'true' ? 0x567497 : 0xc1c7b3);
+    } else if (name === 'lectern') {
+      part([.5,.06,.5],[1,.12,1],0xa48a5a); part([.5,.42,.5],[.4,.72,.4],0x9c7f51); part([.5,.86,.5],[.96,.25,.75],0xb5a071);
+      if (p.has_book === 'true') { part([.5,1.01,.5],[.65,.09,.6],0x715844); part([.5,1.065,.5],[.59,.03,.56],0xe6dfbc); }
+    } else if (name.endsWith('cauldron')) {
+      part([.5,.2,.5],[1,.4,1],0x576567);
+      for (const v of [.06,.94]) { part([v,.67,.5],[.12,.66,1],0x6f7c7d); part([.5,.67,v],[1,.66,.12],0x6f7c7d); }
+      if (name !== 'cauldron') part([.5,.35+Number(p.level ?? 3)*.19,.5],[.76,.04,.76],name.startsWith('lava') ? 0xd07c3a : name.startsWith('water') ? 0x518baa : 0xdce5e0);
+    } else if (name.endsWith('copper_golem_statue')) {
+      const tint = name.includes('oxidized') ? 0x6a9f85 : 0xbc895e;
+      part([.5,.67,.5],[.72,.6,.6],tint); part([.5,.24,.5],[.38,.38,.35],tint);
+      for (const dx of [.21,.79]) part([dx,.42,.5],[.2,.38,.25],tint);
+      part([.35,.73,.806],[.08,.09,.02],0x303d34); part([.65,.73,.806],[.08,.09,.02],0x303d34);
     } else if (name === 'target') { part([.5,.5,.5],[.98,.98,.98],0xd5cbb4); for (const size of [.7,.38,.12]) part([.5,1 + .001 / size,.5],[size,.005,size],size === .38 ? 0xd5cbb4 : 0xa94a3f); }
     else {
       const colors: Record<string, number> = { stone:0x747c80,smooth_stone:0xa3aaa8,white_concrete:0xc5c8bb,light_gray_concrete:0x93978c,red_concrete:0x975347,blue_concrete:0x516f96,white_wool:0xd2cfc0,redstone_block:0xb2372a,glass:0x719d9e,slime_block:0x84b85f,honey_block:0xb99b42,obsidian:0x353041,bedrock:0x474b50,glowstone:0xb8a673,sea_lantern:0xb6cebe };
-      const height = name.endsWith('_slab') && p.type !== 'double' ? .5 : 1; part([.5,height / 2,.5],[.99,height*.99,.99],colors[name] ?? 0x9b9c89);
+      const height = name.endsWith('_slab') && p.type !== 'double' ? .5 : 1; part([.5,(p.type === 'top' ? .5 : 0)+height / 2,.5],[.99,height*.99,.99],colors[name] ?? 0x9b9c89);
     }
     this.handles.set(key, handles);
   }

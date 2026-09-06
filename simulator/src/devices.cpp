@@ -1,0 +1,194 @@
+#include "simulator/simulator.hpp"
+#include <algorithm>
+#include <cmath>
+#include <numbers>
+
+namespace simulator {
+namespace {
+int integerInRange(const Json& values, const char* key, int fallback, int maximum) {
+    if (!values.contains(key)) return fallback;
+    const auto& value = values.at(key);
+    if (!value.is_number_integer() || value.get<std::int64_t>() < 0 || value.get<std::int64_t>() > maximum)
+        throw std::invalid_argument(std::string(key) + " 必须是 0–" + std::to_string(maximum) + " 的整数");
+    return value.get<int>();
+}
+
+// 26.2 Mth.cos takes a double, indexes a 65536-entry float sine table, then
+// daylight arithmetic returns to float before Java's round-to-positive-infinity.
+float daylightCos(float angle) {
+    static const auto table = [] {
+        std::array<float, 65536> values{};
+        for (std::size_t i = 0; i < values.size(); ++i)
+            values[i] = static_cast<float>(std::sin(static_cast<double>(i) * std::numbers::pi * 2.0 / 65536.0));
+        return values;
+    }();
+    auto index = static_cast<std::int64_t>(static_cast<double>(angle) * 10430.378350470453 + 16384.0);
+    return table[static_cast<std::uint64_t>(index) & 65535u];
+}
+}
+
+void Simulator::updateComparatorNeighbors(BlockPos pos) {
+    for (auto direction : horizontal) {
+        auto neighbor = pos.relative(direction);
+        if (at(neighbor).device == Device::comparator) neighborChanged(neighbor, world.get(pos));
+        else if (at(neighbor).conductor) {
+            neighbor = neighbor.relative(direction);
+            if (at(neighbor).device == Device::comparator) neighborChanged(neighbor, world.get(pos));
+        }
+    }
+}
+
+void Simulator::runtimeChanged(BlockPos pos) {
+    ++revision;
+    ++sequence;
+    changes[pos] = world.get(pos);
+    sampleAffected(pos);
+    updateComparatorNeighbors(pos);
+}
+
+void Simulator::updatePressurePlate(BlockPos pos) {
+    auto id = world.get(pos);
+    const auto& state = registry[id];
+    const auto& values = runtime[pos].values;
+    const auto& name = registry.type(id).name;
+    bool stone = name == "minecraft:stone_pressure_plate" || name == "minecraft:polished_blackstone_pressure_plate";
+    int count = values.value(stone ? "livingEntities" : "entities", 0);
+    int power = count > 0 ? 15 : 0;
+    if (state.device == Device::weightedPlate) {
+        int maximum = name == "minecraft:light_weighted_pressure_plate" ? 15 : 150;
+        power = static_cast<int>(std::ceil(static_cast<float>(std::min(count, maximum)) / static_cast<float>(maximum) * 15.0F));
+    }
+    int oldPower = state.device == Device::weightedPlate ? state.power : state.powered ? 15 : 0;
+    if (oldPower != power) {
+        auto next = state.device == Device::weightedPlate ? registry.with(id, "power", power) : registry.withBool(id, "powered", power > 0);
+        setBlock(pos, next, 2);
+        notifyAttached(pos, Direction::up);
+    }
+    // Occupancy is supplied after spectator/trigger filtering. While powered,
+    // both removal and additional arrivals are observed only at the next poll.
+    if (power > 0) schedule(pos, state.device == Device::weightedPlate ? 10 : 20);
+}
+
+void Simulator::updateDaylight(BlockPos pos) {
+    auto id = world.get(pos);
+    auto found = runtime.find(pos);
+    const Json empty = Json::object();
+    const auto& values = found == runtime.end() ? empty : found->second.values;
+    int power = values.value("skyBrightness", 0);
+    if (registry.property(id, "inverted") == "true") power = 15 - power;
+    else if (power > 0) {
+        float angle = values.value("sunAngle", 0.0F) * static_cast<float>(std::numbers::pi / 180.0);
+        float offset = angle < static_cast<float>(std::numbers::pi) ? 0.0F : static_cast<float>(std::numbers::pi * 2.0);
+        angle += (offset - angle) * 0.2F;
+        power = static_cast<int>(std::floor(static_cast<float>(power) * daylightCos(angle) + 0.5F));
+    }
+    setBlock(pos, registry.with(id, "power", std::clamp(power, 0, 15)));
+    // Constant laboratory sky input cannot change on subsequent 20-gt polls.
+    // A new stimulus invalidates this shortcut and schedules the next boundary.
+}
+
+bool Simulator::interactDevice(BlockPos pos) {
+    auto id = world.get(pos);
+    const auto& state = registry[id];
+    const auto& name = registry.type(id).name;
+    if (state.device == Device::door || state.device == Device::trapdoor || state.device == Device::fenceGate) {
+        if (name == "minecraft:iron_door" || name == "minecraft:iron_trapdoor") throw std::invalid_argument("铁门和铁活板门需要红石信号驱动");
+        setBlock(pos, registry.withBool(id, "open", registry.property(id, "open") != "true"), state.device == Device::trapdoor ? 2 : 10);
+        return true;
+    }
+    if (state.device == Device::daylight) {
+        setBlock(pos, registry.withBool(id, "inverted", registry.property(id, "inverted") != "true"), 2);
+        updateDaylight(pos);
+        return true;
+    }
+    if (state.device == Device::lectern) {
+        auto it = runtime.find(pos);
+        int pages = it == runtime.end() ? 0 : it->second.values.value("pages", 0);
+        int page = it == runtime.end() ? 0 : it->second.values.value("page", 0);
+        if (pages == 0) throw std::invalid_argument("请先在环境输入中放入书本");
+        return stimulateDevice(pos, {{"page", (page + 1) % pages}});
+    }
+    if (registry.type(id).className == "CopperGolemStatueBlock" || registry.type(id).className == "WeatheringCopperGolemStatueBlock") {
+        const auto& poses = registry.type(id).properties.at("copper_golem_pose").values;
+        auto current = std::find(poses.begin(), poses.end(), registry.property(id, "copper_golem_pose"));
+        auto next = (static_cast<std::size_t>(current - poses.begin()) + 1) % poses.size();
+        setBlock(pos, registry.with(id, "copper_golem_pose", poses[next]));
+        return true;
+    }
+    return false;
+}
+
+bool Simulator::stimulateDevice(BlockPos pos, const Json& stimulus) {
+    if (!stimulus.is_object()) throw std::invalid_argument("环境输入必须是对象");
+    auto id = world.get(pos);
+    const auto& state = registry[id];
+    if (state.device == Device::pressurePlate || state.device == Device::weightedPlate) {
+        int count = integerInRange(stimulus, "entities", 0, 1000000);
+        int living = integerInRange(stimulus, "livingEntities", count, 1000000);
+        if (living > count) throw std::invalid_argument("生物数量不能超过总实体数量");
+        runtime[pos].values = {{"entities", count}, {"livingEntities", living}};
+        runtimeChanged(pos);
+        if (!state.powered && state.power == 0) updatePressurePlate(pos);
+        return true;
+    }
+    if (state.device == Device::lightningRod) {
+        setBlock(pos, registry.withBool(id, "powered", true));
+        updateNeighbors(pos.relative(opposite(state.facing)), -1, id);
+        schedule(pos, 8);
+        return true;
+    }
+    if (state.device == Device::daylight) {
+        int sky = integerInRange(stimulus, "skyBrightness", 0, 15);
+        float angle = stimulus.value("sunAngle", 0.0F);
+        if (!std::isfinite(angle) || angle < 0 || angle > 360) throw std::invalid_argument("太阳角度必须在 0–360 度之间");
+        runtime[pos].values = {{"skyBrightness", sky}, {"sunAngle", angle}};
+        runtimeChanged(pos);
+        schedulePhase(pos, currentTick + 20 - currentTick % 20, 2, 0);
+        return true;
+    }
+    if (state.device == Device::lectern) {
+        Json values = runtime.contains(pos) ? runtime.at(pos).values : Json::object();
+        if (stimulus.contains("pages")) {
+            int pages = integerInRange(stimulus, "pages", 0, 100);
+            values = {{"pages", pages}, {"page", 0}};
+            runtime[pos].values = values;
+            setBlock(pos, registry.withBool(registry.withBool(id, "has_book", pages > 0), "powered", false));
+            updateNeighbors(pos.relative(Direction::down), -1, id);
+            runtimeChanged(pos);
+            return true;
+        }
+        int pages = values.value("pages", 0);
+        if (pages == 0) throw std::invalid_argument("讲台上没有书本");
+        int page = integerInRange(stimulus, "page", 0, pages - 1);
+        if (page != values.value("page", 0)) {
+            values["page"] = page;
+            runtime[pos].values = values;
+            runtimeChanged(pos);
+            setBlock(pos, registry.withBool(id, "powered", true));
+            updateNeighbors(pos.relative(Direction::down), -1, id);
+            schedule(pos, 2);
+        }
+        return true;
+    }
+    return false;
+}
+
+void Simulator::validateRuntime(BlockPos pos) const {
+    const auto& data = runtime.at(pos);
+    if (!data.values.is_object() || data.output < 0 || data.output > 15) throw std::invalid_argument("无效器件内部状态");
+    auto device = at(pos).device;
+    if (device == Device::pressurePlate || device == Device::weightedPlate) {
+        int entities = integerInRange(data.values, "entities", 0, 1000000);
+        if (integerInRange(data.values, "livingEntities", 0, 1000000) > entities) throw std::invalid_argument("无效压力板实体数量");
+    }
+    if (device == Device::daylight) {
+        integerInRange(data.values, "skyBrightness", 0, 15);
+        float angle = data.values.value("sunAngle", 0.0F);
+        if (!std::isfinite(angle) || angle < 0 || angle > 360) throw std::invalid_argument("无效太阳角度");
+    }
+    if (device == Device::lectern) {
+        int pages = integerInRange(data.values, "pages", 0, 100);
+        integerInRange(data.values, "page", 0, std::max(0, pages - 1));
+    }
+}
+}

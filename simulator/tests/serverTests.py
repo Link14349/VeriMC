@@ -110,6 +110,24 @@ try:
     command('interact', pos=[0,1,4]); command('step', count=3)
     assert command('inspect', pos=[4,1,4])['name'] == 'minecraft:slime_block'
     assert command('inspect', pos=[5,1,4])['name'] == 'minecraft:air'
+    command('demo', kind='environment')
+    command('stimulate', pos=[0,1,0], stimulus={'entities': 1, 'livingEntities': 1})
+    assert command('inspect', pos=[3,2,0])['properties']['open'] == 'true'
+    command('stimulate', pos=[0,1,0], stimulus={'entities': 0, 'livingEntities': 0})
+    command('step', count=19)
+    assert command('inspect', pos=[3,2,0])['properties']['open'] == 'true'
+    command('step', count=1)
+    assert command('inspect', pos=[3,2,0])['properties']['open'] == 'false'
+    assert command('inspect', pos=[7,1,4])['value'] == 15
+    command('stimulate', pos=[0,1,4], stimulus={'page': 14})
+    command('step', count=2)
+    assert command('inspect', pos=[2,1,4])['value'] == 15
+    assert command('stimulate', pos=[0,1,4], stimulus={'page': 200})['type'] == 'error'
+    assert command('inspect', pos=[0,1,4])['runtime']['page'] == 14
+    command('stimulate', pos=[7,1,0], stimulus={})
+    assert command('inspect', pos=[7,1,0])['value'] == 15
+    command('step', count=8)
+    assert command('inspect', pos=[7,1,0])['value'] == 0
     assert frames > 0
     print(f'PASS: HTTP host validation, binary frames ({frames}), circuit editing, delay, probes, VCD, atomic errors, native undo/redo, checkpoint import')
 finally:

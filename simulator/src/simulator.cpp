@@ -41,14 +41,22 @@ int Simulator::analogOutput(BlockPos pos) const {
     auto it = runtime.find(pos);
     if (state.device == Device::comparator) return it == runtime.end() ? 0 : it->second.output;
     if (state.device == Device::bulb) return state.lit ? 15 : 0;
+    if (state.device == Device::analog) return state.staticAnalog;
+    if (state.device == Device::lectern) {
+        if (registry.property(id, "has_book") != "true" || it == runtime.end()) return 0;
+        int pages = it->second.values.value("pages", 0), page = it->second.values.value("page", 0);
+        float progress = pages > 1 ? static_cast<float>(page) / static_cast<float>(pages - 1) : 1.0F;
+        return static_cast<int>(std::floor(progress * 14.0F)) + 1;
+    }
     return it == runtime.end() ? 0 : it->second.output;
 }
 int Simulator::displayValue(BlockPos pos) const {
     const auto& state = at(pos);
     if (state.device == Device::wire || state.device == Device::target || state.device == Device::daylight || state.device == Device::weightedPlate) return state.power;
-    if (state.device == Device::comparator) return analogOutput(pos);
+    if (state.device == Device::comparator || state.device == Device::analog) return analogOutput(pos);
     if (state.device == Device::lamp || state.device == Device::bulb || state.device == Device::torch || state.device == Device::wallTorch) return state.lit ? 15 : 0;
     if (state.device == Device::piston) return state.extended ? 15 : 0;
+    if (state.device == Device::door || state.device == Device::trapdoor || state.device == Device::fenceGate) return registry.property(world.get(pos), "open") == "true" ? 15 : 0;
     int value = 0; for (auto d : directions) value = std::max(value, signal(pos, d));
     return value;
 }
@@ -69,10 +77,10 @@ void Simulator::enqueue(Update update) {
                 if (current.index >= 6) { updateStack.pop_back(); continue; }
                 auto d = updateOrder[static_cast<std::size_t>(current.index++)];
                 updateStack.back().index = current.index;
-                executeNeighbor(current.pos.relative(d));
+                executeNeighbor(current.pos.relative(d), current.neighborState);
             } else {
                 updateStack.pop_back();
-                if (current.kind == UpdateKind::shape) executeShape(current); else executeNeighbor(current.pos);
+                if (current.kind == UpdateKind::shape) executeShape(current); else executeNeighbor(current.pos, current.neighborState);
             }
             ++statistics.updates;
         }
@@ -83,10 +91,10 @@ void Simulator::enqueue(Update update) {
         breakRequested = true; faulted = true; throw;
     }
 }
-void Simulator::updateNeighbors(BlockPos p, int skip) { Update u{UpdateKind::multi, p}; u.skip = skip; enqueue(u); }
-void Simulator::neighborChanged(BlockPos p) { enqueue({UpdateKind::neighbor, p}); }
-void Simulator::notifyFront(BlockPos p, Direction facing) { auto out = p.relative(opposite(facing)); neighborChanged(out); updateNeighbors(out, static_cast<int>(facing)); }
-void Simulator::notifyAttached(BlockPos p, Direction connected) { updateNeighbors(p); updateNeighbors(p.relative(opposite(connected))); }
+void Simulator::updateNeighbors(BlockPos p, int skip, StateId source) { Update u{UpdateKind::multi, p}; u.skip = skip; u.neighborState = source == UINT32_MAX ? world.get(p) : source; enqueue(u); }
+void Simulator::neighborChanged(BlockPos p, StateId source) { Update u{UpdateKind::neighbor, p}; u.neighborState = source; enqueue(u); }
+void Simulator::notifyFront(BlockPos p, Direction facing) { auto out = p.relative(opposite(facing)); neighborChanged(out, world.get(p)); updateNeighbors(out, static_cast<int>(facing), world.get(p)); }
+void Simulator::notifyAttached(BlockPos p, Direction connected) { updateNeighbors(p); updateNeighbors(p.relative(opposite(connected)), -1, world.get(p)); }
 void Simulator::setBlock(BlockPos p, StateId id, unsigned flags, int depth) {
     if (faulted) throw std::runtime_error("当前执行已中止，请撤销、加载快照或新建电路");
     const auto old = world.get(p);
@@ -101,7 +109,7 @@ void Simulator::setBlock(BlockPos p, StateId id, unsigned flags, int depth) {
     }
     onPlace(p, id, old);
     if (world.get(p) != id) return;
-    if ((flags & 1u) != 0) updateNeighbors(p);
+    if ((flags & 1u) != 0) { updateNeighbors(p, -1, old); if (state.analogSource) updateComparatorNeighbors(p); }
     if ((flags & 16u) == 0 && depth > 0) {
         const unsigned nextFlags = flags & ~33u;
         indirectShapes(p, old, nextFlags, depth - 1);
@@ -119,6 +127,7 @@ bool Simulator::survives(BlockPos p, StateId id) const {
     case Device::lever: case Device::button: return (at(p.relative(opposite(s.connectedDirection))).supportMask & (1u << static_cast<unsigned>(s.connectedDirection))) != 0;
     case Device::pressurePlate: case Device::weightedPlate: return (below.rigidMask & 2u) != 0 || (below.centerMask & 2u) != 0;
     case Device::rail: case Device::poweredRail: case Device::activatorRail: case Device::detectorRail: return (below.supportMask & 2u) != 0;
+    case Device::door: return registry.property(id, "half") == "lower" ? (below.supportMask & 2u) != 0 : below.type == s.type;
     case Device::pistonHead: { const auto& base = at(p.relative(opposite(s.facing))); return (base.device == Device::piston && base.extended && base.facing == s.facing && base.sticky == (registry.property(id, "type") == "sticky")) || (base.device == Device::movingPiston && base.facing == s.facing); }
     default: return true;
     }
@@ -126,10 +135,24 @@ bool Simulator::survives(BlockPos p, StateId id) const {
 void Simulator::place(BlockPos p, StateId id) {
     if (registry.type(id).supportLevel == "unimplemented") throw std::invalid_argument("该器件尚未实现：" + registry.type(id).name);
     if (registry[id].device == Device::movingPiston || registry[id].device == Device::pistonHead) throw std::invalid_argument("活塞运动状态由仿真产生，不能直接放置");
+    if (registry[id].device == Device::door && at(p).type != registry[id].type) {
+        id = registry.with(id, "half", std::string("lower"));
+        auto above = p.relative(Direction::up);
+        if (p.y >= 319 || !at(above).replaceable || !survives(p, id)) throw std::invalid_argument("门需要下方支撑及上方一格空间");
+        bool powered = bestSignal(p) > 0 || bestSignal(above) > 0;
+        id = registry.withBool(registry.withBool(id, "powered", powered), "open", powered);
+        setBlock(p, id);
+        setBlock(above, registry.with(id, "half", std::string("upper")));
+        return;
+    }
     if (!survives(p, id)) throw std::invalid_argument("这个位置缺少器件所需的支撑面");
     if (registry[id].device == Device::wire) {
         for (auto d : horizontal) id = registry.with(id, directionNames[static_cast<unsigned>(d)], std::string("side"));
         id = wireConnections(p, id);
+    }
+    if ((registry[id].device == Device::trapdoor || registry[id].device == Device::fenceGate) && at(p).type != registry[id].type) {
+        bool powered = bestSignal(p) > 0;
+        id = registry.withBool(registry.withBool(id, "powered", powered), "open", powered);
     }
     if (registry[id].device == Device::lamp) id = registry.withBool(id, "lit", bestSignal(p) != 0);
     setBlock(p, id);
@@ -144,6 +167,7 @@ void Simulator::onPlace(BlockPos p, StateId id, StateId old) {
     case Device::torch: case Device::wallTorch: for (auto d : directions) updateNeighbors(p.relative(d)); break;
     case Device::observer: if (s.powered && !hasScheduled(p)) { setBlock(p, registry.withBool(id, "powered", false), 18); notifyFront(p, s.facing); } break;
     case Device::bulb: executeNeighbor(p); break;
+    case Device::daylight: schedulePhase(p, currentTick + 20 - currentTick % 20, 2, 0); break;
     case Device::piston: checkPiston(p); break;
     default: break;
     }
@@ -156,6 +180,9 @@ void Simulator::onRemove(BlockPos p, StateId old) {
     case Device::lever: case Device::button: if (s.powered) notifyAttached(p, s.connectedDirection); break;
     case Device::repeater: case Device::comparator: notifyFront(p, s.facing); break;
     case Device::observer: if (s.powered) notifyFront(p, s.facing); break;
+    case Device::pressurePlate: case Device::weightedPlate: if (s.powered || s.power > 0) { updateNeighbors(p, -1, old); updateNeighbors(p.relative(Direction::down), -1, old); } break;
+    case Device::lightningRod: if (s.powered) updateNeighbors(p.relative(opposite(s.facing)), -1, old); break;
+    case Device::lectern: if (s.powered) updateNeighbors(p.relative(Direction::down), -1, old); break;
     case Device::pistonHead: { auto base = p.relative(opposite(s.facing)); if (at(base).device == Device::piston && at(base).extended && at(base).facing == s.facing) setBlock(base, 0); break; }
     default: break;
     }
@@ -227,6 +254,12 @@ void Simulator::indirectShapes(BlockPos p, StateId id, unsigned flags, int depth
 }
 void Simulator::executeShape(const Update& u) {
     auto id = world.get(u.pos); const auto& s = registry[id];
+    if (s.device == Device::door && axis(u.direction) == 0 && ((registry.property(id, "half") == "lower") == (u.direction == Direction::up))) {
+        bool fits = registry[u.neighborState].device == Device::door && registry.property(u.neighborState, "half") != registry.property(id, "half");
+        auto next = fits ? registry.with(u.neighborState, "half", registry.property(id, "half")) : 0;
+        setBlock(u.pos, next, u.flags, u.depth);
+        return;
+    }
     if (!survives(u.pos, id)) { setBlock(u.pos, 0, u.flags, u.depth); return; }
     if (s.device == Device::observer && u.direction == s.facing && !s.powered && !hasScheduled(u.pos)) schedule(u.pos, 2);
     if (s.device == Device::repeater && axis(u.direction) != 0 && axis(u.direction) != axis(s.facing)) setBlock(u.pos, registry.withBool(id, "locked", diodeSideInput(u.pos) > 0), u.flags, u.depth);
@@ -271,7 +304,7 @@ void Simulator::refreshComparator(BlockPos p) {
         ++sequence; sampleAffected(p); changes[p] = world.get(p); notifyFront(p, s.facing);
     }
 }
-void Simulator::executeNeighbor(BlockPos p) {
+void Simulator::executeNeighbor(BlockPos p, StateId source) {
     auto id = world.get(p); const auto& s = registry[id];
     switch (s.device) {
     case Device::wire: if (survives(p, id)) updateWire(p, id); else setBlock(p, 0); break;
@@ -285,6 +318,15 @@ void Simulator::executeNeighbor(BlockPos p) {
     }
     case Device::lamp: if (s.lit != (bestSignal(p) > 0)) { if (s.lit) schedule(p, 4); else setBlock(p, registry.withBool(id, "lit", true), 2); } break;
     case Device::bulb: { bool powered = bestSignal(p) > 0; if (powered != s.powered) { auto next = registry.withBool(id, "powered", powered); if (!s.powered) next = registry.withBool(next, "lit", !s.lit); setBlock(p, next); } break; }
+    case Device::door: case Device::trapdoor: case Device::fenceGate: {
+        bool powered = bestSignal(p) > 0;
+        if (s.device == Device::door) {
+            if (registry[source].type == s.type) break;
+            powered = powered || bestSignal(p.relative(registry.property(id, "half") == "lower" ? Direction::up : Direction::down)) > 0;
+        }
+        if (powered != s.powered) setBlock(p, registry.withBool(registry.withBool(id, "powered", powered), "open", powered), 2);
+        break;
+    }
     case Device::piston: checkPiston(p); break;
     case Device::pistonHead: if (survives(p, id)) neighborChanged(p.relative(opposite(s.facing))); break;
     default: break;
@@ -318,6 +360,9 @@ void Simulator::executeTick(const ScheduledEvent& event) {
     }
     case Device::button: if (s.powered) { setBlock(p, registry.withBool(id, "powered", false)); notifyAttached(p, s.connectedDirection); } break;
     case Device::target: setBlock(p, registry.with(id, "power", 0)); break;
+    case Device::pressurePlate: case Device::weightedPlate: if (s.powered || s.power > 0) updatePressurePlate(p); break;
+    case Device::lightningRod: setBlock(p, registry.withBool(id, "powered", false)); updateNeighbors(p.relative(opposite(s.facing)), -1, id); break;
+    case Device::lectern: setBlock(p, registry.withBool(id, "powered", false)); updateNeighbors(p.relative(Direction::down), -1, id); break;
     default: break;
     }
 }
@@ -328,7 +373,7 @@ bool Simulator::stepEvent() {
     currentTick = std::max(currentTick, event.tick); ++sequence;
     currentPhase = event.phase;
     try {
-        if (at(event.pos).type == event.type) { if (event.phase == 1) pistonEvent(event); else if (event.phase == 2) tickMotion(event); else executeTick(event); ++statistics.scheduledEvents; }
+        if (at(event.pos).type == event.type) { if (event.phase == 1) pistonEvent(event); else if (event.phase == 2) { if (at(event.pos).device == Device::daylight) updateDaylight(event.pos); else tickMotion(event); } else executeTick(event); ++statistics.scheduledEvents; }
     } catch (...) { currentPhase = 3; throw; }
     currentPhase = 3;
     return true;
@@ -358,11 +403,12 @@ void Simulator::interact(BlockPos p) {
         if (dot || cross) { auto next = id; for (auto d : horizontal) next = registry.with(next, directionNames[static_cast<unsigned>(d)], std::string(dot ? "side" : "none")); setBlock(p, wireConnections(p, next)); for (auto d : horizontal) if (at(p.relative(d)).conductor) updateNeighbors(p.relative(d), static_cast<int>(opposite(d))); }
         break;
     }
-    default: throw std::invalid_argument("该器件没有直接点击操作；请编辑属性或使用环境刺激");
+    default: if (!interactDevice(p)) throw std::invalid_argument("该器件没有直接点击操作；请编辑属性或使用环境刺激");
     }
 }
 void Simulator::stimulate(BlockPos p, const Json& input) {
     auto id = world.get(p); const auto& s = registry[id];
+    if (stimulateDevice(p, input)) return;
     const int value = input.value("value", 0);
     if (value < 0 || value > 15) throw std::invalid_argument("刺激强度应为 0–15");
     if (s.device == Device::target) { if (!hasScheduled(p)) { setBlock(p, registry.with(id, "power", value)); schedule(p, input.value("arrow", true) ? 20 : 8); } return; }

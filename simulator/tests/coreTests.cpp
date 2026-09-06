@@ -15,17 +15,22 @@ int main() {
         std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/blockStates.json"); auto source = Json::parse(file);
         for (const auto& block : source["blocks"]) for (const auto& state : block["states"]) expect(r.state(block["name"], state["properties"]) == state["id"].get<StateId>(), "state mismatch: " + block["name"].get<std::string>());
     });
-    test("Java 26.2 GameTest differential trace", [&] {
-        std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/../tests/fixtures/java26_2Redstone.json"); expect(static_cast<bool>(file), "missing vanilla reference fixture");
+    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
+        std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/../tests/fixtures/" + fixtureName + ".json"); expect(static_cast<bool>(file), "missing vanilla reference fixture");
         auto fixture = Json::parse(file); auto origin = fixture["origin"].get<BlockPos>(); Simulator s(r);
         auto absolute = [&](const Json& p) { auto pos = p.get<BlockPos>(); return BlockPos{origin.x + pos.x, origin.y + pos.y, origin.z + pos.z}; };
         for (const auto& frame : fixture["frames"]) {
             Tick tick = frame["tick"]; s.advanceTo(tick);
-            for (const auto& command : fixture["commands"]) if (command["tick"] == tick) s.setBlock(absolute(command["pos"]), command["stateId"]);
+            for (const auto& command : fixture["commands"]) if (command["tick"] == tick) {
+                auto p = absolute(command["pos"]);
+                if (command.contains("stateId")) s.setBlock(p, command["stateId"]);
+                else if (command.contains("interact")) s.interact(p);
+                else s.stimulate(p, command["stimulus"]);
+            }
             for (std::size_t i = 0; i < fixture["watch"].size(); ++i) {
                 auto p = absolute(fixture["watch"][i]); auto expected = frame["states"][i].get<StateId>();
                 expect(s.world.get(p) == expected, "tick " + std::to_string(tick) + " position " + fixture["watch"][i].dump() + " expected " + r.describe(expected).dump() + " got " + r.describe(s.world.get(p)).dump());
-                if (frame["analogs"][i] != -1) expect(s.analogOutput(p) == frame["analogs"][i].get<int>(), "comparator block entity mismatch");
+                if (frame["analogs"][i] != -1) expect(s.analogOutput(p) == frame["analogs"][i].get<int>(), "analog mismatch at " + std::to_string(tick) + " " + fixture["watch"][i].dump());
             }
         }
     });
@@ -42,5 +47,34 @@ int main() {
     test("invalid project import leaves current world intact", [&] { Simulator s(r); s.place({0, 0, 0}, r.state("stone")); auto before = s.saveProject("test", true); auto bad = before; bad["blocks"][0]["name"] = "minecraft:not_a_block"; bool threw = false; try { s.loadProject(bad); } catch (...) { threw = true; } expect(threw && before == s.saveProject("test", true), "load not atomic"); });
     test("piston motion checkpoint continues across event phases", [&] { Simulator s(r); s.place({0,0,0},r.state("sticky_piston",{{"facing","east"}})); s.place({1,0,0},r.state("stone")); s.place({-1,0,0},r.state("redstone_block")); s.advanceTo(1); expect(s.at({2,0,0}).device == Device::movingPiston, "missing moving block"); auto snapshot=s.saveProject("moving",true); Simulator restored(r); restored.loadProject(snapshot); s.advanceTo(4); restored.advanceTo(4); expect(s.saveProject("moving",true)==restored.saveProject("moving",true),"motion checkpoint diverged"); expect(s.at({2,0,0}).device==Device::solid,"push failed"); s.setBlock({-1,0,0},0); s.advanceTo(8); expect(s.world.get({1,0,0})==r.state("stone") && s.world.get({2,0,0})==0,"sticky pull failed"); });
     test("update budget abort cannot resume after discarding updates", [&] { Simulator s(r); s.world.set({1,-1,0},r.state("stone")); s.place({1,0,0},r.state("redstone_wire")); auto before = s.clone(); s.updateBudget=1; bool threw=false; try { s.place({0,0,0},r.state("redstone_block")); } catch (...) { threw=true; } expect(threw&&s.faulted,"budget did not abort"); s.breakRequested=false; threw=false; try { s.advanceTo(1); } catch (...) { threw=true; } expect(threw,"faulted run resumed"); s.restore(*before); expect(!s.faulted&&s.world.size()==before->world.size(),"snapshot failed to recover"); });
+    test("daylight numerical agreement and dirty-only polling", [&] {
+        std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/../tests/fixtures/java26_2Daylight.json");
+        auto fixture = Json::parse(file); Simulator s(r); BlockPos pos{0,0,0}; s.place(pos, r.state("daylight_detector"));
+        for (const auto& sample : fixture.at("samples")) for (int sky = 0; sky <= 15; ++sky) {
+            s.stimulate(pos, {{"skyBrightness", sky}, {"sunAngle", sample.at("angle")}});
+            s.interact(pos); expect(s.at(pos).power == 15 - sky, "inverted daylight"); s.interact(pos);
+            expect(s.at(pos).power == sample.at("outputs").at(static_cast<std::size_t>(sky)).get<int>(), "daylight float/table mismatch");
+        }
+        s.advanceTo(20); expect(s.pendingEvents() == 0, "constant sky caused perpetual idle polls");
+        s.stimulate(pos, {{"skyBrightness", 0}, {"sunAngle", 0}}); s.advanceTo(39);
+        expect(s.at(pos).power == 15, "daylight skipped 20-gt boundary"); s.advanceTo(40); expect(s.at(pos).power == 0, "daylight dirty input missed");
+    });
+    test("paired door placement, upper-half editing and support loss", [&] {
+        Simulator s(r); floor(s); BlockPos lower{0,1,0}, upper{0,2,0};
+        s.place(lower,r.state("oak_door")); expect(s.at(upper).device==Device::door,"door upper half absent");
+        s.interact(upper); expect(r.property(s.world.get(lower),"open")=="true","upper-half operation not synchronized");
+        s.setBlock({0,0,0},0); expect(s.world.get(lower)==0&&s.world.get(upper)==0,"unsupported door remained");
+    });
+    test("environment checkpoint preserves pressure release and lectern pulse", [&] {
+        Simulator s(r); floor(s); s.place({0,1,0},r.state("heavy_weighted_pressure_plate")); s.place({3,1,0},r.state("lectern"));
+        s.stimulate({0,1,0},{{"entities",11}}); expect(s.at({0,1,0}).power==2,"weighted count rounding");
+        s.stimulate({3,1,0},{{"pages",15}}); s.stimulate({3,1,0},{{"page",7}}); expect(s.analogOutput({3,1,0})==8,"page progress");
+        s.advanceTo(1); s.stimulate({0,1,0},{{"entities",0}}); auto saved=s.saveProject("environment",true); Simulator restored(r); restored.loadProject(saved);
+        s.advanceTo(10); restored.advanceTo(10); expect(s.at({0,1,0}).power==0&&!s.at({3,1,0}).powered,"environment release timing");
+        expect(s.saveProject("environment",true)==restored.saveProject("environment",true),"environment checkpoint diverged: " + Json::diff(s.saveProject("environment",true),restored.saveProject("environment",true)).dump());
+        auto invalid=saved; for(auto& row:invalid["blockData"]) if(row["values"].contains("pages")) row["values"]["page"]=500;
+        auto before=restored.saveProject("before",true); bool threw=false; try {restored.loadProject(invalid);}catch(...){threw=true;}
+        expect(threw&&restored.saveProject("before",true)==before,"invalid runtime import was not atomic");
+    });
     std::cout << passed << " passed, " << failed << " failed\n"; return failed ? 1 : 0;
 }

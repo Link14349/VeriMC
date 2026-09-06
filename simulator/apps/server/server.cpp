@@ -115,6 +115,24 @@ public:
 };
 void Hub::demo(const std::string& kind) {
     sim.clear(); projectName = "脉冲与记忆 · 入门电路";
+    if (kind == "environment") {
+        projectName = "环境实验 · 感测与读数";
+        for (int x = -1; x <= 10; ++x) for (int z = -1; z <= 9; ++z) sim.world.set({x,0,z},registry.state("white_concrete"));
+        sim.place({0,1,0},registry.state("stone_pressure_plate"));
+        for (int x : {1,2}) sim.place({x,1,0},registry.state("redstone_wire"));
+        sim.place({3,1,0},registry.state("iron_door",{{"facing","north"}}));
+        sim.place({0,1,4},registry.state("lectern")); sim.stimulate({0,1,4},{{"pages",15}});
+        sim.place({1,1,4},registry.state("stone")); sim.place({2,1,4},registry.state("comparator",{{"facing","west"}}));
+        sim.place({3,1,4},registry.state("redstone_wire")); sim.place({4,1,4},registry.state("redstone_lamp"));
+        sim.place({7,1,0},registry.state("lightning_rod",{{"facing","up"}}));
+        sim.place({8,1,0},registry.state("redstone_wire")); sim.place({9,1,0},registry.state("redstone_lamp"));
+        sim.place({7,1,4},registry.state("daylight_detector")); sim.stimulate({7,1,4},{{"skyBrightness",15},{"sunAngle",0}});
+        sim.place({8,1,4},registry.state("redstone_wire")); sim.place({9,1,4},registry.state("redstone_lamp"));
+        sim.place({0,1,8},registry.state("heavy_weighted_pressure_plate")); sim.place({1,1,8},registry.state("redstone_wire"));
+        sim.place({4,1,8},registry.state("target")); sim.place({5,1,8},registry.state("redstone_wire"));
+        sim.addProbe({0,1,0},"压力板"); sim.addProbe({2,1,4},"讲台读数"); sim.addProbe({7,1,0},"雷击脉冲"); sim.addProbe({7,1,4},"天空输入");
+        runStart = sim.clone(); return;
+    }
     if (kind == "pistons") {
         projectName = "活塞实验 · 推动与黏连";
         for (int x = -1; x <= 8; ++x) for (int z = -1; z <= 5; ++z) sim.world.set({x,0,z},registry.state("obsidian"));

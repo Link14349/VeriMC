@@ -17,7 +17,7 @@ struct BlockState {
     std::uint16_t type{};
     Device device{Device::air};
     Direction facing{Direction::north};
-    std::uint8_t power{}, delay{1}, supportMask{}, rigidMask{}, centerMask{};
+    std::uint8_t power{}, delay{1}, supportMask{}, rigidMask{}, centerMask{}, staticAnalog{};
     bool conductor{}, fullCube{}, analogSource{}, blockEntity{}, replaceable{}, signalSource{};
     bool powered{}, lit{}, locked{}, extended{}, subtract{}, sticky{};
     std::uint8_t pushReaction{};

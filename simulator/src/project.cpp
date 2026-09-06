@@ -28,6 +28,8 @@ Json Simulator::saveProject(const std::string& name, bool checkpoint) const {
         if (checkpoint) { row["output"] = state.output; row["torchToggles"] = state.torchToggles; }
         data["blockData"].push_back(std::move(row));
     }
+    auto positionOrder = [](const Json& a, const Json& b) { return a.at("pos") < b.at("pos"); };
+    std::sort(data["blockData"].begin(), data["blockData"].end(), positionOrder);
     if (checkpoint) {
         data["faulted"] = faulted;
         data["tick"] = currentTick; data["nextOrder"] = nextOrder; data["sequence"] = sequence; data["nextProbeId"] = nextProbeId;
@@ -35,6 +37,7 @@ Json Simulator::saveProject(const std::string& name, bool checkpoint) const {
         while (!queue.empty()) { const auto e = queue.top(); queue.pop(); data["events"].push_back({{"tick", e.tick}, {"priority", e.priority}, {"order", e.order}, {"pos", e.pos}, {"type", e.type}, {"phase", e.phase}, {"data", e.data}}); }
         data["motions"] = Json::array();
         for (const auto& [p, m] : motions) data["motions"].push_back({{"pos", p}, {"movedState", m.movedState}, {"facing", static_cast<unsigned>(m.facing)}, {"extending", m.extending}, {"source", m.source}, {"progress", m.progress}, {"previousProgress", m.previousProgress}, {"lastTicked", m.lastTicked}, {"generation", m.generation}});
+        std::sort(data["motions"].begin(), data["motions"].end(), positionOrder);
         data["trace"] = Json::array(); for (const auto& e : trace) data["trace"].push_back({e.probeId, e.tick, e.sequence, e.value});
         data["traceDropped"] = traceDropped;
     }
@@ -62,6 +65,7 @@ void Simulator::loadProject(const Json& data) {
         if (candidate.world.get(p) == 0) throw std::invalid_argument("器件数据对应位置没有方块");
         auto& state = candidate.runtime[p]; state.values = row.at("values");
         if (checkpoint) { state.output = row.at("output"); state.torchToggles = row.at("torchToggles").get<std::deque<Tick>>(); }
+        candidate.validateRuntime(p);
     }
     if (checkpoint) {
         candidate.currentTick = data.at("tick"); candidate.nextOrder = data.at("nextOrder"); candidate.sequence = data.at("sequence");
