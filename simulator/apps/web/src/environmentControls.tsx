@@ -3,6 +3,7 @@ import { Zap } from 'lucide-react';
 import { connection, posKey, type BlockDef, type Pos, type BlockCell } from './api';
 import { shortName } from './blockLabels';
 import { TargetControls } from './targetControls';
+import { createCoalescedRefresh } from './coalescedRefresh';
 
 type Props = { pos: Pos; block: BlockDef; command: (cmd: string, body?: Record<string, unknown>) => Promise<Record<string, unknown> | undefined> };
 
@@ -18,20 +19,16 @@ export function EnvironmentControls({ pos, block, command }: Props) {
   const supported = plate || daylight || lectern || rod || target || detector || tripwire || button;
   const key = posKey(pos);
   useEffect(() => {
-    let active = true, requesting = false;
-    const refresh = async () => {
-      if (!supported || requesting) return;
-      requesting = true;
-      const info = await command('inspect', { pos });
-      if (active && info) setInspection(info);
-      requesting = false;
-    };
+    if (!supported) return;
+    const refresh = createCoalescedRefresh(() => command('inspect', { pos }), info => {
+      if (info) setInspection(info);
+    }, error => connection.error(String(error)));
     const onCells = (event: Event) => {
       const detail = (event as CustomEvent<{ full: boolean; changes: BlockCell[] }>).detail;
-      if (detail.full || detail.changes.some(cell => posKey(cell.pos) === key)) refresh();
+      if (detail.full || detail.changes.some(cell => posKey(cell.pos) === key)) refresh.request();
     };
-    refresh(); connection.addEventListener('cells', onCells);
-    return () => { active = false; connection.removeEventListener('cells', onCells); };
+    connection.addEventListener('cells', onCells); refresh.request();
+    return () => { refresh.dispose(); connection.removeEventListener('cells', onCells); };
   }, [key, block.name]);
   if (!supported) return null;
   const stimulus = (values: Record<string, unknown>) => command('stimulate', { pos, stimulus: values });

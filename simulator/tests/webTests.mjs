@@ -7,7 +7,7 @@ import { pathToFileURL } from 'node:url';
 import ts from '../apps/web/node_modules/typescript/lib/typescript.js';
 
 const scratch = await mkdtemp(join(tmpdir(), 'simulatorWebTests-'));
-for (const name of ['traceHistory', 'api']) {
+for (const name of ['traceHistory', 'api', 'coalescedRefresh']) {
   const source = await readFile(new URL(`../apps/web/src/${name}.ts`, import.meta.url), 'utf8');
   const output = ts.transpileModule(source, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext } }).outputText;
   await writeFile(join(scratch, `${name}.mjs`), output.replace("'./traceHistory'", "'./traceHistory.mjs'"));
@@ -15,7 +15,36 @@ for (const name of ['traceHistory', 'api']) {
 after(() => rm(scratch, { recursive: true, force: true }));
 const { TraceHistory } = await import(pathToFileURL(join(scratch, 'traceHistory.mjs')));
 const { SimulatorConnection } = await import(pathToFileURL(join(scratch, 'api.mjs')));
+const { createCoalescedRefresh } = await import(pathToFileURL(join(scratch, 'coalescedRefresh.mjs')));
 const frame = (from, edges, reset = false, epoch = 1) => ({ frameId: 1, from, next: from + edges.length, reset, epoch, edges });
+
+const flush = () => new Promise(resolve => setImmediate(resolve));
+const deferred = () => { let resolve, reject; const promise = new Promise((a,b) => { resolve=a; reject=b; }); return {promise,resolve,reject}; };
+test('inspector reads final state after updates during both initial and trailing requests', async () => {
+  const reads=[], shown=[];
+  const refresh=createCoalescedRefresh(() => { const read=deferred();reads.push(read);return read.promise; }, value => shown.push(value), assert.fail);
+  refresh.request();for(let i=0;i<100;++i)refresh.request();
+  assert.equal(reads.length,1);
+  reads[0].resolve('old');await flush();assert.equal(reads.length,2);
+  for(let i=0;i<100;++i)refresh.request();
+  reads[1].resolve('middle');await flush();assert.equal(reads.length,3);
+  reads[2].resolve('latest');await flush();
+  assert.deepEqual(shown,['old','middle','latest']);assert.equal(reads.length,3);
+  refresh.dispose();
+});
+test('selection disposal suppresses stale replies and queued reads', async () => {
+  const read=deferred();let calls=0;
+  const refresh=createCoalescedRefresh(() => {++calls;return read.promise;},assert.fail,assert.fail);
+  refresh.request();refresh.request();refresh.dispose();read.resolve('old selection');await flush();
+  refresh.request();assert.equal(calls,1);
+});
+test('failed inspector request reports error and retains a pending refresh', async () => {
+  const reads=[], shown=[], errors=[];
+  const refresh=createCoalescedRefresh(() => {const read=deferred();reads.push(read);return read.promise;},value=>shown.push(value),error=>errors.push(error.message));
+  refresh.request();refresh.request();reads[0].reject(new Error('disconnected'));await flush();
+  assert.equal(reads.length,2);reads[1].resolve('recovered');await flush();
+  assert.deepEqual(errors,['disconnected']);assert.deepEqual(shown,['recovered']);refresh.dispose();
+});
 
 test('trace retains ordered same-tick edges and rejects gaps atomically', () => {
   const trace = new TraceHistory(5);

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { connection, posKey, type Pos, type BlockCell } from './api';
 import { shortName } from './blockLabels';
+import { createCoalescedRefresh } from './coalescedRefresh';
 
 type Stack = { slot: number; item: string; count: number };
 type Props = { pos: Pos; hopper?: boolean; cart?: boolean; dropper?: boolean; bookshelf?: boolean; pot?: boolean; command: (cmd: string, body?: Record<string, unknown>) => Promise<Record<string, unknown> | undefined> };
@@ -10,23 +11,19 @@ export function InventoryControls({ pos, hopper = false, cart = false, dropper =
   const [item, setItem] = useState(bookshelf?'minecraft:book':'minecraft:stone'), [count, setCount] = useState(bookshelf?1:64), [analog, setAnalog] = useState(0), [viewers, setViewers] = useState(0);
   const key = posKey(pos);
   useEffect(() => {
-    let active = true, pending = false;
-    const refresh = async () => {
-      if (pending) return; pending = true;
-      const data = await command('inspect', { pos });
-      if (active && data) {
+    const refresh = createCoalescedRefresh(() => command('inspect', { pos }), data => {
+      if (data) {
         setSlots((data.inventory ?? []) as Stack[]); setSize(Number(data.inventorySize ?? 27));
         setSlot(previous => Math.min(previous, Math.max(0, Number(data.inventorySize ?? 27) - 1)));
         setAnalog(Number(data.analog ?? 0)); setViewers(Number((data.runtime as Record<string, unknown>)?.viewers ?? 0));
       }
-      pending = false;
-    };
+    }, error => connection.error(String(error)));
     const changed = (event: Event) => {
       const detail = (event as CustomEvent<{ full: boolean; changes: BlockCell[] }>).detail;
-      if (detail.full || detail.changes.some(cell => posKey(cell.pos) === key)) refresh();
+      if (detail.full || detail.changes.some(cell => posKey(cell.pos) === key)) refresh.request();
     };
-    refresh(); connection.addEventListener('cells', changed);
-    return () => { active = false; connection.removeEventListener('cells', changed); };
+    connection.addEventListener('cells', changed); refresh.request();
+    return () => { refresh.dispose(); connection.removeEventListener('cells', changed); };
   }, [key, cart]);
   const update = (inventory: Stack[]) => command('stimulate', { pos, stimulus: cart ? { cartInventory: inventory } : { inventory } });
   const selected = slots.find(stack => stack.slot === slot);
