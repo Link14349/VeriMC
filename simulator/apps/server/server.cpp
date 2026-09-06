@@ -37,15 +37,15 @@ struct Hub {
     std::string token, host;
     std::string projectName{"未命名电路"};
     Clock::time_point lastPump{Clock::now()}, lastPublish{Clock::now()};
-    double measuredTps{};
-    Tick measuredTick{};
+    double eventsPerSecond{};
+    std::uint64_t measuredEvents{};
     Clock::time_point measuredTime{Clock::now()};
     explicit Hub(asio::io_context& context, unsigned short port) : io(context), timer(context), host("127.0.0.1:" + std::to_string(port)) {
         std::random_device random; std::ostringstream value; value << std::hex; for (int i = 0; i < 8; ++i) value << random(); token = value.str();
     }
     Json status() const {
         Json probes = Json::array(); for (const auto& p : sim.getProbes()) probes.push_back({{"id", p.id}, {"pos", p.pos}, {"name", p.name}, {"mode", p.mode}, {"value", p.lastValue}, {"trigger", p.trigger}});
-        return {{"type", "status"}, {"tick", sim.currentTick}, {"running", running}, {"speed", speed}, {"measuredTps", measuredTps}, {"blocks", sim.world.size()}, {"pending", sim.pendingEvents()}, {"updates", sim.statistics.updates}, {"events", sim.statistics.scheduledEvents}, {"storageBytes", sim.world.storageBytes()}, {"traceDropped", sim.traceDropped}, {"pauseReason", sim.pauseReason}, {"revision", sim.revision}, {"probes", probes}, {"canUndo", !undo.empty()}, {"canRedo", !redo.empty()}, {"name", projectName}};
+        return {{"type", "status"}, {"tick", sim.currentTick}, {"running", running}, {"speed", speed}, {"eventsPerSecond", running ? eventsPerSecond : 0}, {"blocks", sim.world.size()}, {"pending", sim.pendingEvents()}, {"updates", sim.statistics.updates}, {"events", sim.statistics.scheduledEvents}, {"storageBytes", sim.world.storageBytes()}, {"traceDropped", sim.traceDropped}, {"pauseReason", sim.pauseReason}, {"revision", sim.revision}, {"probes", probes}, {"canUndo", !undo.empty()}, {"canRedo", !redo.empty()}, {"name", projectName}};
     }
     void remember() { undo.push_back({projectName, sim.clone()}); std::size_t bytes = 0; for (const auto& entry : undo) bytes += entry.state->estimatedBytes(); while (undo.size() > 1 && (undo.size() > 32 || bytes > 128u * 1024u * 1024u)) { bytes -= undo.front().state->estimatedBytes(); undo.pop_front(); } redo.clear(); runStart.reset(); }
     void demo(const std::string& kind = "basic");
@@ -230,15 +230,23 @@ void Hub::start() {
         if (running && (!connected || stalled)) { running = false; sim.pauseReason = connected ? "浏览器未确认数据，仿真已暂停以保留记录" : "浏览器已断开，仿真已暂停"; }
         protectTrace();
         if (running) {
+            const auto before = sim.statistics.scheduledEvents;
             try {
-                Tick target = sim.currentTick;
-                if (speed == 0) { if (sim.pendingEvents() == 0) { running = false; sim.pauseReason = "电路已稳定，没有待执行事件"; } else target += 100000; }
-                else { fractionalTicks += std::min(elapsed, 0.1) * speed; auto ticks = static_cast<Tick>(fractionalTicks); fractionalTicks -= static_cast<double>(ticks); target += ticks; }
-                sim.advanceTo(target, 8192, std::chrono::milliseconds(5)); if (sim.breakRequested) running = false;
+                if (speed == 0) {
+                    sim.advanceActive(8192, std::chrono::milliseconds(5));
+                    if (sim.pendingEvents() == 0 && !sim.breakRequested) { running = false; sim.pauseReason = "电路已稳定，没有待执行事件"; }
+                } else {
+                    fractionalTicks += std::min(elapsed, 0.1) * speed;
+                    auto ticks = static_cast<Tick>(fractionalTicks); fractionalTicks -= static_cast<double>(ticks);
+                    sim.advanceTo(sim.currentTick + ticks, 8192, std::chrono::milliseconds(5));
+                }
+                if (sim.breakRequested) running = false;
             } catch (const std::exception& error) { running = false; sim.pauseReason = error.what(); }
+            measuredEvents += sim.statistics.scheduledEvents - before;
         }
-        auto measurementSeconds = std::chrono::duration<double>(now - measuredTime).count();
-        if (measurementSeconds > 0.5) { measuredTps = sim.currentTick >= measuredTick ? static_cast<double>(sim.currentTick - measuredTick) / measurementSeconds : 0; measuredTick = sim.currentTick; measuredTime = now; }
+        auto measuredNow = Clock::now();
+        auto measurementSeconds = std::chrono::duration<double>(measuredNow - measuredTime).count();
+        if (measurementSeconds > 0.5) { eventsPerSecond = static_cast<double>(measuredEvents) / measurementSeconds; measuredEvents = 0; measuredTime = measuredNow; }
         if (now - lastPublish >= std::chrono::milliseconds(40)) { publish(); lastPublish = now; }
         start();
     });
@@ -277,7 +285,7 @@ void Hub::command(const std::shared_ptr<Client>& client, const Json& message) {
         throw std::invalid_argument("探针缓冲等待浏览器确认，请稍后继续，或清除历史采样后重新运行");
     }
     Json result = Json::object(); bool full = false;
-    if (cmd == "play") { if (sim.faulted) throw std::invalid_argument("执行已中止，请先撤销或加载快照"); sim.breakRequested = false; sim.pauseReason.clear(); if (!runStart) runStart = sim.clone(); running = true; fractionalTicks = 0; lastPump = Clock::now(); }
+    if (cmd == "play") { if (sim.faulted) throw std::invalid_argument("执行已中止，请先撤销或加载快照"); sim.breakRequested = false; sim.pauseReason.clear(); if (!runStart) runStart = sim.clone(); running = true; fractionalTicks = 0; lastPump = Clock::now(); measuredTime = lastPump; measuredEvents = 0; eventsPerSecond = 0; }
     else if (cmd == "pause") { running = false; }
     else if (cmd == "speed") { double next = message.at("value"); if (!std::isfinite(next) || next < 0 || next > 1000000) throw std::invalid_argument("无效运行速度"); speed = next; }
     else if (cmd == "traceBudget") {

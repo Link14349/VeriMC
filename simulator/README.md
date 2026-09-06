@@ -27,6 +27,7 @@ python3 simulator/runSimulator.py --no-build
 - 左侧选择器件，按 `2` 或点击放置工具，在当前 Y 层左键放置。右侧可铺底板和调整方向，`R` 旋转。
 - 右键拖动旋转、中键平移、滚轮缩放。支持俯视、适合画面和编辑层剖切。
 - `1` 选择；`3` 移除；`4` 放置探针；`5` 操作拉杆、按钮等。Space 运行/暂停，`S` 前进一个游戏刻。
+- 不限速模式在电路稳定后停在最后一个事件时刻；底部“事件/s”统计连续运行的实际计划事件，不把空闲时间跳跃算成处理速度。
 - 属性面板检查坐标、方块状态和信号强度；中继器、比较器的朝向属性指向输入。
 - 波形支持缩放、跟随、双游标和触发暂停；探针菜单的 `↑` 或 `↓` 设置边沿断点。Shift 单击波形放置 B 游标。
 - 浏览器接收滞后、未确认采样满额时自动暂停并保留后续事件；接收完成后可继续运行。历史截断会显示数量，具体预算和极端中止条件见 [采样传输](docs/traceTransport.md)。
@@ -58,6 +59,7 @@ ctest --preset debug
 # 服务启动后，验证 HTTP / WebSocket 完整流程
 python3 tests/serverTests.py
 python3 tests/backpressureTests.py
+python3 tests/runControlTests.py
 node tests/webTests.mjs
 
 # 有实际驱动的中继器链基准

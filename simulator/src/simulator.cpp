@@ -487,6 +487,12 @@ void Simulator::pruneEvents() {
     }
 }
 std::size_t Simulator::advanceTo(Tick target, std::size_t eventBudget, std::chrono::microseconds wallBudget) {
+    return advance(target, eventBudget, wallBudget, true);
+}
+std::size_t Simulator::advanceActive(std::size_t eventBudget, std::chrono::microseconds wallBudget) {
+    return advance(std::numeric_limits<Tick>::max() - 1, eventBudget, wallBudget, false);
+}
+std::size_t Simulator::advance(Tick target, std::size_t eventBudget, std::chrono::microseconds wallBudget, bool fillIdle) {
     if (faulted) throw std::runtime_error("当前执行已中止，请从有效快照恢复");
     if (target < currentTick) throw std::invalid_argument("不能倒退时间，请加载运行快照");
     if (traceBlocked()) { breakRequested = true; pauseReason = "探针缓冲等待浏览器确认，仿真已暂停以保留全部边沿"; return 0; }
@@ -496,7 +502,7 @@ std::size_t Simulator::advanceTo(Tick target, std::size_t eventBudget, std::chro
         if ((count & 63u) == 0 && std::chrono::steady_clock::now() - start >= wallBudget) break;
         stepEvent(); ++count; pruneEvents();
     }
-    if (!breakRequested && (pendingEvents() == 0 || nextTick() > target)) { currentTick = target; blockTicks.finishThrough(target); }
+    if (fillIdle && !breakRequested && (pendingEvents() == 0 || nextTick() > target)) { currentTick = target; blockTicks.finishThrough(target); }
     statistics.simulationMicros += static_cast<std::uint64_t>(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - start).count());
     return count;
 }

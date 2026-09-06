@@ -62,6 +62,7 @@ public:
     bool hasScheduled(BlockPos pos) const;
     bool stepEvent();
     std::size_t advanceTo(Tick target, std::size_t eventBudget = 1000000, std::chrono::microseconds wallBudget = std::chrono::seconds(10));
+    std::size_t advanceActive(std::size_t eventBudget = 1000000, std::chrono::microseconds wallBudget = std::chrono::seconds(10));
     std::size_t pendingEvents() const { return scheduledKeys.size() + blockTicks.size(); }
     Tick nextTick();
     void clear();
@@ -86,6 +87,7 @@ public:
     }
     const PistonMotion* motionAt(BlockPos pos) const { auto it = motions.find(pos); return it == motions.end() ? nullptr : &it->second; }
 private:
+    std::size_t advance(Tick target, std::size_t eventBudget, std::chrono::microseconds wallBudget, bool fillIdle);
     enum class UpdateKind { neighbor, shape, multi };
     struct Update { UpdateKind kind; BlockPos pos; Direction direction{Direction::down}; StateId neighborState{}; int index{}, skip{-1}, depth{512}; unsigned flags{2}; };
     std::vector<Update> updateStack, addedUpdates;

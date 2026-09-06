@@ -221,6 +221,21 @@ int main() {
         threw = false; try { s.stepEvent(); } catch (...) { threw = true; }
         expect(threw, "faulted trace execution resumed");
     });
+    test("active execution ends at the last event and preserves budgeted clock continuation", [&] {
+        Simulator s(r); expect(s.advanceActive()==0 && s.currentTick==0,"empty active run advanced time");
+        s.place({0,0,0},r.state("observer")); s.schedule({0,0,0},2);
+        expect(s.advanceActive()==2 && s.currentTick==4 && s.pendingEvents()==0,"active run added trailing idle time");
+        s.advanceActive(); expect(s.currentTick==4,"stable active run advanced again");
+        s.advanceTo(1000); expect(s.currentTick==1000,"explicit time advance lost idle semantics");
+        Simulator clock(r);
+        clock.world.set({0,0,0},r.state("observer",{{"facing","east"}}));
+        clock.world.set({1,0,0},r.state("observer",{{"facing","west"}}));
+        clock.schedule({0,0,0},2); clock.schedule({1,0,0},2);
+        expect(clock.advanceActive(3)==3 && clock.pendingEvents()>0,"active event budget lost clock work");
+        auto saved=clock.saveProject("active",true); Simulator restored(r); restored.loadProject(saved);
+        clock.advanceActive(17); restored.advanceActive(17);
+        expect(clock.saveProject("active",true)==restored.saveProject("active",true),"active continuation diverged");
+    });
     test("probe dependency indices survive deletion and snapshot cloning", [&] {
         Simulator s(r); s.place({0,0,0}, r.state("observer"));
         const auto removed = s.addProbe({0,0,0}), kept = s.addProbe({0,0,0});
