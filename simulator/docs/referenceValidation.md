@@ -39,3 +39,5 @@
 `runReferenceTool.py ExportScheduler <绝对输出路径>` 直接运行原版调度器，生成 206 次初始排期、21 刻 / 181 次回调的对照；`captureTickBatches.py` 增加第七组 GameTest，覆盖 25 刻 / 8 点同刻侦测器事件。
 
 `captureTripwire.py` 增加第八组 GameTest，覆盖 70 刻 / 121 点连接、交叉、长度边界、实体接触、断线、剪刀及支撑破坏。场景通过 `discardDrops` 清除拆钩掉落物，避免随机轨迹混入受控接触输入，详见 [绊线说明](tripwire.md)。
+
+`captureButtons.py` 增加第九组 GameTest，覆盖 101 刻 / 16 点按钮接触、安装朝向与复查。真实箭的碰撞盒分别与弹起/按下检测形状相交；原生专项另验证同刻释放—重按的边沿及中途快照。具体环境边界见 [环境输入](environmentInputs.md)。

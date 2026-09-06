@@ -50,11 +50,39 @@ public class CaptureRedstone extends TestFunctionLoader {
         try {
             if (command.has("interact")) {
                 if (state.getBlock() instanceof DoorBlock door) door.setOpen(null, level, state, pos, !state.getValue(DoorBlock.OPEN));
+                else if (state.getBlock() instanceof ButtonBlock button) { if (!state.getValue(ButtonBlock.POWERED)) button.press(state, level, pos, null); }
                 else throw new IllegalArgumentException("Unsupported reference interaction");
                 return;
             }
             var input = command.getAsJsonObject("stimulus");
-            if (state.getBlock() instanceof TripWireBlock wire) {
+            if (state.getBlock() instanceof ButtonBlock button) {
+                for (var entity : occupants.getOrDefault(pos, List.of())) entity.discard();
+                var list = new ArrayList<Entity>(); occupants.put(pos, list);
+                int arrows = input.get("arrows").getAsInt(), pressedArrows = input.has("pressedArrows") ? input.get("pressedArrows").getAsInt() : arrows;
+                var center = state.setValue(ButtonBlock.POWERED, true).getShape(level, pos).bounds().getCenter();
+                var direction = switch (state.getValue(ButtonBlock.FACE)) {
+                    case FLOOR -> Direction.UP;
+                    case CEILING -> Direction.DOWN;
+                    default -> state.getValue(ButtonBlock.FACING);
+                };
+                for (int i = 0; i < arrows; ++i) {
+                    var type = BuiltInRegistries.ENTITY_TYPE.getValue(Identifier.withDefaultNamespace("arrow"));
+                    var arrow = (net.minecraft.world.entity.projectile.arrow.AbstractArrow)type.create(level, EntitySpawnReason.COMMAND);
+                    double extent = direction.getAxis() == Direction.Axis.Y ? arrow.getBbHeight() : arrow.getBbWidth();
+                    double offset = i < pressedArrows ? 0 : extent / 2 + 1.0 / 16;
+                    arrow.setPos(pos.getX() + center.x + direction.getStepX() * offset,
+                        pos.getY() + center.y - arrow.getBbHeight() / 2 + direction.getStepY() * offset,
+                        pos.getZ() + center.z + direction.getStepZ() * offset);
+                    // Keep ordinary block contact processing enabled. Setting
+                    // noPhysics also disables entity-inside effects in 26.2.
+                    arrow.setNoGravity(true);
+                    level.addFreshEntity(arrow); list.add(arrow);
+                }
+                if (!state.getValue(ButtonBlock.POWERED)) {
+                    var method = ButtonBlock.class.getDeclaredMethod("checkPressed", BlockState.class, Level.class, BlockPos.class);
+                    method.setAccessible(true); method.invoke(button, state, level, pos);
+                }
+            } else if (state.getBlock() instanceof TripWireBlock wire) {
                 if (input.has("shear")) {
                     var player = helper.makeMockPlayer(GameType.CREATIVE);
                     player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(Items.SHEARS));

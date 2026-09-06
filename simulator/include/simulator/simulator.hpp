@@ -154,6 +154,8 @@ private:
     void updateComparatorNeighbors(BlockPos pos);
     void runtimeChanged(BlockPos pos, bool notifyComparators = true);
     void updatePressurePlate(BlockPos pos);
+    void updateButton(BlockPos pos);
+    void buttonContact(BlockPos pos);
     void updateDaylight(BlockPos pos);
     bool interactDevice(BlockPos pos);
     bool stimulateDevice(BlockPos pos, const Json& stimulus);

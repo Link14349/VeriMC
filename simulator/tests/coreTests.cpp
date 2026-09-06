@@ -78,7 +78,7 @@ int main() {
         try { restored.loadProject(invalid); } catch (...) { threw = true; }
         expect(threw && before == restored.saveProject("before", true), "invalid batch import changed world");
     });
-    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers", "java26_2Hoppers", "java26_2Torches", "java26_2Rails", "java26_2TickBatches", "java26_2Tripwire"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
+    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers", "java26_2Hoppers", "java26_2Torches", "java26_2Rails", "java26_2TickBatches", "java26_2Tripwire", "java26_2Buttons"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
         std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/../tests/fixtures/" + fixtureName + ".json"); expect(static_cast<bool>(file), "missing vanilla reference fixture");
         auto fixture = Json::parse(file); auto origin = fixture["origin"].get<BlockPos>(); Simulator s(r);
         auto absolute = [&](const Json& p) { auto pos = p.get<BlockPos>(); return BlockPos{origin.x + pos.x, origin.y + pos.y, origin.z + pos.z}; };
@@ -181,6 +181,33 @@ int main() {
         }
         bool threw = false; try { s.retainTraceFrom(0); } catch (...) { threw = true; }
         expect(threw, "expired ACK cursor accepted");
+    });
+    test("shallow arrow release and re-press retain same-tick phase and checkpoint", [&] {
+        Simulator s(r); s.world.set({0,-1,0},r.state("stone"));
+        s.place({0,0,0},r.state("oak_button",{{"face","floor"}})); s.addProbe({0,0,0});
+        s.stimulate({0,0,0},{{"arrows",1},{"pressedArrows",0}});
+        expect(s.at({0,0,0}).powered,"arrow did not press");
+        s.stepEvent(); expect(s.currentTick==30 && !s.at({0,0,0}).powered,"small pressed shape did not release");
+        auto checkpoint=s.saveProject("arrow",true); Simulator restored(r); restored.loadProject(checkpoint);
+        s.stepEvent(); restored.stepEvent();
+        expect(s.currentTick==30 && s.at({0,0,0}).powered,"entity contact lost same-tick re-press");
+        expect(s.saveProject("arrow",true)==restored.saveProject("arrow",true),"arrow contact phase checkpoint diverged");
+        const auto& trace=s.getTrace();
+        expect(trace.size()==4 && trace[2].tick==trace[3].tick && trace[2].value==0 && trace[3].value==15 && trace[2].sequence<trace[3].sequence,"same-tick edges merged");
+        s.stimulate({0,0,0},{{"arrows",0}}); s.advanceTo(59); expect(s.at({0,0,0}).powered,"arrow removal released before poll");
+        s.advanceTo(60); expect(!s.at({0,0,0}).powered,"arrow removal never released");
+        auto before=s.saveProject("before",true); bool threw=false;
+        try { s.stimulate({0,0,0},{{"arrows",0},{"pressedArrows",1}}); } catch (...) {threw=true;}
+        expect(threw && s.saveProject("before",true)==before,"invalid footprint counts changed state");
+    });
+    test("stone ignores arrows and repeated clicks do not extend button pulses", [&] {
+        for (const auto& name : {"stone_button", "polished_blackstone_button", "oak_button"}) {
+            Simulator s(r); s.world.set({0,-1,0},r.state("stone")); s.place({0,0,0},r.state(name,{{"face","floor"}}));
+            const bool wood=std::string(name)=="oak_button";
+            s.stimulate({0,0,0},{{"arrows",1}}); expect(s.at({0,0,0}).powered==wood,"arrow material filter");
+            s.interact({0,0,0}); s.advanceTo(10); s.interact({0,0,0}); s.stimulate({0,0,0},{{"arrows",0}});
+            s.advanceTo(wood?30:20); expect(!s.at({0,0,0}).powered,"click reset release deadline");
+        }
     });
     test("trace safety reserve faults explicitly and idle time cannot bypass pause", [&] {
         Simulator idle(r); idle.addProbe({0,0,0}); idle.traceCapacity = 1; idle.retainTraceFrom(0);

@@ -132,6 +132,12 @@ void Simulator::setBlock(BlockPos p, StateId id, unsigned flags, int depth) {
         indirectShapes(p, id, nextFlags, depth - 1);
     }
     if (!hoppers.empty()) wakeHoppers(p);
+    if (state.device == Device::button && at(p).device == Device::button && !at(p).powered) {
+        auto contact = runtime.find(p);
+        const auto& name = registry.type(world.get(p)).name;
+        if (contact != runtime.end() && contact->second.values.value("arrows", 0) > 0 && name != "minecraft:stone_button" && name != "minecraft:polished_blackstone_button")
+            schedulePhase(p, currentTick + (currentPhase < 3 ? 0 : 1), 3, 0);
+    }
 }
 bool Simulator::survives(BlockPos p, StateId id) const {
     const auto& s = registry[id]; const auto& below = at(p.relative(Direction::down));
@@ -419,7 +425,7 @@ void Simulator::executeTick(const ScheduledEvent& event) {
         }
         break;
     }
-    case Device::button: if (s.powered) { setBlock(p, registry.withBool(id, "powered", false)); notifyAttached(p, s.connectedDirection); } break;
+    case Device::button: if (s.powered) updateButton(p); break;
     case Device::target: setBlock(p, registry.with(id, "power", 0)); break;
     case Device::pressurePlate: case Device::weightedPlate: if (s.powered || s.power > 0) updatePressurePlate(p); break;
     case Device::lightningRod: setBlock(p, registry.withBool(id, "powered", false)); updateNeighbors(p.relative(opposite(s.facing)), -1, id); break;
@@ -452,7 +458,10 @@ bool Simulator::stepEvent() {
     try {
         if (at(event.pos).type == event.type) {
             if (event.phase == 1) pistonEvent(event);
-            else if (event.phase == 3) tripwireContact(event.pos);
+            else if (event.phase == 3) {
+                if (at(event.pos).device == Device::button) buttonContact(event.pos);
+                else tripwireContact(event.pos);
+            }
             else if (event.phase == 2) {
                 if (at(event.pos).device == Device::daylight) updateDaylight(event.pos);
                 else if (at(event.pos).device == Device::hopper) tickHopper(event);

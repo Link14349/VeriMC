@@ -110,6 +110,19 @@ try:
     command('load', project=hopper)
     command('step', count=8)
     assert command('inspect', pos=[1,0,0])['inventory'][0]['count'] == 2
+    command('new'); command('place',pos=[0,0,0],name='stone')
+    command('place',pos=[0,1,0],name='oak_button',properties={'face':'floor'})
+    command('probe',pos=[0,1,0],name='arrow')
+    command('stimulate',pos=[0,1,0],stimulus={'arrows':1,'pressedArrows':0})
+    assert command('inspect',pos=[0,1,0])['properties']['powered']=='true'
+    command('stepEvent')
+    assert command('inspect',pos=[0,1,0])['properties']['powered']=='false'
+    arrow=command('save',checkpoint=True); command('stepEvent')
+    assert command('inspect',pos=[0,1,0])['properties']['powered']=='true'
+    command('load',project=arrow); command('stepEvent')
+    command('stimulate',pos=[0,1,0],stimulus={'arrows':0}); command('step',count=30)
+    assert command('inspect',pos=[0,1,0])['properties']['powered']=='false'
+    assert command('stimulate',pos=[0,1,0],stimulus={'arrows':0,'pressedArrows':1})['type']=='error'
     assert client.frames > 0
     print(f'PASS: HTTP host validation, binary frames ({client.frames}), circuit editing, delay, probes, VCD, atomic errors, native undo/redo, checkpoint import')
 finally:

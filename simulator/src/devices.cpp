@@ -70,6 +70,28 @@ void Simulator::updatePressurePlate(BlockPos pos) {
     if (power > 0) schedule(pos, state.device == Device::weightedPlate ? 10 : 20);
 }
 
+void Simulator::updateButton(BlockPos pos) {
+    auto id = world.get(pos); const auto& state = registry[id];
+    if (state.device != Device::button) return;
+    const auto& name = registry.type(id).name;
+    const bool allowsArrows = name != "minecraft:stone_button" && name != "minecraft:polished_blackstone_button";
+    auto found = runtime.find(pos);
+    int arrows = found == runtime.end() ? 0 : found->second.values.value("arrows", 0);
+    int pressedArrows = found == runtime.end() ? 0 : found->second.values.value("pressedArrows", arrows);
+    const bool pressed = allowsArrows && (state.powered ? pressedArrows : arrows) > 0;
+    if (pressed != state.powered) {
+        setBlock(pos, registry.withBool(id, "powered", pressed));
+        notifyAttached(pos, state.connectedDirection);
+    }
+    if (pressed) schedule(pos, 30);
+    // setBlock queues contact with the released shape, including shallow arrows
+    // and manual state edits. Contact runs after the current block-tick phase.
+}
+
+void Simulator::buttonContact(BlockPos pos) {
+    if (at(pos).device == Device::button && !at(pos).powered) updateButton(pos);
+}
+
 void Simulator::updateDaylight(BlockPos pos) {
     auto id = world.get(pos);
     auto found = runtime.find(pos);
@@ -128,6 +150,17 @@ bool Simulator::stimulateDevice(BlockPos pos, const Json& stimulus) {
     if (!stimulus.is_object()) throw std::invalid_argument("环境输入必须是对象");
     auto id = world.get(pos);
     const auto& state = registry[id];
+    if (state.device == Device::button) {
+        if (!stimulus.contains("arrows") || stimulus.size() > (stimulus.contains("pressedArrows") ? 2u : 1u)) throw std::invalid_argument("按钮输入需要 arrows，可选 pressedArrows");
+        int arrows = integerInRange(stimulus, "arrows", 0, 1000000);
+        int pressedArrows = integerInRange(stimulus, "pressedArrows", arrows, 1000000);
+        if (pressedArrows > arrows) throw std::invalid_argument("按下形状内的箭数不能超过弹起形状内的箭数");
+        runtime[pos].values = {{"arrows", arrows}, {"pressedArrows", pressedArrows}};
+        runtimeChanged(pos, false);
+        if (arrows == 0) scheduledKeys.erase({pos, state.type, 3, 0});
+        else buttonContact(pos);
+        return true;
+    }
     if (state.device == Device::detectorRail) { setCartInput(pos, stimulus); return true; }
     if (state.device == Device::tripwire) {
         if (stimulus.contains("shear")) {
@@ -207,6 +240,10 @@ void Simulator::validateRuntime(BlockPos pos) const {
     auto device = at(pos).device;
     if (device == Device::detectorRail) normalizeCarts(data.values.value("carts", Json::array()));
     if (device == Device::tripwire) integerInRange(data.values, "entities", 0, 1000000);
+    if (device == Device::button) {
+        int arrows = integerInRange(data.values, "arrows", 0, 1000000);
+        if (integerInRange(data.values, "pressedArrows", arrows, 1000000) > arrows) throw std::invalid_argument("无效按钮箭矢数量");
+    }
     if (inventorySize(world.get(pos))) integerInRange(data.values, "viewers", 0, 1000000);
     if (device == Device::pressurePlate || device == Device::weightedPlate) {
         int entities = integerInRange(data.values, "entities", 0, 1000000);

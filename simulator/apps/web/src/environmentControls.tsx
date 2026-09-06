@@ -13,7 +13,8 @@ export function EnvironmentControls({ pos, block, command }: Props) {
   const name = shortName(block.name), plate = name.endsWith('pressure_plate'), daylight = name === 'daylight_detector';
   const lectern = name === 'lectern', rod = name.endsWith('lightning_rod'), target = name === 'target';
   const detector = name === 'detector_rail', tripwire = name === 'tripwire';
-  const supported = plate || daylight || lectern || rod || target || detector || tripwire;
+  const button = name.endsWith('_button'), stoneButton = name === 'stone_button' || name === 'polished_blackstone_button';
+  const supported = plate || daylight || lectern || rod || target || detector || tripwire || button;
   const key = posKey(pos);
   useEffect(() => {
     let active = true, requesting = false;
@@ -38,6 +39,12 @@ export function EnvironmentControls({ pos, block, command }: Props) {
   const numberField = (label: string, value: number, change: (next: number) => void, maximum: number, minimum = 0) =>
     <label className="propertyRow"><span>{label}</span><input aria-label={label} type="number" min={minimum} max={maximum} value={value} onChange={e => change(Number(e.target.value))}/></label>;
   return <div className="inspectorSection environmentControls"><label className="miniLabel"><Zap size={12}/>环境输入</label>
+    {button && <>
+      <button className="wideButton accentOutline" onClick={() => stimulus({arrows:1})}>箭留在按钮内</button>
+      <button className="wideButton" onClick={() => stimulus({arrows:1, pressedArrows:0})}>箭只触及弹起部分</button>
+      <button className="wideButton" onClick={() => stimulus({arrows:0})}>移走所有箭</button>
+      <p className="subtleText">当前箭数 {runtime.arrows ?? 0}；其中 {runtime.pressedArrows ?? 0} 支仍触及按下形状。{stoneButton ? '石按钮不受箭矢触发，手动按下持续 20 gt。' : '木按钮每 30 gt 复查，箭仍在内时保持按下。仅触及弹起部分的箭会在复查时产生同刻释放与重按。'}</p>
+    </>}
     {tripwire && <>
       <p className="subtleText">提供触及这段线的有效实体数量。</p>
       {numberField('绊线接触数量', entities, setEntities, 1000000)}
