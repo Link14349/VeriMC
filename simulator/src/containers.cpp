@@ -13,6 +13,7 @@ Direction turn(Direction direction, int steps) {
 }
 
 std::size_t Simulator::inventorySize(StateId id) const {
+    if(isBookshelf(id)) return 6;
     switch (registry[id].device) {
     case Device::container: return 27;
     case Device::hopper: return 5;
@@ -20,6 +21,29 @@ std::size_t Simulator::inventorySize(StateId id) const {
     case Device::furnace: return 3;
     default: return 0;
     }
+}
+bool Simulator::isBookshelf(StateId state) const {
+    return registry[state].device==Device::analog && registry.type(state).className=="ChiseledBookShelfBlock";
+}
+bool Simulator::canInsertStack(const InventorySlot& slot, ItemStack stack) const {
+    if(isBookshelf(world.get(slot.pos))) return registry.item(stack.item).bookshelfBook && !stackAt(slot).count;
+    return true;
+}
+bool Simulator::canExtractStack(const InventorySlot& slot, BlockPos into) const {
+    if(!isBookshelf(world.get(slot.pos))) return true;
+    const auto source=stackAt(slot);
+    for(const auto& target:containerSlots(into)) {
+        const auto stack=stackAt(target);
+        if(!stack.count || (source.item==stack.item && source.count+stack.count<=registry.item(stack.item).maxStack)) return true;
+    }
+    return false;
+}
+void Simulator::updateBookshelfSlot(const InventorySlot& slot) {
+    auto id=world.get(slot.pos);
+    runtime[slot.pos].values["lastInteractedSlot"]=slot.index;
+    for(std::size_t i=0;i<6;++i) id=registry.withBool(id,"slot_"+std::to_string(i)+"_occupied",stackAt({slot.pos,i}).count>0);
+    setBlock(slot.pos,id);
+    runtimeChanged(slot.pos,false);
 }
 
 Direction Simulator::chestConnection(StateId state) const {
@@ -125,7 +149,7 @@ Json Simulator::inventoryJson(BlockPos pos, bool combined) const {
     return result;
 }
 
-std::vector<std::pair<std::size_t, ItemStack>> Simulator::parseInventory(const Json& values, std::size_t size) const {
+std::vector<std::pair<std::size_t, ItemStack>> Simulator::parseInventory(const Json& values, std::size_t size, bool preserveOrder) const {
     if (!values.is_array() || values.size() > size) throw std::invalid_argument("库存修改必须是有效槽位数组");
     std::vector<std::pair<std::size_t, ItemStack>> edits;
     std::set<std::size_t> edited;
@@ -138,7 +162,7 @@ std::vector<std::pair<std::size_t, ItemStack>> Simulator::parseInventory(const J
         if (count < 0 || count > registry.item(item).maxStack || (count > 0 && registry.item(item).name == "minecraft:air")) throw std::invalid_argument("物品数量超出该物品的堆叠上限");
         edits.push_back({static_cast<std::size_t>(slot), {item, static_cast<std::uint16_t>(count)}});
     }
-    std::sort(edits.begin(), edits.end(), [](const auto& a, const auto& b) { return a.first < b.first; });
+    if(!preserveOrder) std::sort(edits.begin(), edits.end(), [](const auto& a, const auto& b) { return a.first < b.first; });
     return edits;
 }
 
@@ -146,8 +170,15 @@ void Simulator::setInventory(BlockPos pos, const Json& values, bool combined, bo
     auto slots = combined ? containerSlots(pos) : std::vector<InventorySlot>{};
     if (!combined) for (std::size_t i = 0; i < inventorySize(world.get(pos)); ++i) slots.push_back({pos, i});
     if (slots.empty()) throw std::invalid_argument("这个器件没有库存槽位");
-    for (const auto& [index, stack] : parseInventory(values, slots.size())) {
+    const bool bookshelf=isBookshelf(world.get(pos));
+    const auto edits=parseInventory(values,slots.size(),bookshelf);
+    if(bookshelf) for(const auto& [index,stack]:edits) {
+        (void)index;
+        if(stack.count && (stack.count>1 || !registry.item(stack.item).bookshelfBook)) throw std::invalid_argument("雕纹书架每槽仅接受一本原版书籍");
+    }
+    for (const auto& [index, stack] : edits) {
         const auto& slot = slots[index];
+        if(notify && bookshelf) {writeStack(slot,stack);continue;}
         auto& inventory = runtime[slot.pos].inventory;
         inventory.resize(inventorySize(world.get(slot.pos)));
         inventory[slot.index] = stack;

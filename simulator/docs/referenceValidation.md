@@ -47,3 +47,5 @@
 `captureTargets.py` 增加第十一组 GameTest：53 刻 / 26 点，六面命中、箭/其他投射物、重复命中、红石粉输出与带电标靶重放置。`runReferenceTool.py ExportTarget <绝对输出路径>` 直接调用原版强度计算，4,272 次样本覆盖各信号阈值相邻浮点数及正负/大坐标，详见 [标靶说明](targets.md)。
 
 `captureCopperChests.py` 增加第十二组 GameTest：25 刻 / 132 点，64 种铜箱配对、原版玩家放置、变体同步、库存保留及传输。`playerPlace` 在参考端调用方块原版放置方法，在独立内核调用编辑器放置方法；普通 `stateId` 命令仍是原始状态编辑，二者不混用。详见 [铜箱说明](copperChests.md)。
+
+`captureBookshelves.py` 增加第十三组 GameTest：57 刻 / 11 点，书籍标签、操作次序、最后槽位读数、漏斗预检查及投掷器过滤，详见 [书架说明](bookshelves.md)。`exportItems.py` 同时从固定 JAR 导出书架物品标签。

@@ -12,7 +12,7 @@ export class SimulatorConnection extends EventTarget {
   cells = new Map<string, BlockCell>();
   states = new Map<number, BlockDef>();
   catalog: CatalogItem[] = [];
-  items: { name: string; maxStack: number }[] = [];
+  items: { name: string; maxStack: number; bookshelfBook?: boolean }[] = [];
   trace = new TraceHistory();
   connected = false;
   status: Status = { tick: 0, running: false, speed: 20, eventsPerSecond: 0, blocks: 0, pending: 0, updates: 0, events: 0, storageBytes: 0, traceDropped: 0, pauseReason: '', pendingActions: [], actionsDropped: 0, revision: 0, probes: [], canUndo: false, canRedo: false, name: '连接本地内核…' };

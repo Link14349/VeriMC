@@ -136,6 +136,15 @@ try:
     command('undo');assert command('inspect',pos=[0,0,0])['name']=='minecraft:exposed_copper_chest'
     command('load',project=opened)
     restored=command('inspect',pos=[0,0,0]);assert restored['inventory']==copper['inventory'] and restored['runtime']['viewers']==1
+    command('new');command('place',pos=[0,0,0],name='chiseled_bookshelf')
+    command('probe',pos=[0,0,0],name='lastSlot')
+    command('stimulate',pos=[0,0,0],stimulus={'inventory':[{'slot':5,'item':'book','count':1},{'slot':0,'item':'knowledge_book','count':1}]})
+    shelf=command('inspect',pos=[0,0,0]);assert shelf['analog']==1 and shelf['inventorySize']==6
+    assert command('stimulate',pos=[0,0,0],stimulus={'inventory':[{'slot':2,'item':'stone','count':1}]})['type']=='error'
+    command('stimulate',pos=[0,0,0],stimulus={'inventory':[{'slot':0,'count':0},{'slot':5,'count':0}]})
+    empty=command('inspect',pos=[0,0,0]);assert empty['analog']==6 and empty['inventory']==[]
+    shelfSnapshot=command('save',checkpoint=True);command('new');command('load',project=shelfSnapshot)
+    assert command('inspect',pos=[0,0,0])['analog']==6
     assert client.frames > 0
     print(f'PASS: HTTP host validation, binary frames ({client.frames}), circuit editing, delay, probes, VCD, atomic errors, native undo/redo, checkpoint import')
 finally:

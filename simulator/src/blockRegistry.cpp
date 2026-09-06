@@ -45,7 +45,7 @@ BlockRegistry::BlockRegistry(const std::string& path) {
     if (itemData.at("version") != "26.2") throw std::runtime_error("Item registry version mismatch");
     for (const auto& row : itemData.at("items")) {
         itemNames.emplace(row.at("name").get<std::string>(), static_cast<std::uint32_t>(items.size()));
-        items.push_back({row.at("name"), row.at("maxStack")});
+        items.push_back({row.at("name"), row.at("maxStack"), row.value("bookshelfBook",false)});
     }
     const Json data = Json::parse(file);
     if (data.at("version") != "26.2") throw std::runtime_error("需要 Minecraft 26.2 数据");
@@ -63,6 +63,7 @@ BlockRegistry::BlockRegistry(const std::string& path) {
         if (typeInfo.className == "CopperChestBlock" || typeInfo.className == "WeatheringCopperChestBlock") typeInfo.supportLevel = "implemented";
         if (typeInfo.device == Device::hopper) typeInfo.supportLevel = "implemented";
         if (typeInfo.device == Device::dropper) typeInfo.supportLevel = "partial";
+        if (typeInfo.className == "ChiseledBookShelfBlock") typeInfo.supportLevel = "partial";
         if (typeInfo.device == Device::target) typeInfo.supportLevel = "externalStimulus";
         if (typeInfo.device == Device::rail || typeInfo.device == Device::poweredRail || typeInfo.device == Device::activatorRail) typeInfo.supportLevel = "implemented";
         if (typeInfo.device == Device::detectorRail) typeInfo.supportLevel = "externalStimulus";
@@ -122,7 +123,11 @@ std::uint32_t BlockRegistry::itemId(const std::string& name) const {
 }
 Json BlockRegistry::itemCatalog() const {
     Json result = Json::array();
-    for (const auto& info : items) result.push_back({{"name", info.name}, {"maxStack", info.maxStack}});
+    for (const auto& info : items) {
+        Json row{{"name", info.name}, {"maxStack", info.maxStack}};
+        if(info.bookshelfBook) row["bookshelfBook"]=true;
+        result.push_back(std::move(row));
+    }
     return result;
 }
 StateId BlockRegistry::state(const std::string& name, const Json& props) const {

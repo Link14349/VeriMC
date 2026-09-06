@@ -180,7 +180,7 @@ int main() {
         try { restored.loadProject(invalid); } catch (...) { threw = true; }
         expect(threw && before == restored.saveProject("before", true), "invalid batch import changed world");
     });
-    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers", "java26_2Hoppers", "java26_2Torches", "java26_2Rails", "java26_2TickBatches", "java26_2Tripwire", "java26_2Buttons", "java26_2Droppers", "java26_2Targets", "java26_2CopperChests"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
+    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers", "java26_2Hoppers", "java26_2Torches", "java26_2Rails", "java26_2TickBatches", "java26_2Tripwire", "java26_2Buttons", "java26_2Droppers", "java26_2Targets", "java26_2CopperChests", "java26_2Bookshelves"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
         std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/../tests/fixtures/" + fixtureName + ".json"); expect(static_cast<bool>(file), "missing vanilla reference fixture");
         auto fixture = Json::parse(file); auto origin = fixture["origin"].get<BlockPos>(); Simulator s(r);
         auto absolute = [&](const Json& p) { auto pos = p.get<BlockPos>(); return BlockPos{origin.x + pos.x, origin.y + pos.y, origin.z + pos.z}; };
@@ -440,6 +440,35 @@ int main() {
             expect(sim->viewerCount(second)==0,"unrelated replacement kept old viewer state");
         }
         expect(s.saveProject("copper",true)==restored.saveProject("copper",true),"copper conversion diverged after checkpoint");
+    });
+    test("bookshelf edits retain operation order, last-slot history and atomic validation", [&] {
+        Simulator s(r);const BlockPos pos{0,0,0};s.place(pos,r.state("chiseled_bookshelf"));
+        s.stimulate(pos,{{"inventory",Json::array({{{"slot",5},{"item","book"},{"count",1}},{{"slot",0},{"item","knowledge_book"},{"count",1}}})}});
+        expect(s.analogOutput(pos)==1 && r.property(s.world.get(pos),"slot_5_occupied")=="true","bookshelf reordered edits or lost occupied state");
+        const auto before=s.saveProject("shelf",true);
+        for(const auto& inventory:std::vector<Json>{Json::array({{{"slot",2},{"item","book"},{"count",1}},{{"slot",3},{"item","stone"},{"count",1}}}),Json::array({{{"slot",1},{"item","book"},{"count",2}}})}) {
+            bool threw=false;try{s.stimulate(pos,{{"inventory",inventory}});}catch(...){threw=true;}
+            expect(threw && s.saveProject("shelf",true)==before,"invalid bookshelf batch partially modified slots");
+        }
+        s.stimulate(pos,{{"inventory",Json::array({{{"slot",0},{"count",0}},{{"slot",5},{"count",0}}})}});
+        expect(s.inventoryJson(pos).empty() && s.analogOutput(pos)==6,"empty shelf forgot last interaction");
+        s.stimulate(pos,{{"inventory",Json::array({{{"slot",2},{"count",0}}})}});expect(s.analogOutput(pos)==6,"removing empty slot changed history");
+        auto saved=s.saveProject("emptyShelf",true);Simulator restored(r);restored.loadProject(saved);
+        expect(saved==restored.saveProject("emptyShelf",true),"empty shelf checkpoint lost history");
+        auto invalid=saved;invalid["blockData"][0]["values"]["lastInteractedSlot"]=6;bool threw=false;
+        try{restored.loadProject(invalid);}catch(...){threw=true;}
+        expect(threw && restored.saveProject("emptyShelf",true)==saved,"invalid shelf checkpoint was not atomic");
+    });
+    test("blocked bookshelf extraction sleeps without changing history and wakes on capacity", [&] {
+        Simulator s(r);s.place({0,1,0},r.state("chiseled_bookshelf"));s.place({0,0,0},r.state("hopper",{{"facing","east"}}));
+        s.stimulate({0,1,0},{{"inventory",Json::array({{{"slot",0},{"item","book"},{"count",1}},{{"slot",5},{"item","enchanted_book"},{"count",1}}})}});
+        Json filled=Json::array();for(int i=0;i<5;++i) filled.push_back({{"slot",i},{"item","stone"},{"count",63}});
+        s.stimulate({0,0,0},{{"inventory",filled}});s.advanceTo(10000);
+        expect(s.analogOutput({0,1,0})==6 && s.pendingEvents()==0 && s.statistics.scheduledEvents==1,"failed precheck changed shelf or kept idle polling");
+        s.stimulate({0,0,0},{{"inventory",Json::array({{{"slot",1},{"count",0}}})}});auto saved=s.saveProject("blockedShelf",true);Simulator restored(r);restored.loadProject(saved);
+        s.advanceTo(10001);restored.advanceTo(10001);
+        expect(s.analogOutput({0,1,0})==1 && s.inventoryJson({0,0,0})[1]["item"]=="minecraft:book","shelf failed to wake and extract first book");
+        expect(s.saveProject("shelf",true)==restored.saveProject("shelf",true),"shelf/hopper checkpoint diverged");
     });
     test("invalid inventory edits reject the whole batch", [&] {
         Simulator s(r); s.place({0,0,0},r.state("barrel")); auto before=s.saveProject("before",true);

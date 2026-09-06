@@ -200,7 +200,7 @@ bool Simulator::stimulateDevice(BlockPos pos, const Json& stimulus) {
         }
         return true;
     }
-    if (state.device == Device::container || state.device == Device::hopper || state.device == Device::dropper) {
+    if (state.device == Device::container || state.device == Device::hopper || state.device == Device::dropper || isBookshelf(id)) {
         if (stimulus.contains("inventory")) setInventory(pos, stimulus.at("inventory"));
         else if (state.device == Device::container && stimulus.contains("viewers")) setViewers(pos, integerInRange(stimulus, "viewers", 0, 1000000));
         else throw std::invalid_argument("Container input requires inventory or viewers");
@@ -261,6 +261,10 @@ void Simulator::validateRuntime(BlockPos pos) const {
     const auto& data = runtime.at(pos);
     if (!data.values.is_object() || data.output < 0 || data.output > 15) throw std::invalid_argument("无效器件内部状态");
     auto device = at(pos).device;
+    if(isBookshelf(world.get(pos)) && data.values.contains("lastInteractedSlot")) {
+        const auto& last=data.values.at("lastInteractedSlot");
+        if(!last.is_number_integer() || last < -1 || last > 5) throw std::invalid_argument("无效雕纹书架最后操作槽位");
+    }
     if (device == Device::detectorRail) normalizeCarts(data.values.value("carts", Json::array()));
     if (device == Device::tripwire) integerInRange(data.values, "entities", 0, 1000000);
     if (device == Device::button) {

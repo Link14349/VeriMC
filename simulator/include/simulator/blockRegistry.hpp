@@ -6,7 +6,7 @@
 
 namespace simulator {
 struct PropertyInfo { std::vector<std::string> values; std::uint32_t stride{}; };
-struct ItemInfo { std::string name; std::uint16_t maxStack{}; };
+struct ItemInfo { std::string name; std::uint16_t maxStack{}; bool bookshelfBook{}; };
 struct BlockType {
     std::string name, className;
     StateId defaultState{}, firstState{};

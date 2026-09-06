@@ -51,3 +51,5 @@ body{overflow-x:auto}
 .targetFace svg{display:block;width:100%;height:100%}
 .targetPresets{display:flex;gap:7px;margin:8px 0}
 .targetPresets button{flex:1;border:1px solid var(--border);border-radius:5px;padding:5px}
+
+.inventoryGrid.bookshelfGrid{grid-template-columns:repeat(3,minmax(0,1fr))}

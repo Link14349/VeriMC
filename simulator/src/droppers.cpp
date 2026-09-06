@@ -26,6 +26,7 @@ void Simulator::dispenseDropper(BlockPos pos) {
     }
     const bool wasEmpty = inventoryEmpty(targetPos);
     for (const auto& target : targets) {
+        if(!canInsertStack(target,stack)) continue;
         auto existing = stackAt(target);
         if (existing.count && (existing.item != stack.item || existing.count >= registry.item(existing.item).maxStack)) continue;
         writeStack(target, {stack.item, static_cast<std::uint16_t>(existing.count + 1)}, existing.count == 0);

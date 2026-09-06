@@ -180,6 +180,10 @@ private:
     void validateRuntime(BlockPos pos) const;
     struct InventorySlot { BlockPos pos; std::size_t index; };
     std::size_t inventorySize(StateId state) const;
+    bool isBookshelf(StateId state) const;
+    bool canInsertStack(const InventorySlot& slot, ItemStack stack) const;
+    bool canExtractStack(const InventorySlot& slot, BlockPos into) const;
+    void updateBookshelfSlot(const InventorySlot& slot);
     std::vector<InventorySlot> containerSlots(BlockPos pos, bool ignoreBlockage = true) const;
     Direction chestConnection(StateId state) const;
     bool isCopperChest(StateId state) const;
@@ -189,7 +193,7 @@ private:
     ItemStack stackAt(const InventorySlot& slot) const;
     int containerAnalog(BlockPos pos) const;
     void setInventory(BlockPos pos, const Json& slots, bool combined = true, bool notify = true);
-    std::vector<std::pair<std::size_t, ItemStack>> parseInventory(const Json& values, std::size_t size) const;
+    std::vector<std::pair<std::size_t, ItemStack>> parseInventory(const Json& values, std::size_t size, bool preserveOrder = false) const;
     void setViewers(BlockPos pos, int viewers);
     void writeStack(const InventorySlot& slot, ItemStack stack, bool notify = true);
     void containerChanged(BlockPos pos);

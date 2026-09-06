@@ -1,0 +1,7104 @@
+{
+  "endTick": 56,
+  "commands": [
+    {
+      "tick": 0,
+      "pos": [
+        3,
+        2,
+        3
+      ],
+      "stateId": 2407
+    },
+    {
+      "tick": 0,
+      "pos": [
+        4,
+        1,
+        3
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        4,
+        2,
+        3
+      ],
+      "stateId": 11272
+    },
+    {
+      "tick": 0,
+      "pos": [
+        3,
+        2,
+        3
+      ],
+      "stimulus": {
+        "inventory": [
+          {
+            "slot": 5,
+            "item": "book",
+            "count": 1
+          },
+          {
+            "slot": 0,
+            "item": "knowledge_book",
+            "count": 1
+          }
+        ]
+      }
+    },
+    {
+      "tick": 2,
+      "pos": [
+        3,
+        2,
+        3
+      ],
+      "stimulus": {
+        "inventory": [
+          {
+            "slot": 1,
+            "item": "book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "written_book",
+            "count": 1
+          },
+          {
+            "slot": 3,
+            "item": "enchanted_book",
+            "count": 1
+          },
+          {
+            "slot": 4,
+            "item": "writable_book",
+            "count": 1
+          },
+          {
+            "slot": 5,
+            "item": "knowledge_book",
+            "count": 1
+          }
+        ]
+      }
+    },
+    {
+      "tick": 4,
+      "pos": [
+        3,
+        2,
+        3
+      ],
+      "stimulus": {
+        "inventory": [
+          {
+            "slot": 2,
+            "item": "book",
+            "count": 0
+          }
+        ]
+      }
+    },
+    {
+      "tick": 6,
+      "pos": [
+        3,
+        2,
+        3
+      ],
+      "stimulus": {
+        "inventory": [
+          {
+            "slot": 5,
+            "item": "book",
+            "count": 0
+          },
+          {
+            "slot": 4,
+            "item": "book",
+            "count": 0
+          },
+          {
+            "slot": 3,
+            "item": "book",
+            "count": 0
+          },
+          {
+            "slot": 2,
+            "item": "book",
+            "count": 0
+          },
+          {
+            "slot": 1,
+            "item": "book",
+            "count": 0
+          },
+          {
+            "slot": 0,
+            "item": "book",
+            "count": 0
+          }
+        ]
+      }
+    },
+    {
+      "tick": 7,
+      "pos": [
+        3,
+        2,
+        3
+      ],
+      "stimulus": {
+        "inventory": [
+          {
+            "slot": 5,
+            "item": "book",
+            "count": 0
+          }
+        ]
+      }
+    },
+    {
+      "tick": 0,
+      "pos": [
+        3,
+        2,
+        10
+      ],
+      "stateId": 11317
+    },
+    {
+      "tick": 0,
+      "pos": [
+        4,
+        2,
+        10
+      ],
+      "stateId": 2599
+    },
+    {
+      "tick": 0,
+      "pos": [
+        3,
+        2,
+        10
+      ],
+      "stimulus": {
+        "inventory": [
+          {
+            "slot": 0,
+            "item": "stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "book",
+            "count": 7
+          }
+        ]
+      }
+    },
+    {
+      "tick": 0,
+      "pos": [
+        5,
+        1,
+        10
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        5,
+        2,
+        10
+      ],
+      "stateId": 11272
+    },
+    {
+      "tick": 0,
+      "pos": [
+        12,
+        3,
+        10
+      ],
+      "stateId": 2407
+    },
+    {
+      "tick": 0,
+      "pos": [
+        12,
+        2,
+        10
+      ],
+      "stateId": 11317
+    },
+    {
+      "tick": 0,
+      "pos": [
+        12,
+        3,
+        10
+      ],
+      "stimulus": {
+        "inventory": [
+          {
+            "slot": 0,
+            "item": "book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 5,
+            "item": "enchanted_book",
+            "count": 1
+          }
+        ]
+      }
+    },
+    {
+      "tick": 0,
+      "pos": [
+        12,
+        2,
+        10
+      ],
+      "stimulus": {
+        "inventory": [
+          {
+            "slot": 0,
+            "item": "stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "stone",
+            "count": 63
+          },
+          {
+            "slot": 2,
+            "item": "stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "stone",
+            "count": 63
+          }
+        ]
+      }
+    },
+    {
+      "tick": 7,
+      "pos": [
+        12,
+        2,
+        10
+      ],
+      "stimulus": {
+        "inventory": [
+          {
+            "slot": 1,
+            "item": "book",
+            "count": 0
+          }
+        ]
+      }
+    },
+    {
+      "tick": 16,
+      "pos": [
+        12,
+        2,
+        10
+      ],
+      "stimulus": {
+        "inventory": [
+          {
+            "slot": 1,
+            "item": "book",
+            "count": 0
+          }
+        ]
+      }
+    },
+    {
+      "tick": 0,
+      "pos": [
+        13,
+        2,
+        10
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        13,
+        3,
+        10
+      ],
+      "stateId": 11272
+    },
+    {
+      "tick": 0,
+      "pos": [
+        22,
+        2,
+        10
+      ],
+      "stateId": 11435
+    },
+    {
+      "tick": 0,
+      "pos": [
+        23,
+        2,
+        10
+      ],
+      "stateId": 2407
+    },
+    {
+      "tick": 0,
+      "pos": [
+        22,
+        2,
+        10
+      ],
+      "stimulus": {
+        "inventory": [
+          {
+            "slot": 0,
+            "item": "stone",
+            "count": 2
+          }
+        ]
+      }
+    },
+    {
+      "tick": 1,
+      "pos": [
+        21,
+        2,
+        10
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 2,
+      "pos": [
+        21,
+        2,
+        10
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 6,
+      "pos": [
+        22,
+        2,
+        10
+      ],
+      "stimulus": {
+        "inventory": [
+          {
+            "slot": 0,
+            "item": "knowledge_book",
+            "count": 1
+          }
+        ]
+      }
+    },
+    {
+      "tick": 7,
+      "pos": [
+        21,
+        2,
+        10
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 8,
+      "pos": [
+        21,
+        2,
+        10
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 0,
+      "pos": [
+        24,
+        1,
+        10
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        24,
+        2,
+        10
+      ],
+      "stateId": 11272
+    }
+  ],
+  "watch": [
+    [
+      3,
+      2,
+      3
+    ],
+    [
+      4,
+      2,
+      3
+    ],
+    [
+      3,
+      2,
+      10
+    ],
+    [
+      4,
+      2,
+      10
+    ],
+    [
+      5,
+      2,
+      10
+    ],
+    [
+      12,
+      3,
+      10
+    ],
+    [
+      12,
+      2,
+      10
+    ],
+    [
+      13,
+      3,
+      10
+    ],
+    [
+      22,
+      2,
+      10
+    ],
+    [
+      23,
+      2,
+      10
+    ],
+    [
+      24,
+      2,
+      10
+    ]
+  ],
+  "reference": "Minecraft Java 26.2 GameTest, nonexperimental redstone",
+  "origin": [
+    14800727,
+    -58,
+    -10706771
+  ],
+  "frames": [
+    {
+      "tick": 0,
+      "states": [
+        2374,
+        11272,
+        11317,
+        2599,
+        11272,
+        2366,
+        11317,
+        11272,
+        11435,
+        2407,
+        11272
+      ],
+      "analogs": [
+        1,
+        0,
+        1,
+        0,
+        0,
+        6,
+        14,
+        0,
+        1,
+        0,
+        0
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 7
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        []
+      ]
+    },
+    {
+      "tick": 1,
+      "states": [
+        2374,
+        11272,
+        11317,
+        2567,
+        11272,
+        2366,
+        11317,
+        11272,
+        11434,
+        2407,
+        11272
+      ],
+      "analogs": [
+        1,
+        0,
+        1,
+        1,
+        0,
+        6,
+        14,
+        0,
+        1,
+        0,
+        0
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 6
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        []
+      ]
+    },
+    {
+      "tick": 2,
+      "states": [
+        2344,
+        11271,
+        11317,
+        2567,
+        11272,
+        2366,
+        11317,
+        11272,
+        11435,
+        2407,
+        11272
+      ],
+      "analogs": [
+        6,
+        1,
+        1,
+        1,
+        0,
+        6,
+        14,
+        0,
+        1,
+        0,
+        0
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:written_book",
+            "count": 1
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:writable_book",
+            "count": 1
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 6
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        []
+      ]
+    },
+    {
+      "tick": 3,
+      "states": [
+        2344,
+        11271,
+        11317,
+        2567,
+        11271,
+        2366,
+        11317,
+        11272,
+        11435,
+        2407,
+        11272
+      ],
+      "analogs": [
+        6,
+        1,
+        1,
+        1,
+        1,
+        6,
+        14,
+        0,
+        1,
+        0,
+        0
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:written_book",
+            "count": 1
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:writable_book",
+            "count": 1
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 6
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        []
+      ]
+    },
+    {
+      "tick": 4,
+      "states": [
+        2352,
+        11271,
+        11317,
+        2567,
+        11271,
+        2366,
+        11317,
+        11272,
+        11435,
+        2407,
+        11272
+      ],
+      "analogs": [
+        3,
+        6,
+        1,
+        1,
+        1,
+        6,
+        14,
+        0,
+        1,
+        0,
+        0
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:writable_book",
+            "count": 1
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 6
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        []
+      ]
+    },
+    {
+      "tick": 5,
+      "states": [
+        2352,
+        11271,
+        11317,
+        2567,
+        11271,
+        2366,
+        11317,
+        11272,
+        11435,
+        2407,
+        11272
+      ],
+      "analogs": [
+        3,
+        6,
+        1,
+        1,
+        1,
+        6,
+        14,
+        0,
+        1,
+        0,
+        0
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:writable_book",
+            "count": 1
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 6
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        []
+      ]
+    },
+    {
+      "tick": 6,
+      "states": [
+        2407,
+        11271,
+        11317,
+        2567,
+        11271,
+        2366,
+        11317,
+        11272,
+        11435,
+        2407,
+        11272
+      ],
+      "analogs": [
+        1,
+        3,
+        1,
+        1,
+        1,
+        6,
+        14,
+        0,
+        2,
+        0,
+        0
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 6
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        [],
+        []
+      ]
+    },
+    {
+      "tick": 7,
+      "states": [
+        2407,
+        11271,
+        11317,
+        2567,
+        11271,
+        2366,
+        11317,
+        11272,
+        11434,
+        2407,
+        11272
+      ],
+      "analogs": [
+        1,
+        3,
+        1,
+        1,
+        1,
+        6,
+        12,
+        0,
+        2,
+        0,
+        0
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 6
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        [],
+        []
+      ]
+    },
+    {
+      "tick": 8,
+      "states": [
+        2407,
+        11271,
+        11317,
+        2567,
+        11271,
+        2398,
+        11317,
+        11272,
+        11435,
+        2407,
+        11272
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        12,
+        0,
+        2,
+        0,
+        0
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 6
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 2,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        [],
+        []
+      ]
+    },
+    {
+      "tick": 9,
+      "states": [
+        2407,
+        11271,
+        11317,
+        2551,
+        11271,
+        2398,
+        11317,
+        11272,
+        11435,
+        2407,
+        11272
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        2,
+        1,
+        1,
+        12,
+        0,
+        2,
+        0,
+        0
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 5
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 2,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        [],
+        []
+      ]
+    },
+    {
+      "tick": 10,
+      "states": [
+        2407,
+        11271,
+        11317,
+        2551,
+        11271,
+        2398,
+        11317,
+        11271,
+        11435,
+        2407,
+        11272
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        2,
+        1,
+        1,
+        12,
+        1,
+        2,
+        0,
+        0
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 5
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 2,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        [],
+        []
+      ]
+    },
+    {
+      "tick": 11,
+      "states": [
+        2407,
+        11271,
+        11317,
+        2551,
+        11271,
+        2398,
+        11317,
+        11271,
+        11435,
+        2375,
+        11272
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        2,
+        2,
+        1,
+        12,
+        1,
+        0,
+        1,
+        0
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 5
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 2,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 12,
+      "states": [
+        2407,
+        11271,
+        11317,
+        2551,
+        11271,
+        2398,
+        11317,
+        11271,
+        11435,
+        2375,
+        11272
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        2,
+        2,
+        1,
+        12,
+        1,
+        0,
+        1,
+        0
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 5
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 2,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 13,
+      "states": [
+        2407,
+        11271,
+        11317,
+        2551,
+        11271,
+        2398,
+        11317,
+        11271,
+        11435,
+        2375,
+        11271
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        2,
+        2,
+        1,
+        12,
+        1,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 5
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 2,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 14,
+      "states": [
+        2407,
+        11271,
+        11317,
+        2551,
+        11271,
+        2398,
+        11317,
+        11271,
+        11435,
+        2375,
+        11271
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        2,
+        2,
+        1,
+        12,
+        1,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 5
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 2,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 15,
+      "states": [
+        2407,
+        11271,
+        11317,
+        2551,
+        11271,
+        2398,
+        11317,
+        11271,
+        11435,
+        2375,
+        11271
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        2,
+        2,
+        1,
+        12,
+        1,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 5
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 2,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 16,
+      "states": [
+        2407,
+        11271,
+        11317,
+        2551,
+        11271,
+        2398,
+        11317,
+        11271,
+        11435,
+        2375,
+        11271
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        2,
+        2,
+        1,
+        12,
+        1,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 5
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 2,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 17,
+      "states": [
+        2407,
+        11271,
+        11317,
+        2543,
+        11271,
+        2406,
+        11317,
+        11271,
+        11435,
+        2375,
+        11271
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        3,
+        2,
+        3,
+        14,
+        1,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 4
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 18,
+      "states": [
+        2407,
+        11271,
+        11317,
+        2543,
+        11271,
+        2406,
+        11317,
+        11271,
+        11435,
+        2375,
+        11271
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        3,
+        2,
+        3,
+        14,
+        1,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 4
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 19,
+      "states": [
+        2407,
+        11271,
+        11317,
+        2543,
+        11271,
+        2406,
+        11317,
+        11271,
+        11435,
+        2375,
+        11271
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        3,
+        3,
+        3,
+        14,
+        3,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 4
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 20,
+      "states": [
+        2407,
+        11271,
+        11317,
+        2543,
+        11271,
+        2406,
+        11317,
+        11271,
+        11435,
+        2375,
+        11271
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        3,
+        3,
+        3,
+        14,
+        3,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 4
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 21,
+      "states": [
+        2407,
+        11271,
+        11317,
+        2543,
+        11271,
+        2406,
+        11317,
+        11271,
+        11435,
+        2375,
+        11271
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        3,
+        3,
+        3,
+        14,
+        3,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 4
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 22,
+      "states": [
+        2407,
+        11271,
+        11317,
+        2543,
+        11271,
+        2406,
+        11317,
+        11271,
+        11435,
+        2375,
+        11271
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        3,
+        3,
+        3,
+        14,
+        3,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 4
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 23,
+      "states": [
+        2407,
+        11271,
+        11317,
+        2543,
+        11271,
+        2406,
+        11317,
+        11271,
+        11435,
+        2375,
+        11271
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        3,
+        3,
+        3,
+        14,
+        3,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 4
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 24,
+      "states": [
+        2407,
+        11271,
+        11317,
+        2543,
+        11271,
+        2406,
+        11317,
+        11271,
+        11435,
+        2375,
+        11271
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        3,
+        3,
+        3,
+        14,
+        3,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 4
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 25,
+      "states": [
+        2407,
+        11271,
+        11317,
+        2539,
+        11271,
+        2406,
+        11317,
+        11271,
+        11435,
+        2375,
+        11271
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        4,
+        3,
+        3,
+        14,
+        3,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 3
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 26,
+      "states": [
+        2407,
+        11271,
+        11317,
+        2539,
+        11271,
+        2406,
+        11317,
+        11271,
+        11435,
+        2375,
+        11271
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        4,
+        3,
+        3,
+        14,
+        3,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 3
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 27,
+      "states": [
+        2407,
+        11271,
+        11317,
+        2539,
+        11271,
+        2406,
+        11317,
+        11271,
+        11435,
+        2375,
+        11271
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        4,
+        4,
+        3,
+        14,
+        3,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 3
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 28,
+      "states": [
+        2407,
+        11271,
+        11317,
+        2539,
+        11271,
+        2406,
+        11317,
+        11271,
+        11435,
+        2375,
+        11271
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        4,
+        4,
+        3,
+        14,
+        3,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 3
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 29,
+      "states": [
+        2407,
+        11271,
+        11317,
+        2539,
+        11271,
+        2406,
+        11317,
+        11271,
+        11435,
+        2375,
+        11271
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        4,
+        4,
+        3,
+        14,
+        3,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 3
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 30,
+      "states": [
+        2407,
+        11271,
+        11317,
+        2539,
+        11271,
+        2406,
+        11317,
+        11271,
+        11435,
+        2375,
+        11271
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        4,
+        4,
+        3,
+        14,
+        3,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 3
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 31,
+      "states": [
+        2407,
+        11271,
+        11317,
+        2539,
+        11271,
+        2406,
+        11317,
+        11271,
+        11435,
+        2375,
+        11271
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        4,
+        4,
+        3,
+        14,
+        3,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 3
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 32,
+      "states": [
+        2407,
+        11271,
+        11317,
+        2539,
+        11271,
+        2406,
+        11317,
+        11271,
+        11435,
+        2375,
+        11271
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        4,
+        4,
+        3,
+        14,
+        3,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 3
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 33,
+      "states": [
+        2407,
+        11271,
+        11317,
+        2537,
+        11271,
+        2406,
+        11317,
+        11271,
+        11435,
+        2375,
+        11271
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        5,
+        4,
+        3,
+        14,
+        3,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 2
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 34,
+      "states": [
+        2407,
+        11271,
+        11317,
+        2537,
+        11271,
+        2406,
+        11317,
+        11271,
+        11435,
+        2375,
+        11271
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        5,
+        4,
+        3,
+        14,
+        3,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 2
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 35,
+      "states": [
+        2407,
+        11271,
+        11317,
+        2537,
+        11271,
+        2406,
+        11317,
+        11271,
+        11435,
+        2375,
+        11271
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        5,
+        5,
+        3,
+        14,
+        3,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 2
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 36,
+      "states": [
+        2407,
+        11271,
+        11317,
+        2537,
+        11271,
+        2406,
+        11317,
+        11271,
+        11435,
+        2375,
+        11271
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        5,
+        5,
+        3,
+        14,
+        3,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 2
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 37,
+      "states": [
+        2407,
+        11271,
+        11317,
+        2537,
+        11271,
+        2406,
+        11317,
+        11271,
+        11435,
+        2375,
+        11271
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        5,
+        5,
+        3,
+        14,
+        3,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 2
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 38,
+      "states": [
+        2407,
+        11271,
+        11317,
+        2537,
+        11271,
+        2406,
+        11317,
+        11271,
+        11435,
+        2375,
+        11271
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        5,
+        5,
+        3,
+        14,
+        3,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 2
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 39,
+      "states": [
+        2407,
+        11271,
+        11317,
+        2537,
+        11271,
+        2406,
+        11317,
+        11271,
+        11435,
+        2375,
+        11271
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        5,
+        5,
+        3,
+        14,
+        3,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 2
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 40,
+      "states": [
+        2407,
+        11271,
+        11317,
+        2537,
+        11271,
+        2406,
+        11317,
+        11271,
+        11435,
+        2375,
+        11271
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        5,
+        5,
+        3,
+        14,
+        3,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 2
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 41,
+      "states": [
+        2407,
+        11271,
+        11317,
+        2536,
+        11271,
+        2406,
+        11317,
+        11271,
+        11435,
+        2375,
+        11271
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        6,
+        5,
+        3,
+        14,
+        3,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 42,
+      "states": [
+        2407,
+        11271,
+        11317,
+        2536,
+        11271,
+        2406,
+        11317,
+        11271,
+        11435,
+        2375,
+        11271
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        6,
+        5,
+        3,
+        14,
+        3,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 43,
+      "states": [
+        2407,
+        11271,
+        11317,
+        2536,
+        11271,
+        2406,
+        11317,
+        11271,
+        11435,
+        2375,
+        11271
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        6,
+        6,
+        3,
+        14,
+        3,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 44,
+      "states": [
+        2407,
+        11271,
+        11317,
+        2536,
+        11271,
+        2406,
+        11317,
+        11271,
+        11435,
+        2375,
+        11271
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        6,
+        6,
+        3,
+        14,
+        3,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 45,
+      "states": [
+        2407,
+        11271,
+        11317,
+        2536,
+        11271,
+        2406,
+        11317,
+        11271,
+        11435,
+        2375,
+        11271
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        6,
+        6,
+        3,
+        14,
+        3,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 46,
+      "states": [
+        2407,
+        11271,
+        11317,
+        2536,
+        11271,
+        2406,
+        11317,
+        11271,
+        11435,
+        2375,
+        11271
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        6,
+        6,
+        3,
+        14,
+        3,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 47,
+      "states": [
+        2407,
+        11271,
+        11317,
+        2536,
+        11271,
+        2406,
+        11317,
+        11271,
+        11435,
+        2375,
+        11271
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        6,
+        6,
+        3,
+        14,
+        3,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 48,
+      "states": [
+        2407,
+        11271,
+        11317,
+        2536,
+        11271,
+        2406,
+        11317,
+        11271,
+        11435,
+        2375,
+        11271
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        6,
+        6,
+        3,
+        14,
+        3,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 49,
+      "states": [
+        2407,
+        11271,
+        11317,
+        2536,
+        11271,
+        2406,
+        11317,
+        11271,
+        11435,
+        2375,
+        11271
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        6,
+        6,
+        3,
+        14,
+        3,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 50,
+      "states": [
+        2407,
+        11271,
+        11317,
+        2536,
+        11271,
+        2406,
+        11317,
+        11271,
+        11435,
+        2375,
+        11271
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        6,
+        6,
+        3,
+        14,
+        3,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 51,
+      "states": [
+        2407,
+        11271,
+        11317,
+        2536,
+        11271,
+        2406,
+        11317,
+        11271,
+        11435,
+        2375,
+        11271
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        6,
+        6,
+        3,
+        14,
+        3,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 52,
+      "states": [
+        2407,
+        11271,
+        11317,
+        2536,
+        11271,
+        2406,
+        11317,
+        11271,
+        11435,
+        2375,
+        11271
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        6,
+        6,
+        3,
+        14,
+        3,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 53,
+      "states": [
+        2407,
+        11271,
+        11317,
+        2536,
+        11271,
+        2406,
+        11317,
+        11271,
+        11435,
+        2375,
+        11271
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        6,
+        6,
+        3,
+        14,
+        3,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 54,
+      "states": [
+        2407,
+        11271,
+        11317,
+        2536,
+        11271,
+        2406,
+        11317,
+        11271,
+        11435,
+        2375,
+        11271
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        6,
+        6,
+        3,
+        14,
+        3,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 55,
+      "states": [
+        2407,
+        11271,
+        11317,
+        2536,
+        11271,
+        2406,
+        11317,
+        11271,
+        11435,
+        2375,
+        11271
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        6,
+        6,
+        3,
+        14,
+        3,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 56,
+      "states": [
+        2407,
+        11271,
+        11317,
+        2536,
+        11271,
+        2406,
+        11317,
+        11271,
+        11435,
+        2375,
+        11271
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        6,
+        6,
+        3,
+        14,
+        3,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:book",
+            "count": 1
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:book",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 5,
+            "item": "minecraft:enchanted_book",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 63
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 63
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:knowledge_book",
+            "count": 1
+          }
+        ],
+        []
+      ]
+    }
+  ]
+}

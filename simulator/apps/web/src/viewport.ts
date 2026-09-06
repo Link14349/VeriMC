@@ -190,6 +190,17 @@ export class CircuitViewport {
         part([.5,.24,.5],[.8,.16,.8],0x465155);
         for (const edge of [.14,.86]) { part([edge,.48,.5],[.12,.38,.84],0x9ba7a8); part([.5,.48,edge],[.6,.38,.12],0x9ba7a8); }
       }
+    } else if (name === 'chiseled_bookshelf') {
+      const v=directionVectors[facing];part([.5,.5,.5],[.98,.98,.98],0xa18c65);
+      for(let slot=0;slot<6;++slot) {
+        const side=(slot%3-1)*.29,height=slot<3 ? .73 : .27;
+        const center: [number,number,number]=[.5+v[0]*.5+v[2]*side,height,.5+v[2]*.5-v[0]*side];
+        part(center,[v[0] ? .014 : .24,.35,v[2] ? .014 : .24],0x4c4a3e);
+        if(p[`slot_${slot}_occupied`]==='true') {
+          center[0]+=v[0]*.009;center[2]+=v[2]*.009;
+          part(center,[v[0] ? .02 : .16,.29,v[2] ? .02 : .16],[0x855e51,0x819073,0x8b718b][slot%3]);
+        }
+      }
     } else if (name === 'dropper') {
       const v = directionVectors[facing];
       part([.5,.5,.5],[.99,.99,.99],0x778184);

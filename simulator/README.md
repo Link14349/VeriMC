@@ -48,6 +48,8 @@ python3 simulator/runSimulator.py --no-build
 
 八种铜箱支持跨变体配对、去蜡与氧化程度同步，转换保留库存，具体规则见 [铜箱说明](docs/copperChests.md)。
 
+雕纹书架支持六槽书籍、最后操作槽位读数，以及漏斗/投掷器传输；清空后保留读数，详见 [书架说明](docs/bookshelves.md)。
+
 ## 验证
 
 ```sh

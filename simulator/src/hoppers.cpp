@@ -50,12 +50,18 @@ bool Simulator::inventoryFull(BlockPos pos) const {
 }
 
 void Simulator::writeStack(const InventorySlot& slot, ItemStack stack, bool notify) {
+    const auto id=world.get(slot.pos);
+    const bool bookshelf=isBookshelf(id), occupied=bookshelf && stackAt(slot).count>0;
     auto& inventory = runtime[slot.pos].inventory;
-    inventory.resize(inventorySize(world.get(slot.pos)));
+    inventory.resize(inventorySize(id));
     inventory[slot.index] = stack.count ? stack : ItemStack{};
+    if(bookshelf) {
+        if(occupied || stack.count) updateBookshelfSlot(slot);
+        return;
+    }
     // Base containers call setChanged from setItem/removeItem. Hopper overrides
     // deliberately omit it; the transfer code notifies at its original points.
-    if (notify && at(slot.pos).device != Device::hopper) runtimeChanged(slot.pos);
+    if (notify && registry[id].device != Device::hopper) runtimeChanged(slot.pos);
 }
 
 void Simulator::containerChanged(BlockPos pos) {
@@ -70,11 +76,13 @@ bool Simulator::transferItem(BlockPos from, BlockPos to, bool pulling) {
     for (const auto& source : sourceSlots) {
         auto original = stackAt(source);
         if (!original.count) continue;
+        if(pulling && !canExtractStack(source,to)) continue;
         auto remaining = original;
         --remaining.count;
         writeStack(source, remaining);
         bool targetWasEmpty = inventoryEmpty(to);
         for (const auto& target : targetSlots) {
+            if(!canInsertStack(target,original)) continue;
             auto stack = stackAt(target);
             if (stack.count && (stack.item != original.item || stack.count >= registry.item(stack.item).maxStack)) continue;
             writeStack(target, {original.item, static_cast<std::uint16_t>(stack.count + 1)}, stack.count == 0);
@@ -116,6 +124,10 @@ void Simulator::tickHopper(const ScheduledEvent& event) {
         // Failed extraction from ordinary containers can still issue comparator
         // updates on remove/restore. Preserve those observable repeated calls.
         retryExtraction = !pulled && at(source).device != Device::hopper && !inventoryEmpty(source);
+        if(retryExtraction && isBookshelf(world.get(source))) {
+            retryExtraction=false;
+            for(const auto& slot:containerSlots(source)) if(stackAt(slot).count && canExtractStack(slot,event.pos)) {retryExtraction=true;break;}
+        }
         moved = pulled || moved;
     }
     if (moved) {
