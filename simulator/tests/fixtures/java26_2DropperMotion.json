@@ -1,0 +1,1157 @@
+{
+  "reference": "Minecraft Java 26.2 DropperBlock.dispenseFrom; RNG reset immediately before each isolated call; entity not ticked",
+  "cases": [
+    {
+      "seedBits": "0",
+      "facing": "down",
+      "source": [
+        3747695,
+        -55,
+        -5763627
+      ],
+      "position": [
+        3747695.5,
+        -55.325,
+        -5763626.5
+      ],
+      "positionBits": [
+        "414c97b7c0000000",
+        "c04ba9999999999a",
+        "c155fc8aa0000000"
+      ],
+      "velocity": [
+        0.030729861269604128,
+        0.1313110608779959,
+        -0.03723823370580472
+      ],
+      "velocityBits": [
+        "3f9f77a614a77e0c",
+        "3fc0cecd04097ab7",
+        "bfa310e3c7dabeb3"
+      ],
+      "randomState": 277208248579770,
+      "remaining": 1,
+      "count": 1
+    },
+    {
+      "seedBits": "0",
+      "facing": "up",
+      "source": [
+        3747695,
+        -55,
+        -5763627
+      ],
+      "position": [
+        3747695.5,
+        -53.925,
+        -5763626.5
+      ],
+      "positionBits": [
+        "414c97b7c0000000",
+        "c04af66666666666",
+        "c155fc8aa0000000"
+      ],
+      "velocity": [
+        0.030729861269604128,
+        0.1313110608779959,
+        -0.03723823370580472
+      ],
+      "velocityBits": [
+        "3f9f77a614a77e0c",
+        "3fc0cecd04097ab7",
+        "bfa310e3c7dabeb3"
+      ],
+      "randomState": 277208248579770,
+      "remaining": 1,
+      "count": 1
+    },
+    {
+      "seedBits": "0",
+      "facing": "north",
+      "source": [
+        3747695,
+        -55,
+        -5763627
+      ],
+      "position": [
+        3747695.5,
+        -54.65625,
+        -5763627.2
+      ],
+      "positionBits": [
+        "414c97b7c0000000",
+        "c04b540000000000",
+        "c155fc8acccccccd"
+      ],
+      "velocity": [
+        0.030729861269604128,
+        0.1313110608779959,
+        -0.3203823325845108
+      ],
+      "velocityBits": [
+        "3f9f77a614a77e0c",
+        "3fc0cecd04097ab7",
+        "bfd48124e62aaab5"
+      ],
+      "randomState": 277208248579770,
+      "remaining": 1,
+      "count": 1
+    },
+    {
+      "seedBits": "0",
+      "facing": "south",
+      "source": [
+        3747695,
+        -55,
+        -5763627
+      ],
+      "position": [
+        3747695.5,
+        -54.65625,
+        -5763625.8
+      ],
+      "positionBits": [
+        "414c97b7c0000000",
+        "c04b540000000000",
+        "c155fc8a73333333"
+      ],
+      "velocity": [
+        0.030729861269604128,
+        0.1313110608779959,
+        0.2459058651729014
+      ],
+      "velocityBits": [
+        "3f9f77a614a77e0c",
+        "3fc0cecd04097ab7",
+        "3fcf79d7e867f611"
+      ],
+      "randomState": 277208248579770,
+      "remaining": 1,
+      "count": 1
+    },
+    {
+      "seedBits": "0",
+      "facing": "west",
+      "source": [
+        3747695,
+        -55,
+        -5763627
+      ],
+      "position": [
+        3747694.8,
+        -54.65625,
+        -5763626.5
+      ],
+      "positionBits": [
+        "414c97b766666666",
+        "c04b540000000000",
+        "c155fc8aa0000000"
+      ],
+      "velocity": [
+        -0.252414237609102,
+        0.1313110608779959,
+        -0.03723823370580472
+      ],
+      "velocityBits": [
+        "bfd0278e0be4dafe",
+        "3fc0cecd04097ab7",
+        "bfa310e3c7dabeb3"
+      ],
+      "randomState": 277208248579770,
+      "remaining": 1,
+      "count": 1
+    },
+    {
+      "seedBits": "0",
+      "facing": "east",
+      "source": [
+        3747695,
+        -55,
+        -5763627
+      ],
+      "position": [
+        3747696.2,
+        -54.65625,
+        -5763626.5
+      ],
+      "positionBits": [
+        "414c97b81999999a",
+        "c04b540000000000",
+        "c155fc8aa0000000"
+      ],
+      "velocity": [
+        0.31387396014831026,
+        0.1313110608779959,
+        -0.03723823370580472
+      ],
+      "velocityBits": [
+        "3fd41682ce79cac0",
+        "3fc0cecd04097ab7",
+        "bfa310e3c7dabeb3"
+      ],
+      "randomState": 277208248579770,
+      "remaining": 1,
+      "count": 1
+    },
+    {
+      "seedBits": "1",
+      "facing": "down",
+      "source": [
+        3747695,
+        -55,
+        -5763627
+      ],
+      "position": [
+        3747695.5,
+        -55.325,
+        -5763626.5
+      ],
+      "positionBits": [
+        "414c97b7c0000000",
+        "c04ba9999999999a",
+        "c155fc8aa0000000"
+      ],
+      "velocity": [
+        0.03836954477629285,
+        0.19463821060403863,
+        -7.072081256037795E-4
+      ],
+      "velocityBits": [
+        "3fa3a52c47f40301",
+        "3fc8e9e7a68c53c4",
+        "bf472c7de2adf48c"
+      ],
+      "randomState": 264548589551637,
+      "remaining": 1,
+      "count": 1
+    },
+    {
+      "seedBits": "1",
+      "facing": "up",
+      "source": [
+        3747695,
+        -55,
+        -5763627
+      ],
+      "position": [
+        3747695.5,
+        -53.925,
+        -5763626.5
+      ],
+      "positionBits": [
+        "414c97b7c0000000",
+        "c04af66666666666",
+        "c155fc8aa0000000"
+      ],
+      "velocity": [
+        0.03836954477629285,
+        0.19463821060403863,
+        -7.072081256037795E-4
+      ],
+      "velocityBits": [
+        "3fa3a52c47f40301",
+        "3fc8e9e7a68c53c4",
+        "bf472c7de2adf48c"
+      ],
+      "randomState": 264548589551637,
+      "remaining": 1,
+      "count": 1
+    },
+    {
+      "seedBits": "1",
+      "facing": "north",
+      "source": [
+        3747695,
+        -55,
+        -5763627
+      ],
+      "position": [
+        3747695.5,
+        -54.65625,
+        -5763627.2
+      ],
+      "positionBits": [
+        "414c97b7c0000000",
+        "c04b540000000000",
+        "c155fc8acccccccd"
+      ],
+      "velocity": [
+        0.03836954477629285,
+        0.19463821060403863,
+        -0.2107545297582287
+      ],
+      "velocityBits": [
+        "3fa3a52c47f40301",
+        "3fc8e9e7a68c53c4",
+        "bfcafa012265d157"
+      ],
+      "randomState": 264548589551637,
+      "remaining": 1,
+      "count": 1
+    },
+    {
+      "seedBits": "1",
+      "facing": "south",
+      "source": [
+        3747695,
+        -55,
+        -5763627
+      ],
+      "position": [
+        3747695.5,
+        -54.65625,
+        -5763625.8
+      ],
+      "positionBits": [
+        "414c97b7c0000000",
+        "c04b540000000000",
+        "c155fc8a73333333"
+      ],
+      "velocity": [
+        0.03836954477629285,
+        0.19463821060403863,
+        0.2093401135070211
+      ],
+      "velocityBits": [
+        "3fa3a52c47f40301",
+        "3fc8e9e7a68c53c4",
+        "3fcacba826a0756d"
+      ],
+      "randomState": 264548589551637,
+      "remaining": 1,
+      "count": 1
+    },
+    {
+      "seedBits": "1",
+      "facing": "west",
+      "source": [
+        3747695,
+        -55,
+        -5763627
+      ],
+      "position": [
+        3747694.8,
+        -54.65625,
+        -5763626.5
+      ],
+      "positionBits": [
+        "414c97b766666666",
+        "c04b540000000000",
+        "c155fc8aa0000000"
+      ],
+      "velocity": [
+        -0.17167777685633206,
+        0.19463821060403863,
+        -7.072081256037795E-4
+      ],
+      "velocityBits": [
+        "bfc5f989928622a2",
+        "3fc8e9e7a68c53c4",
+        "bf472c7de2adf48c"
+      ],
+      "randomState": 264548589551637,
+      "remaining": 1,
+      "count": 1
+    },
+    {
+      "seedBits": "1",
+      "facing": "east",
+      "source": [
+        3747695,
+        -55,
+        -5763627
+      ],
+      "position": [
+        3747696.2,
+        -54.65625,
+        -5763626.5
+      ],
+      "positionBits": [
+        "414c97b81999999a",
+        "c04b540000000000",
+        "c155fc8aa0000000"
+      ],
+      "velocity": [
+        0.24841686640891775,
+        0.19463821060403863,
+        -7.072081256037795E-4
+      ],
+      "velocityBits": [
+        "3fcfcc1fb6802422",
+        "3fc8e9e7a68c53c4",
+        "bf472c7de2adf48c"
+      ],
+      "randomState": 264548589551637,
+      "remaining": 1,
+      "count": 1
+    },
+    {
+      "seedBits": "ffffffffffffffff",
+      "facing": "down",
+      "source": [
+        3747695,
+        -55,
+        -5763627
+      ],
+      "position": [
+        3747695.5,
+        -55.325,
+        -5763626.5
+      ],
+      "positionBits": [
+        "414c97b7c0000000",
+        "c04ba9999999999a",
+        "c155fc8aa0000000"
+      ],
+      "velocity": [
+        -0.005453622252401463,
+        0.23542848603376149,
+        0.024822244184177514
+      ],
+      "velocityBits": [
+        "bf765689938036ad",
+        "3fce22854807e902",
+        "3f996b009beffe54"
+      ],
+      "randomState": 23185370954643,
+      "remaining": 1,
+      "count": 1
+    },
+    {
+      "seedBits": "ffffffffffffffff",
+      "facing": "up",
+      "source": [
+        3747695,
+        -55,
+        -5763627
+      ],
+      "position": [
+        3747695.5,
+        -53.925,
+        -5763626.5
+      ],
+      "positionBits": [
+        "414c97b7c0000000",
+        "c04af66666666666",
+        "c155fc8aa0000000"
+      ],
+      "velocity": [
+        -0.005453622252401463,
+        0.23542848603376149,
+        0.024822244184177514
+      ],
+      "velocityBits": [
+        "bf765689938036ad",
+        "3fce22854807e902",
+        "3f996b009beffe54"
+      ],
+      "randomState": 23185370954643,
+      "remaining": 1,
+      "count": 1
+    },
+    {
+      "seedBits": "ffffffffffffffff",
+      "facing": "north",
+      "source": [
+        3747695,
+        -55,
+        -5763627
+      ],
+      "position": [
+        3747695.5,
+        -54.65625,
+        -5763627.2
+      ],
+      "positionBits": [
+        "414c97b7c0000000",
+        "c04b540000000000",
+        "c155fc8acccccccd"
+      ],
+      "velocity": [
+        -0.005453622252401463,
+        0.23542848603376149,
+        -0.21913395661259055
+      ],
+      "velocityBits": [
+        "bf765689938036ad",
+        "3fce22854807e902",
+        "bfcc0c94dc8c0d6a"
+      ],
+      "randomState": 23185370954643,
+      "remaining": 1,
+      "count": 1
+    },
+    {
+      "seedBits": "ffffffffffffffff",
+      "facing": "south",
+      "source": [
+        3747695,
+        -55,
+        -5763627
+      ],
+      "position": [
+        3747695.5,
+        -54.65625,
+        -5763625.8
+      ],
+      "positionBits": [
+        "414c97b7c0000000",
+        "c04b540000000000",
+        "c155fc8a73333333"
+      ],
+      "velocity": [
+        -0.005453622252401463,
+        0.23542848603376149,
+        0.26877844498094555
+      ],
+      "velocityBits": [
+        "bf765689938036ad",
+        "3fce22854807e902",
+        "3fd133aa81c4067f"
+      ],
+      "randomState": 23185370954643,
+      "remaining": 1,
+      "count": 1
+    },
+    {
+      "seedBits": "ffffffffffffffff",
+      "facing": "west",
+      "source": [
+        3747695,
+        -55,
+        -5763627
+      ],
+      "position": [
+        3747694.8,
+        -54.65625,
+        -5763626.5
+      ],
+      "positionBits": [
+        "414c97b766666666",
+        "c04b540000000000",
+        "c155fc8aa0000000"
+      ],
+      "velocity": [
+        -0.2494098230491695,
+        0.23542848603376149,
+        0.024822244184177514
+      ],
+      "velocityBits": [
+        "bfcfeca93ca60ee9",
+        "3fce22854807e902",
+        "3f996b009beffe54"
+      ],
+      "randomState": 23185370954643,
+      "remaining": 1,
+      "count": 1
+    },
+    {
+      "seedBits": "ffffffffffffffff",
+      "facing": "east",
+      "source": [
+        3747695,
+        -55,
+        -5763627
+      ],
+      "position": [
+        3747696.2,
+        -54.65625,
+        -5763626.5
+      ],
+      "positionBits": [
+        "414c97b81999999a",
+        "c04b540000000000",
+        "c155fc8aa0000000"
+      ],
+      "velocity": [
+        0.2385025785443666,
+        0.23542848603376149,
+        0.024822244184177514
+      ],
+      "velocityBits": [
+        "3fce8740a36e0b7f",
+        "3fce22854807e902",
+        "3f996b009beffe54"
+      ],
+      "randomState": 23185370954643,
+      "remaining": 1,
+      "count": 1
+    },
+    {
+      "seedBits": "8000000000000000",
+      "facing": "down",
+      "source": [
+        3747695,
+        -55,
+        -5763627
+      ],
+      "position": [
+        3747695.5,
+        -55.325,
+        -5763626.5
+      ],
+      "positionBits": [
+        "414c97b7c0000000",
+        "c04ba9999999999a",
+        "c155fc8aa0000000"
+      ],
+      "velocity": [
+        0.030729861269604128,
+        0.1313110608779959,
+        -0.03723823370580472
+      ],
+      "velocityBits": [
+        "3f9f77a614a77e0c",
+        "3fc0cecd04097ab7",
+        "bfa310e3c7dabeb3"
+      ],
+      "randomState": 277208248579770,
+      "remaining": 1,
+      "count": 1
+    },
+    {
+      "seedBits": "8000000000000000",
+      "facing": "up",
+      "source": [
+        3747695,
+        -55,
+        -5763627
+      ],
+      "position": [
+        3747695.5,
+        -53.925,
+        -5763626.5
+      ],
+      "positionBits": [
+        "414c97b7c0000000",
+        "c04af66666666666",
+        "c155fc8aa0000000"
+      ],
+      "velocity": [
+        0.030729861269604128,
+        0.1313110608779959,
+        -0.03723823370580472
+      ],
+      "velocityBits": [
+        "3f9f77a614a77e0c",
+        "3fc0cecd04097ab7",
+        "bfa310e3c7dabeb3"
+      ],
+      "randomState": 277208248579770,
+      "remaining": 1,
+      "count": 1
+    },
+    {
+      "seedBits": "8000000000000000",
+      "facing": "north",
+      "source": [
+        3747695,
+        -55,
+        -5763627
+      ],
+      "position": [
+        3747695.5,
+        -54.65625,
+        -5763627.2
+      ],
+      "positionBits": [
+        "414c97b7c0000000",
+        "c04b540000000000",
+        "c155fc8acccccccd"
+      ],
+      "velocity": [
+        0.030729861269604128,
+        0.1313110608779959,
+        -0.3203823325845108
+      ],
+      "velocityBits": [
+        "3f9f77a614a77e0c",
+        "3fc0cecd04097ab7",
+        "bfd48124e62aaab5"
+      ],
+      "randomState": 277208248579770,
+      "remaining": 1,
+      "count": 1
+    },
+    {
+      "seedBits": "8000000000000000",
+      "facing": "south",
+      "source": [
+        3747695,
+        -55,
+        -5763627
+      ],
+      "position": [
+        3747695.5,
+        -54.65625,
+        -5763625.8
+      ],
+      "positionBits": [
+        "414c97b7c0000000",
+        "c04b540000000000",
+        "c155fc8a73333333"
+      ],
+      "velocity": [
+        0.030729861269604128,
+        0.1313110608779959,
+        0.2459058651729014
+      ],
+      "velocityBits": [
+        "3f9f77a614a77e0c",
+        "3fc0cecd04097ab7",
+        "3fcf79d7e867f611"
+      ],
+      "randomState": 277208248579770,
+      "remaining": 1,
+      "count": 1
+    },
+    {
+      "seedBits": "8000000000000000",
+      "facing": "west",
+      "source": [
+        3747695,
+        -55,
+        -5763627
+      ],
+      "position": [
+        3747694.8,
+        -54.65625,
+        -5763626.5
+      ],
+      "positionBits": [
+        "414c97b766666666",
+        "c04b540000000000",
+        "c155fc8aa0000000"
+      ],
+      "velocity": [
+        -0.252414237609102,
+        0.1313110608779959,
+        -0.03723823370580472
+      ],
+      "velocityBits": [
+        "bfd0278e0be4dafe",
+        "3fc0cecd04097ab7",
+        "bfa310e3c7dabeb3"
+      ],
+      "randomState": 277208248579770,
+      "remaining": 1,
+      "count": 1
+    },
+    {
+      "seedBits": "8000000000000000",
+      "facing": "east",
+      "source": [
+        3747695,
+        -55,
+        -5763627
+      ],
+      "position": [
+        3747696.2,
+        -54.65625,
+        -5763626.5
+      ],
+      "positionBits": [
+        "414c97b81999999a",
+        "c04b540000000000",
+        "c155fc8aa0000000"
+      ],
+      "velocity": [
+        0.31387396014831026,
+        0.1313110608779959,
+        -0.03723823370580472
+      ],
+      "velocityBits": [
+        "3fd41682ce79cac0",
+        "3fc0cecd04097ab7",
+        "bfa310e3c7dabeb3"
+      ],
+      "randomState": 277208248579770,
+      "remaining": 1,
+      "count": 1
+    },
+    {
+      "seedBits": "7fffffffffffffff",
+      "facing": "down",
+      "source": [
+        3747695,
+        -55,
+        -5763627
+      ],
+      "position": [
+        3747695.5,
+        -55.325,
+        -5763626.5
+      ],
+      "positionBits": [
+        "414c97b7c0000000",
+        "c04ba9999999999a",
+        "c155fc8aa0000000"
+      ],
+      "velocity": [
+        -0.005453622252401463,
+        0.23542848603376149,
+        0.024822244184177514
+      ],
+      "velocityBits": [
+        "bf765689938036ad",
+        "3fce22854807e902",
+        "3f996b009beffe54"
+      ],
+      "randomState": 23185370954643,
+      "remaining": 1,
+      "count": 1
+    },
+    {
+      "seedBits": "7fffffffffffffff",
+      "facing": "up",
+      "source": [
+        3747695,
+        -55,
+        -5763627
+      ],
+      "position": [
+        3747695.5,
+        -53.925,
+        -5763626.5
+      ],
+      "positionBits": [
+        "414c97b7c0000000",
+        "c04af66666666666",
+        "c155fc8aa0000000"
+      ],
+      "velocity": [
+        -0.005453622252401463,
+        0.23542848603376149,
+        0.024822244184177514
+      ],
+      "velocityBits": [
+        "bf765689938036ad",
+        "3fce22854807e902",
+        "3f996b009beffe54"
+      ],
+      "randomState": 23185370954643,
+      "remaining": 1,
+      "count": 1
+    },
+    {
+      "seedBits": "7fffffffffffffff",
+      "facing": "north",
+      "source": [
+        3747695,
+        -55,
+        -5763627
+      ],
+      "position": [
+        3747695.5,
+        -54.65625,
+        -5763627.2
+      ],
+      "positionBits": [
+        "414c97b7c0000000",
+        "c04b540000000000",
+        "c155fc8acccccccd"
+      ],
+      "velocity": [
+        -0.005453622252401463,
+        0.23542848603376149,
+        -0.21913395661259055
+      ],
+      "velocityBits": [
+        "bf765689938036ad",
+        "3fce22854807e902",
+        "bfcc0c94dc8c0d6a"
+      ],
+      "randomState": 23185370954643,
+      "remaining": 1,
+      "count": 1
+    },
+    {
+      "seedBits": "7fffffffffffffff",
+      "facing": "south",
+      "source": [
+        3747695,
+        -55,
+        -5763627
+      ],
+      "position": [
+        3747695.5,
+        -54.65625,
+        -5763625.8
+      ],
+      "positionBits": [
+        "414c97b7c0000000",
+        "c04b540000000000",
+        "c155fc8a73333333"
+      ],
+      "velocity": [
+        -0.005453622252401463,
+        0.23542848603376149,
+        0.26877844498094555
+      ],
+      "velocityBits": [
+        "bf765689938036ad",
+        "3fce22854807e902",
+        "3fd133aa81c4067f"
+      ],
+      "randomState": 23185370954643,
+      "remaining": 1,
+      "count": 1
+    },
+    {
+      "seedBits": "7fffffffffffffff",
+      "facing": "west",
+      "source": [
+        3747695,
+        -55,
+        -5763627
+      ],
+      "position": [
+        3747694.8,
+        -54.65625,
+        -5763626.5
+      ],
+      "positionBits": [
+        "414c97b766666666",
+        "c04b540000000000",
+        "c155fc8aa0000000"
+      ],
+      "velocity": [
+        -0.2494098230491695,
+        0.23542848603376149,
+        0.024822244184177514
+      ],
+      "velocityBits": [
+        "bfcfeca93ca60ee9",
+        "3fce22854807e902",
+        "3f996b009beffe54"
+      ],
+      "randomState": 23185370954643,
+      "remaining": 1,
+      "count": 1
+    },
+    {
+      "seedBits": "7fffffffffffffff",
+      "facing": "east",
+      "source": [
+        3747695,
+        -55,
+        -5763627
+      ],
+      "position": [
+        3747696.2,
+        -54.65625,
+        -5763626.5
+      ],
+      "positionBits": [
+        "414c97b81999999a",
+        "c04b540000000000",
+        "c155fc8aa0000000"
+      ],
+      "velocity": [
+        0.2385025785443666,
+        0.23542848603376149,
+        0.024822244184177514
+      ],
+      "velocityBits": [
+        "3fce8740a36e0b7f",
+        "3fce22854807e902",
+        "3f996b009beffe54"
+      ],
+      "randomState": 23185370954643,
+      "remaining": 1,
+      "count": 1
+    },
+    {
+      "seedBits": "123456789abcdef",
+      "facing": "down",
+      "source": [
+        3747695,
+        -55,
+        -5763627
+      ],
+      "position": [
+        3747695.5,
+        -55.325,
+        -5763626.5
+      ],
+      "positionBits": [
+        "414c97b7c0000000",
+        "c04ba9999999999a",
+        "c155fc8aa0000000"
+      ],
+      "velocity": [
+        0.021053533260626388,
+        0.25449031953488244,
+        0.05538926347017082
+      ],
+      "velocityBits": [
+        "3f958f0eb3474f56",
+        "3fd04991c3e3421c",
+        "3fac5bfb464ecd71"
+      ],
+      "randomState": 31189590928195,
+      "remaining": 1,
+      "count": 1
+    },
+    {
+      "seedBits": "123456789abcdef",
+      "facing": "up",
+      "source": [
+        3747695,
+        -55,
+        -5763627
+      ],
+      "position": [
+        3747695.5,
+        -53.925,
+        -5763626.5
+      ],
+      "positionBits": [
+        "414c97b7c0000000",
+        "c04af66666666666",
+        "c155fc8aa0000000"
+      ],
+      "velocity": [
+        0.021053533260626388,
+        0.25449031953488244,
+        0.05538926347017082
+      ],
+      "velocityBits": [
+        "3f958f0eb3474f56",
+        "3fd04991c3e3421c",
+        "3fac5bfb464ecd71"
+      ],
+      "randomState": 31189590928195,
+      "remaining": 1,
+      "count": 1
+    },
+    {
+      "seedBits": "123456789abcdef",
+      "facing": "north",
+      "source": [
+        3747695,
+        -55,
+        -5763627
+      ],
+      "position": [
+        3747695.5,
+        -54.65625,
+        -5763627.2
+      ],
+      "positionBits": [
+        "414c97b7c0000000",
+        "c04b540000000000",
+        "c155fc8acccccccd"
+      ],
+      "velocity": [
+        0.021053533260626388,
+        0.25449031953488244,
+        -0.19169154515805426
+      ],
+      "velocityBits": [
+        "3f958f0eb3474f56",
+        "3fd04991c3e3421c",
+        "bfc889593aafd07e"
+      ],
+      "randomState": 31189590928195,
+      "remaining": 1,
+      "count": 1
+    },
+    {
+      "seedBits": "123456789abcdef",
+      "facing": "south",
+      "source": [
+        3747695,
+        -55,
+        -5763627
+      ],
+      "position": [
+        3747695.5,
+        -54.65625,
+        -5763625.8
+      ],
+      "positionBits": [
+        "414c97b7c0000000",
+        "c04b540000000000",
+        "c155fc8a73333333"
+      ],
+      "velocity": [
+        0.021053533260626388,
+        0.25449031953488244,
+        0.3024700720983959
+      ],
+      "velocityBits": [
+        "3f958f0eb3474f56",
+        "3fd04991c3e3421c",
+        "3fd35bab6eeb9b9b"
+      ],
+      "randomState": 31189590928195,
+      "remaining": 1,
+      "count": 1
+    },
+    {
+      "seedBits": "123456789abcdef",
+      "facing": "west",
+      "source": [
+        3747695,
+        -55,
+        -5763627
+      ],
+      "position": [
+        3747694.8,
+        -54.65625,
+        -5763626.5
+      ],
+      "positionBits": [
+        "414c97b766666666",
+        "c04b540000000000",
+        "c155fc8aa0000000"
+      ],
+      "velocity": [
+        -0.22602727536759867,
+        0.25449031953488244,
+        0.05538926347017082
+      ],
+      "velocityBits": [
+        "bfccee7635da99ef",
+        "3fd04991c3e3421c",
+        "3fac5bfb464ecd71"
+      ],
+      "randomState": 31189590928195,
+      "remaining": 1,
+      "count": 1
+    },
+    {
+      "seedBits": "123456789abcdef",
+      "facing": "east",
+      "source": [
+        3747695,
+        -55,
+        -5763627
+      ],
+      "position": [
+        3747696.2,
+        -54.65625,
+        -5763626.5
+      ],
+      "positionBits": [
+        "414c97b81999999a",
+        "c04b540000000000",
+        "c155fc8aa0000000"
+      ],
+      "velocity": [
+        0.26813434188885144,
+        0.25449031953488244,
+        0.05538926347017082
+      ],
+      "velocityBits": [
+        "3fd1291cf15636e2",
+        "3fd04991c3e3421c",
+        "3fac5bfb464ecd71"
+      ],
+      "randomState": 31189590928195,
+      "remaining": 1,
+      "count": 1
+    }
+  ]
+}

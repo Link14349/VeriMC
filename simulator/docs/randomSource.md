@@ -2,7 +2,7 @@
 
 `LegacyRandom` 实现 Java 26.2 `LegacyRandomSource` / `BitRandomSource` 的 48 位线性同余运算，提供整数、有界整数、长整数、布尔、单/双精度浮点和三角分布。没有依赖 C++ 标准库随机分布的跨实现行为。
 
-原版 `Level.random` 经 `RandomSource.create()` 构造，使用此类算法；这不意味着所有世界和实体的随机源都相同。世界生成等其他随机源及高斯缓存尚未实现。此基础类当前未接入世界对象，不能把它的测试当成完整世界随机调用顺序的证明。
+原版 `Level.random` 经 `RandomSource.create()` 构造，使用此类算法；这不意味着所有世界和实体的随机源都相同。世界生成等其他随机源及高斯缓存尚未实现。当前已接入世界对象、投掷器选槽与物品初始弹出速度；声音等其他器件的随机消耗仍未补全，不能把局部测试当成完整世界随机调用顺序的证明。
 
 ## 语义与恢复
 
@@ -11,7 +11,7 @@
 - `nextLong` 对低 32 位有符号扩展后相加，不能直接拼接两个无符号整数。
 - 同一次方法内的多次取值显式依次执行，避免 C++ 表达式求值顺序改变抽样次序。
 - 使用无符号运算定义溢出，再通过 `bit_cast` 表达原版有符号结果。
-- 可读取、恢复内部 48 位状态与基础抽样次数；恢复前校验范围。尚无世界工程级随机状态字段。
+- 可读取、恢复内部 48 位状态与基础抽样次数；恢复前校验范围。工程保存 `randomSource.algorithm = "javaLegacy48"` 与十进制字符串 `seed`；快照额外保存数值 `state` 和字符串 `draws`，避免 JavaScript 对 64 位整数舍入。旧工程缺少该字段时使用种子 0。
 
 构建关闭浮点乘加融合，保留 Java 逐次乘法、加法舍入；Clang/GCC 使用 `-ffp-contract=off`，MSVC 配置 `/fp:strict`。目前实际验证平台为 Apple Clang 17，其他编译器仍需独立执行对照测试。
 
@@ -24,4 +24,4 @@ python3 simulator/tools/reference/runReferenceTool.py ExportRandom /绝对路径
 ctest --test-dir simulator/build --output-on-failure
 ```
 
-Release 与 ASAN/UBSAN 共 47 项测试通过，包括 6,000 次逐位随机对照、周期性恢复状态、错误参数不修改随机源，以及既有九组 GameTest。接下来需要把容器选槽、物品投放、声音和游戏事件相关随机消耗接入运行快照与重放，再声明相应器件的随机语义支持。
+Release 与 ASAN/UBSAN 共 51 项测试通过，包括 6,000 次逐位随机对照、周期性恢复、错误参数校验、十组 GameTest、600 次投掷器选槽和 36 次实际弹出。声音和游戏事件的完整随机消耗仍待实现，投掷器范围见 [投掷器说明](droppers.md)。

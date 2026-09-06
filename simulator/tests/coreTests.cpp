@@ -81,6 +81,75 @@ int main() {
             expect(index == run.at("events").size() && ticks.size() == run.at("remaining"), "collection limit or deferred callbacks differ");
         }
     });
+    test("dropper selection and random checkpoint agree with 600 original slot draws", [&] {
+        std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/../tests/fixtures/java26_2DropperSlots.json");
+        const auto fixture=Json::parse(file);
+        for (const auto& example:fixture.at("cases")) {
+            Simulator s(r); s.place({0,0,0},r.state("dropper",{{"facing","east"}})); s.place({1,0,0},r.state("barrel"));
+            s.setRandomSeed(std::stoull(example.at("seedBits").get<std::string>(),nullptr,16));
+            int index=0;
+            for (const auto& call:example.at("calls")) {
+                const int mask=call.at("mask"), chosen=call.at("slot"); Json inventory=Json::array();
+                for (int slot=0;slot<9;++slot) inventory.push_back({{"slot",slot},{"item","stone"},{"count",(mask&(1<<slot))?1:0}});
+                s.stimulate({0,0,0},{{"inventory",inventory}});s.place({-1,0,0},r.state("redstone_block"));s.advanceTo(s.currentTick+4);s.setBlock({-1,0,0},0);
+                int remaining=0;for(const auto& stack:s.inventoryJson({0,0,0}))remaining|=1<<stack.at("slot").get<int>();
+                expect(remaining==(chosen<0?mask:mask&~(1<<chosen)),"dropper chose a different slot");
+                auto snapshot=s.saveProject("dropper",true);
+                expect(snapshot["randomSource"]["state"]==call.at("state") && snapshot["randomSource"]["draws"]==std::to_string(call.at("draws").get<std::uint64_t>()),"dropper consumed different random draws");
+                if (++index%17==0) {Simulator restored(r);restored.loadProject(snapshot);s.restore(restored);}
+            }
+            auto before=s.saveProject("random",true), invalid=before;invalid["randomSource"]["seed"]="-1";bool threw=false;
+            try{s.loadProject(invalid);}catch(...){threw=true;}
+            expect(threw && s.saveProject("random",true)==before,"invalid random seed import was not atomic");
+        }
+    });
+    test("dropper external actions preserve paused batches, inventory and checkpoint continuation", [&] {
+        Simulator s(r);
+        for(int x : {0,8}) {
+            s.place({x,0,0},r.state("dropper",{{"facing","east"}}));
+            s.stimulate({x,0,0},{{"inventory",Json::array({{{"slot",0},{"item","stone"},{"count",2}}})}});
+            s.place({x-1,0,0},r.state("redstone_block"));
+        }
+        s.advanceTo(100);
+        expect(s.currentTick==4 && s.hasPendingActions() && s.pendingEvents()==1 && !s.faulted,"external output did not pause at atomic event boundary");
+        auto checkpoint=s.saveProject("actions",true); Simulator restored(r);restored.loadProject(checkpoint);
+        expect(checkpoint==restored.saveProject("actions",true),"pending action checkpoint changed");
+        for(auto* sim : {&s,&restored}) {
+            sim->breakRequested=false;expect(!sim->stepEvent() && sim->currentTick==4,"manual event bypassed pending output");
+            sim->breakRequested=false;expect(sim->advanceTo(100)==0 && sim->currentTick==4,"idle advance bypassed pending output");
+            bool threw=false;try{sim->saveProject();}catch(...){threw=true;}expect(threw,"design export silently discarded pending feedback");
+            auto action=sim->pendingActionsJson()[0];expect(action["count"]==1 && action["item"]=="minecraft:stone","wrong emitted stack");
+            expect(sim->inventoryJson(action["source"].get<BlockPos>())[0]["count"]==1,"emission failed to consume inventory");
+            sim->resolveAction(action["id"]);sim->breakRequested=false;sim->advanceActive();
+            expect(sim->currentTick==4 && sim->hasPendingActions() && sim->actionHistory().size()==2,"remaining batch was lost or ran past next output");
+            sim->resolveAction(sim->pendingActionsJson()[0]["id"]);sim->breakRequested=false;sim->advanceTo(5);
+            expect(!sim->hasPendingActions() && sim->currentTick==5,"resolved output did not resume");
+        }
+        expect(s.saveProject("actions",true)==restored.saveProject("actions",true),"random output diverged after checkpoint");
+        const auto before=s.saveProject("before",true);
+        for (const auto& patch : std::vector<Json>{{{"id",-1}},{{"id",1.5}},{{"kind","unknown"}},{{"count",0}},{{"item","minecraft:air"}},{{"velocity",Json::array({0,1})}},{{"tick",99}}}) {
+            auto bad=before;bad["environmentActions"][0].update(patch);bool threw=false;
+            try{s.loadProject(bad);}catch(...){threw=true;}
+            expect(threw && before==s.saveProject("before",true),"bad action import partially replaced world");
+        }
+    });
+    test("dropper emission matches original entity position, velocity bits and random state", [&] {
+        std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/../tests/fixtures/java26_2DropperMotion.json");
+        const auto fixture=Json::parse(file);
+        for(const auto& row:fixture.at("cases")) {
+            Simulator s(r);const auto pos=row.at("source").get<BlockPos>();const auto direction=parseDirection(row.at("facing"));
+            s.place(pos,r.state("dropper",{{"facing",row.at("facing")}}));
+            s.stimulate(pos,{{"inventory",Json::array({{{"slot",4},{"item","stone"},{"count",2}}})}});
+            s.setRandomSeed(std::stoull(row.at("seedBits").get<std::string>(),nullptr,16));
+            s.place(pos.relative(opposite(direction)),r.state("redstone_block"));s.advanceTo(4);
+            expect(s.hasPendingActions(),"dropper did not emit external item");
+            const auto action=s.pendingActionsJson()[0];
+            for(const auto* field:{"position","velocity"})for(std::size_t i=0;i<3;++i)
+                expect(std::bit_cast<std::uint64_t>(action[field][i].get<double>())==std::stoull(row[std::string(field)+"Bits"][i].get<std::string>(),nullptr,16),std::string("original dropper ")+field+" differs");
+            expect(s.saveProject("dropper",true)["randomSource"]["state"]==row.at("randomState"),"ejection consumed different world randomness");
+            expect(s.inventoryJson(pos)[0]["count"]==row.at("remaining") && action["count"]==row.at("count"),"emission inventory differs");
+        }
+    });
     test("block tick cap defers backlog and zero delay waits for next collection", [&] {
         BlockTicks ticks;
         for (std::uint64_t i = 0; i < 65537; ++i) ticks.schedule({1, 0, i, {static_cast<int>(i), 0, 0}, 1});
@@ -111,7 +180,7 @@ int main() {
         try { restored.loadProject(invalid); } catch (...) { threw = true; }
         expect(threw && before == restored.saveProject("before", true), "invalid batch import changed world");
     });
-    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers", "java26_2Hoppers", "java26_2Torches", "java26_2Rails", "java26_2TickBatches", "java26_2Tripwire", "java26_2Buttons"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
+    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers", "java26_2Hoppers", "java26_2Torches", "java26_2Rails", "java26_2TickBatches", "java26_2Tripwire", "java26_2Buttons", "java26_2Droppers"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
         std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/../tests/fixtures/" + fixtureName + ".json"); expect(static_cast<bool>(file), "missing vanilla reference fixture");
         auto fixture = Json::parse(file); auto origin = fixture["origin"].get<BlockPos>(); Simulator s(r);
         auto absolute = [&](const Json& p) { auto pos = p.get<BlockPos>(); return BlockPos{origin.x + pos.x, origin.y + pos.y, origin.z + pos.z}; };

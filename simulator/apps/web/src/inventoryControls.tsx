@@ -3,9 +3,9 @@ import { connection, posKey, type Pos, type BlockCell } from './api';
 import { shortName } from './blockLabels';
 
 type Stack = { slot: number; item: string; count: number };
-type Props = { pos: Pos; hopper?: boolean; cart?: boolean; command: (cmd: string, body?: Record<string, unknown>) => Promise<Record<string, unknown> | undefined> };
+type Props = { pos: Pos; hopper?: boolean; cart?: boolean; dropper?: boolean; command: (cmd: string, body?: Record<string, unknown>) => Promise<Record<string, unknown> | undefined> };
 
-export function InventoryControls({ pos, hopper = false, cart = false, command }: Props) {
+export function InventoryControls({ pos, hopper = false, cart = false, dropper = false, command }: Props) {
   const [slots, setSlots] = useState<Stack[]>([]), [size, setSize] = useState(cart ? 0 : 27), [slot, setSlot] = useState(0);
   const [item, setItem] = useState('minecraft:stone'), [count, setCount] = useState(64), [analog, setAnalog] = useState(0), [viewers, setViewers] = useState(0);
   const key = posKey(pos);
@@ -48,7 +48,7 @@ export function InventoryControls({ pos, hopper = false, cart = false, command }
     <label className="propertyRow"><span>数量 / {info?.maxStack ?? '—'}</span><input aria-label="物品数量" type="number" min={0} max={info?.maxStack ?? 99} value={count} onChange={e => setCount(Number(e.target.value))}/></label>
     <button className="wideButton accentOutline" onClick={() => update([{ slot, item, count }])}>写入所选槽位</button>
     <button className="wideButton" onClick={() => update([{ slot, item, count: 0 }])}>清空所选槽位</button>
-    {!hopper && !cart && <button className="wideButton" onClick={() => command('stimulate', { pos, stimulus: { viewers: viewers ? 0 : 1 } })}>{viewers ? '关闭容器' : '打开容器'}</button>}
-    <p className="subtleText">{cart ? '探测铁轨定期通知比较器读取矿车库存。' : hopper ? '先推出，再从上方吸入；红石供电时锁定。' : `当前查看人数 ${viewers}。`}支持默认物品；自定义组件仍在开发中。</p>
+    {!hopper && !cart && !dropper && <button className="wideButton" onClick={() => command('stimulate', { pos, stimulus: { viewers: viewers ? 0 : 1 } })}>{viewers ? '关闭容器' : '打开容器'}</button>}
+    <p className="subtleText">{cart ? '探测铁轨定期通知比较器读取矿车库存。' : hopper ? '先推出，再从上方吸入；红石供电时锁定。' : dropper ? '通电后 4 gt 随机选槽，向前方容器转移一件。向外抛出时记录初始位置与速度，暂停等待环境反馈。' : `当前查看人数 ${viewers}。`}支持默认物品；自定义组件仍在开发中。</p>
   </div>;
 }

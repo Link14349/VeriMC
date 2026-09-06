@@ -42,3 +42,8 @@ body{overflow-x:auto}
   .viewportTools{left:9px}
   .viewportBottom{left:9px;font-size:7px}
 }
+
+.actionControls{border-left:3px solid #d6a44e;background:rgba(214,164,78,.06)}
+.actionControls strong{display:block;font-size:12px;margin-top:9px;overflow-wrap:anywhere}
+.actionControls .subtleText{overflow-wrap:anywhere}
+.actionControls .wideButton{white-space:normal;height:auto;min-height:30px;padding:7px 5px}

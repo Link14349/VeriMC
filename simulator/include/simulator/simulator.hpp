@@ -2,6 +2,7 @@
 #include "blockRegistry.hpp"
 #include "world.hpp"
 #include "blockTicks.hpp"
+#include "legacyRandom.hpp"
 #include <deque>
 #include <queue>
 #include <unordered_set>
@@ -25,6 +26,12 @@ public:
     const BlockRegistry& registry;
     World world;
     Tick currentTick{};
+    void setRandomSeed(std::uint64_t seed) { randomSeed = seed; worldRandom.setSeed(seed); }
+    bool hasPendingActions() const { return !pendingActionIds.empty(); }
+    Json pendingActionsJson() const;
+    const std::deque<Json>& actionHistory() const { return environmentActions; }
+    std::uint64_t actionHistoryDropped() const { return actionsDropped; }
+    void resolveAction(std::uint64_t id);
     Statistics statistics;
     bool breakRequested{};
     bool faulted{};
@@ -83,10 +90,19 @@ public:
     std::size_t estimatedBytes() const {
         auto bytes = world.storageBytes() + trace.size() * sizeof(TraceEdge) + runtime.size() * 512 + scheduled.size() * 128 + hoppers.size() * 96 + entityOrders.size() * 64 + blockTicks.estimatedBytes();
         for (const auto& [pos, data] : runtime) { (void)pos; bytes += data.inventory.capacity() * sizeof(ItemStack); }
-        return bytes + recentTorchToggles.size() * sizeof(TorchToggle) + torchToggleCounts.size() * 64;
+        return bytes + recentTorchToggles.size() * sizeof(TorchToggle) + torchToggleCounts.size() * 64 + environmentActions.size() * 2048;
     }
     const PistonMotion* motionAt(BlockPos pos) const { auto it = motions.find(pos); return it == motions.end() ? nullptr : &it->second; }
 private:
+    LegacyRandom worldRandom;
+    std::uint64_t randomSeed{};
+    void dispenseDropper(BlockPos pos);
+    std::deque<Json> environmentActions;
+    std::unordered_set<std::uint64_t> pendingActionIds;
+    std::uint64_t nextActionId{1}, actionsDropped{};
+    static constexpr std::size_t actionCapacity = 4096;
+    void recordAction(Json action);
+    void loadActions(const Json& data);
     std::size_t advance(Tick target, std::size_t eventBudget, std::chrono::microseconds wallBudget, bool fillIdle);
     enum class UpdateKind { neighbor, shape, multi };
     struct Update { UpdateKind kind; BlockPos pos; Direction direction{Direction::down}; StateId neighborState{}; int index{}, skip{-1}, depth{512}; unsigned flags{2}; };

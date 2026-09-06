@@ -219,7 +219,7 @@ void Simulator::onRemove(BlockPos p, StateId old) {
     case Device::pressurePlate: case Device::weightedPlate: if (s.powered || s.power > 0) { updateNeighbors(p, -1, old); updateNeighbors(p.relative(Direction::down), -1, old); } break;
     case Device::lightningRod: if (s.powered) updateNeighbors(p.relative(opposite(s.facing)), -1, old); break;
     case Device::lectern: if (s.powered) updateNeighbors(p.relative(Direction::down), -1, old); break;
-    case Device::container: case Device::hopper: updateComparatorNeighbors(p); break;
+    case Device::container: case Device::hopper: case Device::dropper: updateComparatorNeighbors(p); break;
     case Device::rail: case Device::poweredRail: case Device::activatorRail: case Device::detectorRail: removeRail(p, old); break;
     case Device::tripwire: updateTripwireSource(p, registry.withBool(old, "powered", true)); break;
     case Device::tripwireHook: removeTripwireHook(p, old); break;
@@ -357,6 +357,13 @@ void Simulator::refreshComparator(BlockPos p) {
 void Simulator::executeNeighbor(BlockPos p, StateId source) {
     auto id = world.get(p); const auto& s = registry[id];
     switch (s.device) {
+    case Device::dropper: {
+        bool powered = bestSignal(p) > 0 || bestSignal(p.relative(Direction::up)) > 0;
+        bool triggered = registry.property(id, "triggered") == "true";
+        if (powered && !triggered) { schedule(p, 4); setBlock(p, registry.withBool(id, "triggered", true), 2); }
+        else if (!powered && triggered) setBlock(p, registry.withBool(id, "triggered", false), 2);
+        break;
+    }
     case Device::wire: if (survives(p, id)) updateWire(p, id); else setBlock(p, 0); break;
     case Device::torch: case Device::wallTorch: if (s.lit == torchInput(p) && !blockTicks.willTick(p, s.type)) schedule(p, 2); break;
     case Device::repeater: if (diodeSideInput(p) == 0 && s.powered != (diodeInput(p) > 0) && !blockTicks.willTick(p, s.type)) schedule(p, static_cast<Tick>(s.delay) * 2, prioritizeDiode(p) ? -3 : s.powered ? -2 : -1); break;
@@ -426,6 +433,7 @@ void Simulator::executeTick(const ScheduledEvent& event) {
         break;
     }
     case Device::button: if (s.powered) updateButton(p); break;
+    case Device::dropper: dispenseDropper(p); break;
     case Device::target: setBlock(p, registry.with(id, "power", 0)); break;
     case Device::pressurePlate: case Device::weightedPlate: if (s.powered || s.power > 0) updatePressurePlate(p); break;
     case Device::lightningRod: setBlock(p, registry.withBool(id, "powered", false)); updateNeighbors(p.relative(opposite(s.facing)), -1, id); break;
@@ -438,6 +446,7 @@ void Simulator::executeTick(const ScheduledEvent& event) {
 }
 bool Simulator::stepEvent() {
     if (faulted) throw std::runtime_error("当前执行已中止，请从有效快照恢复");
+    if (hasPendingActions()) { breakRequested = true; pauseReason = "存在待处理的外部动作，请检查输出并提供环境反馈，或确认本次不反馈"; return false; }
     if (traceBlocked()) { breakRequested = true; pauseReason = "探针缓冲等待浏览器确认，仿真已暂停以保留全部边沿"; }
     pruneEvents();
     if (pendingEvents() == 0 || breakRequested) return false;
@@ -494,6 +503,7 @@ std::size_t Simulator::advanceActive(std::size_t eventBudget, std::chrono::micro
 }
 std::size_t Simulator::advance(Tick target, std::size_t eventBudget, std::chrono::microseconds wallBudget, bool fillIdle) {
     if (faulted) throw std::runtime_error("当前执行已中止，请从有效快照恢复");
+    if (hasPendingActions()) { breakRequested = true; pauseReason = "存在待处理的外部动作，请检查输出并提供环境反馈，或确认本次不反馈"; return 0; }
     if (target < currentTick) throw std::invalid_argument("不能倒退时间，请加载运行快照");
     if (traceBlocked()) { breakRequested = true; pauseReason = "探针缓冲等待浏览器确认，仿真已暂停以保留全部边沿"; return 0; }
     auto start = std::chrono::steady_clock::now(); std::size_t count = 0;
@@ -533,6 +543,8 @@ void Simulator::stimulate(BlockPos p, const Json& input) {
     throw std::invalid_argument("该器件尚不支持这类环境刺激");
 }
 void Simulator::clear() {
+    setRandomSeed(0);
+    environmentActions.clear(); pendingActionIds.clear(); nextActionId = 1; actionsDropped = 0;
     recentTorchToggles.clear(); torchToggleCounts.clear();
     world.clear(); runtime.clear(); motions.clear(); hoppers.clear(); entityOrders.clear(); nextEntityOrder = 0; scheduled = {}; scheduledKeys.clear(); blockTicks = {}; changes.clear(); currentTick = 0; nextOrder = 0; sequence = 0; currentPhase = 4;
     probes.clear(); probeDependencies.clear(); nextProbeId = 1; trace.clear(); traceDropped = 0; statistics = {}; breakRequested = false; faulted = false; pauseReason.clear(); ++revision;

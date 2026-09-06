@@ -4,7 +4,8 @@ export type BlockDef = { stateId: number; name: string; properties: Record<strin
 export type BlockCell = { pos: Pos; stateId: number; value: number; renderStateId: number; motion: number };
 export type CatalogItem = { name: string; defaultState: number; device: number; properties: Record<string, string[]>; supportLevel: string };
 export type Probe = { id: number; pos: Pos; name: string; value: number; mode: string; trigger: string };
-export type Status = { tick: number; running: boolean; speed: number; eventsPerSecond: number; blocks: number; pending: number; updates: number; events: number; storageBytes: number; traceDropped: number; pauseReason: string; revision: number; probes: Probe[]; canUndo: boolean; canRedo: boolean; name: string };
+export type EnvironmentAction = { id: number; tick: number; sequence: number; kind: 'itemEjected'; source: Pos; item: string; count: number; position: Pos; velocity: Pos; resolved: boolean };
+export type Status = { tick: number; running: boolean; speed: number; eventsPerSecond: number; blocks: number; pending: number; updates: number; events: number; storageBytes: number; traceDropped: number; pauseReason: string; pendingActions: EnvironmentAction[]; actionsDropped: number; revision: number; probes: Probe[]; canUndo: boolean; canRedo: boolean; name: string };
 type Reply = Record<string, unknown>;
 export const posKey = (p: Pos) => p.join(',');
 export class SimulatorConnection extends EventTarget {
@@ -14,7 +15,7 @@ export class SimulatorConnection extends EventTarget {
   items: { name: string; maxStack: number }[] = [];
   trace = new TraceHistory();
   connected = false;
-  status: Status = { tick: 0, running: false, speed: 20, eventsPerSecond: 0, blocks: 0, pending: 0, updates: 0, events: 0, storageBytes: 0, traceDropped: 0, pauseReason: '', revision: 0, probes: [], canUndo: false, canRedo: false, name: '连接本地内核…' };
+  status: Status = { tick: 0, running: false, speed: 20, eventsPerSecond: 0, blocks: 0, pending: 0, updates: 0, events: 0, storageBytes: 0, traceDropped: 0, pauseReason: '', pendingActions: [], actionsDropped: 0, revision: 0, probes: [], canUndo: false, canRedo: false, name: '连接本地内核…' };
   private socket?: WebSocket;
   private nextRequest = 1;
   private pending = new Map<number, { resolve: (value: Reply) => void; reject: (reason: Error) => void; timer: number }>();

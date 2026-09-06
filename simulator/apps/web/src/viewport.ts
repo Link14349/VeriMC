@@ -190,6 +190,11 @@ export class CircuitViewport {
         part([.5,.24,.5],[.8,.16,.8],0x465155);
         for (const edge of [.14,.86]) { part([edge,.48,.5],[.12,.38,.84],0x9ba7a8); part([.5,.48,edge],[.6,.38,.12],0x9ba7a8); }
       }
+    } else if (name === 'dropper') {
+      const v = directionVectors[facing];
+      part([.5,.5,.5],[.99,.99,.99],0x778184);
+      part([.5+v[0]*.498,.5+v[1]*.498,.5+v[2]*.498],[v[0] ? .012 : .79,v[1] ? .012 : .79,v[2] ? .012 : .79],0xa4adac);
+      part([.5+v[0]*.506,.5+v[1]*.506,.5+v[2]*.506],[v[0] ? .015 : .3,v[1] ? .015 : .3,v[2] ? .015 : .3],0x293236);
     } else if (name === 'hopper') {
       const tint = p.enabled === 'false' ? 0x596369 : 0x788487;
       for (const edge of [.0625,.9375]) { part([edge,.8,.5],[.125,.4,1],tint); part([.5,.8,edge],[.75,.4,.125],tint); }

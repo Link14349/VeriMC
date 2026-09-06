@@ -10,6 +10,12 @@ Json eventJson(const ScheduledEvent& e) {
 ScheduledEvent readEvent(const Json& row) {
     return {row.at("tick"), row.at("priority"), row.at("order"), row.at("pos").get<BlockPos>(), row.at("type"), row.value("phase", std::uint8_t{0}), row.value("data", std::uint64_t{0}), row.value("entityOrder", std::uint64_t{0})};
 }
+std::uint64_t unsignedDecimal(const Json& value) {
+    if (!value.is_string()) throw std::invalid_argument("随机种子和取样计数必须为十进制字符串");
+    const auto text = value.get<std::string>();
+    if (text.empty() || !std::all_of(text.begin(), text.end(), [](unsigned char c) { return c >= '0' && c <= '9'; })) throw std::invalid_argument("无效的无符号十进制字符串");
+    return std::stoull(text);
+}
 }
 std::unique_ptr<Simulator> Simulator::clone() const {
     auto result = std::make_unique<Simulator>(registry); result->restore(*this); return result;
@@ -17,6 +23,8 @@ std::unique_ptr<Simulator> Simulator::clone() const {
 void Simulator::restore(const Simulator& snapshot) {
     if (&registry != &snapshot.registry) throw std::invalid_argument("运行快照的注册表不匹配");
     world = snapshot.world; runtime = snapshot.runtime; motions = snapshot.motions; scheduled = snapshot.scheduled; scheduledKeys = snapshot.scheduledKeys;
+    worldRandom = snapshot.worldRandom; randomSeed = snapshot.randomSeed;
+    environmentActions = snapshot.environmentActions; pendingActionIds = snapshot.pendingActionIds; nextActionId = snapshot.nextActionId; actionsDropped = snapshot.actionsDropped;
     blockTicks = snapshot.blockTicks;
     hoppers = snapshot.hoppers; entityOrders = snapshot.entityOrders; nextEntityOrder = snapshot.nextEntityOrder;
     recentTorchToggles = snapshot.recentTorchToggles; torchToggleCounts = snapshot.torchToggleCounts;
@@ -28,8 +36,11 @@ void Simulator::restore(const Simulator& snapshot) {
 }
 Json Simulator::saveProject(const std::string& name, bool checkpoint) const {
     if (!checkpoint && !motions.empty()) throw std::invalid_argument("活塞正在运动，请导出运行快照，或等待动作完成后导出电路");
+    if (!checkpoint && hasPendingActions()) throw std::invalid_argument("仍有待处理的外部动作，请导出运行快照，或先确认环境反馈");
     Json data{{"format", "verimc.simulator"}, {"formatVersion", 1}, {"minecraftVersion", "26.2"}, {"edition", "java"}, {"kind", checkpoint ? "checkpoint" : "circuit"}, {"name", name}};
     data["profile"] = {{"experimentalRedstone", false}, {"naturalRandomTicks", false}, {"loadedRegionOnly", true}};
+    data["randomSource"] = {{"algorithm", "javaLegacy48"}, {"seed", std::to_string(randomSeed)}};
+    if (checkpoint) { data["randomSource"]["state"] = worldRandom.state(); data["randomSource"]["draws"] = std::to_string(worldRandom.drawCount()); }
     data["blocks"] = Json::array();
     for (const auto& cell : world.cells()) { auto block = registry.describe(cell.state); block.erase("stateId"); block["pos"] = cell.pos; data["blocks"].push_back(block); }
     data["probes"] = Json::array();
@@ -50,6 +61,7 @@ Json Simulator::saveProject(const std::string& name, bool checkpoint) const {
     for (const auto& [rank, pos] : orderedEntities) data["entityOrder"].push_back({{"pos", pos}, {"order", rank}});
     data["nextEntityOrder"] = nextEntityOrder;
     if (checkpoint) {
+        data["environmentActions"] = environmentActions; data["nextActionId"] = nextActionId; data["actionsDropped"] = actionsDropped;
         data["torchToggles"] = Json::array();
         for (const auto& toggle : recentTorchToggles) data["torchToggles"].push_back({{"pos", toggle.pos}, {"tick", toggle.tick}});
         data["faulted"] = faulted;
@@ -81,6 +93,16 @@ void Simulator::loadProject(const Json& data) {
     if (!checkpoint && data.at("kind") != "circuit") throw std::invalid_argument("未知工程类型");
     if (data.at("blocks").size() > 2000000) throw std::invalid_argument("工程超过 200 万方块限制");
     Simulator candidate(registry); candidate.traceCapacity = traceCapacity; candidate.traceAtomicReserve = traceAtomicReserve; candidate.updateBudget = updateBudget;
+    if (data.contains("randomSource")) {
+        const auto& random = data.at("randomSource");
+        if (random.at("algorithm") != "javaLegacy48") throw std::invalid_argument("尚未支持此随机算法");
+        candidate.setRandomSeed(unsignedDecimal(random.at("seed")));
+        if (checkpoint) {
+            const auto& state = random.at("state");
+            if (!state.is_number_integer() || state < 0 || state > ((1ULL << 48) - 1)) throw std::invalid_argument("无效随机源内部状态");
+            candidate.worldRandom.restore(state, unsignedDecimal(random.at("draws")));
+        }
+    }
     std::unordered_set<BlockPos, PosHash> occupied;
     for (const auto& row : data.at("blocks")) {
         auto p = row.at("pos").get<BlockPos>(); auto id = registry.state(row.at("name"), row.at("properties"));
@@ -185,6 +207,7 @@ void Simulator::loadProject(const Json& data) {
         for (const auto& e : data.at("trace")) candidate.trace.push_back({e.at(0), e.at(1), e.at(2), e.at(3)});
         candidate.traceDropped = data.at("traceDropped");
     }
+    if (checkpoint) candidate.loadActions(data);
     using std::swap;
     swap(world, candidate.world); swap(runtime, candidate.runtime); swap(motions, candidate.motions); swap(scheduled, candidate.scheduled); swap(scheduledKeys, candidate.scheduledKeys);
     swap(blockTicks, candidate.blockTicks);
@@ -192,6 +215,8 @@ void Simulator::loadProject(const Json& data) {
     swap(recentTorchToggles, candidate.recentTorchToggles); swap(torchToggleCounts, candidate.torchToggleCounts);
     swap(probes, candidate.probes); swap(probeDependencies, candidate.probeDependencies); swap(trace, candidate.trace);
     currentTick = candidate.currentTick; nextOrder = candidate.nextOrder; sequence = candidate.sequence; nextProbeId = candidate.nextProbeId; traceDropped = candidate.traceDropped;
+    worldRandom = candidate.worldRandom; randomSeed = candidate.randomSeed;
+    swap(environmentActions, candidate.environmentActions); swap(pendingActionIds, candidate.pendingActionIds); nextActionId = candidate.nextActionId; actionsDropped = candidate.actionsDropped;
     if (retainedTrace) retainedTrace = traceDropped;
     statistics = {}; changes.clear(); breakRequested = false; faulted = false; pauseReason.clear(); ++revision;
 }

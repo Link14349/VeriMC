@@ -45,7 +45,7 @@ struct Hub {
     }
     Json status() const {
         Json probes = Json::array(); for (const auto& p : sim.getProbes()) probes.push_back({{"id", p.id}, {"pos", p.pos}, {"name", p.name}, {"mode", p.mode}, {"value", p.lastValue}, {"trigger", p.trigger}});
-        return {{"type", "status"}, {"tick", sim.currentTick}, {"running", running}, {"speed", speed}, {"eventsPerSecond", running ? eventsPerSecond : 0}, {"blocks", sim.world.size()}, {"pending", sim.pendingEvents()}, {"updates", sim.statistics.updates}, {"events", sim.statistics.scheduledEvents}, {"storageBytes", sim.world.storageBytes()}, {"traceDropped", sim.traceDropped}, {"pauseReason", sim.pauseReason}, {"revision", sim.revision}, {"probes", probes}, {"canUndo", !undo.empty()}, {"canRedo", !redo.empty()}, {"name", projectName}};
+        return {{"type", "status"}, {"tick", sim.currentTick}, {"running", running}, {"speed", speed}, {"eventsPerSecond", running ? eventsPerSecond : 0}, {"blocks", sim.world.size()}, {"pending", sim.pendingEvents()}, {"updates", sim.statistics.updates}, {"events", sim.statistics.scheduledEvents}, {"storageBytes", sim.world.storageBytes()}, {"traceDropped", sim.traceDropped}, {"pauseReason", sim.pauseReason}, {"pendingActions", sim.pendingActionsJson()}, {"actionsDropped", sim.actionHistoryDropped()}, {"revision", sim.revision}, {"probes", probes}, {"canUndo", !undo.empty()}, {"canRedo", !redo.empty()}, {"name", projectName}};
     }
     void remember() { undo.push_back({projectName, sim.clone()}); std::size_t bytes = 0; for (const auto& entry : undo) bytes += entry.state->estimatedBytes(); while (undo.size() > 1 && (undo.size() > 32 || bytes > 128u * 1024u * 1024u)) { bytes -= undo.front().state->estimatedBytes(); undo.pop_front(); } redo.clear(); runStart.reset(); }
     void demo(const std::string& kind = "basic");
@@ -130,6 +130,18 @@ public:
 };
 void Hub::demo(const std::string& kind) {
     sim.clear(); projectName = "脉冲与记忆 · 入门电路";
+    if (kind == "droppers") {
+        projectName = "投掷器实验 · 入库与抛出";
+        for (int x = -2; x <= 4; ++x) for (int z = -1; z <= 5; ++z) sim.world.set({x,0,z},registry.state("white_concrete"));
+        for (int z : {0,3}) {
+            sim.place({0,1,z},registry.state("dropper",{{"facing","east"}}));
+            sim.stimulate({0,1,z},{{"inventory",Json::array({{{"slot",0},{"item","stone"},{"count",8}},{{"slot",4},{"item","redstone"},{"count",8}}})}});
+            sim.place({-1,1,z},registry.state("stone_button",{{"face","floor"}}));
+            sim.addProbe({0,1,z},z==0?"入库库存":"抛出库存");
+        }
+        sim.place({1,1,0},registry.state("barrel"));
+        runStart = sim.clone(); return;
+    }
     if (kind == "tripwire") {
         projectName = "绊线实验 · 接触与剪断";
         for (int x = -2; x <= 9; ++x) for (int z = -1; z <= 7; ++z) sim.world.set({x,0,z}, registry.state("white_concrete"));
@@ -284,6 +296,10 @@ void Hub::command(const std::shared_ptr<Client>& client, const Json& message) {
         running = false;
         throw std::invalid_argument("探针缓冲等待浏览器确认，请稍后继续，或清除历史采样后重新运行");
     }
+    if (sim.hasPendingActions() && (cmd == "play" || cmd == "step" || cmd == "stepEvent")) {
+        running = false;
+        throw std::invalid_argument("请先处理外部动作；可输入环境反馈，然后确认继续");
+    }
     Json result = Json::object(); bool full = false;
     if (cmd == "play") { if (sim.faulted) throw std::invalid_argument("执行已中止，请先撤销或加载快照"); sim.breakRequested = false; sim.pauseReason.clear(); if (!runStart) runStart = sim.clone(); running = true; fractionalTicks = 0; lastPump = Clock::now(); measuredTime = lastPump; measuredEvents = 0; eventsPerSecond = 0; }
     else if (cmd == "pause") { running = false; }
@@ -295,6 +311,15 @@ void Hub::command(const std::shared_ptr<Client>& client, const Json& message) {
     }
     else if (cmd == "step" || cmd == "stepEvent") { running = false; sim.breakRequested = false; sim.pauseReason.clear(); if (!runStart) runStart = sim.clone(); if (cmd == "stepEvent") sim.stepEvent(); else { int count = message.value("count", 1); if (count < 1 || count > 10000) throw std::invalid_argument("单步范围为 1–10000 gt"); sim.advanceTo(sim.currentTick + static_cast<Tick>(count), 100000, std::chrono::milliseconds(40)); } }
     else if (cmd == "inspect") { result = sim.inspect(message.at("pos").get<BlockPos>()); }
+    else if (cmd == "actionLog") { result = {{"actions", sim.actionHistory()}, {"dropped", sim.actionHistoryDropped()}}; }
+    else if (cmd == "resolveAction") {
+        if (message.at("revision") != sim.revision) throw std::invalid_argument("状态已变化，请查看最新外部动作后重试");
+        const auto& id = message.at("id");
+        if (!id.is_number_integer() || id < 1) throw std::invalid_argument("无效外部动作序号");
+        auto pending = sim.pendingActionsJson();
+        if (std::none_of(pending.begin(), pending.end(), [&](const auto& action) { return action.at("id") == id; })) throw std::invalid_argument("外部动作不存在或已确认");
+        running = false; remember(); sim.resolveAction(id.get<std::uint64_t>());
+    }
     else if (cmd == "save") { result = sim.saveProject(projectName, message.value("checkpoint", false)); }
     else if (cmd == "vcd") { result = {{"text", sim.exportVcd()}}; }
     else if (cmd == "probe") { result["id"] = sim.addProbe(message.at("pos").get<BlockPos>(), message.value("name", std::string()), message.value("mode", std::string("output"))); }

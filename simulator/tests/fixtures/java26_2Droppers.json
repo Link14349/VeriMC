@@ -1,0 +1,9199 @@
+{
+  "endTick": 30,
+  "commands": [
+    {
+      "tick": 0,
+      "pos": [
+        4,
+        3,
+        4
+      ],
+      "stateId": 11435
+    },
+    {
+      "tick": 0,
+      "pos": [
+        5,
+        3,
+        4
+      ],
+      "stateId": 20743
+    },
+    {
+      "tick": 0,
+      "pos": [
+        4,
+        3,
+        4
+      ],
+      "stimulus": {
+        "inventory": [
+          {
+            "slot": 4,
+            "item": "stone",
+            "count": 2
+          }
+        ]
+      }
+    },
+    {
+      "tick": 1,
+      "pos": [
+        4,
+        3,
+        5
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 2,
+      "pos": [
+        4,
+        3,
+        5
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 3,
+      "pos": [
+        4,
+        3,
+        5
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 4,
+      "pos": [
+        4,
+        3,
+        5
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 6,
+      "pos": [
+        4,
+        3,
+        5
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 7,
+      "pos": [
+        4,
+        3,
+        5
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 0,
+      "pos": [
+        11,
+        3,
+        4
+      ],
+      "stateId": 11439
+    },
+    {
+      "tick": 0,
+      "pos": [
+        10,
+        3,
+        4
+      ],
+      "stateId": 20743
+    },
+    {
+      "tick": 0,
+      "pos": [
+        11,
+        3,
+        4
+      ],
+      "stimulus": {
+        "inventory": [
+          {
+            "slot": 4,
+            "item": "stone",
+            "count": 2
+          }
+        ]
+      }
+    },
+    {
+      "tick": 1,
+      "pos": [
+        11,
+        3,
+        5
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 2,
+      "pos": [
+        11,
+        3,
+        5
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 3,
+      "pos": [
+        11,
+        3,
+        5
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 4,
+      "pos": [
+        11,
+        3,
+        5
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 6,
+      "pos": [
+        11,
+        3,
+        5
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 7,
+      "pos": [
+        11,
+        3,
+        5
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 0,
+      "pos": [
+        18,
+        3,
+        4
+      ],
+      "stateId": 11441
+    },
+    {
+      "tick": 0,
+      "pos": [
+        18,
+        4,
+        4
+      ],
+      "stateId": 20743
+    },
+    {
+      "tick": 0,
+      "pos": [
+        18,
+        3,
+        4
+      ],
+      "stimulus": {
+        "inventory": [
+          {
+            "slot": 4,
+            "item": "stone",
+            "count": 2
+          }
+        ]
+      }
+    },
+    {
+      "tick": 1,
+      "pos": [
+        18,
+        3,
+        5
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 2,
+      "pos": [
+        18,
+        3,
+        5
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 3,
+      "pos": [
+        18,
+        3,
+        5
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 4,
+      "pos": [
+        18,
+        3,
+        5
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 6,
+      "pos": [
+        18,
+        3,
+        5
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 7,
+      "pos": [
+        18,
+        3,
+        5
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 0,
+      "pos": [
+        25,
+        3,
+        4
+      ],
+      "stateId": 11443
+    },
+    {
+      "tick": 0,
+      "pos": [
+        25,
+        2,
+        4
+      ],
+      "stateId": 20743
+    },
+    {
+      "tick": 0,
+      "pos": [
+        25,
+        3,
+        4
+      ],
+      "stimulus": {
+        "inventory": [
+          {
+            "slot": 4,
+            "item": "stone",
+            "count": 2
+          }
+        ]
+      }
+    },
+    {
+      "tick": 1,
+      "pos": [
+        25,
+        3,
+        5
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 2,
+      "pos": [
+        25,
+        3,
+        5
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 3,
+      "pos": [
+        25,
+        3,
+        5
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 4,
+      "pos": [
+        25,
+        3,
+        5
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 6,
+      "pos": [
+        25,
+        3,
+        5
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 7,
+      "pos": [
+        25,
+        3,
+        5
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 0,
+      "pos": [
+        32,
+        3,
+        4
+      ],
+      "stateId": 11433
+    },
+    {
+      "tick": 0,
+      "pos": [
+        32,
+        3,
+        3
+      ],
+      "stateId": 20743
+    },
+    {
+      "tick": 0,
+      "pos": [
+        32,
+        3,
+        4
+      ],
+      "stimulus": {
+        "inventory": [
+          {
+            "slot": 4,
+            "item": "stone",
+            "count": 2
+          }
+        ]
+      }
+    },
+    {
+      "tick": 1,
+      "pos": [
+        33,
+        3,
+        4
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 2,
+      "pos": [
+        33,
+        3,
+        4
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 3,
+      "pos": [
+        33,
+        3,
+        4
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 4,
+      "pos": [
+        33,
+        3,
+        4
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 6,
+      "pos": [
+        33,
+        3,
+        4
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 7,
+      "pos": [
+        33,
+        3,
+        4
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 0,
+      "pos": [
+        39,
+        3,
+        4
+      ],
+      "stateId": 11437
+    },
+    {
+      "tick": 0,
+      "pos": [
+        39,
+        3,
+        5
+      ],
+      "stateId": 20743
+    },
+    {
+      "tick": 0,
+      "pos": [
+        39,
+        3,
+        4
+      ],
+      "stimulus": {
+        "inventory": [
+          {
+            "slot": 4,
+            "item": "stone",
+            "count": 2
+          }
+        ]
+      }
+    },
+    {
+      "tick": 1,
+      "pos": [
+        40,
+        3,
+        4
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 2,
+      "pos": [
+        40,
+        3,
+        4
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 3,
+      "pos": [
+        40,
+        3,
+        4
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 4,
+      "pos": [
+        40,
+        3,
+        4
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 6,
+      "pos": [
+        40,
+        3,
+        4
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 7,
+      "pos": [
+        40,
+        3,
+        4
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 0,
+      "pos": [
+        4,
+        3,
+        16
+      ],
+      "stateId": 11435
+    },
+    {
+      "tick": 0,
+      "pos": [
+        5,
+        3,
+        16
+      ],
+      "stateId": 11317
+    },
+    {
+      "tick": 0,
+      "pos": [
+        6,
+        3,
+        16
+      ],
+      "stateId": 20743
+    },
+    {
+      "tick": 0,
+      "pos": [
+        4,
+        3,
+        16
+      ],
+      "stimulus": {
+        "inventory": [
+          {
+            "slot": 0,
+            "item": "stone",
+            "count": 2
+          }
+        ]
+      }
+    },
+    {
+      "tick": 1,
+      "pos": [
+        3,
+        3,
+        16
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 2,
+      "pos": [
+        3,
+        3,
+        16
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 9,
+      "pos": [
+        3,
+        3,
+        16
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 10,
+      "pos": [
+        3,
+        3,
+        16
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 0,
+      "pos": [
+        12,
+        3,
+        16
+      ],
+      "stateId": 11435
+    },
+    {
+      "tick": 0,
+      "pos": [
+        13,
+        3,
+        16
+      ],
+      "stateId": 20743
+    },
+    {
+      "tick": 0,
+      "pos": [
+        12,
+        3,
+        16
+      ],
+      "stimulus": {
+        "inventory": [
+          {
+            "slot": 2,
+            "item": "wooden_sword",
+            "count": 1
+          }
+        ]
+      }
+    },
+    {
+      "tick": 0,
+      "pos": [
+        13,
+        3,
+        16
+      ],
+      "stimulus": {
+        "inventory": [
+          {
+            "slot": 0,
+            "item": "stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "stone",
+            "count": 64
+          },
+          {
+            "slot": 5,
+            "item": "stone",
+            "count": 64
+          },
+          {
+            "slot": 6,
+            "item": "stone",
+            "count": 64
+          },
+          {
+            "slot": 7,
+            "item": "stone",
+            "count": 64
+          },
+          {
+            "slot": 8,
+            "item": "stone",
+            "count": 64
+          },
+          {
+            "slot": 9,
+            "item": "stone",
+            "count": 64
+          },
+          {
+            "slot": 10,
+            "item": "stone",
+            "count": 64
+          },
+          {
+            "slot": 11,
+            "item": "stone",
+            "count": 64
+          },
+          {
+            "slot": 12,
+            "item": "stone",
+            "count": 64
+          },
+          {
+            "slot": 13,
+            "item": "stone",
+            "count": 64
+          },
+          {
+            "slot": 14,
+            "item": "stone",
+            "count": 64
+          },
+          {
+            "slot": 15,
+            "item": "stone",
+            "count": 64
+          },
+          {
+            "slot": 16,
+            "item": "stone",
+            "count": 64
+          },
+          {
+            "slot": 17,
+            "item": "stone",
+            "count": 64
+          },
+          {
+            "slot": 18,
+            "item": "stone",
+            "count": 64
+          },
+          {
+            "slot": 19,
+            "item": "stone",
+            "count": 64
+          },
+          {
+            "slot": 20,
+            "item": "stone",
+            "count": 64
+          },
+          {
+            "slot": 21,
+            "item": "stone",
+            "count": 64
+          },
+          {
+            "slot": 22,
+            "item": "stone",
+            "count": 64
+          },
+          {
+            "slot": 23,
+            "item": "stone",
+            "count": 64
+          },
+          {
+            "slot": 24,
+            "item": "stone",
+            "count": 64
+          },
+          {
+            "slot": 25,
+            "item": "stone",
+            "count": 64
+          },
+          {
+            "slot": 26,
+            "item": "stone",
+            "count": 64
+          }
+        ]
+      }
+    },
+    {
+      "tick": 1,
+      "pos": [
+        11,
+        3,
+        16
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 2,
+      "pos": [
+        11,
+        3,
+        16
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 8,
+      "pos": [
+        13,
+        3,
+        16
+      ],
+      "stimulus": {
+        "inventory": [
+          {
+            "slot": 9,
+            "item": "stone",
+            "count": 0
+          }
+        ]
+      }
+    },
+    {
+      "tick": 9,
+      "pos": [
+        11,
+        3,
+        16
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 0,
+      "pos": [
+        20,
+        3,
+        16
+      ],
+      "stateId": 11435
+    },
+    {
+      "tick": 0,
+      "pos": [
+        21,
+        3,
+        16
+      ],
+      "stateId": 3988
+    },
+    {
+      "tick": 0,
+      "pos": [
+        21,
+        4,
+        16
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        20,
+        3,
+        16
+      ],
+      "stimulus": {
+        "inventory": [
+          {
+            "slot": 8,
+            "item": "ender_pearl",
+            "count": 2
+          }
+        ]
+      }
+    },
+    {
+      "tick": 1,
+      "pos": [
+        20,
+        5,
+        16
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 8,
+      "pos": [
+        19,
+        3,
+        16
+      ],
+      "stateId": 1
+    }
+  ],
+  "watch": [
+    [
+      4,
+      3,
+      4
+    ],
+    [
+      5,
+      3,
+      4
+    ],
+    [
+      11,
+      3,
+      4
+    ],
+    [
+      10,
+      3,
+      4
+    ],
+    [
+      18,
+      3,
+      4
+    ],
+    [
+      18,
+      4,
+      4
+    ],
+    [
+      25,
+      3,
+      4
+    ],
+    [
+      25,
+      2,
+      4
+    ],
+    [
+      32,
+      3,
+      4
+    ],
+    [
+      32,
+      3,
+      3
+    ],
+    [
+      39,
+      3,
+      4
+    ],
+    [
+      39,
+      3,
+      5
+    ],
+    [
+      4,
+      3,
+      16
+    ],
+    [
+      5,
+      3,
+      16
+    ],
+    [
+      6,
+      3,
+      16
+    ],
+    [
+      12,
+      3,
+      16
+    ],
+    [
+      13,
+      3,
+      16
+    ],
+    [
+      20,
+      3,
+      16
+    ],
+    [
+      21,
+      3,
+      16
+    ]
+  ],
+  "reference": "Minecraft Java 26.2 GameTest, nonexperimental redstone",
+  "origin": [
+    -11393430,
+    -58,
+    -5537450
+  ],
+  "frames": [
+    {
+      "tick": 0,
+      "states": [
+        11435,
+        20743,
+        11439,
+        20743,
+        11441,
+        20743,
+        11443,
+        20743,
+        11433,
+        20743,
+        11437,
+        20743,
+        11435,
+        11317,
+        20743,
+        11435,
+        20743,
+        11435,
+        3988
+      ],
+      "analogs": [
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        0,
+        2,
+        15,
+        1,
+        0
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 2,
+            "item": "minecraft:wooden_sword",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 6,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 7,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 8,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 9,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 10,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 11,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 12,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 13,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 14,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 15,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 16,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 17,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 18,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 19,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 20,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 21,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 22,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 23,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 24,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 25,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 26,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 8,
+            "item": "minecraft:ender_pearl",
+            "count": 2
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 1,
+      "states": [
+        11434,
+        20743,
+        11438,
+        20743,
+        11440,
+        20743,
+        11442,
+        20743,
+        11432,
+        20743,
+        11436,
+        20743,
+        11434,
+        11317,
+        20743,
+        11434,
+        20743,
+        11435,
+        3988
+      ],
+      "analogs": [
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        0,
+        2,
+        15,
+        1,
+        0
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 2,
+            "item": "minecraft:wooden_sword",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 6,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 7,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 8,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 9,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 10,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 11,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 12,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 13,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 14,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 15,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 16,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 17,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 18,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 19,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 20,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 21,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 22,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 23,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 24,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 25,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 26,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 8,
+            "item": "minecraft:ender_pearl",
+            "count": 2
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 2,
+      "states": [
+        11435,
+        20743,
+        11439,
+        20743,
+        11441,
+        20743,
+        11443,
+        20743,
+        11433,
+        20743,
+        11437,
+        20743,
+        11435,
+        11317,
+        20743,
+        11435,
+        20743,
+        11435,
+        3988
+      ],
+      "analogs": [
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        0,
+        2,
+        15,
+        1,
+        0
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 2,
+            "item": "minecraft:wooden_sword",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 6,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 7,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 8,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 9,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 10,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 11,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 12,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 13,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 14,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 15,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 16,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 17,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 18,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 19,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 20,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 21,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 22,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 23,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 24,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 25,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 26,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 8,
+            "item": "minecraft:ender_pearl",
+            "count": 2
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 3,
+      "states": [
+        11434,
+        20743,
+        11438,
+        20743,
+        11440,
+        20743,
+        11442,
+        20743,
+        11432,
+        20743,
+        11436,
+        20743,
+        11435,
+        11317,
+        20743,
+        11435,
+        20743,
+        11435,
+        3988
+      ],
+      "analogs": [
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        0,
+        2,
+        15,
+        1,
+        0
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 2,
+            "item": "minecraft:wooden_sword",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 6,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 7,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 8,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 9,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 10,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 11,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 12,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 13,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 14,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 15,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 16,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 17,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 18,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 19,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 20,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 21,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 22,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 23,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 24,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 25,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 26,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 8,
+            "item": "minecraft:ender_pearl",
+            "count": 2
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 4,
+      "states": [
+        11435,
+        20743,
+        11439,
+        20743,
+        11441,
+        20743,
+        11443,
+        20743,
+        11433,
+        20743,
+        11437,
+        20743,
+        11435,
+        11317,
+        20743,
+        11435,
+        20743,
+        11435,
+        3988
+      ],
+      "analogs": [
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        0,
+        2,
+        15,
+        1,
+        0
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 2,
+            "item": "minecraft:wooden_sword",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 6,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 7,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 8,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 9,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 10,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 11,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 12,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 13,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 14,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 15,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 16,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 17,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 18,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 19,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 20,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 21,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 22,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 23,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 24,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 25,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 26,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 8,
+            "item": "minecraft:ender_pearl",
+            "count": 2
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 5,
+      "states": [
+        11435,
+        20743,
+        11439,
+        20743,
+        11441,
+        20743,
+        11443,
+        20743,
+        11433,
+        20743,
+        11437,
+        20743,
+        11435,
+        11317,
+        20743,
+        11435,
+        20743,
+        11435,
+        3988
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        2,
+        15,
+        1,
+        0
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 2,
+            "item": "minecraft:wooden_sword",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 6,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 7,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 8,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 9,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 10,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 11,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 12,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 13,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 14,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 15,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 16,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 17,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 18,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 19,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 20,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 21,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 22,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 23,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 24,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 25,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 26,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 8,
+            "item": "minecraft:ender_pearl",
+            "count": 2
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 6,
+      "states": [
+        11434,
+        20743,
+        11438,
+        20743,
+        11440,
+        20743,
+        11442,
+        20743,
+        11432,
+        20743,
+        11436,
+        20743,
+        11435,
+        11317,
+        20743,
+        11435,
+        20743,
+        11435,
+        3988
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        2,
+        15,
+        1,
+        0
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 2,
+            "item": "minecraft:wooden_sword",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 6,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 7,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 8,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 9,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 10,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 11,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 12,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 13,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 14,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 15,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 16,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 17,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 18,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 19,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 20,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 21,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 22,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 23,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 24,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 25,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 26,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 8,
+            "item": "minecraft:ender_pearl",
+            "count": 2
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 7,
+      "states": [
+        11435,
+        20743,
+        11439,
+        20743,
+        11441,
+        20743,
+        11443,
+        20743,
+        11433,
+        20743,
+        11437,
+        20743,
+        11435,
+        11317,
+        20743,
+        11435,
+        20743,
+        11435,
+        3988
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        2,
+        15,
+        1,
+        0
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 2,
+            "item": "minecraft:wooden_sword",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 6,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 7,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 8,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 9,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 10,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 11,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 12,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 13,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 14,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 15,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 16,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 17,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 18,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 19,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 20,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 21,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 22,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 23,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 24,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 25,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 26,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 8,
+            "item": "minecraft:ender_pearl",
+            "count": 2
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 8,
+      "states": [
+        11435,
+        20743,
+        11439,
+        20743,
+        11441,
+        20743,
+        11443,
+        20743,
+        11433,
+        20743,
+        11437,
+        20743,
+        11435,
+        11317,
+        20743,
+        11435,
+        20743,
+        11434,
+        3988
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        2,
+        14,
+        1,
+        0
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 2,
+            "item": "minecraft:wooden_sword",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 6,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 7,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 8,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 10,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 11,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 12,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 13,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 14,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 15,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 16,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 17,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 18,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 19,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 20,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 21,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 22,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 23,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 24,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 25,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 26,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 8,
+            "item": "minecraft:ender_pearl",
+            "count": 2
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 9,
+      "states": [
+        11435,
+        20743,
+        11439,
+        20743,
+        11441,
+        20743,
+        11443,
+        20743,
+        11433,
+        20743,
+        11437,
+        20743,
+        11434,
+        11317,
+        20743,
+        11434,
+        20743,
+        11434,
+        3988
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        2,
+        14,
+        1,
+        0
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 2,
+            "item": "minecraft:wooden_sword",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 6,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 7,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 8,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 10,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 11,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 12,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 13,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 14,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 15,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 16,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 17,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 18,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 19,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 20,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 21,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 22,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 23,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 24,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 25,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 26,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 8,
+            "item": "minecraft:ender_pearl",
+            "count": 2
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 10,
+      "states": [
+        11435,
+        20743,
+        11439,
+        20743,
+        11441,
+        20743,
+        11443,
+        20743,
+        11433,
+        20743,
+        11437,
+        20743,
+        11435,
+        11317,
+        20743,
+        11434,
+        20743,
+        11434,
+        3988
+      ],
+      "analogs": [
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        1,
+        1,
+        0,
+        2,
+        14,
+        1,
+        0
+      ],
+      "inventories": [
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 2,
+            "item": "minecraft:wooden_sword",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 6,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 7,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 8,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 10,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 11,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 12,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 13,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 14,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 15,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 16,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 17,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 18,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 19,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 20,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 21,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 22,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 23,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 24,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 25,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 26,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 8,
+            "item": "minecraft:ender_pearl",
+            "count": 2
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 11,
+      "states": [
+        11435,
+        20743,
+        11439,
+        20743,
+        11441,
+        20743,
+        11443,
+        20743,
+        11433,
+        20743,
+        11437,
+        20743,
+        11435,
+        11317,
+        20743,
+        11434,
+        20743,
+        11434,
+        3988
+      ],
+      "analogs": [
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        1,
+        1,
+        0,
+        2,
+        14,
+        1,
+        0
+      ],
+      "inventories": [
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 2,
+            "item": "minecraft:wooden_sword",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 6,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 7,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 8,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 10,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 11,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 12,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 13,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 14,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 15,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 16,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 17,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 18,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 19,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 20,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 21,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 22,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 23,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 24,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 25,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 26,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 8,
+            "item": "minecraft:ender_pearl",
+            "count": 2
+          }
+        ],
+        []
+      ]
+    },
+    {
+      "tick": 12,
+      "states": [
+        11435,
+        20743,
+        11439,
+        20743,
+        11441,
+        20743,
+        11443,
+        20743,
+        11433,
+        20743,
+        11437,
+        20743,
+        11435,
+        11317,
+        20743,
+        11434,
+        20743,
+        11434,
+        3988
+      ],
+      "analogs": [
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        1,
+        0,
+        1,
+        2,
+        14,
+        1,
+        0
+      ],
+      "inventories": [
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 2,
+            "item": "minecraft:wooden_sword",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 6,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 7,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 8,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 10,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 11,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 12,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 13,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 14,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 15,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 16,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 17,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 18,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 19,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 20,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 21,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 22,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 23,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 24,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 25,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 26,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 8,
+            "item": "minecraft:ender_pearl",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:ender_pearl",
+            "count": 1
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 13,
+      "states": [
+        11435,
+        20743,
+        11439,
+        20743,
+        11441,
+        20743,
+        11443,
+        20743,
+        11433,
+        20743,
+        11437,
+        20743,
+        11435,
+        11317,
+        20743,
+        11434,
+        20743,
+        11434,
+        3988
+      ],
+      "analogs": [
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        1,
+        0,
+        15,
+        1,
+        0
+      ],
+      "inventories": [
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 6,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 7,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 8,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 9,
+            "item": "minecraft:wooden_sword",
+            "count": 1
+          },
+          {
+            "slot": 10,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 11,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 12,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 13,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 14,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 15,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 16,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 17,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 18,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 19,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 20,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 21,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 22,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 23,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 24,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 25,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 26,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 8,
+            "item": "minecraft:ender_pearl",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:ender_pearl",
+            "count": 1
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 14,
+      "states": [
+        11435,
+        20743,
+        11439,
+        20743,
+        11441,
+        20743,
+        11443,
+        20743,
+        11433,
+        20743,
+        11437,
+        20743,
+        11435,
+        11317,
+        20743,
+        11434,
+        20743,
+        11434,
+        3988
+      ],
+      "analogs": [
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        1,
+        0,
+        15,
+        1,
+        0
+      ],
+      "inventories": [
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 6,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 7,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 8,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 9,
+            "item": "minecraft:wooden_sword",
+            "count": 1
+          },
+          {
+            "slot": 10,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 11,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 12,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 13,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 14,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 15,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 16,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 17,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 18,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 19,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 20,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 21,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 22,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 23,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 24,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 25,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 26,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 8,
+            "item": "minecraft:ender_pearl",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:ender_pearl",
+            "count": 1
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 15,
+      "states": [
+        11435,
+        20743,
+        11439,
+        20743,
+        11441,
+        20743,
+        11443,
+        20743,
+        11433,
+        20743,
+        11437,
+        20743,
+        11435,
+        11317,
+        20743,
+        11434,
+        20743,
+        11434,
+        3988
+      ],
+      "analogs": [
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        1,
+        0,
+        15,
+        1,
+        0
+      ],
+      "inventories": [
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 6,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 7,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 8,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 9,
+            "item": "minecraft:wooden_sword",
+            "count": 1
+          },
+          {
+            "slot": 10,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 11,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 12,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 13,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 14,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 15,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 16,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 17,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 18,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 19,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 20,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 21,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 22,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 23,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 24,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 25,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 26,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 8,
+            "item": "minecraft:ender_pearl",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:ender_pearl",
+            "count": 1
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 16,
+      "states": [
+        11435,
+        20743,
+        11439,
+        20743,
+        11441,
+        20743,
+        11443,
+        20743,
+        11433,
+        20743,
+        11437,
+        20743,
+        11435,
+        11317,
+        20743,
+        11434,
+        20743,
+        11434,
+        3988
+      ],
+      "analogs": [
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        1,
+        0,
+        15,
+        1,
+        0
+      ],
+      "inventories": [
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 6,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 7,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 8,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 9,
+            "item": "minecraft:wooden_sword",
+            "count": 1
+          },
+          {
+            "slot": 10,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 11,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 12,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 13,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 14,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 15,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 16,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 17,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 18,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 19,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 20,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 21,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 22,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 23,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 24,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 25,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 26,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 8,
+            "item": "minecraft:ender_pearl",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:ender_pearl",
+            "count": 1
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 17,
+      "states": [
+        11435,
+        20743,
+        11439,
+        20743,
+        11441,
+        20743,
+        11443,
+        20743,
+        11433,
+        20743,
+        11437,
+        20743,
+        11435,
+        11317,
+        20743,
+        11434,
+        20743,
+        11434,
+        3988
+      ],
+      "analogs": [
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        1,
+        0,
+        15,
+        1,
+        0
+      ],
+      "inventories": [
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 6,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 7,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 8,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 9,
+            "item": "minecraft:wooden_sword",
+            "count": 1
+          },
+          {
+            "slot": 10,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 11,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 12,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 13,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 14,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 15,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 16,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 17,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 18,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 19,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 20,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 21,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 22,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 23,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 24,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 25,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 26,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 8,
+            "item": "minecraft:ender_pearl",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:ender_pearl",
+            "count": 1
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 18,
+      "states": [
+        11435,
+        20743,
+        11439,
+        20743,
+        11441,
+        20743,
+        11443,
+        20743,
+        11433,
+        20743,
+        11437,
+        20743,
+        11435,
+        11317,
+        20743,
+        11434,
+        20743,
+        11434,
+        3988
+      ],
+      "analogs": [
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        1,
+        0,
+        15,
+        1,
+        0
+      ],
+      "inventories": [
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 6,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 7,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 8,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 9,
+            "item": "minecraft:wooden_sword",
+            "count": 1
+          },
+          {
+            "slot": 10,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 11,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 12,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 13,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 14,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 15,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 16,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 17,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 18,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 19,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 20,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 21,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 22,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 23,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 24,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 25,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 26,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 8,
+            "item": "minecraft:ender_pearl",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:ender_pearl",
+            "count": 1
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 19,
+      "states": [
+        11435,
+        20743,
+        11439,
+        20743,
+        11441,
+        20743,
+        11443,
+        20743,
+        11433,
+        20743,
+        11437,
+        20743,
+        11435,
+        11317,
+        20743,
+        11434,
+        20743,
+        11434,
+        3988
+      ],
+      "analogs": [
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        1,
+        0,
+        15,
+        1,
+        0
+      ],
+      "inventories": [
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 6,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 7,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 8,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 9,
+            "item": "minecraft:wooden_sword",
+            "count": 1
+          },
+          {
+            "slot": 10,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 11,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 12,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 13,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 14,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 15,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 16,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 17,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 18,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 19,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 20,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 21,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 22,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 23,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 24,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 25,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 26,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 8,
+            "item": "minecraft:ender_pearl",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:ender_pearl",
+            "count": 1
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 20,
+      "states": [
+        11435,
+        20743,
+        11439,
+        20743,
+        11441,
+        20743,
+        11443,
+        20743,
+        11433,
+        20743,
+        11437,
+        20743,
+        11435,
+        11317,
+        20743,
+        11434,
+        20743,
+        11434,
+        3988
+      ],
+      "analogs": [
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        15,
+        1,
+        0
+      ],
+      "inventories": [
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 6,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 7,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 8,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 9,
+            "item": "minecraft:wooden_sword",
+            "count": 1
+          },
+          {
+            "slot": 10,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 11,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 12,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 13,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 14,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 15,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 16,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 17,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 18,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 19,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 20,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 21,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 22,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 23,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 24,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 25,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 26,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 8,
+            "item": "minecraft:ender_pearl",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:ender_pearl",
+            "count": 1
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 21,
+      "states": [
+        11435,
+        20743,
+        11439,
+        20743,
+        11441,
+        20743,
+        11443,
+        20743,
+        11433,
+        20743,
+        11437,
+        20743,
+        11435,
+        11317,
+        20743,
+        11434,
+        20743,
+        11434,
+        3988
+      ],
+      "analogs": [
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        15,
+        1,
+        0
+      ],
+      "inventories": [
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 6,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 7,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 8,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 9,
+            "item": "minecraft:wooden_sword",
+            "count": 1
+          },
+          {
+            "slot": 10,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 11,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 12,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 13,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 14,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 15,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 16,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 17,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 18,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 19,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 20,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 21,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 22,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 23,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 24,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 25,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 26,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 8,
+            "item": "minecraft:ender_pearl",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:ender_pearl",
+            "count": 1
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 22,
+      "states": [
+        11435,
+        20743,
+        11439,
+        20743,
+        11441,
+        20743,
+        11443,
+        20743,
+        11433,
+        20743,
+        11437,
+        20743,
+        11435,
+        11317,
+        20743,
+        11434,
+        20743,
+        11434,
+        3988
+      ],
+      "analogs": [
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        15,
+        1,
+        0
+      ],
+      "inventories": [
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 6,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 7,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 8,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 9,
+            "item": "minecraft:wooden_sword",
+            "count": 1
+          },
+          {
+            "slot": 10,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 11,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 12,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 13,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 14,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 15,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 16,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 17,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 18,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 19,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 20,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 21,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 22,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 23,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 24,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 25,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 26,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 8,
+            "item": "minecraft:ender_pearl",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:ender_pearl",
+            "count": 1
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 23,
+      "states": [
+        11435,
+        20743,
+        11439,
+        20743,
+        11441,
+        20743,
+        11443,
+        20743,
+        11433,
+        20743,
+        11437,
+        20743,
+        11435,
+        11317,
+        20743,
+        11434,
+        20743,
+        11434,
+        3988
+      ],
+      "analogs": [
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        15,
+        1,
+        0
+      ],
+      "inventories": [
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 6,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 7,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 8,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 9,
+            "item": "minecraft:wooden_sword",
+            "count": 1
+          },
+          {
+            "slot": 10,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 11,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 12,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 13,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 14,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 15,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 16,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 17,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 18,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 19,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 20,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 21,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 22,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 23,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 24,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 25,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 26,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 8,
+            "item": "minecraft:ender_pearl",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:ender_pearl",
+            "count": 1
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 24,
+      "states": [
+        11435,
+        20743,
+        11439,
+        20743,
+        11441,
+        20743,
+        11443,
+        20743,
+        11433,
+        20743,
+        11437,
+        20743,
+        11435,
+        11317,
+        20743,
+        11434,
+        20743,
+        11434,
+        3988
+      ],
+      "analogs": [
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        15,
+        1,
+        0
+      ],
+      "inventories": [
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 6,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 7,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 8,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 9,
+            "item": "minecraft:wooden_sword",
+            "count": 1
+          },
+          {
+            "slot": 10,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 11,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 12,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 13,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 14,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 15,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 16,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 17,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 18,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 19,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 20,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 21,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 22,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 23,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 24,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 25,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 26,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 8,
+            "item": "minecraft:ender_pearl",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:ender_pearl",
+            "count": 1
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 25,
+      "states": [
+        11435,
+        20743,
+        11439,
+        20743,
+        11441,
+        20743,
+        11443,
+        20743,
+        11433,
+        20743,
+        11437,
+        20743,
+        11435,
+        11317,
+        20743,
+        11434,
+        20743,
+        11434,
+        3988
+      ],
+      "analogs": [
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        15,
+        1,
+        0
+      ],
+      "inventories": [
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 6,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 7,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 8,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 9,
+            "item": "minecraft:wooden_sword",
+            "count": 1
+          },
+          {
+            "slot": 10,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 11,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 12,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 13,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 14,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 15,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 16,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 17,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 18,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 19,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 20,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 21,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 22,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 23,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 24,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 25,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 26,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 8,
+            "item": "minecraft:ender_pearl",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:ender_pearl",
+            "count": 1
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 26,
+      "states": [
+        11435,
+        20743,
+        11439,
+        20743,
+        11441,
+        20743,
+        11443,
+        20743,
+        11433,
+        20743,
+        11437,
+        20743,
+        11435,
+        11317,
+        20743,
+        11434,
+        20743,
+        11434,
+        3988
+      ],
+      "analogs": [
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        15,
+        1,
+        0
+      ],
+      "inventories": [
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 6,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 7,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 8,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 9,
+            "item": "minecraft:wooden_sword",
+            "count": 1
+          },
+          {
+            "slot": 10,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 11,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 12,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 13,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 14,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 15,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 16,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 17,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 18,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 19,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 20,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 21,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 22,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 23,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 24,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 25,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 26,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 8,
+            "item": "minecraft:ender_pearl",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:ender_pearl",
+            "count": 1
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 27,
+      "states": [
+        11435,
+        20743,
+        11439,
+        20743,
+        11441,
+        20743,
+        11443,
+        20743,
+        11433,
+        20743,
+        11437,
+        20743,
+        11435,
+        11317,
+        20743,
+        11434,
+        20743,
+        11434,
+        3988
+      ],
+      "analogs": [
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        15,
+        1,
+        0
+      ],
+      "inventories": [
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 6,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 7,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 8,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 9,
+            "item": "minecraft:wooden_sword",
+            "count": 1
+          },
+          {
+            "slot": 10,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 11,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 12,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 13,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 14,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 15,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 16,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 17,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 18,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 19,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 20,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 21,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 22,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 23,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 24,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 25,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 26,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 8,
+            "item": "minecraft:ender_pearl",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:ender_pearl",
+            "count": 1
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 28,
+      "states": [
+        11435,
+        20743,
+        11439,
+        20743,
+        11441,
+        20743,
+        11443,
+        20743,
+        11433,
+        20743,
+        11437,
+        20743,
+        11435,
+        11317,
+        20743,
+        11434,
+        20743,
+        11434,
+        3988
+      ],
+      "analogs": [
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        15,
+        1,
+        0
+      ],
+      "inventories": [
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 6,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 7,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 8,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 9,
+            "item": "minecraft:wooden_sword",
+            "count": 1
+          },
+          {
+            "slot": 10,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 11,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 12,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 13,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 14,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 15,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 16,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 17,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 18,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 19,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 20,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 21,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 22,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 23,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 24,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 25,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 26,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 8,
+            "item": "minecraft:ender_pearl",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:ender_pearl",
+            "count": 1
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 29,
+      "states": [
+        11435,
+        20743,
+        11439,
+        20743,
+        11441,
+        20743,
+        11443,
+        20743,
+        11433,
+        20743,
+        11437,
+        20743,
+        11435,
+        11317,
+        20743,
+        11434,
+        20743,
+        11434,
+        3988
+      ],
+      "analogs": [
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        15,
+        1,
+        0
+      ],
+      "inventories": [
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 6,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 7,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 8,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 9,
+            "item": "minecraft:wooden_sword",
+            "count": 1
+          },
+          {
+            "slot": 10,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 11,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 12,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 13,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 14,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 15,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 16,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 17,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 18,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 19,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 20,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 21,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 22,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 23,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 24,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 25,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 26,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 8,
+            "item": "minecraft:ender_pearl",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:ender_pearl",
+            "count": 1
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 30,
+      "states": [
+        11435,
+        20743,
+        11439,
+        20743,
+        11441,
+        20743,
+        11443,
+        20743,
+        11433,
+        20743,
+        11437,
+        20743,
+        11435,
+        11317,
+        20743,
+        11434,
+        20743,
+        11434,
+        3988
+      ],
+      "analogs": [
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        15,
+        1,
+        0
+      ],
+      "inventories": [
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 5,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 6,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 7,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 8,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 9,
+            "item": "minecraft:wooden_sword",
+            "count": 1
+          },
+          {
+            "slot": 10,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 11,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 12,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 13,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 14,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 15,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 16,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 17,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 18,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 19,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 20,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 21,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 22,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 23,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 24,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 25,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 26,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 8,
+            "item": "minecraft:ender_pearl",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:ender_pearl",
+            "count": 1
+          }
+        ]
+      ]
+    }
+  ]
+}

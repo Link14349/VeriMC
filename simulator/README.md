@@ -44,6 +44,8 @@ python3 simulator/runSimulator.py --no-build
 
 按钮环境面板支持箭矢留在按钮内、只触及弹起部分和移走箭；木按钮按原版周期复查并保留同刻释放与重按，石按钮忽略箭矢。
 
+投掷器支持九槽编辑、随机投放和向容器传输，提供“投掷器实验”。向外抛出时显示初始位置与速度并等待环境反馈，支持动作导出与快照续跑；随机语义边界见 [投掷器说明](docs/droppers.md)。
+
 ## 验证
 
 ```sh
@@ -60,6 +62,7 @@ ctest --preset debug
 python3 tests/serverTests.py
 python3 tests/backpressureTests.py
 python3 tests/runControlTests.py
+python3 tests/dropperTests.py
 node tests/webTests.mjs
 
 # 有实际驱动的中继器链基准

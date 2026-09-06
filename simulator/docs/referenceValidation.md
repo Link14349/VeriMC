@@ -11,7 +11,7 @@
 5. `python3 tools/reference/captureRedstone.py`：用本项目原创输入场景运行原版 GameTest，生成 `tests/fixtures/java26_2Redstone.json`。测试世界仅位于忽略的 `.cache/reference/captureWorld/`，重跑时替换该缓存世界。
 6. 构建后执行 `ctest --preset release`，独立 C++ 内核按相同绝对坐标、放置顺序和游戏刻逐帧比较状态 ID 与比较器内部输出。
 
-扩展数据与场景：生成报告后运行 `python3 tools/reference/exportItems.py` 导出默认物品堆叠上限；`captureDevices.py`、`captureContainers.py` 和 `captureHoppers.py` 分别生成环境器件、库存与传输场景。`runReferenceTool.py ExportDaylight <绝对输出路径>` 生成阳光探测器数值对照。六种 GameTest 生成脚本共享缓存世界，请顺序运行。
+扩展数据与场景：生成报告后运行 `python3 tools/reference/exportItems.py` 导出默认物品堆叠上限；`captureDevices.py`、`captureContainers.py` 和 `captureHoppers.py` 分别生成环境器件、库存与传输场景。`runReferenceTool.py ExportDaylight <绝对输出路径>` 生成阳光探测器数值对照。所有 GameTest 生成脚本共享缓存世界，请顺序运行。
 
 正常构建、启动、仿真和测试不依赖 Java 或 Minecraft 安装；注册表和场景观测结果随项目提供。JAR、反编译参考源码、游戏资源和缓存世界不进入 Git。
 
@@ -41,3 +41,5 @@
 `captureTripwire.py` 增加第八组 GameTest，覆盖 70 刻 / 121 点连接、交叉、长度边界、实体接触、断线、剪刀及支撑破坏。场景通过 `discardDrops` 清除拆钩掉落物，避免随机轨迹混入受控接触输入，详见 [绊线说明](tripwire.md)。
 
 `captureButtons.py` 增加第九组 GameTest，覆盖 101 刻 / 16 点按钮接触、安装朝向与复查。真实箭的碰撞盒分别与弹起/按下检测形状相交；原生专项另验证同刻释放—重按的边沿及中途快照。具体环境边界见 [环境输入](environmentInputs.md)。
+
+`captureDroppers.py` 增加第十组 GameTest，覆盖 31 刻 / 19 点。`runReferenceTool.py ExportDropperSlots <绝对输出路径>` 生成 600 次选槽。`ExportDropperMotion` 接受四个绝对路径参数：输出 JSON、缓存 captureWorld、缓存 fixturePacks、输出报告 XML；先运行任一 capture 脚本生成公共空结构。该工具在一次 GameTest 回调内分别重置原版随机源并立即读取实体，36 组位置/速度位模式对照通过，详细隔离条件见 [投掷器说明](droppers.md)。
