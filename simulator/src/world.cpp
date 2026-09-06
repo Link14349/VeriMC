@@ -7,9 +7,15 @@ World::World(const World& other) : blockCount(other.blockCount) {
     for (const auto& [pos, chunk] : other.chunks) chunks.emplace(pos, std::make_unique<Chunk>(*chunk));
 }
 World& World::operator=(const World& other) { if (this != &other) { World copy(other); *this = std::move(copy); } return *this; }
-StateId World::get(BlockPos pos) const {
-    auto found = chunks.find(chunkPos(pos));
-    return found == chunks.end() ? 0 : found->second->states[offset(pos)];
+World::World(World&& other) noexcept : chunks(std::move(other.chunks)), blockCount(other.blockCount) {
+    other.chunks.clear(); other.blockCount = 0; other.chunkCache = {};
+}
+World& World::operator=(World&& other) noexcept {
+    if (this != &other) {
+        chunks = std::move(other.chunks); blockCount = other.blockCount; chunkCache = {};
+        other.chunks.clear(); other.blockCount = 0; other.chunkCache = {};
+    }
+    return *this;
 }
 StateId World::set(BlockPos pos, StateId state) {
     const auto key = chunkPos(pos);
@@ -23,7 +29,8 @@ StateId World::set(BlockPos pos, StateId state) {
     chunk.states[offset(pos)] = state;
     if (old == 0 && state != 0) { ++chunk.count; ++blockCount; }
     if (old != 0 && state == 0) { --chunk.count; --blockCount; }
-    if (chunk.count == 0) chunks.erase(found);
+    if (chunk.count == 0) { chunks.erase(found); chunkCache[cacheIndex(key)] = {key, nullptr, true}; }
+    else chunkCache[cacheIndex(key)] = {key, &chunk, true};
     return old;
 }
 std::vector<Cell> World::cells() const {

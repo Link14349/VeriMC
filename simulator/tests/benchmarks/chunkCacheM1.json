@@ -1,0 +1,133 @@
+{
+  "date": "2026-09-07",
+  "hardware": {
+    "cpu": "Apple M1",
+    "memoryBytes": 17179869184,
+    "logicalCores": 8,
+    "os": "macOS 15.7.4 (24G517)"
+  },
+  "build": "Apple Clang 17, CMake Release, arm64",
+  "minecraft": "Java 26.2 nonexperimental",
+  "beforeCommit": "84ce470",
+  "change": "8-entry chunk pointer cache; see world.hpp and world.cpp",
+  "sourceSha256": {
+    "simulator/include/simulator/world.hpp": "6dbec12d436028e5cb2cb1c29c76cea61cba55cca8107bcc6a50d729c766dafb",
+    "simulator/src/world.cpp": "e2c9df0bbbeb2a35ea0428bb55d2c67251912a1aaceb7330864495de848f2c3f"
+  },
+  "baseline": [
+    {
+      "benchmark": "drivenRepeaterChains",
+      "blocks": 110000,
+      "chunkStorageBytes": 20485000,
+      "circuits": 10000,
+      "events": 600000,
+      "gameTicksPerSecond": 94.98633198628367,
+      "neighborUpdates": 55200000,
+      "seconds": 3.36890575,
+      "ticks": 320,
+      "version": "26.2"
+    },
+    {
+      "benchmark": "drivenRepeaterChains",
+      "blocks": 110000,
+      "chunkStorageBytes": 20485000,
+      "circuits": 10000,
+      "events": 600000,
+      "gameTicksPerSecond": 94.30594574362273,
+      "neighborUpdates": 55200000,
+      "seconds": 3.393211292,
+      "ticks": 320,
+      "version": "26.2"
+    },
+    {
+      "benchmark": "drivenRepeaterChains",
+      "blocks": 110000,
+      "chunkStorageBytes": 20485000,
+      "circuits": 10000,
+      "events": 600000,
+      "gameTicksPerSecond": 93.88098642865936,
+      "neighborUpdates": 55200000,
+      "seconds": 3.408570917,
+      "ticks": 320,
+      "version": "26.2"
+    }
+  ],
+  "optimized": [
+    {
+      "benchmark": "drivenRepeaterChains",
+      "blocks": 110000,
+      "chunkStorageBytes": 20485000,
+      "circuits": 10000,
+      "events": 600000,
+      "gameTicksPerSecond": 144.93849576149248,
+      "neighborUpdates": 55200000,
+      "seconds": 2.207833042,
+      "ticks": 320,
+      "version": "26.2"
+    },
+    {
+      "benchmark": "drivenRepeaterChains",
+      "blocks": 110000,
+      "chunkStorageBytes": 20485000,
+      "circuits": 10000,
+      "events": 600000,
+      "gameTicksPerSecond": 147.2103946937892,
+      "neighborUpdates": 55200000,
+      "seconds": 2.173759541,
+      "ticks": 320,
+      "version": "26.2"
+    },
+    {
+      "benchmark": "drivenRepeaterChains",
+      "blocks": 110000,
+      "chunkStorageBytes": 20485000,
+      "circuits": 10000,
+      "events": 600000,
+      "gameTicksPerSecond": 142.69156649365686,
+      "neighborUpdates": 55200000,
+      "seconds": 2.24259925,
+      "ticks": 320,
+      "version": "26.2"
+    }
+  ],
+  "medianSeconds": {
+    "baseline": 3.393211292,
+    "optimized": 2.207833042
+  },
+  "notes": [
+    "40 driven cycles, 320 game ticks; timing includes input changes, core execution and delta collection, excludes scene construction.",
+    "110000 blocks: 10000 identical circuits; each cycle toggles every input. No probes or browser rendering.",
+    "All runs report 600000 scheduled events and 55200000 neighbor updates.",
+    "Order of runs: 3 baseline, 3 optimized; ordinary desktop load, no affinity or thermal controls. These are workload-specific observations, not a Minecraft speedup ratio."
+  ],
+  "millionBlockSample": {
+    "dateUtc": "2026-09-06T18:31:52.451699+00:00",
+    "platform": "macOS-15.7.4-arm64-arm-64bit",
+    "machine": "arm64",
+    "sourceCommit": "84ce4702acbc8573b9fe31ebc85dcc9c62ac8ffc",
+    "sourceDirty": true,
+    "binarySha256": "0fec77ec608f4a999f4a4170de45295fa35351a14ee13e4845d51acf07fda715",
+    "build": "Release (build/simulatorCli)",
+    "command": [
+      "simulatorCli",
+      "--benchmark",
+      "100000"
+    ],
+    "samples": [
+      {
+        "benchmark": "drivenRepeaterChains",
+        "blocks": 1100000,
+        "chunkStorageBytes": 204850000,
+        "circuits": 100000,
+        "events": 6000000,
+        "gameTicksPerSecond": 11.19862243192179,
+        "neighborUpdates": 552000000,
+        "seconds": 28.574943208,
+        "ticks": 320,
+        "version": "26.2"
+      }
+    ],
+    "notes": "Timed work includes 40 input transitions per circuit, execution and change collection; excludes construction. No browser rendering. No idle-only TPS claim.",
+    "medianSeconds": 28.574943208
+  }
+}

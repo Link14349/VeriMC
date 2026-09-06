@@ -36,6 +36,21 @@ int main() {
         }
     });
     test("negative chunk boundaries and empty chunk reclamation", [&] { World w; for (int i = -33; i < 33; ++i) w.set({i, i - 16, -i}, 7); expect(w.size() == 66, "count"); for (int i = -33; i < 33; ++i) expect(w.get({i, i -16, -i}) == 7, "negative coordinate"); for (int i = -33; i < 33; ++i) w.set({i, i - 16, -i}, 0); expect(w.chunkCount() == 0, "empty chunks leaked"); });
+    test("world cache survives rehash, deletion, copying and ownership transfer", [&] {
+        World world; const BlockPos point{-1, -17, 31};
+        expect(world.get(point) == 0, "initial empty read"); world.set(point, 7);
+        expect(world.get(point) == 7, "cached miss survived insertion");
+        World copy = world; world.set(point, 9);
+        expect(copy.get(point) == 7 && world.get(point) == 9, "copy shared mutable storage");
+        for (int i = 0; i < 4096; ++i) world.set({i * 16, 32, -48}, 5);
+        expect(world.get(point) == 9, "rehash invalidated chunk");
+        World moved = std::move(world);
+        expect(world.size() == 0 && world.get(point) == 0 && moved.get(point) == 9, "moved-from world retained cached pointers");
+        moved.set(point, 0); expect(moved.get(point) == 0, "deleted chunk read after free");
+        moved.set(point, 8); moved.get(point); moved.clear(); expect(moved.get(point) == 0, "clear retained cache");
+        moved = std::move(copy); expect(moved.get(point) == 7 && copy.get(point) == 0, "move assignment retained old cache");
+        copy = moved; moved.set(point, 1); expect(copy.get(point) == 7, "copy assignment alias");
+    });
     test("wire attenuation and zero-delay settling", [&] { Simulator s(r); floor(s); for (int x = 1; x <= 17; ++x) s.place({x, 1, 0}, r.state("redstone_wire")); s.place({0, 1, 0}, r.state("redstone_block")); for (int x = 1; x <= 17; ++x) expect(s.at({x, 1, 0}).power == std::max(16 - x, 0), "wire at " + std::to_string(x)); expect(s.currentTick == 0, "wire introduced tick delay"); s.setBlock({0, 1, 0}, 0); for (int x = 1; x <= 17; ++x) expect(s.at({x, 1, 0}).power == 0, "wire failed to decay"); });
     test("strong power relays through a solid cube", [&] { Simulator s(r); floor(s); s.place({1, 1, 0}, r.state("stone")); s.place({2, 1, 0}, r.state("redstone_wire")); s.place({1, 2, 0}, r.state("lever", {{"face", "floor"}})); s.interact({1, 2, 0}); expect(s.at({2, 1, 0}).power == 15, "lever strong output"); s.interact({1, 2, 0}); expect(s.at({2, 1, 0}).power == 0, "strong output off"); });
     test("repeater stretches a one-game-tick input to configured delay", [&] { Simulator s(r); floor(s); s.place({1, 1, 0}, r.state("repeater", {{"facing", "west"}, {"delay", "2"}})); s.place({2, 1, 0}, r.state("redstone_wire")); s.place({0, 1, 0}, r.state("redstone_block")); s.advanceTo(1); s.setBlock({0, 1, 0}, 0); s.advanceTo(3); expect(!s.at({1, 1, 0}).powered, "early output"); s.advanceTo(4); expect(s.at({1, 1, 0}).powered && s.at({2, 1, 0}).power == 15, "pulse disappeared"); s.advanceTo(7); expect(s.at({1, 1, 0}).powered, "pulse too short"); s.advanceTo(8); expect(!s.at({1, 1, 0}).powered, "pulse did not end"); });
