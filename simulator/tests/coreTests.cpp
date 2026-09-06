@@ -1,4 +1,5 @@
 #include "simulator/simulator.hpp"
+#include "simulator/legacyRandom.hpp"
 #include <iostream>
 #include <functional>
 #include <fstream>
@@ -21,6 +22,38 @@ int main() {
     test("all 26.2 property combinations round-trip", [&] {
         std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/blockStates.json"); auto source = Json::parse(file);
         for (const auto& block : source["blocks"]) for (const auto& state : block["states"]) expect(r.state(block["name"], state["properties"]) == state["id"].get<StateId>(), "state mismatch: " + block["name"].get<std::string>());
+    });
+    test("Java 26.2 random primitives match exact bits, rejection counts and restored state", [&] {
+        std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/../tests/fixtures/java26_2Random.json");
+        const auto fixture=Json::parse(file);
+        for (const auto& example:fixture.at("cases")) {
+            LegacyRandom random(std::stoull(example.at("seedBits").get<std::string>(),nullptr,16));
+            std::size_t index=0;
+            for (const auto& call:example.at("calls")) {
+                const auto op=call.at("op").get<std::string>();
+                auto expectedBits=[&] {return std::stoull(call.at("bits").get<std::string>(),nullptr,16);};
+                if (op=="int") expect(random.nextInt()==call.at("value"),"random int");
+                else if (op=="bound") expect(random.nextInt(call.at("bound"))==call.at("value"),"random bounded int");
+                else if (op=="long") expect(std::bit_cast<std::uint64_t>(random.nextLong())==expectedBits(),"random signed long");
+                else if (op=="bool") expect(random.nextBoolean()==call.at("value"),"random bool");
+                else if (op=="float") expect(std::bit_cast<std::uint32_t>(random.nextFloat())==expectedBits(),"random float bits");
+                else if (op=="double") expect(std::bit_cast<std::uint64_t>(random.nextDouble())==expectedBits(),"random double bits");
+                else if (op=="triangleDouble") expect(std::bit_cast<std::uint64_t>(random.triangle(3.75,.123))==expectedBits(),"random double triangle");
+                else if (op=="triangleFloat") expect(std::bit_cast<std::uint32_t>(random.triangle(-.25F,.137F))==expectedBits(),"random float triangle");
+                else throw std::runtime_error("unknown random fixture operation");
+                expect(random.state()==call.at("state") && random.drawCount()==call.at("draws"),"random rejection draw/state mismatch");
+                if (++index%37==0) {
+                    const auto state=random.state(), draws=random.drawCount();
+                    for (int i=0;i<7;++i) random.nextInt();
+                    random.restore(state,draws);
+                }
+            }
+        }
+        LegacyRandom random; auto state=random.state(); bool threw=false;
+        try {random.nextInt(0);} catch (...) {threw=true;}
+        expect(threw && random.state()==state && random.drawCount()==0,"invalid bound consumed random state");
+        threw=false; try {random.restore(1ULL<<48,10);} catch (...) {threw=true;}
+        expect(threw && random.state()==state,"invalid random restore changed state");
     });
     test("Java 26.2 chunk scheduler: backlog, limits and callback queue membership", [&] {
         std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/../tests/fixtures/java26_2Scheduler.json");

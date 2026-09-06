@@ -15,10 +15,12 @@ if(simulatorBuildServer)
 endif()
 
 add_library(simulatorOptions INTERFACE)
+# Java evaluates multiply and add separately; implicit FMA changes random
+# triangle samples and other observable float arithmetic by an ULP.
 if(MSVC)
-  target_compile_options(simulatorOptions INTERFACE /W4 /permissive- /utf-8)
+  target_compile_options(simulatorOptions INTERFACE /W4 /permissive- /utf-8 /fp:strict)
 else()
-  target_compile_options(simulatorOptions INTERFACE -Wall -Wextra -Wpedantic -Wconversion -Wshadow)
+  target_compile_options(simulatorOptions INTERFACE -Wall -Wextra -Wpedantic -Wconversion -Wshadow -ffp-contract=off)
 endif()
 if(simulatorSanitizers AND NOT MSVC)
   target_compile_options(simulatorOptions INTERFACE -fsanitize=address,undefined -fno-omit-frame-pointer)
