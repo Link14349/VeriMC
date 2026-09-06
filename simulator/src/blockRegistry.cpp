@@ -64,6 +64,7 @@ BlockRegistry::BlockRegistry(const std::string& path) {
         if (typeInfo.device == Device::hopper) typeInfo.supportLevel = "implemented";
         if (typeInfo.device == Device::dropper) typeInfo.supportLevel = "partial";
         if (typeInfo.className == "ChiseledBookShelfBlock") typeInfo.supportLevel = "partial";
+        if (typeInfo.className == "DecoratedPotBlock") typeInfo.supportLevel = "partial";
         if (typeInfo.device == Device::target) typeInfo.supportLevel = "externalStimulus";
         if (typeInfo.device == Device::rail || typeInfo.device == Device::poweredRail || typeInfo.device == Device::activatorRail) typeInfo.supportLevel = "implemented";
         if (typeInfo.device == Device::detectorRail) typeInfo.supportLevel = "externalStimulus";

@@ -14,6 +14,7 @@ Direction turn(Direction direction, int steps) {
 
 std::size_t Simulator::inventorySize(StateId id) const {
     if(isBookshelf(id)) return 6;
+    if(isDecoratedPot(id)) return 1;
     switch (registry[id].device) {
     case Device::container: return 27;
     case Device::hopper: return 5;
@@ -24,6 +25,9 @@ std::size_t Simulator::inventorySize(StateId id) const {
 }
 bool Simulator::isBookshelf(StateId state) const {
     return registry[state].device==Device::analog && registry.type(state).className=="ChiseledBookShelfBlock";
+}
+bool Simulator::isDecoratedPot(StateId state) const {
+    return registry[state].device==Device::analog && registry.type(state).className=="DecoratedPotBlock";
 }
 bool Simulator::canInsertStack(const InventorySlot& slot, ItemStack stack) const {
     if(isBookshelf(world.get(slot.pos))) return registry.item(stack.item).bookshelfBook && !stackAt(slot).count;

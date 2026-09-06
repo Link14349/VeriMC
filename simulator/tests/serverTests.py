@@ -145,6 +145,17 @@ try:
     empty=command('inspect',pos=[0,0,0]);assert empty['analog']==6 and empty['inventory']==[]
     shelfSnapshot=command('save',checkpoint=True);command('new');command('load',project=shelfSnapshot)
     assert command('inspect',pos=[0,0,0])['analog']==6
+    command('new');command('place',pos=[0,0,0],name='decorated_pot')
+    command('stimulate',pos=[0,0,0],stimulus={'inventory':[{'slot':0,'item':'snowball','count':16}]})
+    pot=command('inspect',pos=[0,0,0]);assert pot['analog']==15 and pot['inventorySize']==1
+    assert command('stimulate',pos=[0,0,0],stimulus={'inventory':[{'slot':0,'item':'snowball','count':17}]})['type']=='error'
+    assert command('stimulate',pos=[0,0,0],stimulus={'viewers':1})['type']=='error'
+    potSnapshot=command('save',checkpoint=True)
+    command('stimulate',pos=[0,0,0],stimulus={'inventory':[{'slot':0,'count':0}]})
+    assert command('inspect',pos=[0,0,0])['analog']==0
+    command('undo');assert command('inspect',pos=[0,0,0])['inventory']==pot['inventory']
+    command('new');command('load',project=potSnapshot)
+    assert command('inspect',pos=[0,0,0])['analog']==15
     assert client.frames > 0
     print(f'PASS: HTTP host validation, binary frames ({client.frames}), circuit editing, delay, probes, VCD, atomic errors, native undo/redo, checkpoint import')
 finally:

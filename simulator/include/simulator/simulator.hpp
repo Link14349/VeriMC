@@ -181,6 +181,7 @@ private:
     struct InventorySlot { BlockPos pos; std::size_t index; };
     std::size_t inventorySize(StateId state) const;
     bool isBookshelf(StateId state) const;
+    bool isDecoratedPot(StateId state) const;
     bool canInsertStack(const InventorySlot& slot, ItemStack stack) const;
     bool canExtractStack(const InventorySlot& slot, BlockPos into) const;
     void updateBookshelfSlot(const InventorySlot& slot);

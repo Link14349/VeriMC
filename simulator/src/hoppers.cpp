@@ -59,9 +59,9 @@ void Simulator::writeStack(const InventorySlot& slot, ItemStack stack, bool noti
         if(occupied || stack.count) updateBookshelfSlot(slot);
         return;
     }
-    // Base containers call setChanged from setItem/removeItem. Hopper overrides
-    // deliberately omit it; the transfer code notifies at its original points.
-    if (notify && registry[id].device != Device::hopper) runtimeChanged(slot.pos);
+    // Hopper overrides and the pot's ContainerSingleItem omit setChanged from
+    // setItem/removeItem; only the successful transfer notifies their readers.
+    if (notify && registry[id].device != Device::hopper && !isDecoratedPot(id)) runtimeChanged(slot.pos);
 }
 
 void Simulator::containerChanged(BlockPos pos) {
@@ -123,7 +123,7 @@ void Simulator::tickHopper(const ScheduledEvent& event) {
         bool pulled = transferItem(source, event.pos, true);
         // Failed extraction from ordinary containers can still issue comparator
         // updates on remove/restore. Preserve those observable repeated calls.
-        retryExtraction = !pulled && at(source).device != Device::hopper && !inventoryEmpty(source);
+        retryExtraction = !pulled && at(source).device != Device::hopper && !isDecoratedPot(world.get(source)) && !inventoryEmpty(source);
         if(retryExtraction && isBookshelf(world.get(source))) {
             retryExtraction=false;
             for(const auto& slot:containerSlots(source)) if(stackAt(slot).count && canExtractStack(slot,event.pos)) {retryExtraction=true;break;}

@@ -222,7 +222,7 @@ void Simulator::onRemove(BlockPos p, StateId old) {
     case Device::lightningRod: if (s.powered) updateNeighbors(p.relative(opposite(s.facing)), -1, old); break;
     case Device::lectern: if (s.powered) updateNeighbors(p.relative(Direction::down), -1, old); break;
     case Device::container: case Device::hopper: case Device::dropper: updateComparatorNeighbors(p); break;
-    case Device::analog: if(isBookshelf(old)) updateComparatorNeighbors(p); break;
+    case Device::analog: if(isBookshelf(old) || isDecoratedPot(old)) updateComparatorNeighbors(p); break;
     case Device::rail: case Device::poweredRail: case Device::activatorRail: case Device::detectorRail: removeRail(p, old); break;
     case Device::tripwire: updateTripwireSource(p, registry.withBool(old, "powered", true)); break;
     case Device::tripwireHook: removeTripwireHook(p, old); break;

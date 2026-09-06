@@ -50,6 +50,8 @@ python3 simulator/runSimulator.py --no-build
 
 雕纹书架支持六槽书籍、最后操作槽位读数，以及漏斗/投掷器传输；清空后保留读数，详见 [书架说明](docs/bookshelves.md)。
 
+饰纹陶罐支持单槽库存、容量读数和六向传输，详见 [陶罐说明](docs/decoratedPots.md)。
+
 ## 验证
 
 ```sh

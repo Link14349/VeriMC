@@ -200,7 +200,7 @@ bool Simulator::stimulateDevice(BlockPos pos, const Json& stimulus) {
         }
         return true;
     }
-    if (state.device == Device::container || state.device == Device::hopper || state.device == Device::dropper || isBookshelf(id)) {
+    if (state.device == Device::container || state.device == Device::hopper || state.device == Device::dropper || isBookshelf(id) || isDecoratedPot(id)) {
         if (stimulus.contains("inventory")) setInventory(pos, stimulus.at("inventory"));
         else if (state.device == Device::container && stimulus.contains("viewers")) setViewers(pos, integerInRange(stimulus, "viewers", 0, 1000000));
         else throw std::invalid_argument("Container input requires inventory or viewers");

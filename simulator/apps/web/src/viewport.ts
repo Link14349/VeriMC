@@ -190,6 +190,14 @@ export class CircuitViewport {
         part([.5,.24,.5],[.8,.16,.8],0x465155);
         for (const edge of [.14,.86]) { part([edge,.48,.5],[.12,.38,.84],0x9ba7a8); part([.5,.48,edge],[.6,.38,.12],0x9ba7a8); }
       }
+    } else if (name === 'decorated_pot') {
+      part([.5,.43,.5],[.875,.86,.875],0x9a5d42);
+      part([.5,.89,.5],[.49,.12,.49],0xa96d4c);
+      for(const edge of [.23,.77]) {
+        part([edge,.98,.5],[.06,.04,.6],0xbd8258);
+        part([.5,.98,edge],[.48,.04,.06],0xbd8258);
+      }
+      part([.5,.95,.5],[.48,.012,.48],0x342f29);
     } else if (name === 'chiseled_bookshelf') {
       const v=directionVectors[facing];part([.5,.5,.5],[.98,.98,.98],0xa18c65);
       for(let slot=0;slot<6;++slot) {

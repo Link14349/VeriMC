@@ -180,7 +180,7 @@ int main() {
         try { restored.loadProject(invalid); } catch (...) { threw = true; }
         expect(threw && before == restored.saveProject("before", true), "invalid batch import changed world");
     });
-    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers", "java26_2Hoppers", "java26_2Torches", "java26_2Rails", "java26_2TickBatches", "java26_2Tripwire", "java26_2Buttons", "java26_2Droppers", "java26_2Targets", "java26_2CopperChests", "java26_2Bookshelves"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
+    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers", "java26_2Hoppers", "java26_2Torches", "java26_2Rails", "java26_2TickBatches", "java26_2Tripwire", "java26_2Buttons", "java26_2Droppers", "java26_2Targets", "java26_2CopperChests", "java26_2Bookshelves", "java26_2Pots"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
         std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/../tests/fixtures/" + fixtureName + ".json"); expect(static_cast<bool>(file), "missing vanilla reference fixture");
         auto fixture = Json::parse(file); auto origin = fixture["origin"].get<BlockPos>(); Simulator s(r);
         auto absolute = [&](const Json& p) { auto pos = p.get<BlockPos>(); return BlockPos{origin.x + pos.x, origin.y + pos.y, origin.z + pos.z}; };
@@ -469,6 +469,28 @@ int main() {
         s.advanceTo(10001);restored.advanceTo(10001);
         expect(s.analogOutput({0,1,0})==1 && s.inventoryJson({0,0,0})[1]["item"]=="minecraft:book","shelf failed to wake and extract first book");
         expect(s.saveProject("shelf",true)==restored.saveProject("shelf",true),"shelf/hopper checkpoint diverged");
+    });
+    test("pot capacity, failed extraction sleep and checkpoint wake", [&] {
+        Simulator s(r);const BlockPos pot{0,1,0},hopper{0,0,0};
+        s.place(pot,r.state("decorated_pot"));s.place(hopper,r.state("hopper",{{"facing","east"}}));
+        s.stimulate(pot,{{"inventory",Json::array({{{"slot",0},{"item","snowball"},{"count",16}}})}});
+        expect(s.analogOutput(pot)==15,"full single-slot pot output");
+        s.addProbe(pot,"pot");
+        Json filled=Json::array();for(int i=0;i<5;++i) filled.push_back({{"slot",i},{"item","stone"},{"count",63}});
+        s.stimulate(hopper,{{"inventory",filled}});auto edges=s.getTrace().size();s.advanceTo(10000);
+        expect(s.pendingEvents()==0 && s.statistics.scheduledEvents==1 && s.getTrace().size()==edges,"failed pot extraction notified or kept polling");
+        auto before=s.saveProject("pot",true);bool threw=false;
+        try{s.stimulate(pot,{{"inventory",Json::array({{{"slot",0},{"item","snowball"},{"count",17}}})}});}catch(...){threw=true;}
+        expect(threw && s.saveProject("pot",true)==before,"overstacked pot input changed world");
+        s.stimulate(hopper,{{"inventory",Json::array({{{"slot",1},{"count",0}}})}});
+        auto saved=s.saveProject("pot",true);Simulator restored(r);restored.loadProject(saved);
+        s.advanceTo(10001);restored.advanceTo(10001);
+        expect(s.inventoryJson(pot)[0]["count"]==15 && s.analogOutput(pot)==14,"pot did not wake and transfer");
+        expect(s.getTrace().size()==edges+1 && s.getTrace().back().value==14,"pot transfer emitted phantom transitions");
+        expect(s.saveProject("pot",true)==restored.saveProject("pot",true),"pot checkpoint continuation diverged");
+        s.setBlock(pot,r.state("decorated_pot",{{"facing","south"},{"cracked","true"}}));
+        expect(s.inventoryJson(pot)[0]["count"]==15,"pot state edit erased inventory");
+        s.place(pot,r.state("stone"));expect(s.inventoryJson(pot).empty(),"pot removal left stale inventory");
     });
     test("invalid inventory edits reject the whole batch", [&] {
         Simulator s(r); s.place({0,0,0},r.state("barrel")); auto before=s.saveProject("before",true);
