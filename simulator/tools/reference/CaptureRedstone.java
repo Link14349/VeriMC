@@ -55,7 +55,16 @@ public class CaptureRedstone extends TestFunctionLoader {
                 return;
             }
             var input = command.getAsJsonObject("stimulus");
-            if (state.getBlock() instanceof ButtonBlock button) {
+            if (state.getBlock() instanceof TargetBlock) {
+                var values=input.getAsJsonArray("hit");
+                var location=new net.minecraft.world.phys.Vec3(pos.getX()+values.get(0).getAsDouble(),pos.getY()+values.get(1).getAsDouble(),pos.getZ()+values.get(2).getAsDouble());
+                var direction=Direction.byName(input.get("face").getAsString());
+                var hit=new net.minecraft.world.phys.BlockHitResult(location,direction,pos,false);
+                var type=BuiltInRegistries.ENTITY_TYPE.getValue(Identifier.withDefaultNamespace(input.get("arrow").getAsBoolean()?"arrow":"snowball"));
+                var entity=type.create(level,EntitySpawnReason.COMMAND);
+                var method=TargetBlock.class.getDeclaredMethod("updateRedstoneOutput",net.minecraft.world.level.LevelAccessor.class,BlockState.class,net.minecraft.world.phys.BlockHitResult.class,Entity.class);
+                method.setAccessible(true);method.invoke(null,level,state,hit,entity);
+            } else if (state.getBlock() instanceof ButtonBlock button) {
                 for (var entity : occupants.getOrDefault(pos, List.of())) entity.discard();
                 var list = new ArrayList<Entity>(); occupants.put(pos, list);
                 int arrows = input.get("arrows").getAsInt(), pressedArrows = input.has("pressedArrows") ? input.get("pressedArrows").getAsInt() : arrows;

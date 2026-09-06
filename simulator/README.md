@@ -63,6 +63,7 @@ python3 tests/serverTests.py
 python3 tests/backpressureTests.py
 python3 tests/runControlTests.py
 python3 tests/dropperTests.py
+python3 tests/targetTests.py
 node tests/webTests.mjs
 
 # 有实际驱动的中继器链基准

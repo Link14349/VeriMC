@@ -256,7 +256,13 @@ export class CircuitViewport {
       part([.5,.67,.5],[.72,.6,.6],tint); part([.5,.24,.5],[.38,.38,.35],tint);
       for (const dx of [.21,.79]) part([dx,.42,.5],[.2,.38,.25],tint);
       part([.35,.73,.806],[.08,.09,.02],0x303d34); part([.65,.73,.806],[.08,.09,.02],0x303d34);
-    } else if (name === 'target') { part([.5,.5,.5],[.98,.98,.98],0xd5cbb4); for (const size of [.7,.38,.12]) part([.5,1 + .001 / size,.5],[size,.005,size],size === .38 ? 0xd5cbb4 : 0xa94a3f); }
+    } else if (name === 'target') {
+      part([.5,.5,.5],[.98,.98,.98],0xd5cbb4);
+      for (const v of Object.values(directionVectors)) for (const size of [.7,.38,.12]) {
+        const offset=.494+.001/size;
+        part([.5+v[0]*offset,.5+v[1]*offset,.5+v[2]*offset],[v[0] ? .005 : size,v[1] ? .005 : size,v[2] ? .005 : size],size===.38?0xd5cbb4:0xa94a3f);
+      }
+    }
     else {
       const colors: Record<string, number> = { stone:0x747c80,smooth_stone:0xa3aaa8,white_concrete:0xc5c8bb,light_gray_concrete:0x93978c,red_concrete:0x975347,blue_concrete:0x516f96,white_wool:0xd2cfc0,redstone_block:0xb2372a,glass:0x719d9e,slime_block:0x84b85f,honey_block:0xb99b42,obsidian:0x353041,bedrock:0x474b50,glowstone:0xb8a673,sea_lantern:0xb6cebe };
       const height = name.endsWith('_slab') && p.type !== 'double' ? .5 : 1; part([.5,(p.type === 'top' ? .5 : 0)+height / 2,.5],[.99,height*.99,.99],colors[name] ?? 0x9b9c89);

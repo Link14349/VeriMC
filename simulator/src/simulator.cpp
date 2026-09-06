@@ -194,6 +194,7 @@ void Simulator::onPlace(BlockPos p, StateId id, StateId old) {
     if (s.device == Device::torch || s.device == Device::wallTorch) { for (auto d : directions) updateNeighbors(p.relative(d)); return; }
     if (registry[old].type == s.type) return;
     switch (s.device) {
+    case Device::target: if (s.power && !hasScheduled(p)) setBlock(p, registry.with(id, "power", 0), 18); break;
     case Device::wire: updateWire(p, id); updateNeighbors(p.relative(Direction::up)); updateNeighbors(p.relative(Direction::down)); wireCorners(p); break;
     case Device::observer: if (s.powered && !hasScheduled(p)) { setBlock(p, registry.withBool(id, "powered", false), 18); notifyFront(p, s.facing); } break;
     case Device::bulb: executeNeighbor(p); break;
@@ -535,11 +536,7 @@ void Simulator::interact(BlockPos p) {
 }
 void Simulator::stimulate(BlockPos p, const Json& input) {
     if (faulted) throw std::runtime_error("当前执行已中止，请从有效快照恢复");
-    auto id = world.get(p); const auto& s = registry[id];
     if (stimulateDevice(p, input)) return;
-    const int value = input.value("value", 0);
-    if (value < 0 || value > 15) throw std::invalid_argument("刺激强度应为 0–15");
-    if (s.device == Device::target) { if (!hasScheduled(p)) { setBlock(p, registry.with(id, "power", value)); schedule(p, input.value("arrow", true) ? 20 : 8); } return; }
     throw std::invalid_argument("该器件尚不支持这类环境刺激");
 }
 void Simulator::clear() {

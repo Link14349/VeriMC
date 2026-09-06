@@ -180,7 +180,7 @@ int main() {
         try { restored.loadProject(invalid); } catch (...) { threw = true; }
         expect(threw && before == restored.saveProject("before", true), "invalid batch import changed world");
     });
-    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers", "java26_2Hoppers", "java26_2Torches", "java26_2Rails", "java26_2TickBatches", "java26_2Tripwire", "java26_2Buttons", "java26_2Droppers"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
+    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers", "java26_2Hoppers", "java26_2Torches", "java26_2Rails", "java26_2TickBatches", "java26_2Tripwire", "java26_2Buttons", "java26_2Droppers", "java26_2Targets"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
         std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/../tests/fixtures/" + fixtureName + ".json"); expect(static_cast<bool>(file), "missing vanilla reference fixture");
         auto fixture = Json::parse(file); auto origin = fixture["origin"].get<BlockPos>(); Simulator s(r);
         auto absolute = [&](const Json& p) { auto pos = p.get<BlockPos>(); return BlockPos{origin.x + pos.x, origin.y + pos.y, origin.z + pos.z}; };
@@ -200,6 +200,34 @@ int main() {
                 if (frame.contains("inventories")) expect(s.inventoryJson(p, false) == frame["inventories"][i], "inventory mismatch at " + std::to_string(tick) + " " + fixture["watch"][i].dump() + " expected " + frame["inventories"][i].dump() + " got " + s.inventoryJson(p, false).dump());
             }
         }
+    });
+    test("target world-coordinate rounding matches 4272 original hit strengths", [&] {
+        std::ifstream file(std::string(SIMULATOR_DATA_DIR)+"/../tests/fixtures/java26_2TargetStrength.json");
+        auto fixture=Json::parse(file);
+        for(const auto& row:fixture.at("cases")) {
+            Simulator s(r);const auto pos=row.at("source").get<BlockPos>();s.place(pos,r.state("target"));
+            for(const auto& sample:row.at("samples")) {
+                s.stimulate(pos,{{"face",row.at("face")},{"hit",sample.at("hit")},{"arrow",true}});
+                expect(s.at(pos).power==sample.at("power"),"target differs near world-coordinate threshold");
+                s.advanceTo(s.currentTick+20);expect(s.at(pos).power==0,"arrow pulse did not release");
+            }
+        }
+    });
+    test("target rejects direct strength edits and preserves pulse on invalid input and restore", [&] {
+        Simulator s(r);const BlockPos pos{-3,2,-7};s.place(pos,r.state("target"));
+        s.stimulate(pos,{{"face","up"},{"hit",Json::array({.5,1,.5})},{"arrow",false}});s.advanceTo(3);
+        const auto before=s.saveProject("target",true);
+        for(const auto& input:std::vector<Json>{{{"value",15}},{{"face","invalid"},{"hit",Json::array({.5,1,.5})}},{{"face","up"},{"hit",Json::array({-.01,1,.5})}},{{"face","up"},{"hit",Json::array({.5,1,.5})},{"arrow","false"}}}) {
+            bool threw=false;try{s.stimulate(pos,input);}catch(...){threw=true;}
+            expect(threw && before==s.saveProject("target",true),"invalid target input modified pulse");
+        }
+        Simulator restored(r);restored.loadProject(before);
+        for(auto* sim:{&s,&restored}) {
+            sim->stimulate(pos,{{"face","north"},{"hit",Json::array({0,.5,0})},{"arrow",true}});
+            sim->advanceTo(7);expect(sim->at(pos).power==15,"repeat hit changed existing power");
+            sim->advanceTo(8);expect(sim->at(pos).power==0,"repeat hit extended duration");
+        }
+        expect(s.saveProject("target",true)==restored.saveProject("target",true),"target checkpoint diverged");
     });
     test("negative chunk boundaries and empty chunk reclamation", [&] { World w; for (int i = -33; i < 33; ++i) w.set({i, i - 16, -i}, 7); expect(w.size() == 66, "count"); for (int i = -33; i < 33; ++i) expect(w.get({i, i -16, -i}) == 7, "negative coordinate"); for (int i = -33; i < 33; ++i) w.set({i, i - 16, -i}, 0); expect(w.chunkCount() == 0, "empty chunks leaked"); });
     test("tripwire ordinary break pulses, shears disarm, and hook support detaches", [&] {

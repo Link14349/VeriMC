@@ -47,3 +47,7 @@ body{overflow-x:auto}
 .actionControls strong{display:block;font-size:12px;margin-top:9px;overflow-wrap:anywhere}
 .actionControls .subtleText{overflow-wrap:anywhere}
 .actionControls .wideButton{white-space:normal;height:auto;min-height:30px;padding:7px 5px}
+.targetFace{display:block;width:100%;padding:0;margin:10px 0;cursor:crosshair;border:0;aspect-ratio:1}
+.targetFace svg{display:block;width:100%;height:100%}
+.targetPresets{display:flex;gap:7px;margin:8px 0}
+.targetPresets button{flex:1;border:1px solid var(--border);border-radius:5px;padding:5px}

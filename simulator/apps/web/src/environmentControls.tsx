@@ -2,13 +2,14 @@ import { useEffect, useState } from 'react';
 import { Zap } from 'lucide-react';
 import { connection, posKey, type BlockDef, type Pos, type BlockCell } from './api';
 import { shortName } from './blockLabels';
+import { TargetControls } from './targetControls';
 
 type Props = { pos: Pos; block: BlockDef; command: (cmd: string, body?: Record<string, unknown>) => Promise<Record<string, unknown> | undefined> };
 
 export function EnvironmentControls({ pos, block, command }: Props) {
   const [entities, setEntities] = useState(1), [living, setLiving] = useState(1);
   const [sky, setSky] = useState(15), [angle, setAngle] = useState(0);
-  const [pages, setPages] = useState(15), [page, setPage] = useState(1), [strength, setStrength] = useState(15);
+  const [pages, setPages] = useState(15), [page, setPage] = useState(1);
   const [inspection, setInspection] = useState<Record<string, unknown>>({});
   const name = shortName(block.name), plate = name.endsWith('pressure_plate'), daylight = name === 'daylight_detector';
   const lectern = name === 'lectern', rod = name.endsWith('lightning_rod'), target = name === 'target';
@@ -84,6 +85,6 @@ export function EnvironmentControls({ pos, block, command }: Props) {
       <p className="subtleText">{runtime.pages ? `第 ${(runtime.page ?? 0) + 1} / ${runtime.pages} 页` : '尚未放入书本'} · 比较器读数 {Number(inspection.analog ?? 0)}。翻页脉冲持续 2 gt。</p>
     </>}
     {rod && <><button className="wideButton accentOutline" onClick={() => stimulus({})}>施加雷击</button><p className="subtleText">产生 8 gt 红石脉冲。天气、火焰和实体伤害不在当前环境模型内。</p></>}
-    {target && <>{numberField('命中强度', strength, setStrength, 15, 1)}<button className="wideButton accentOutline" onClick={() => stimulus({ value: strength, arrow: true })}>箭命中 · 20 gt</button><button className="wideButton" onClick={() => stimulus({ value: strength, arrow: false })}>其他投射物 · 8 gt</button></>}
+    {target && <TargetControls stimulus={stimulus}/>}
   </div>;
 }

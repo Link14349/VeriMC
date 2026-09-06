@@ -161,6 +161,29 @@ bool Simulator::stimulateDevice(BlockPos pos, const Json& stimulus) {
         else buttonContact(pos);
         return true;
     }
+    if (state.device == Device::target) {
+        for (const auto& field : stimulus.items()) if (field.key() != "hit" && field.key() != "face" && field.key() != "arrow")
+            throw std::invalid_argument("标靶输入需要命中面 face 和格内坐标 hit，不能直接指定信号强度");
+        const auto direction = parseDirection(stimulus.at("face"));
+        const auto& hit = stimulus.at("hit");
+        if (!hit.is_array() || hit.size() != 3) throw std::invalid_argument("命中坐标需要三个 0–1 数值");
+        if (stimulus.contains("arrow") && !stimulus.at("arrow").is_boolean()) throw std::invalid_argument("arrow 必须为布尔值");
+        std::array<double,3> distances{};
+        const std::array<int,3> coordinates{pos.x,pos.y,pos.z};
+        for (std::size_t i=0;i<3;++i) {
+            if (!hit[i].is_number() || !std::isfinite(hit[i].get<double>()) || hit[i]<0 || hit[i]>1) throw std::invalid_argument("命中坐标需要三个 0–1 数值");
+            // Match vanilla's fraction of world-space doubles, including
+            // negative positions and rounding near signal thresholds.
+            const double absolute=coordinates[i]+hit[i].get<double>();
+            distances[i]=std::abs(absolute-std::floor(absolute)-.5);
+        }
+        const auto normal=axis(direction)==0?1u:axis(direction)==1?2u:0u;
+        double distance=0;
+        for(std::size_t i=0;i<3;++i) if(i!=normal) distance=std::max(distance,distances[i]);
+        const int strength=std::max(1,static_cast<int>(std::ceil(15.0*std::clamp((.5-distance)/.5,0.0,1.0))));
+        if (!hasScheduled(pos)) { setBlock(pos,registry.with(id,"power",strength));schedule(pos,stimulus.value("arrow",true)?20:8); }
+        return true;
+    }
     if (state.device == Device::detectorRail) { setCartInput(pos, stimulus); return true; }
     if (state.device == Device::tripwire) {
         if (stimulus.contains("shear")) {
