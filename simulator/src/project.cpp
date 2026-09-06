@@ -127,7 +127,8 @@ void Simulator::loadProject(const Json& data) {
                 if (rank == candidate.entityOrders.end() || rank->second != e.entityOrder || candidate.at(e.pos).type != e.type) throw std::invalid_argument("运行事件的方块实体顺序不一致");
             }
             if (e.phase == 1 && ((e.data & 3u) > 2 || (e.data >> 2) > 5)) throw std::invalid_argument("无效活塞方块事件");
-            if ((e.phase != 0 && e.tick < candidate.currentTick) || e.type >= registry.typeCount() || e.priority < -3 || e.priority > 3 || e.phase > 2 || e.order >= candidate.nextOrder || !usedOrders.insert(e.order).second) throw std::invalid_argument("无效的运行队列");
+            if (e.phase == 3 && (e.type != registry[registry.state("tripwire")].type || e.data != 0 || e.entityOrder != 0)) throw std::invalid_argument("无效的环境接触事件");
+            if ((e.phase != 0 && e.tick < candidate.currentTick) || e.type >= registry.typeCount() || e.priority < -3 || e.priority > 3 || e.phase > 3 || e.order >= candidate.nextOrder || !usedOrders.insert(e.order).second) throw std::invalid_argument("无效的运行队列");
             if (e.phase == 0) {
                 if (!data.contains("blockTickState") && e.tick <= candidate.currentTick) throw std::invalid_argument("旧版快照缺少本刻计划事件批次，请使用电路工程重新开始运行");
                 if (!candidate.blockTicks.schedule(e)) throw std::invalid_argument("重复方块计划刻");

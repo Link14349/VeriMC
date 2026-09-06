@@ -12,8 +12,8 @@ export function EnvironmentControls({ pos, block, command }: Props) {
   const [inspection, setInspection] = useState<Record<string, unknown>>({});
   const name = shortName(block.name), plate = name.endsWith('pressure_plate'), daylight = name === 'daylight_detector';
   const lectern = name === 'lectern', rod = name.endsWith('lightning_rod'), target = name === 'target';
-  const detector = name === 'detector_rail';
-  const supported = plate || daylight || lectern || rod || target || detector;
+  const detector = name === 'detector_rail', tripwire = name === 'tripwire';
+  const supported = plate || daylight || lectern || rod || target || detector || tripwire;
   const key = posKey(pos);
   useEffect(() => {
     let active = true, requesting = false;
@@ -38,6 +38,14 @@ export function EnvironmentControls({ pos, block, command }: Props) {
   const numberField = (label: string, value: number, change: (next: number) => void, maximum: number, minimum = 0) =>
     <label className="propertyRow"><span>{label}</span><input aria-label={label} type="number" min={minimum} max={maximum} value={value} onChange={e => change(Number(e.target.value))}/></label>;
   return <div className="inspectorSection environmentControls"><label className="miniLabel"><Zap size={12}/>环境输入</label>
+    {tripwire && <>
+      <p className="subtleText">提供触及这段线的有效实体数量。</p>
+      {numberField('绊线接触数量', entities, setEntities, 1000000)}
+      <button className="wideButton accentOutline" onClick={() => stimulus({entities})}>触及绊线</button>
+      <button className="wideButton" onClick={() => stimulus({entities:0})}>离开绊线</button>
+      <button className="wideButton" onClick={() => stimulus({shear:true})}>用剪刀剪断</button>
+      <p className="subtleText">当前接触 {runtime.entities ?? 0}。每 10 gt 复查；普通移除会触发断线脉冲，剪刀解除该段触发。</p>
+    </>}
     {detector && <>
       <p className="subtleText">提供检测区内的矿车接触，轨道自动输出信号。</p>
       <button className="wideButton" onClick={() => stimulus({carts:[{type:'minecart'}]})}>普通矿车进入</button>

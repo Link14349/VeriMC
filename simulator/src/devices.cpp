@@ -129,6 +129,21 @@ bool Simulator::stimulateDevice(BlockPos pos, const Json& stimulus) {
     auto id = world.get(pos);
     const auto& state = registry[id];
     if (state.device == Device::detectorRail) { setCartInput(pos, stimulus); return true; }
+    if (state.device == Device::tripwire) {
+        if (stimulus.contains("shear")) {
+            if (stimulus.size() != 1 || stimulus.at("shear") != true) throw std::invalid_argument("剪断输入必须为 shear: true");
+            setBlock(pos, registry.withBool(id, "disarmed", true), 260);
+            setBlock(pos, 0);
+        } else {
+            if (stimulus.size() != 1 || !stimulus.contains("entities")) throw std::invalid_argument("绊线输入需要 entities 实体数量");
+            int count = integerInRange(stimulus, "entities", 0, 1000000);
+            runtime[pos].values = {{"entities", count}};
+            runtimeChanged(pos, false);
+            if (count > 0) tripwireContact(pos);
+            else scheduledKeys.erase({pos, state.type, 3, 0});
+        }
+        return true;
+    }
     if (state.device == Device::container || state.device == Device::hopper) {
         if (stimulus.contains("inventory")) setInventory(pos, stimulus.at("inventory"));
         else if (state.device == Device::container && stimulus.contains("viewers")) setViewers(pos, integerInRange(stimulus, "viewers", 0, 1000000));
@@ -191,6 +206,7 @@ void Simulator::validateRuntime(BlockPos pos) const {
     if (!data.values.is_object() || data.output < 0 || data.output > 15) throw std::invalid_argument("无效器件内部状态");
     auto device = at(pos).device;
     if (device == Device::detectorRail) normalizeCarts(data.values.value("carts", Json::array()));
+    if (device == Device::tripwire) integerInRange(data.values, "entities", 0, 1000000);
     if (inventorySize(world.get(pos))) integerInRange(data.values, "viewers", 0, 1000000);
     if (device == Device::pressurePlate || device == Device::weightedPlate) {
         int entities = integerInRange(data.values, "entities", 0, 1000000);

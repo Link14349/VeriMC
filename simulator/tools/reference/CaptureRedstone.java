@@ -40,7 +40,12 @@ public class CaptureRedstone extends TestFunctionLoader {
     static JsonArray coordinates(BlockPos p) { JsonArray a = new JsonArray(); a.add(p.getX()); a.add(p.getY()); a.add(p.getZ()); return a; }
     static void applyCommand(GameTestHelper helper, BlockPos pos, JsonObject command) {
         var level = helper.getLevel();
-        if (command.has("stateId")) { level.setBlock(pos, Block.stateById(command.get("stateId").getAsInt()), 3); return; }
+        if (command.has("stateId")) {
+            var placed = Block.stateById(command.get("stateId").getAsInt());
+            level.setBlock(pos, placed, 3);
+            if (command.has("placedBy")) placed.getBlock().setPlacedBy(level, pos, placed, null, ItemStack.EMPTY);
+            return;
+        }
         var state = level.getBlockState(pos);
         try {
             if (command.has("interact")) {
@@ -49,7 +54,25 @@ public class CaptureRedstone extends TestFunctionLoader {
                 return;
             }
             var input = command.getAsJsonObject("stimulus");
-            if (state.getBlock() instanceof DetectorRailBlock detector) {
+            if (state.getBlock() instanceof TripWireBlock wire) {
+                if (input.has("shear")) {
+                    var player = helper.makeMockPlayer(GameType.CREATIVE);
+                    player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(Items.SHEARS));
+                    wire.playerWillDestroy(level, pos, state, player);
+                    level.setBlock(pos, Block.stateById(0), 3);
+                } else {
+                    for (var entity : occupants.getOrDefault(pos, List.of())) entity.discard();
+                    var list = new ArrayList<Entity>(); occupants.put(pos, list);
+                    for (int i = 0; i < input.get("entities").getAsInt(); ++i) {
+                        var entity = new ArmorStand(level, pos.getX() + .5, pos.getY() + .08, pos.getZ() + .5);
+                        entity.setNoGravity(true); level.addFreshEntity(entity); list.add(entity);
+                    }
+                    if (!state.getValue(TripWireBlock.POWERED) && !level.getBlockTicks().hasScheduledTick(pos, wire)) {
+                        var method = TripWireBlock.class.getDeclaredMethod("checkPressed", Level.class, BlockPos.class, List.class);
+                        method.setAccessible(true); method.invoke(wire, level, pos, list);
+                    }
+                }
+            } else if (state.getBlock() instanceof DetectorRailBlock detector) {
                 if (input.has("carts")) {
                     for (var entity : occupants.getOrDefault(pos, List.of())) entity.discard();
                     var list = new ArrayList<Entity>(); occupants.put(pos, list);
@@ -141,6 +164,12 @@ public class CaptureRedstone extends TestFunctionLoader {
                     JsonObject command = value.getAsJsonObject(); if (command.get("tick").getAsInt() != tick) continue;
                     var absolute = helper.absolutePos(pos(command.getAsJsonArray("pos")));
                     applyCommand(helper, absolute, command);
+                }
+                if (scenario.has("discardDrops") && scenario.get("discardDrops").getAsBoolean()) {
+                    // Isolate block logic from random dropped-hook trajectories;
+                    // explicit contact inputs remain real persistent entities.
+                    var bounds = net.minecraft.world.phys.AABB.encapsulatingFullBlocks(helper.absolutePos(new BlockPos(-4,-4,-4)), helper.absolutePos(new BlockPos(52,10,52)));
+                    for (var drop : helper.getLevel().getEntitiesOfClass(ItemEntity.class, bounds)) drop.discard();
                 }
                 JsonObject frame = new JsonObject(); frame.addProperty("tick", tick); JsonArray states = new JsonArray(); JsonArray analogs = new JsonArray(); JsonArray inventories = new JsonArray();
                 for (var value : scenario.getAsJsonArray("watch")) {

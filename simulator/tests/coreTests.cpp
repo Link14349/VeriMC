@@ -7,6 +7,13 @@ using namespace simulator;
 namespace {
 void expect(bool condition, const std::string& message) { if (!condition) throw std::runtime_error(message); }
 void floor(Simulator& s, int start = -4, int end = 20) { for (int x = start; x <= end; ++x) for (int z = -4; z <= 4; ++z) s.world.set({x, 0, z}, s.registry.state("stone")); }
+void tripwireLine(Simulator& s) {
+    s.place({-1,1,0}, s.registry.state("stone")); s.place({7,1,0}, s.registry.state("stone"));
+    s.place({0,1,0}, s.registry.state("tripwire_hook", {{"facing","east"}}));
+    s.place({6,1,0}, s.registry.state("tripwire_hook", {{"facing","west"}}));
+    for (int x = 1; x < 6; ++x) s.place({x,1,0}, s.registry.state("tripwire"));
+    s.advanceTo(20);
+}
 }
 int main() {
     BlockRegistry r; int passed = 0, failed = 0;
@@ -71,7 +78,7 @@ int main() {
         try { restored.loadProject(invalid); } catch (...) { threw = true; }
         expect(threw && before == restored.saveProject("before", true), "invalid batch import changed world");
     });
-    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers", "java26_2Hoppers", "java26_2Torches", "java26_2Rails", "java26_2TickBatches"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
+    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers", "java26_2Hoppers", "java26_2Torches", "java26_2Rails", "java26_2TickBatches", "java26_2Tripwire"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
         std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/../tests/fixtures/" + fixtureName + ".json"); expect(static_cast<bool>(file), "missing vanilla reference fixture");
         auto fixture = Json::parse(file); auto origin = fixture["origin"].get<BlockPos>(); Simulator s(r);
         auto absolute = [&](const Json& p) { auto pos = p.get<BlockPos>(); return BlockPos{origin.x + pos.x, origin.y + pos.y, origin.z + pos.z}; };
@@ -79,7 +86,8 @@ int main() {
             Tick tick = frame["tick"]; s.advanceTo(tick);
             for (const auto& command : fixture["commands"]) if (command["tick"] == tick) {
                 auto p = absolute(command["pos"]);
-                if (command.contains("stateId")) s.setBlock(p, command["stateId"]);
+                if (command.contains("placedBy")) s.place(p, command["stateId"]);
+                else if (command.contains("stateId")) s.setBlock(p, command["stateId"]);
                 else if (command.contains("interact")) s.interact(p);
                 else s.stimulate(p, command["stimulus"]);
             }
@@ -92,6 +100,37 @@ int main() {
         }
     });
     test("negative chunk boundaries and empty chunk reclamation", [&] { World w; for (int i = -33; i < 33; ++i) w.set({i, i - 16, -i}, 7); expect(w.size() == 66, "count"); for (int i = -33; i < 33; ++i) expect(w.get({i, i -16, -i}) == 7, "negative coordinate"); for (int i = -33; i < 33; ++i) w.set({i, i - 16, -i}, 0); expect(w.chunkCount() == 0, "empty chunks leaked"); });
+    test("tripwire ordinary break pulses, shears disarm, and hook support detaches", [&] {
+        Simulator s(r); tripwireLine(s);
+        expect(r.property(s.world.get({0,1,0}), "attached") == "true", "manual span did not attach");
+        s.setBlock({3,1,0}, 0);
+        expect(s.at({0,1,0}).powered && s.at({6,1,0}).powered, "ordinary break omitted pulse");
+        s.advanceTo(29); expect(s.at({0,1,0}).powered, "break pulse ended early");
+        s.advanceTo(30); expect(!s.at({0,1,0}).powered, "broken span remained powered");
+        Simulator sheared(r); tripwireLine(sheared); sheared.addProbe({0,1,0}, "cut");
+        sheared.stimulate({3,1,0}, {{"shear",true}});
+        expect(sheared.world.get({3,1,0}) == 0 && !sheared.at({0,1,0}).powered, "shears produced a break pulse");
+        for (const auto& edge : sheared.getTrace()) expect(edge.value == 0, "shears produced a transient pulse");
+        Simulator detached(r); tripwireLine(detached); detached.setBlock({-1,1,0}, 0);
+        expect(detached.world.get({0,1,0}) == 0 && r.property(detached.world.get({6,1,0}), "attached") == "false", "support destruction skipped hook notifications");
+    });
+    test("tripwire re-entry waits for zero-delay tick and restores contact phase", [&] {
+        Simulator s(r); tripwireLine(s);
+        s.stimulate({3,1,0}, {{"entities",1}}); s.stimulate({3,1,0}, {{"entities",0}});
+        s.advanceTo(30); expect(!s.at({3,1,0}).powered && s.hasScheduled({3,1,0}), "release lost zero-delay guard");
+        s.place({8,1,0}, r.state("piston", {{"facing","east"}}));
+        s.stimulate({3,1,0}, {{"entities",1}});
+        expect(!s.at({3,1,0}).powered, "re-entry bypassed pending recheck");
+        auto saved = s.saveProject("contact", true); Simulator restored(r); restored.loadProject(saved);
+        s.advanceTo(31); restored.advanceTo(31);
+        expect(s.at({3,1,0}).powered && !s.at({8,1,0}).extended, "contact did not run between block events and block entities");
+        s.advanceTo(34); restored.advanceTo(34);
+        expect(s.at({8,1,0}).extended && s.saveProject("contact",true) == restored.saveProject("contact",true), "contact snapshot lost piston activation");
+        expect(s.signal({3,1,0}, Direction::up) == 0 && s.displayValue({3,1,0}) == 15, "tripwire emitted electrical power directly");
+        auto before = s.saveProject("before", true); bool threw = false;
+        try { s.stimulate({3,1,0}, {{"entities",-1}}); } catch (...) { threw = true; }
+        expect(threw && before == s.saveProject("before", true), "invalid contact input changed state");
+    });
     test("world cache survives rehash, deletion, copying and ownership transfer", [&] {
         World world; const BlockPos point{-1, -17, 31};
         expect(world.get(point) == 0, "initial empty read"); world.set(point, 7);

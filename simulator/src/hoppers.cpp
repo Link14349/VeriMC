@@ -7,7 +7,7 @@ namespace simulator {
 void Simulator::startHopper(BlockPos pos) {
     registerEntity(pos);
     auto& hopper = hoppers[pos];
-    hopper.firstTick = currentTick + (currentPhase < 2 ? 0 : 1);
+    hopper.firstTick = currentTick + (beforeBlockEntities() ? 0 : 1);
     wakeHopper(pos);
 }
 
@@ -18,7 +18,7 @@ void Simulator::wakeHopper(BlockPos pos) {
     auto rank = entityOrders.at(pos);
     // The current tick will schedule its own continuation after push and pull.
     if (currentPhase == 2 && rank == currentEntityOrder) return;
-    bool canRunThisTick = currentPhase < 2 || (currentPhase == 2 && rank > currentEntityOrder);
+    bool canRunThisTick = beforeBlockEntities() || (currentPhase == 2 && rank > currentEntityOrder);
     auto when = std::max({hopper.readyAt, hopper.firstTick, currentTick + (canRunThisTick ? 0 : 1)});
     if (hopper.wakeAt <= when) return;
     if (hopper.wakeAt != UINT64_MAX) scheduledKeys.erase({pos, at(pos).type, 2, hopper.generation});

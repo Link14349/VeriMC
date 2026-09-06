@@ -20,9 +20,10 @@ class InstancePool {
   private free: number[] = [];
   private count = 0;
   private capacity = 32;
-  constructor(readonly group: THREE.Group, readonly geometry: THREE.BufferGeometry) { this.mesh = this.create(); }
+  constructor(readonly group: THREE.Group, readonly geometry: THREE.BufferGeometry, readonly visible = true) { this.mesh = this.create(); }
   private create() {
     const mesh = new THREE.InstancedMesh(this.geometry, material, this.capacity); mesh.count = this.count;
+    mesh.visible = this.visible;
     mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage); mesh.castShadow = false; mesh.receiveShadow = true;
     mesh.boundingSphere = new THREE.Sphere(new THREE.Vector3(8,8,8), 15); mesh.userData.pool = this; this.group.add(mesh); return mesh;
   }
@@ -39,7 +40,7 @@ class InstancePool {
   private dirty() { this.mesh.instanceMatrix.needsUpdate = true; if (this.mesh.instanceColor) this.mesh.instanceColor.needsUpdate = true; }
   dispose() { this.group.remove(this.mesh); this.mesh.dispose(); }
 }
-type Chunk = { group: THREE.Group; box: InstancePool; cylinder: InstancePool };
+type Chunk = { group: THREE.Group; box: InstancePool; cylinder: InstancePool; pick?: InstancePool };
 export class CircuitViewport {
   renderer: THREE.WebGLRenderer;
   scene = new THREE.Scene();
@@ -133,6 +134,29 @@ export class CircuitViewport {
         if (!open || (moving && source && !extending)) { const headOffset = moving ? 1-progress : 0; pistonPart(.37+headOffset,.25,.99,sticky?0x8da96a:0xbb9f70); if(moving)pistonPart(headOffset*.5,.8,.22,0xaaa58e); }
         for (const offset of [-.25,0,.25]) part([.5,.995,.5+offset],[.77,.01,.045],0x48534f);
       }
+    } else if (name === 'tripwire') {
+      const attached = p.attached === 'true';
+      // Original wire selection volume covers the cell, not only its thin
+      // rendered thread. Keep pick geometry invisible and pooled by chunk.
+      const pick = chunk.pick ??= new InstancePool(chunk.group, box, false);
+      transform.compose(vector.set(x+.5,y+(attached ? .109375 : .25),z+.5),quaternion.identity(),scaleVector.set(1,attached ? .09375 : .5,1));
+      handles.push(pick.add(cell.pos,transform,0));
+      const shade = p.disarmed === 'true' ? 0x8e9390 : p.powered === 'true' ? 0xd97743 : 0x596e74;
+      const height = attached ? .09 : .035;
+      part([.5,height,.5],[.09,.03,.09],shade);
+      for (const direction of ['north','south','east','west']) if (p[direction] === 'true') {
+        const v = directionVectors[direction];
+        part([.5+v[0]*.25,height,.5+v[2]*.25],[v[0] ? .5 : .045,.035,v[2] ? .5 : .045],shade);
+      }
+    } else if (name === 'tripwire_hook') {
+      const v = directionVectors[facing], attached = p.attached === 'true';
+      const shade = p.powered === 'true' ? 0xe6ad69 : 0xb4beb9;
+      part([.5-v[0]*.455,.28,.5-v[2]*.455],[v[0] ? .09 : .32,.5,v[2] ? .09 : .32],0x927c5b);
+      const height = attached ? .11 : .29;
+      part([.5-v[0]*.25,height,.5-v[2]*.25],[v[0] ? .42 : .055,.055,v[2] ? .42 : .055],shade);
+      for (const side of [-1,1]) part([.5-v[0]*.065+v[2]*side*.07,height,.5-v[2]*.065-v[0]*side*.07],[v[0] ? .15 : .035,.045,v[2] ? .15 : .035],shade);
+      part([.5+v[0]*.01,height,.5+v[2]*.01],[v[0] ? .035 : .17,.045,v[2] ? .035 : .17],shade);
+      if (attached) part([.5+v[0]*.25,.09,.5+v[2]*.25],[v[0] ? .5 : .026,.026,v[2] ? .5 : .026],shade);
     } else if (name === 'rail' || name.endsWith('_rail')) {
       const shape = p.shape ?? 'north_south';
       const powered = p.powered === 'true';
@@ -235,7 +259,7 @@ export class CircuitViewport {
     this.handles.set(key, handles);
   }
   private applyChanges = (event: Event) => { const { full, changes } = (event as CustomEvent<{ full: boolean; changes: BlockCell[] }>).detail; if (full) this.rebuild(); else for (const cell of changes) this.drawCell(cell); };
-  private rebuild() { for (const chunk of this.chunks.values()) { chunk.box.dispose(); chunk.cylinder.dispose(); this.scene.remove(chunk.group); } this.chunks.clear(); this.handles.clear(); for (const cell of connection.cells.values()) this.drawCell(cell); }
+  private rebuild() { for (const chunk of this.chunks.values()) { chunk.box.dispose(); chunk.cylinder.dispose(); chunk.pick?.dispose(); this.scene.remove(chunk.group); } this.chunks.clear(); this.handles.clear(); for (const cell of connection.cells.values()) this.drawCell(cell); }
   setLayer(layer: number, cutaway: boolean) { this.layer = layer; this.cutaway = cutaway; this.plane.constant = -layer; this.clipPlane.constant = cutaway ? layer + 1.01 : 2000000; }
   select(pos: Pos | null) { this.selected = pos; this.selection.visible = !!pos; if (pos) { this.selection.box.min.fromArray(pos).addScalar(-.007); this.selection.box.max.fromArray(pos).addScalar(1.007); } }
   fit() { const bounds = new THREE.Box3(); for (const cell of connection.cells.values()) bounds.expandByPoint(new THREE.Vector3(...cell.pos)); if (bounds.isEmpty()) bounds.set(new THREE.Vector3(-4,0,-4),new THREE.Vector3(4,0,4)); const center = bounds.getCenter(new THREE.Vector3()), size = bounds.getSize(new THREE.Vector3()).length(); this.controls.target.copy(center); this.camera.position.copy(center).add(new THREE.Vector3(1,1.25,1.4).multiplyScalar(Math.max(size*.65,8))); }
@@ -243,7 +267,7 @@ export class CircuitViewport {
   private locate(event: PointerEvent): Pos | null {
     const rect = this.renderer.domElement.getBoundingClientRect(); this.pointer.set((event.clientX-rect.left)/rect.width*2-1,-(event.clientY-rect.top)/rect.height*2+1); this.raycaster.setFromCamera(this.pointer,this.camera);
     if (this.tool === 'place') { const hit = this.raycaster.ray.intersectPlane(this.plane, new THREE.Vector3()); return hit ? [Math.floor(hit.x),this.layer,Math.floor(hit.z)] : null; }
-    const meshes: THREE.Object3D[] = []; for (const chunk of this.chunks.values()) meshes.push(chunk.box.mesh,chunk.cylinder.mesh);
+    const meshes: THREE.Object3D[] = []; for (const chunk of this.chunks.values()) { meshes.push(chunk.box.mesh,chunk.cylinder.mesh); if (chunk.pick) meshes.push(chunk.pick.mesh); }
     for (const hit of this.raycaster.intersectObjects(meshes)) { const pool = hit.object.userData.pool as InstancePool; const pos = pool.positions[hit.instanceId!]; if (pos && (!this.cutaway || pos[1] <= this.layer)) return pos; }
     return null;
   }
@@ -251,5 +275,5 @@ export class CircuitViewport {
   private pointerUp = (event: PointerEvent) => { if (event.button === 0 && this.down && Math.hypot(event.clientX-this.down[0],event.clientY-this.down[1]) < 5) { const pos = this.locate(event); if (pos) this.onPick(pos,this.tool,event.shiftKey); } this.down = null; };
   private pointerMove = (event: PointerEvent) => { const pos = this.locate(event); if (posKey(pos ?? [0,0,0]) !== posKey(this.hover ?? [0,0,0])) this.onHover(pos); this.hover = pos; this.ghost.visible = this.tool === 'place' && !!pos; if (pos) this.ghost.position.set(pos[0]+.5,pos[1]+.5,pos[2]+.5); };
   private animate = () => { this.frameId = requestAnimationFrame(this.animate); this.controls.update(); this.renderer.render(this.scene,this.camera); this.frameCount++; const now = performance.now(); if (now-this.lastFps > 1000) { this.onFps(Math.round(this.frameCount*1000/(now-this.lastFps))); this.lastFps=now; this.frameCount=0; } };
-  dispose() { cancelAnimationFrame(this.frameId); this.resizeObserver.disconnect(); connection.removeEventListener('cells',this.applyChanges); this.controls.dispose(); for (const c of this.chunks.values()) { c.box.dispose(); c.cylinder.dispose(); } this.renderer.dispose(); this.renderer.domElement.remove(); }
+  dispose() { cancelAnimationFrame(this.frameId); this.resizeObserver.disconnect(); connection.removeEventListener('cells',this.applyChanges); this.controls.dispose(); for (const c of this.chunks.values()) { c.box.dispose(); c.cylinder.dispose(); c.pick?.dispose(); } this.renderer.dispose(); this.renderer.domElement.remove(); }
 }

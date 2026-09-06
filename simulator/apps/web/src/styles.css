@@ -6,3 +6,39 @@
 .environmentControls .miniLabel{display:flex;align-items:center;gap:6px}.propertyRow input{width:83px;padding:5px 7px;color:#d4e0de;background:#172126;border:1px solid #37464d;border-radius:4px;font:inherit}.environmentControls .subtleText{line-height:1.7}.inspectorSection{flex-shrink:0}
 
 .inventoryGrid{display:grid;grid-template-columns:repeat(9,1fr);gap:2px;margin-top:12px}.inventoryGrid button{height:27px;position:relative;padding:0;background:#172126;border:1px solid #34464c;border-radius:3px;font-size:7px;color:#9dafab}.inventoryGrid button.selected{border-color:#dfbd81;background:#3f4136}.inventoryGrid button b{position:absolute;bottom:1px;right:2px;font-size:8px;color:#edd9b5}.itemInput{width:100%;margin:8px 0 12px;padding:7px;background:#172126;color:#d4dfdb;border:1px solid #35464b;border-radius:4px;font:10px monospace}
+.app{min-width:640px}
+body{overflow-x:auto}
+@media(max-width:930px){
+  .palette{width:140px}
+  .tabs button{white-space:nowrap;padding:3px 4px;font-size:9px}
+  .paletteItem{gap:6px;padding:6px}
+  .paletteItem>span:nth-child(2){font-size:10px}
+  .paletteItem small{font-size:7px}
+  .paletteNote{padding:12px 8px;gap:6px}
+  .inspector{width:185px}
+  .toolbar{padding:0 9px;gap:8px}
+  .fileTools{min-width:0;gap:2px}
+  .transport{gap:3px}
+  .transport select{min-width:0;width:97px}
+  .transport .runButton{padding:6px 8px}
+  .runButton kbd{display:none}
+  .divider{margin:0 2px}
+  .tickReadout{min-width:51px;gap:4px}
+  .tickReadout b{min-width:30px;font-size:17px}
+  .brand,.headerRight{min-width:0}
+  .headerRight{gap:5px}
+  .version,.brand small,.brand strong span{display:none}
+  .appHeader{padding:0 12px}
+  .projectTitle{gap:5px;max-width:220px}
+  .channels{width:142px;min-width:142px}
+  .channel{font-size:9px;padding-left:5px;gap:4px}
+  .channelHead{font-size:7px;padding:0 6px}
+  .waveHeader{padding:0 6px;gap:3px}
+  .waveActions{gap:0}
+  .waveActions button{padding:3px}
+  .waveFooter{padding:0 6px;font-size:7px;gap:5px}
+  .waveEmpty{left:142px}
+  .viewportTop{left:9px;right:9px}
+  .viewportTools{left:9px}
+  .viewportBottom{left:9px;font-size:7px}
+}

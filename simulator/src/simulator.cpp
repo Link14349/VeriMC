@@ -60,6 +60,7 @@ int Simulator::displayValue(BlockPos pos) const {
     if (inventorySize(world.get(pos)) && registry.type(world.get(pos)).name != "minecraft:trapped_chest") return containerAnalog(pos);
     if (state.device == Device::piston) return state.extended ? 15 : 0;
     if (state.device == Device::poweredRail || state.device == Device::activatorRail) return state.powered ? 15 : 0;
+    if (state.device == Device::tripwire) return state.powered ? 15 : 0;
     if (state.device == Device::door || state.device == Device::trapdoor || state.device == Device::fenceGate) return registry.property(world.get(pos), "open") == "true" ? 15 : 0;
     int value = 0; for (auto d : directions) value = std::max(value, signal(pos, d));
     return value;
@@ -108,6 +109,7 @@ void Simulator::setBlock(BlockPos p, StateId id, unsigned flags, int depth) {
     sampleAffected(p);
     if (oldState.type != state.type) {
         runtime.erase(p);
+        scheduledKeys.erase({p, oldState.type, 3, 0});
         if (auto motion = motions.find(p); motion != motions.end()) {
             scheduledKeys.erase({p, oldState.type, 2, motion->second.generation});
             motions.erase(motion);
@@ -138,6 +140,7 @@ bool Simulator::survives(BlockPos p, StateId id) const {
     case Device::repeater: case Device::comparator: return (below.rigidMask & 2u) != 0;
     case Device::torch: return (below.centerMask & 2u) != 0;
     case Device::wallTorch: return (at(p.relative(opposite(s.facing))).supportMask & (1u << static_cast<unsigned>(s.facing))) != 0;
+    case Device::tripwireHook: return axis(s.facing) != 0 && (at(p.relative(opposite(s.facing))).supportMask & (1u << static_cast<unsigned>(s.facing))) != 0;
     case Device::lever: case Device::button: return (at(p.relative(opposite(s.connectedDirection))).supportMask & (1u << static_cast<unsigned>(s.connectedDirection))) != 0;
     case Device::pressurePlate: case Device::weightedPlate: return (below.rigidMask & 2u) != 0 || (below.centerMask & 2u) != 0;
     case Device::rail: case Device::poweredRail: case Device::activatorRail: case Device::detectorRail: return (below.rigidMask & 2u) != 0;
@@ -160,6 +163,11 @@ void Simulator::place(BlockPos p, StateId id) {
         return;
     }
     if (!survives(p, id)) throw std::invalid_argument("这个位置缺少器件所需的支撑面");
+    if (registry[id].device == Device::tripwire) {
+        for (auto d : horizontal) id = registry.withBool(id, directionNames[static_cast<unsigned>(d)], connectsTripwire(world.get(p.relative(d)), d));
+    }
+    if (registry[id].device == Device::tripwireHook && at(p).type != registry[id].type)
+        id = registry.withBool(registry.withBool(id, "attached", false), "powered", false);
     if (registry[id].device == Device::wire) {
         for (auto d : horizontal) id = registry.with(id, directionNames[static_cast<unsigned>(d)], std::string("side"));
         id = wireConnections(p, id);
@@ -171,6 +179,7 @@ void Simulator::place(BlockPos p, StateId id) {
     if (registry[id].device == Device::container && at(p).type != registry[id].type) id = placedChest(p, id);
     if (registry[id].device == Device::lamp) id = registry.withBool(id, "lit", bestSignal(p) != 0);
     setBlock(p, id);
+    if (registry[id].device == Device::tripwireHook && at(p).type == registry[id].type) calculateTripwire(p, world.get(p), false, false);
     if (isDiode(registry[id].device) && (registry[id].device == Device::comparator ? comparatorInput(p) : diodeInput(p)) > 0) schedule(p, 1);
 }
 void Simulator::onPlace(BlockPos p, StateId id, StateId old) {
@@ -186,6 +195,10 @@ void Simulator::onPlace(BlockPos p, StateId id, StateId old) {
     case Device::hopper: executeNeighbor(p); startHopper(p); break;
     case Device::rail: case Device::poweredRail: case Device::activatorRail: case Device::detectorRail: placeRail(p); break;
     case Device::piston: checkPiston(p); break;
+    case Device::tripwire:
+        updateTripwireSource(p, id);
+        if (runtime.contains(p) && runtime.at(p).values.value("entities", 0) > 0) schedulePhase(p, currentTick + 1, 3, 0);
+        break;
     default: break;
     }
 }
@@ -202,6 +215,8 @@ void Simulator::onRemove(BlockPos p, StateId old) {
     case Device::lectern: if (s.powered) updateNeighbors(p.relative(Direction::down), -1, old); break;
     case Device::container: case Device::hopper: updateComparatorNeighbors(p); break;
     case Device::rail: case Device::poweredRail: case Device::activatorRail: case Device::detectorRail: removeRail(p, old); break;
+    case Device::tripwire: updateTripwireSource(p, registry.withBool(old, "powered", true)); break;
+    case Device::tripwireHook: removeTripwireHook(p, old); break;
     case Device::pistonHead: { auto base = p.relative(opposite(s.facing)); if (at(base).device == Device::piston && at(base).extended && at(base).facing == s.facing) setBlock(base, 0); break; }
     default: break;
     }
@@ -274,14 +289,22 @@ void Simulator::indirectShapes(BlockPos p, StateId id, unsigned flags, int depth
 void Simulator::executeShape(const Update& u) {
     auto id = world.get(u.pos); const auto& s = registry[id];
     if (isRail(s.device)) return; // Rail support is checked by neighborChanged.
+    if (s.device == Device::tripwireHook) {
+        if (opposite(u.direction) == s.facing && !survives(u.pos, id)) setBlock(u.pos, 0, 3, u.depth);
+        return;
+    }
+    if (s.device == Device::tripwire) {
+        if (axis(u.direction) != 0) setBlock(u.pos, registry.withBool(id, directionNames[static_cast<unsigned>(u.direction)], connectsTripwire(u.neighborState, u.direction)), u.flags, u.depth);
+        return;
+    }
     if (s.device == Device::door && axis(u.direction) == 0 && ((registry.property(id, "half") == "lower") == (u.direction == Direction::up))) {
         bool fits = registry[u.neighborState].device == Device::door && registry.property(u.neighborState, "half") != registry.property(id, "half");
         auto next = fits ? registry.with(u.neighborState, "half", registry.property(id, "half")) : 0;
-        setBlock(u.pos, next, u.flags, u.depth);
+        setBlock(u.pos, next, next == 0 ? 3 : u.flags, u.depth);
         return;
     }
     if (s.device == Device::container && registry.has(id, "type")) { updateChestShape(u); return; }
-    if (!survives(u.pos, id)) { setBlock(u.pos, 0, u.flags, u.depth); return; }
+    if (!survives(u.pos, id)) { setBlock(u.pos, 0, 3, u.depth); return; }
     if (s.device == Device::observer && u.direction == s.facing && !s.powered && !hasScheduled(u.pos)) schedule(u.pos, 2);
     if (s.device == Device::repeater && axis(u.direction) != 0 && axis(u.direction) != axis(s.facing)) setBlock(u.pos, registry.withBool(id, "locked", diodeSideInput(u.pos) > 0), u.flags, u.depth);
     if (s.device == Device::wire && u.direction != Direction::down) {
@@ -402,6 +425,8 @@ void Simulator::executeTick(const ScheduledEvent& event) {
     case Device::lightningRod: setBlock(p, registry.withBool(id, "powered", false)); updateNeighbors(p.relative(opposite(s.facing)), -1, id); break;
     case Device::lectern: setBlock(p, registry.withBool(id, "powered", false)); updateNeighbors(p.relative(Direction::down), -1, id); break;
     case Device::detectorRail: if (s.powered) updateDetectorRail(p); break;
+    case Device::tripwire: if (s.powered) updateTripwire(p); break;
+    case Device::tripwireHook: calculateTripwire(p, id, false, true); break;
     default: break;
     }
 }
@@ -426,6 +451,7 @@ bool Simulator::stepEvent() {
     try {
         if (at(event.pos).type == event.type) {
             if (event.phase == 1) pistonEvent(event);
+            else if (event.phase == 3) tripwireContact(event.pos);
             else if (event.phase == 2) {
                 if (at(event.pos).device == Device::daylight) updateDaylight(event.pos);
                 else if (at(event.pos).device == Device::hopper) tickHopper(event);
@@ -433,8 +459,8 @@ bool Simulator::stepEvent() {
             } else executeTick(event);
             ++statistics.scheduledEvents;
         }
-    } catch (...) { currentPhase = 3; throw; }
-    currentPhase = 3;
+    } catch (...) { currentPhase = 4; throw; }
+    currentPhase = 4;
     return true;
 }
 Tick Simulator::nextTick() {
@@ -491,7 +517,7 @@ void Simulator::stimulate(BlockPos p, const Json& input) {
 }
 void Simulator::clear() {
     recentTorchToggles.clear(); torchToggleCounts.clear();
-    world.clear(); runtime.clear(); motions.clear(); hoppers.clear(); entityOrders.clear(); nextEntityOrder = 0; scheduled = {}; scheduledKeys.clear(); blockTicks = {}; changes.clear(); currentTick = 0; nextOrder = 0; sequence = 0; currentPhase = 3;
+    world.clear(); runtime.clear(); motions.clear(); hoppers.clear(); entityOrders.clear(); nextEntityOrder = 0; scheduled = {}; scheduledKeys.clear(); blockTicks = {}; changes.clear(); currentTick = 0; nextOrder = 0; sequence = 0; currentPhase = 4;
     probes.clear(); probeDependencies.clear(); nextProbeId = 1; trace.clear(); traceDropped = 0; statistics = {}; breakRequested = false; faulted = false; pauseReason.clear(); ++revision;
 }
 std::vector<Cell> Simulator::takeChanges() { std::vector<Cell> result; result.reserve(changes.size()); for (const auto& [p, id] : changes) result.push_back({p, id}); changes.clear(); return result; }

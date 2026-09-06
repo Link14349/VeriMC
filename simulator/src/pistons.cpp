@@ -94,7 +94,7 @@ void Simulator::addMotion(BlockPos pos, StateId state, Direction facing, bool ex
     if (auto old = motions.find(pos); old != motions.end()) scheduledKeys.erase({pos, at(pos).type, 2, old->second.generation});
     PistonMotion motion{state, facing, extending, source, 0, 0, 0, nextOrder++};
     motions[pos] = motion;
-    schedulePhase(pos, currentTick + (currentPhase < 2 ? 0 : 1), 2, motion.generation);
+    schedulePhase(pos, currentTick + (beforeBlockEntities() ? 0 : 1), 2, motion.generation);
     changes[pos] = world.get(pos);
 }
 bool Simulator::movePistonBlocks(BlockPos pos, Direction facing, bool extending) {

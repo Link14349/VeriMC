@@ -101,7 +101,10 @@ private:
     std::uint32_t nextProbeId{1};
     std::uint64_t nextOrder{}, sequence{};
     std::uint64_t nextEntityOrder{}, currentEntityOrder{};
-    std::uint8_t currentPhase{3};
+    // 0: block ticks, 1: block events, 2: block entities, 3: external contacts,
+    // 4: paused/manual input. Contacts run between block events and entities.
+    std::uint8_t currentPhase{4};
+    bool beforeBlockEntities() const { return currentPhase < 2 || currentPhase == 3; }
     void enqueue(Update update);
     void executeNeighbor(BlockPos pos, StateId source = 0);
     void executeShape(const Update& update);
@@ -176,5 +179,11 @@ private:
     Json normalizeCarts(const Json& carts) const;
     const Json* firstContainerCart(BlockPos pos) const;
     int cartAnalog(BlockPos pos) const;
+    bool connectsTripwire(StateId neighbor, Direction direction) const;
+    void updateTripwireSource(BlockPos pos, StateId state);
+    void calculateTripwire(BlockPos pos, StateId state, bool destroying, bool notify, int wireSource = -1, StateId sourceState = 0);
+    void removeTripwireHook(BlockPos pos, StateId state);
+    void updateTripwire(BlockPos pos);
+    void tripwireContact(BlockPos pos);
 };
 }

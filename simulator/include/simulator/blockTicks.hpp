@@ -16,7 +16,7 @@ struct ScheduledEvent {
     std::uint16_t type{};
     std::uint8_t phase{};
     std::uint64_t data{}, entityOrder{};
-    auto key() const { return std::tuple(tick, phase, priority, phase == 2 ? entityOrder : order, order); }
+    auto key() const { return std::tuple(tick, phase == 3 ? 2 : phase == 2 ? 3 : phase, priority, phase == 2 ? entityOrder : order, order); }
     auto blockKey() const { return std::tuple(tick, priority, order); }
     auto drainKey() const { return std::pair(priority, order); }
 };

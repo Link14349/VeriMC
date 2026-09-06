@@ -161,6 +161,23 @@ try:
     assert command('inspect', pos=[0,1,0])['properties']['powered'] == 'true'
     command('step', count=18)
     assert command('inspect', pos=[0,1,0])['properties']['powered'] == 'false'
+    command('demo', kind='tripwire')
+    command('step', count=20)
+    assert command('inspect', pos=[6,1,1])['properties']['attached'] == 'true'
+    command('stimulate', pos=[3,1,1], stimulus={'entities':1})
+    assert command('inspect', pos=[8,1,1])['properties']['lit'] == 'true'
+    command('stimulate', pos=[3,1,1], stimulus={'entities':0})
+    command('step', count=10)
+    command('stimulate', pos=[3,1,1], stimulus={'entities':1})
+    assert command('inspect', pos=[6,1,1])['properties']['powered'] == 'false'
+    contact = command('save', checkpoint=True)
+    command('step', count=1)
+    assert command('inspect', pos=[6,1,1])['properties']['powered'] == 'true'
+    command('load', project=contact); command('step', count=1)
+    assert command('inspect', pos=[6,1,1])['properties']['powered'] == 'true'
+    command('stimulate', pos=[3,1,5], stimulus={'shear':True})
+    assert command('inspect', pos=[3,1,5])['name'] == 'minecraft:air'
+    assert command('inspect', pos=[6,1,5])['properties']['powered'] == 'false'
     command('load', project=hopper)
     command('step', count=8)
     assert command('inspect', pos=[1,0,0])['inventory'][0]['count'] == 2

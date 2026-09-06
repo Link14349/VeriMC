@@ -63,6 +63,8 @@ BlockRegistry::BlockRegistry(const std::string& path) {
         if (typeInfo.device == Device::hopper) typeInfo.supportLevel = "implemented";
         if (typeInfo.device == Device::rail || typeInfo.device == Device::poweredRail || typeInfo.device == Device::activatorRail) typeInfo.supportLevel = "implemented";
         if (typeInfo.device == Device::detectorRail) typeInfo.supportLevel = "externalStimulus";
+        if (typeInfo.device == Device::tripwire) typeInfo.supportLevel = "externalStimulus";
+        if (typeInfo.device == Device::tripwireHook) typeInfo.supportLevel = "implemented";
         auto typeId = static_cast<std::uint16_t>(types.size());
         names.emplace(typeInfo.name, typeId);
         for (const auto& s : b.at("states")) for (const auto& [key, value] : s.at("properties").items()) {

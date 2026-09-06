@@ -37,3 +37,5 @@
 `captureRails.py` 生成 45 刻 / 93 点轨道场景，覆盖连接、坡道、岔路、供电路径、支撑及真实矿车接触/库存；机制边界详见 [rails.md](rails.md)。
 
 `runReferenceTool.py ExportScheduler <绝对输出路径>` 直接运行原版调度器，生成 206 次初始排期、21 刻 / 181 次回调的对照；`captureTickBatches.py` 增加第七组 GameTest，覆盖 25 刻 / 8 点同刻侦测器事件。
+
+`captureTripwire.py` 增加第八组 GameTest，覆盖 70 刻 / 121 点连接、交叉、长度边界、实体接触、断线、剪刀及支撑破坏。场景通过 `discardDrops` 清除拆钩掉落物，避免随机轨迹混入受控接触输入，详见 [绊线说明](tripwire.md)。

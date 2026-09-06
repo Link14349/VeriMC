@@ -122,6 +122,20 @@ public:
 };
 void Hub::demo(const std::string& kind) {
     sim.clear(); projectName = "脉冲与记忆 · 入门电路";
+    if (kind == "tripwire") {
+        projectName = "绊线实验 · 接触与剪断";
+        for (int x = -2; x <= 9; ++x) for (int z = -1; z <= 7; ++z) sim.world.set({x,0,z}, registry.state("white_concrete"));
+        for (int z : {1,5}) {
+            sim.place({-1,1,z}, registry.state("stone")); sim.place({7,1,z}, registry.state("stone"));
+            sim.place({0,1,z}, registry.state("tripwire_hook", {{"facing","east"}}));
+            sim.place({6,1,z}, registry.state("tripwire_hook", {{"facing","west"}}));
+            for (int x = 1; x < 6; ++x) sim.place({x,1,z}, registry.state("tripwire"));
+            sim.place({8,1,z}, registry.state("redstone_lamp"));
+            sim.addProbe({6,1,z}, z == 1 ? "触发输出" : "剪断输出");
+        }
+        sim.addProbe({3,1,1}, "绊线接触");
+        runStart = sim.clone(); return;
+    }
     if (kind == "rails") {
         projectName = "铁轨实验 · 检测与传导";
         for (int x = -1; x <= 12; ++x) for (int z = -1; z <= 8; ++z) sim.world.set({x,0,z}, registry.state("white_concrete"));
