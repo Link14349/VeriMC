@@ -1,0 +1,54 @@
+{
+  "dateUtc": "2026-09-06T19:01:32.973680+00:00",
+  "platform": "macOS-15.7.4-arm64-arm-64bit",
+  "machine": "arm64",
+  "sourceCommit": "fc39b1823c31ea173b10b5fa1ed98c2561689f37",
+  "sourceDirty": true,
+  "binarySha256": "2b23a07639f0f301eaf495c1bbbb38d756932efbc49fd43fe8000141311da052",
+  "build": "Release (build/simulatorCli)",
+  "command": [
+    "simulatorCli",
+    "--benchmark",
+    "10000"
+  ],
+  "samples": [
+    {
+      "benchmark": "drivenRepeaterChains",
+      "blocks": 110000,
+      "chunkStorageBytes": 20485000,
+      "circuits": 10000,
+      "events": 600000,
+      "gameTicksPerSecond": 136.79845723590472,
+      "neighborUpdates": 55200000,
+      "seconds": 2.339207667,
+      "ticks": 320,
+      "version": "26.2"
+    },
+    {
+      "benchmark": "drivenRepeaterChains",
+      "blocks": 110000,
+      "chunkStorageBytes": 20485000,
+      "circuits": 10000,
+      "events": 600000,
+      "gameTicksPerSecond": 131.64154525073153,
+      "neighborUpdates": 55200000,
+      "seconds": 2.430843541,
+      "ticks": 320,
+      "version": "26.2"
+    },
+    {
+      "benchmark": "drivenRepeaterChains",
+      "blocks": 110000,
+      "chunkStorageBytes": 20485000,
+      "circuits": 10000,
+      "events": 600000,
+      "gameTicksPerSecond": 135.17859391136653,
+      "neighborUpdates": 55200000,
+      "seconds": 2.367238708,
+      "ticks": 320,
+      "version": "26.2"
+    }
+  ],
+  "notes": "Timed work includes 40 input transitions per circuit, execution and change collection; excludes construction. No browser rendering. No idle-only TPS claim.",
+  "medianSeconds": 2.367238708
+}

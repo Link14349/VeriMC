@@ -329,12 +329,12 @@ void Simulator::executeNeighbor(BlockPos p, StateId source) {
     auto id = world.get(p); const auto& s = registry[id];
     switch (s.device) {
     case Device::wire: if (survives(p, id)) updateWire(p, id); else setBlock(p, 0); break;
-    case Device::torch: case Device::wallTorch: if (s.lit == torchInput(p)) schedule(p, 2); break;
-    case Device::repeater: if (diodeSideInput(p) == 0 && s.powered != (diodeInput(p) > 0)) schedule(p, static_cast<Tick>(s.delay) * 2, prioritizeDiode(p) ? -3 : s.powered ? -2 : -1); break;
+    case Device::torch: case Device::wallTorch: if (s.lit == torchInput(p) && !blockTicks.willTick(p, s.type)) schedule(p, 2); break;
+    case Device::repeater: if (diodeSideInput(p) == 0 && s.powered != (diodeInput(p) > 0) && !blockTicks.willTick(p, s.type)) schedule(p, static_cast<Tick>(s.delay) * 2, prioritizeDiode(p) ? -3 : s.powered ? -2 : -1); break;
     case Device::comparator: {
         int input = comparatorInput(p), side = diodeSideInput(p); int output = input == 0 || side > input ? 0 : s.subtract ? input - side : input;
         bool shouldOn = input > 0 && (input > side || (input == side && !s.subtract));
-        if (output != analogOutput(p) || s.powered != shouldOn) schedule(p, 2, prioritizeDiode(p) ? -1 : 0);
+        if ((output != analogOutput(p) || s.powered != shouldOn) && !blockTicks.willTick(p, s.type)) schedule(p, 2, prioritizeDiode(p) ? -1 : 0);
         break;
     }
     case Device::lamp: if (s.lit != (bestSignal(p) > 0)) { if (s.lit) schedule(p, 4); else setBlock(p, registry.withBool(id, "lit", true), 2); } break;
@@ -361,9 +361,11 @@ void Simulator::executeNeighbor(BlockPos p, StateId source) {
 }
 void Simulator::schedule(BlockPos p, Tick delay, int priority) {
     auto type = at(p).type;
-    if (scheduledKeys.insert({p, type}).second) scheduled.push({currentTick + delay, priority, nextOrder++, p, type});
+    if (delay > std::numeric_limits<Tick>::max() - currentTick) throw std::invalid_argument("计划时间超出范围");
+    // Vanilla allocates subTickOrder even when the chunk rejects a duplicate.
+    blockTicks.schedule({currentTick + delay, priority, nextOrder++, p, type});
 }
-bool Simulator::hasScheduled(BlockPos p) const { return scheduledKeys.contains({p, at(p).type}); }
+bool Simulator::hasScheduled(BlockPos p) const { return blockTicks.hasScheduled(p, at(p).type); }
 void Simulator::executeTick(const ScheduledEvent& event) {
     auto p = event.pos; auto id = world.get(p); const auto& s = registry[id];
     switch (s.device) {
@@ -406,9 +408,19 @@ void Simulator::executeTick(const ScheduledEvent& event) {
 bool Simulator::stepEvent() {
     if (faulted) throw std::runtime_error("当前执行已中止，请从有效快照恢复");
     pruneEvents();
-    if (scheduled.empty() || breakRequested) return false;
-    auto event = scheduled.top(); scheduled.pop(); scheduledKeys.erase({event.pos, event.type, event.phase, event.data});
-    currentTick = std::max(currentTick, event.tick); ++sequence;
+    if (pendingEvents() == 0 || breakRequested) return false;
+    ScheduledEvent event;
+    auto nextBlockTick = blockTicks.nextTick();
+    if (nextBlockTick && (scheduled.empty() || *nextBlockTick <= scheduled.top().tick)) {
+        if (!blockTicks.hasBatch()) blockTicks.collect(std::max(currentTick, *nextBlockTick));
+        currentTick = blockTicks.batchTick();
+        event = blockTicks.pop();
+    } else {
+        event = scheduled.top(); scheduled.pop(); scheduledKeys.erase({event.pos, event.type, event.phase, event.data});
+        currentTick = std::max(currentTick, event.tick);
+        blockTicks.finishThrough(currentTick);
+    }
+    ++sequence;
     currentPhase = event.phase;
     currentEntityOrder = event.entityOrder;
     try {
@@ -425,6 +437,12 @@ bool Simulator::stepEvent() {
     currentPhase = 3;
     return true;
 }
+Tick Simulator::nextTick() {
+    pruneEvents();
+    auto blockTick = blockTicks.nextTick();
+    if (scheduled.empty()) return blockTick.value_or(currentTick);
+    return std::max(currentTick, blockTick ? std::min(*blockTick, scheduled.top().tick) : scheduled.top().tick);
+}
 void Simulator::pruneEvents() {
     while (!scheduled.empty()) {
         const auto& e = scheduled.top();
@@ -437,11 +455,11 @@ std::size_t Simulator::advanceTo(Tick target, std::size_t eventBudget, std::chro
     if (target < currentTick) throw std::invalid_argument("不能倒退时间，请加载运行快照");
     auto start = std::chrono::steady_clock::now(); std::size_t count = 0;
     pruneEvents();
-    while (!scheduled.empty() && scheduled.top().tick <= target && !breakRequested && count < eventBudget) {
+    while (pendingEvents() != 0 && nextTick() <= target && !breakRequested && count < eventBudget) {
         if ((count & 63u) == 0 && std::chrono::steady_clock::now() - start >= wallBudget) break;
         stepEvent(); ++count; pruneEvents();
     }
-    if (!breakRequested && (scheduled.empty() || scheduled.top().tick > target)) currentTick = target;
+    if (!breakRequested && (pendingEvents() == 0 || nextTick() > target)) { currentTick = target; blockTicks.finishThrough(target); }
     statistics.simulationMicros += static_cast<std::uint64_t>(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - start).count());
     return count;
 }
@@ -473,7 +491,7 @@ void Simulator::stimulate(BlockPos p, const Json& input) {
 }
 void Simulator::clear() {
     recentTorchToggles.clear(); torchToggleCounts.clear();
-    world.clear(); runtime.clear(); motions.clear(); hoppers.clear(); entityOrders.clear(); nextEntityOrder = 0; scheduled = {}; scheduledKeys.clear(); changes.clear(); currentTick = 0; nextOrder = 0; sequence = 0; currentPhase = 3;
+    world.clear(); runtime.clear(); motions.clear(); hoppers.clear(); entityOrders.clear(); nextEntityOrder = 0; scheduled = {}; scheduledKeys.clear(); blockTicks = {}; changes.clear(); currentTick = 0; nextOrder = 0; sequence = 0; currentPhase = 3;
     probes.clear(); probeDependencies.clear(); nextProbeId = 1; trace.clear(); traceDropped = 0; statistics = {}; breakRequested = false; faulted = false; pauseReason.clear(); ++revision;
 }
 std::vector<Cell> Simulator::takeChanges() { std::vector<Cell> result; result.reserve(changes.size()); for (const auto& [p, id] : changes) result.push_back({p, id}); changes.clear(); return result; }

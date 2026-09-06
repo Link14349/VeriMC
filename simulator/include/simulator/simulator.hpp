@@ -1,20 +1,13 @@
 #pragma once
 #include "blockRegistry.hpp"
 #include "world.hpp"
+#include "blockTicks.hpp"
 #include <deque>
 #include <queue>
 #include <unordered_set>
 #include <chrono>
 
 namespace simulator {
-struct ScheduledEvent {
-    Tick tick{}; int priority{}; std::uint64_t order{}; BlockPos pos{}; std::uint16_t type{};
-    std::uint8_t phase{}; std::uint64_t data{}, entityOrder{};
-    auto key() const { return std::tuple(tick, phase, priority, phase == 2 ? entityOrder : order, order); }
-};
-struct EventLater { bool operator()(const ScheduledEvent& a, const ScheduledEvent& b) const { return a.key() > b.key(); } };
-struct EventKey { BlockPos pos; std::uint16_t type; std::uint8_t phase{}; std::uint64_t data{}; bool operator==(const EventKey&) const = default; };
-struct EventKeyHash { std::size_t operator()(const EventKey& k) const { return PosHash{}(k.pos) ^ (static_cast<std::size_t>(k.type) * 65537) ^ (static_cast<std::size_t>(k.phase) * 31) ^ static_cast<std::size_t>(k.data * 16777619); } };
 struct TraceEdge { std::uint32_t probeId{}; Tick tick{}; std::uint64_t sequence{}; std::uint8_t value{}; };
 struct Probe { std::uint32_t id{}; BlockPos pos{}; std::string name; std::string mode{"output"}; Direction direction{Direction::up}; int lastValue{-1}; std::string trigger{"none"}; int triggerValue{15}; };
 struct ItemStack { std::uint32_t item{}; std::uint16_t count{}; bool operator==(const ItemStack&) const = default; };
@@ -63,8 +56,8 @@ public:
     bool hasScheduled(BlockPos pos) const;
     bool stepEvent();
     std::size_t advanceTo(Tick target, std::size_t eventBudget = 1000000, std::chrono::microseconds wallBudget = std::chrono::seconds(10));
-    std::size_t pendingEvents() const { return scheduledKeys.size(); }
-    Tick nextTick() { pruneEvents(); return scheduled.empty() ? currentTick : scheduled.top().tick; }
+    std::size_t pendingEvents() const { return scheduledKeys.size() + blockTicks.size(); }
+    Tick nextTick();
     void clear();
     std::uint32_t addProbe(BlockPos pos, const std::string& name = "", const std::string& mode = "output", Direction direction = Direction::up);
     void removeProbe(std::uint32_t id);
@@ -81,7 +74,7 @@ public:
     std::unique_ptr<Simulator> clone() const;
     void restore(const Simulator& snapshot);
     std::size_t estimatedBytes() const {
-        auto bytes = world.storageBytes() + trace.size() * sizeof(TraceEdge) + runtime.size() * 512 + scheduled.size() * 128 + hoppers.size() * 96 + entityOrders.size() * 64;
+        auto bytes = world.storageBytes() + trace.size() * sizeof(TraceEdge) + runtime.size() * 512 + scheduled.size() * 128 + hoppers.size() * 96 + entityOrders.size() * 64 + blockTicks.estimatedBytes();
         for (const auto& [pos, data] : runtime) { (void)pos; bytes += data.inventory.capacity() * sizeof(ItemStack); }
         return bytes + recentTorchToggles.size() * sizeof(TorchToggle) + torchToggleCounts.size() * 64;
     }
@@ -92,6 +85,7 @@ private:
     std::vector<Update> updateStack, addedUpdates;
     bool updating{};
     std::size_t updateCount{};
+    BlockTicks blockTicks;
     std::priority_queue<ScheduledEvent, std::vector<ScheduledEvent>, EventLater> scheduled;
     std::unordered_set<EventKey, EventKeyHash> scheduledKeys;
     std::unordered_map<BlockPos, RuntimeData, PosHash> runtime;

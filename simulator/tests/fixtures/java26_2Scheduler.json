@@ -1,0 +1,4463 @@
+{
+  "reference": "Minecraft Java 26.2 LevelTicks and LevelChunkTicks; synthetic callbacks, all chunks loaded",
+  "initial": [
+    {
+      "pos": [
+        -64,
+        0,
+        -48
+      ],
+      "type": 0,
+      "tick": 0,
+      "priority": -3,
+      "order": 0
+    },
+    {
+      "pos": [
+        -64,
+        0,
+        -48
+      ],
+      "type": 0,
+      "tick": 0,
+      "priority": -3,
+      "order": 1
+    },
+    {
+      "pos": [
+        -47,
+        0,
+        -32
+      ],
+      "type": 1,
+      "tick": 2,
+      "priority": 2,
+      "order": 2
+    },
+    {
+      "pos": [
+        -30,
+        0,
+        -16
+      ],
+      "type": 2,
+      "tick": 4,
+      "priority": 0,
+      "order": 3
+    },
+    {
+      "pos": [
+        -16,
+        0,
+        0
+      ],
+      "type": 0,
+      "tick": 6,
+      "priority": -2,
+      "order": 4
+    },
+    {
+      "pos": [
+        1,
+        0,
+        16
+      ],
+      "type": 1,
+      "tick": 8,
+      "priority": 3,
+      "order": 5
+    },
+    {
+      "pos": [
+        18,
+        0,
+        32
+      ],
+      "type": 2,
+      "tick": 10,
+      "priority": 1,
+      "order": 6
+    },
+    {
+      "pos": [
+        32,
+        0,
+        48
+      ],
+      "type": 0,
+      "tick": 1,
+      "priority": -1,
+      "order": 7
+    },
+    {
+      "pos": [
+        49,
+        0,
+        -48
+      ],
+      "type": 1,
+      "tick": 3,
+      "priority": -3,
+      "order": 8
+    },
+    {
+      "pos": [
+        49,
+        0,
+        -48
+      ],
+      "type": 1,
+      "tick": 0,
+      "priority": -3,
+      "order": 9
+    },
+    {
+      "pos": [
+        66,
+        0,
+        -32
+      ],
+      "type": 2,
+      "tick": 5,
+      "priority": 2,
+      "order": 10
+    },
+    {
+      "pos": [
+        -64,
+        0,
+        -16
+      ],
+      "type": 0,
+      "tick": 7,
+      "priority": 0,
+      "order": 11
+    },
+    {
+      "pos": [
+        -47,
+        0,
+        0
+      ],
+      "type": 1,
+      "tick": 9,
+      "priority": -2,
+      "order": 12
+    },
+    {
+      "pos": [
+        -30,
+        0,
+        16
+      ],
+      "type": 2,
+      "tick": 0,
+      "priority": 3,
+      "order": 13
+    },
+    {
+      "pos": [
+        -16,
+        0,
+        32
+      ],
+      "type": 0,
+      "tick": 2,
+      "priority": 1,
+      "order": 14
+    },
+    {
+      "pos": [
+        1,
+        0,
+        48
+      ],
+      "type": 1,
+      "tick": 4,
+      "priority": -1,
+      "order": 15
+    },
+    {
+      "pos": [
+        18,
+        0,
+        -48
+      ],
+      "type": 2,
+      "tick": 6,
+      "priority": -3,
+      "order": 16
+    },
+    {
+      "pos": [
+        18,
+        0,
+        -48
+      ],
+      "type": 2,
+      "tick": 0,
+      "priority": -3,
+      "order": 17
+    },
+    {
+      "pos": [
+        32,
+        0,
+        -32
+      ],
+      "type": 0,
+      "tick": 8,
+      "priority": 2,
+      "order": 18
+    },
+    {
+      "pos": [
+        49,
+        0,
+        -16
+      ],
+      "type": 1,
+      "tick": 10,
+      "priority": 0,
+      "order": 19
+    },
+    {
+      "pos": [
+        66,
+        0,
+        0
+      ],
+      "type": 2,
+      "tick": 1,
+      "priority": -2,
+      "order": 20
+    },
+    {
+      "pos": [
+        -64,
+        0,
+        16
+      ],
+      "type": 0,
+      "tick": 3,
+      "priority": 3,
+      "order": 21
+    },
+    {
+      "pos": [
+        -47,
+        0,
+        32
+      ],
+      "type": 1,
+      "tick": 5,
+      "priority": 1,
+      "order": 22
+    },
+    {
+      "pos": [
+        -30,
+        0,
+        48
+      ],
+      "type": 2,
+      "tick": 7,
+      "priority": -1,
+      "order": 23
+    },
+    {
+      "pos": [
+        -16,
+        0,
+        -48
+      ],
+      "type": 0,
+      "tick": 9,
+      "priority": -3,
+      "order": 24
+    },
+    {
+      "pos": [
+        -16,
+        0,
+        -48
+      ],
+      "type": 0,
+      "tick": 0,
+      "priority": -3,
+      "order": 25
+    },
+    {
+      "pos": [
+        1,
+        0,
+        -32
+      ],
+      "type": 1,
+      "tick": 0,
+      "priority": 2,
+      "order": 26
+    },
+    {
+      "pos": [
+        18,
+        0,
+        -16
+      ],
+      "type": 2,
+      "tick": 2,
+      "priority": 0,
+      "order": 27
+    },
+    {
+      "pos": [
+        32,
+        0,
+        0
+      ],
+      "type": 0,
+      "tick": 4,
+      "priority": -2,
+      "order": 28
+    },
+    {
+      "pos": [
+        49,
+        0,
+        16
+      ],
+      "type": 1,
+      "tick": 6,
+      "priority": 3,
+      "order": 29
+    },
+    {
+      "pos": [
+        66,
+        0,
+        32
+      ],
+      "type": 2,
+      "tick": 8,
+      "priority": 1,
+      "order": 30
+    },
+    {
+      "pos": [
+        -64,
+        1,
+        48
+      ],
+      "type": 0,
+      "tick": 10,
+      "priority": -1,
+      "order": 31
+    },
+    {
+      "pos": [
+        -47,
+        1,
+        -48
+      ],
+      "type": 1,
+      "tick": 1,
+      "priority": -3,
+      "order": 32
+    },
+    {
+      "pos": [
+        -47,
+        1,
+        -48
+      ],
+      "type": 1,
+      "tick": 0,
+      "priority": -3,
+      "order": 33
+    },
+    {
+      "pos": [
+        -30,
+        1,
+        -32
+      ],
+      "type": 2,
+      "tick": 3,
+      "priority": 2,
+      "order": 34
+    },
+    {
+      "pos": [
+        -16,
+        1,
+        -16
+      ],
+      "type": 0,
+      "tick": 5,
+      "priority": 0,
+      "order": 35
+    },
+    {
+      "pos": [
+        1,
+        1,
+        0
+      ],
+      "type": 1,
+      "tick": 7,
+      "priority": -2,
+      "order": 36
+    },
+    {
+      "pos": [
+        18,
+        1,
+        16
+      ],
+      "type": 2,
+      "tick": 9,
+      "priority": 3,
+      "order": 37
+    },
+    {
+      "pos": [
+        32,
+        1,
+        32
+      ],
+      "type": 0,
+      "tick": 0,
+      "priority": 1,
+      "order": 38
+    },
+    {
+      "pos": [
+        49,
+        1,
+        48
+      ],
+      "type": 1,
+      "tick": 2,
+      "priority": -1,
+      "order": 39
+    },
+    {
+      "pos": [
+        66,
+        1,
+        -48
+      ],
+      "type": 2,
+      "tick": 4,
+      "priority": -3,
+      "order": 40
+    },
+    {
+      "pos": [
+        66,
+        1,
+        -48
+      ],
+      "type": 2,
+      "tick": 0,
+      "priority": -3,
+      "order": 41
+    },
+    {
+      "pos": [
+        -64,
+        1,
+        -32
+      ],
+      "type": 0,
+      "tick": 6,
+      "priority": 2,
+      "order": 42
+    },
+    {
+      "pos": [
+        -47,
+        1,
+        -16
+      ],
+      "type": 1,
+      "tick": 8,
+      "priority": 0,
+      "order": 43
+    },
+    {
+      "pos": [
+        -30,
+        1,
+        0
+      ],
+      "type": 2,
+      "tick": 10,
+      "priority": -2,
+      "order": 44
+    },
+    {
+      "pos": [
+        -16,
+        1,
+        16
+      ],
+      "type": 0,
+      "tick": 1,
+      "priority": 3,
+      "order": 45
+    },
+    {
+      "pos": [
+        1,
+        1,
+        32
+      ],
+      "type": 1,
+      "tick": 3,
+      "priority": 1,
+      "order": 46
+    },
+    {
+      "pos": [
+        18,
+        1,
+        48
+      ],
+      "type": 2,
+      "tick": 5,
+      "priority": -1,
+      "order": 47
+    },
+    {
+      "pos": [
+        32,
+        1,
+        -48
+      ],
+      "type": 0,
+      "tick": 7,
+      "priority": -3,
+      "order": 48
+    },
+    {
+      "pos": [
+        32,
+        1,
+        -48
+      ],
+      "type": 0,
+      "tick": 0,
+      "priority": -3,
+      "order": 49
+    },
+    {
+      "pos": [
+        49,
+        1,
+        -32
+      ],
+      "type": 1,
+      "tick": 9,
+      "priority": 2,
+      "order": 50
+    },
+    {
+      "pos": [
+        66,
+        1,
+        -16
+      ],
+      "type": 2,
+      "tick": 0,
+      "priority": 0,
+      "order": 51
+    },
+    {
+      "pos": [
+        -64,
+        1,
+        0
+      ],
+      "type": 0,
+      "tick": 2,
+      "priority": -2,
+      "order": 52
+    },
+    {
+      "pos": [
+        -47,
+        1,
+        16
+      ],
+      "type": 1,
+      "tick": 4,
+      "priority": 3,
+      "order": 53
+    },
+    {
+      "pos": [
+        -30,
+        1,
+        32
+      ],
+      "type": 2,
+      "tick": 6,
+      "priority": 1,
+      "order": 54
+    },
+    {
+      "pos": [
+        -16,
+        1,
+        48
+      ],
+      "type": 0,
+      "tick": 8,
+      "priority": -1,
+      "order": 55
+    },
+    {
+      "pos": [
+        1,
+        1,
+        -48
+      ],
+      "type": 1,
+      "tick": 10,
+      "priority": -3,
+      "order": 56
+    },
+    {
+      "pos": [
+        1,
+        1,
+        -48
+      ],
+      "type": 1,
+      "tick": 0,
+      "priority": -3,
+      "order": 57
+    },
+    {
+      "pos": [
+        18,
+        1,
+        -32
+      ],
+      "type": 2,
+      "tick": 1,
+      "priority": 2,
+      "order": 58
+    },
+    {
+      "pos": [
+        32,
+        1,
+        -16
+      ],
+      "type": 0,
+      "tick": 3,
+      "priority": 0,
+      "order": 59
+    },
+    {
+      "pos": [
+        49,
+        1,
+        0
+      ],
+      "type": 1,
+      "tick": 5,
+      "priority": -2,
+      "order": 60
+    },
+    {
+      "pos": [
+        66,
+        1,
+        16
+      ],
+      "type": 2,
+      "tick": 7,
+      "priority": 3,
+      "order": 61
+    },
+    {
+      "pos": [
+        -64,
+        2,
+        32
+      ],
+      "type": 0,
+      "tick": 9,
+      "priority": 1,
+      "order": 62
+    },
+    {
+      "pos": [
+        -47,
+        2,
+        48
+      ],
+      "type": 1,
+      "tick": 0,
+      "priority": -1,
+      "order": 63
+    },
+    {
+      "pos": [
+        -30,
+        2,
+        -48
+      ],
+      "type": 2,
+      "tick": 2,
+      "priority": -3,
+      "order": 64
+    },
+    {
+      "pos": [
+        -30,
+        2,
+        -48
+      ],
+      "type": 2,
+      "tick": 0,
+      "priority": -3,
+      "order": 65
+    },
+    {
+      "pos": [
+        -16,
+        2,
+        -32
+      ],
+      "type": 0,
+      "tick": 4,
+      "priority": 2,
+      "order": 66
+    },
+    {
+      "pos": [
+        1,
+        2,
+        -16
+      ],
+      "type": 1,
+      "tick": 6,
+      "priority": 0,
+      "order": 67
+    },
+    {
+      "pos": [
+        18,
+        2,
+        0
+      ],
+      "type": 2,
+      "tick": 8,
+      "priority": -2,
+      "order": 68
+    },
+    {
+      "pos": [
+        32,
+        2,
+        16
+      ],
+      "type": 0,
+      "tick": 10,
+      "priority": 3,
+      "order": 69
+    },
+    {
+      "pos": [
+        49,
+        2,
+        32
+      ],
+      "type": 1,
+      "tick": 1,
+      "priority": 1,
+      "order": 70
+    },
+    {
+      "pos": [
+        66,
+        2,
+        48
+      ],
+      "type": 2,
+      "tick": 3,
+      "priority": -1,
+      "order": 71
+    },
+    {
+      "pos": [
+        -64,
+        2,
+        -48
+      ],
+      "type": 0,
+      "tick": 5,
+      "priority": -3,
+      "order": 72
+    },
+    {
+      "pos": [
+        -64,
+        2,
+        -48
+      ],
+      "type": 0,
+      "tick": 0,
+      "priority": -3,
+      "order": 73
+    },
+    {
+      "pos": [
+        -47,
+        2,
+        -32
+      ],
+      "type": 1,
+      "tick": 7,
+      "priority": 2,
+      "order": 74
+    },
+    {
+      "pos": [
+        -30,
+        2,
+        -16
+      ],
+      "type": 2,
+      "tick": 9,
+      "priority": 0,
+      "order": 75
+    },
+    {
+      "pos": [
+        -16,
+        2,
+        0
+      ],
+      "type": 0,
+      "tick": 0,
+      "priority": -2,
+      "order": 76
+    },
+    {
+      "pos": [
+        1,
+        2,
+        16
+      ],
+      "type": 1,
+      "tick": 2,
+      "priority": 3,
+      "order": 77
+    },
+    {
+      "pos": [
+        18,
+        2,
+        32
+      ],
+      "type": 2,
+      "tick": 4,
+      "priority": 1,
+      "order": 78
+    },
+    {
+      "pos": [
+        32,
+        2,
+        48
+      ],
+      "type": 0,
+      "tick": 6,
+      "priority": -1,
+      "order": 79
+    },
+    {
+      "pos": [
+        49,
+        2,
+        -48
+      ],
+      "type": 1,
+      "tick": 8,
+      "priority": -3,
+      "order": 80
+    },
+    {
+      "pos": [
+        49,
+        2,
+        -48
+      ],
+      "type": 1,
+      "tick": 0,
+      "priority": -3,
+      "order": 81
+    },
+    {
+      "pos": [
+        66,
+        2,
+        -32
+      ],
+      "type": 2,
+      "tick": 10,
+      "priority": 2,
+      "order": 82
+    },
+    {
+      "pos": [
+        -64,
+        2,
+        -16
+      ],
+      "type": 0,
+      "tick": 1,
+      "priority": 0,
+      "order": 83
+    },
+    {
+      "pos": [
+        -47,
+        2,
+        0
+      ],
+      "type": 1,
+      "tick": 3,
+      "priority": -2,
+      "order": 84
+    },
+    {
+      "pos": [
+        -30,
+        2,
+        16
+      ],
+      "type": 2,
+      "tick": 5,
+      "priority": 3,
+      "order": 85
+    },
+    {
+      "pos": [
+        -16,
+        2,
+        32
+      ],
+      "type": 0,
+      "tick": 7,
+      "priority": 1,
+      "order": 86
+    },
+    {
+      "pos": [
+        1,
+        2,
+        48
+      ],
+      "type": 1,
+      "tick": 9,
+      "priority": -1,
+      "order": 87
+    },
+    {
+      "pos": [
+        18,
+        2,
+        -48
+      ],
+      "type": 2,
+      "tick": 0,
+      "priority": -3,
+      "order": 88
+    },
+    {
+      "pos": [
+        18,
+        2,
+        -48
+      ],
+      "type": 2,
+      "tick": 0,
+      "priority": -3,
+      "order": 89
+    },
+    {
+      "pos": [
+        32,
+        2,
+        -32
+      ],
+      "type": 0,
+      "tick": 2,
+      "priority": 2,
+      "order": 90
+    },
+    {
+      "pos": [
+        49,
+        2,
+        -16
+      ],
+      "type": 1,
+      "tick": 4,
+      "priority": 0,
+      "order": 91
+    },
+    {
+      "pos": [
+        66,
+        2,
+        0
+      ],
+      "type": 2,
+      "tick": 6,
+      "priority": -2,
+      "order": 92
+    },
+    {
+      "pos": [
+        -64,
+        3,
+        16
+      ],
+      "type": 0,
+      "tick": 8,
+      "priority": 3,
+      "order": 93
+    },
+    {
+      "pos": [
+        -47,
+        3,
+        32
+      ],
+      "type": 1,
+      "tick": 10,
+      "priority": 1,
+      "order": 94
+    },
+    {
+      "pos": [
+        -30,
+        3,
+        48
+      ],
+      "type": 2,
+      "tick": 1,
+      "priority": -1,
+      "order": 95
+    },
+    {
+      "pos": [
+        -16,
+        3,
+        -48
+      ],
+      "type": 0,
+      "tick": 3,
+      "priority": -3,
+      "order": 96
+    },
+    {
+      "pos": [
+        -16,
+        3,
+        -48
+      ],
+      "type": 0,
+      "tick": 0,
+      "priority": -3,
+      "order": 97
+    },
+    {
+      "pos": [
+        1,
+        3,
+        -32
+      ],
+      "type": 1,
+      "tick": 5,
+      "priority": 2,
+      "order": 98
+    },
+    {
+      "pos": [
+        18,
+        3,
+        -16
+      ],
+      "type": 2,
+      "tick": 7,
+      "priority": 0,
+      "order": 99
+    },
+    {
+      "pos": [
+        32,
+        3,
+        0
+      ],
+      "type": 0,
+      "tick": 9,
+      "priority": -2,
+      "order": 100
+    },
+    {
+      "pos": [
+        49,
+        3,
+        16
+      ],
+      "type": 1,
+      "tick": 0,
+      "priority": 3,
+      "order": 101
+    },
+    {
+      "pos": [
+        66,
+        3,
+        32
+      ],
+      "type": 2,
+      "tick": 2,
+      "priority": 1,
+      "order": 102
+    },
+    {
+      "pos": [
+        -64,
+        3,
+        48
+      ],
+      "type": 0,
+      "tick": 4,
+      "priority": -1,
+      "order": 103
+    },
+    {
+      "pos": [
+        -47,
+        3,
+        -48
+      ],
+      "type": 1,
+      "tick": 6,
+      "priority": -3,
+      "order": 104
+    },
+    {
+      "pos": [
+        -47,
+        3,
+        -48
+      ],
+      "type": 1,
+      "tick": 0,
+      "priority": -3,
+      "order": 105
+    },
+    {
+      "pos": [
+        -30,
+        3,
+        -32
+      ],
+      "type": 2,
+      "tick": 8,
+      "priority": 2,
+      "order": 106
+    },
+    {
+      "pos": [
+        -16,
+        3,
+        -16
+      ],
+      "type": 0,
+      "tick": 10,
+      "priority": 0,
+      "order": 107
+    },
+    {
+      "pos": [
+        1,
+        3,
+        0
+      ],
+      "type": 1,
+      "tick": 1,
+      "priority": -2,
+      "order": 108
+    },
+    {
+      "pos": [
+        18,
+        3,
+        16
+      ],
+      "type": 2,
+      "tick": 3,
+      "priority": 3,
+      "order": 109
+    },
+    {
+      "pos": [
+        32,
+        3,
+        32
+      ],
+      "type": 0,
+      "tick": 5,
+      "priority": 1,
+      "order": 110
+    },
+    {
+      "pos": [
+        49,
+        3,
+        48
+      ],
+      "type": 1,
+      "tick": 7,
+      "priority": -1,
+      "order": 111
+    },
+    {
+      "pos": [
+        66,
+        3,
+        -48
+      ],
+      "type": 2,
+      "tick": 9,
+      "priority": -3,
+      "order": 112
+    },
+    {
+      "pos": [
+        66,
+        3,
+        -48
+      ],
+      "type": 2,
+      "tick": 0,
+      "priority": -3,
+      "order": 113
+    },
+    {
+      "pos": [
+        -64,
+        3,
+        -32
+      ],
+      "type": 0,
+      "tick": 0,
+      "priority": 2,
+      "order": 114
+    },
+    {
+      "pos": [
+        -47,
+        3,
+        -16
+      ],
+      "type": 1,
+      "tick": 2,
+      "priority": 0,
+      "order": 115
+    },
+    {
+      "pos": [
+        -30,
+        3,
+        0
+      ],
+      "type": 2,
+      "tick": 4,
+      "priority": -2,
+      "order": 116
+    },
+    {
+      "pos": [
+        -16,
+        3,
+        16
+      ],
+      "type": 0,
+      "tick": 6,
+      "priority": 3,
+      "order": 117
+    },
+    {
+      "pos": [
+        1,
+        3,
+        32
+      ],
+      "type": 1,
+      "tick": 8,
+      "priority": 1,
+      "order": 118
+    },
+    {
+      "pos": [
+        18,
+        3,
+        48
+      ],
+      "type": 2,
+      "tick": 10,
+      "priority": -1,
+      "order": 119
+    },
+    {
+      "pos": [
+        32,
+        3,
+        -48
+      ],
+      "type": 0,
+      "tick": 1,
+      "priority": -3,
+      "order": 120
+    },
+    {
+      "pos": [
+        32,
+        3,
+        -48
+      ],
+      "type": 0,
+      "tick": 0,
+      "priority": -3,
+      "order": 121
+    },
+    {
+      "pos": [
+        49,
+        3,
+        -32
+      ],
+      "type": 1,
+      "tick": 3,
+      "priority": 2,
+      "order": 122
+    },
+    {
+      "pos": [
+        66,
+        3,
+        -16
+      ],
+      "type": 2,
+      "tick": 5,
+      "priority": 0,
+      "order": 123
+    },
+    {
+      "pos": [
+        -64,
+        4,
+        0
+      ],
+      "type": 0,
+      "tick": 7,
+      "priority": -2,
+      "order": 124
+    },
+    {
+      "pos": [
+        -47,
+        4,
+        16
+      ],
+      "type": 1,
+      "tick": 9,
+      "priority": 3,
+      "order": 125
+    },
+    {
+      "pos": [
+        -30,
+        4,
+        32
+      ],
+      "type": 2,
+      "tick": 0,
+      "priority": 1,
+      "order": 126
+    },
+    {
+      "pos": [
+        -16,
+        4,
+        48
+      ],
+      "type": 0,
+      "tick": 2,
+      "priority": -1,
+      "order": 127
+    },
+    {
+      "pos": [
+        1,
+        4,
+        -48
+      ],
+      "type": 1,
+      "tick": 4,
+      "priority": -3,
+      "order": 128
+    },
+    {
+      "pos": [
+        1,
+        4,
+        -48
+      ],
+      "type": 1,
+      "tick": 0,
+      "priority": -3,
+      "order": 129
+    },
+    {
+      "pos": [
+        18,
+        4,
+        -32
+      ],
+      "type": 2,
+      "tick": 6,
+      "priority": 2,
+      "order": 130
+    },
+    {
+      "pos": [
+        32,
+        4,
+        -16
+      ],
+      "type": 0,
+      "tick": 8,
+      "priority": 0,
+      "order": 131
+    },
+    {
+      "pos": [
+        49,
+        4,
+        0
+      ],
+      "type": 1,
+      "tick": 10,
+      "priority": -2,
+      "order": 132
+    },
+    {
+      "pos": [
+        66,
+        4,
+        16
+      ],
+      "type": 2,
+      "tick": 1,
+      "priority": 3,
+      "order": 133
+    },
+    {
+      "pos": [
+        -64,
+        4,
+        32
+      ],
+      "type": 0,
+      "tick": 3,
+      "priority": 1,
+      "order": 134
+    },
+    {
+      "pos": [
+        -47,
+        4,
+        48
+      ],
+      "type": 1,
+      "tick": 5,
+      "priority": -1,
+      "order": 135
+    },
+    {
+      "pos": [
+        -30,
+        4,
+        -48
+      ],
+      "type": 2,
+      "tick": 7,
+      "priority": -3,
+      "order": 136
+    },
+    {
+      "pos": [
+        -30,
+        4,
+        -48
+      ],
+      "type": 2,
+      "tick": 0,
+      "priority": -3,
+      "order": 137
+    },
+    {
+      "pos": [
+        -16,
+        4,
+        -32
+      ],
+      "type": 0,
+      "tick": 9,
+      "priority": 2,
+      "order": 138
+    },
+    {
+      "pos": [
+        1,
+        4,
+        -16
+      ],
+      "type": 1,
+      "tick": 0,
+      "priority": 0,
+      "order": 139
+    },
+    {
+      "pos": [
+        18,
+        4,
+        0
+      ],
+      "type": 2,
+      "tick": 2,
+      "priority": -2,
+      "order": 140
+    },
+    {
+      "pos": [
+        32,
+        4,
+        16
+      ],
+      "type": 0,
+      "tick": 4,
+      "priority": 3,
+      "order": 141
+    },
+    {
+      "pos": [
+        49,
+        4,
+        32
+      ],
+      "type": 1,
+      "tick": 6,
+      "priority": 1,
+      "order": 142
+    },
+    {
+      "pos": [
+        66,
+        4,
+        48
+      ],
+      "type": 2,
+      "tick": 8,
+      "priority": -1,
+      "order": 143
+    },
+    {
+      "pos": [
+        -64,
+        4,
+        -48
+      ],
+      "type": 0,
+      "tick": 10,
+      "priority": -3,
+      "order": 144
+    },
+    {
+      "pos": [
+        -64,
+        4,
+        -48
+      ],
+      "type": 0,
+      "tick": 0,
+      "priority": -3,
+      "order": 145
+    },
+    {
+      "pos": [
+        -47,
+        4,
+        -32
+      ],
+      "type": 1,
+      "tick": 1,
+      "priority": 2,
+      "order": 146
+    },
+    {
+      "pos": [
+        -30,
+        4,
+        -16
+      ],
+      "type": 2,
+      "tick": 3,
+      "priority": 0,
+      "order": 147
+    },
+    {
+      "pos": [
+        -16,
+        4,
+        0
+      ],
+      "type": 0,
+      "tick": 5,
+      "priority": -2,
+      "order": 148
+    },
+    {
+      "pos": [
+        1,
+        4,
+        16
+      ],
+      "type": 1,
+      "tick": 7,
+      "priority": 3,
+      "order": 149
+    },
+    {
+      "pos": [
+        18,
+        4,
+        32
+      ],
+      "type": 2,
+      "tick": 9,
+      "priority": 1,
+      "order": 150
+    },
+    {
+      "pos": [
+        32,
+        4,
+        48
+      ],
+      "type": 0,
+      "tick": 0,
+      "priority": -1,
+      "order": 151
+    },
+    {
+      "pos": [
+        49,
+        4,
+        -48
+      ],
+      "type": 1,
+      "tick": 2,
+      "priority": -3,
+      "order": 152
+    },
+    {
+      "pos": [
+        49,
+        4,
+        -48
+      ],
+      "type": 1,
+      "tick": 0,
+      "priority": -3,
+      "order": 153
+    },
+    {
+      "pos": [
+        66,
+        4,
+        -32
+      ],
+      "type": 2,
+      "tick": 4,
+      "priority": 2,
+      "order": 154
+    },
+    {
+      "pos": [
+        -64,
+        5,
+        -16
+      ],
+      "type": 0,
+      "tick": 6,
+      "priority": 0,
+      "order": 155
+    },
+    {
+      "pos": [
+        -47,
+        5,
+        0
+      ],
+      "type": 1,
+      "tick": 8,
+      "priority": -2,
+      "order": 156
+    },
+    {
+      "pos": [
+        -30,
+        5,
+        16
+      ],
+      "type": 2,
+      "tick": 10,
+      "priority": 3,
+      "order": 157
+    },
+    {
+      "pos": [
+        -16,
+        5,
+        32
+      ],
+      "type": 0,
+      "tick": 1,
+      "priority": 1,
+      "order": 158
+    },
+    {
+      "pos": [
+        1,
+        5,
+        48
+      ],
+      "type": 1,
+      "tick": 3,
+      "priority": -1,
+      "order": 159
+    },
+    {
+      "pos": [
+        18,
+        5,
+        -48
+      ],
+      "type": 2,
+      "tick": 5,
+      "priority": -3,
+      "order": 160
+    },
+    {
+      "pos": [
+        18,
+        5,
+        -48
+      ],
+      "type": 2,
+      "tick": 0,
+      "priority": -3,
+      "order": 161
+    },
+    {
+      "pos": [
+        32,
+        5,
+        -32
+      ],
+      "type": 0,
+      "tick": 7,
+      "priority": 2,
+      "order": 162
+    },
+    {
+      "pos": [
+        49,
+        5,
+        -16
+      ],
+      "type": 1,
+      "tick": 9,
+      "priority": 0,
+      "order": 163
+    },
+    {
+      "pos": [
+        66,
+        5,
+        0
+      ],
+      "type": 2,
+      "tick": 0,
+      "priority": -2,
+      "order": 164
+    },
+    {
+      "pos": [
+        -64,
+        5,
+        16
+      ],
+      "type": 0,
+      "tick": 2,
+      "priority": 3,
+      "order": 165
+    },
+    {
+      "pos": [
+        -47,
+        5,
+        32
+      ],
+      "type": 1,
+      "tick": 4,
+      "priority": 1,
+      "order": 166
+    },
+    {
+      "pos": [
+        -30,
+        5,
+        48
+      ],
+      "type": 2,
+      "tick": 6,
+      "priority": -1,
+      "order": 167
+    },
+    {
+      "pos": [
+        -16,
+        5,
+        -48
+      ],
+      "type": 0,
+      "tick": 8,
+      "priority": -3,
+      "order": 168
+    },
+    {
+      "pos": [
+        -16,
+        5,
+        -48
+      ],
+      "type": 0,
+      "tick": 0,
+      "priority": -3,
+      "order": 169
+    },
+    {
+      "pos": [
+        1,
+        5,
+        -32
+      ],
+      "type": 1,
+      "tick": 10,
+      "priority": 2,
+      "order": 170
+    },
+    {
+      "pos": [
+        18,
+        5,
+        -16
+      ],
+      "type": 2,
+      "tick": 1,
+      "priority": 0,
+      "order": 171
+    },
+    {
+      "pos": [
+        32,
+        5,
+        0
+      ],
+      "type": 0,
+      "tick": 3,
+      "priority": -2,
+      "order": 172
+    },
+    {
+      "pos": [
+        49,
+        5,
+        16
+      ],
+      "type": 1,
+      "tick": 5,
+      "priority": 3,
+      "order": 173
+    },
+    {
+      "pos": [
+        66,
+        5,
+        32
+      ],
+      "type": 2,
+      "tick": 7,
+      "priority": 1,
+      "order": 174
+    },
+    {
+      "pos": [
+        -64,
+        5,
+        48
+      ],
+      "type": 0,
+      "tick": 9,
+      "priority": -1,
+      "order": 175
+    },
+    {
+      "pos": [
+        -47,
+        5,
+        -48
+      ],
+      "type": 1,
+      "tick": 0,
+      "priority": -3,
+      "order": 176
+    },
+    {
+      "pos": [
+        -47,
+        5,
+        -48
+      ],
+      "type": 1,
+      "tick": 0,
+      "priority": -3,
+      "order": 177
+    },
+    {
+      "pos": [
+        -30,
+        5,
+        -32
+      ],
+      "type": 2,
+      "tick": 2,
+      "priority": 2,
+      "order": 178
+    },
+    {
+      "pos": [
+        -16,
+        5,
+        -16
+      ],
+      "type": 0,
+      "tick": 4,
+      "priority": 0,
+      "order": 179
+    },
+    {
+      "pos": [
+        1,
+        5,
+        0
+      ],
+      "type": 1,
+      "tick": 6,
+      "priority": -2,
+      "order": 180
+    },
+    {
+      "pos": [
+        18,
+        5,
+        16
+      ],
+      "type": 2,
+      "tick": 8,
+      "priority": 3,
+      "order": 181
+    },
+    {
+      "pos": [
+        32,
+        5,
+        32
+      ],
+      "type": 0,
+      "tick": 10,
+      "priority": 1,
+      "order": 182
+    },
+    {
+      "pos": [
+        49,
+        5,
+        48
+      ],
+      "type": 1,
+      "tick": 1,
+      "priority": -1,
+      "order": 183
+    },
+    {
+      "pos": [
+        66,
+        5,
+        -48
+      ],
+      "type": 2,
+      "tick": 3,
+      "priority": -3,
+      "order": 184
+    },
+    {
+      "pos": [
+        66,
+        5,
+        -48
+      ],
+      "type": 2,
+      "tick": 0,
+      "priority": -3,
+      "order": 185
+    },
+    {
+      "pos": [
+        -64,
+        6,
+        -32
+      ],
+      "type": 0,
+      "tick": 5,
+      "priority": 2,
+      "order": 186
+    },
+    {
+      "pos": [
+        -47,
+        6,
+        -16
+      ],
+      "type": 1,
+      "tick": 7,
+      "priority": 0,
+      "order": 187
+    },
+    {
+      "pos": [
+        -30,
+        6,
+        0
+      ],
+      "type": 2,
+      "tick": 9,
+      "priority": -2,
+      "order": 188
+    },
+    {
+      "pos": [
+        -16,
+        6,
+        16
+      ],
+      "type": 0,
+      "tick": 0,
+      "priority": 3,
+      "order": 189
+    },
+    {
+      "pos": [
+        1,
+        6,
+        32
+      ],
+      "type": 1,
+      "tick": 2,
+      "priority": 1,
+      "order": 190
+    },
+    {
+      "pos": [
+        18,
+        6,
+        48
+      ],
+      "type": 2,
+      "tick": 4,
+      "priority": -1,
+      "order": 191
+    },
+    {
+      "pos": [
+        32,
+        6,
+        -48
+      ],
+      "type": 0,
+      "tick": 6,
+      "priority": -3,
+      "order": 192
+    },
+    {
+      "pos": [
+        32,
+        6,
+        -48
+      ],
+      "type": 0,
+      "tick": 0,
+      "priority": -3,
+      "order": 193
+    },
+    {
+      "pos": [
+        49,
+        6,
+        -32
+      ],
+      "type": 1,
+      "tick": 8,
+      "priority": 2,
+      "order": 194
+    },
+    {
+      "pos": [
+        66,
+        6,
+        -16
+      ],
+      "type": 2,
+      "tick": 10,
+      "priority": 0,
+      "order": 195
+    },
+    {
+      "pos": [
+        -64,
+        6,
+        0
+      ],
+      "type": 0,
+      "tick": 1,
+      "priority": -2,
+      "order": 196
+    },
+    {
+      "pos": [
+        -47,
+        6,
+        16
+      ],
+      "type": 1,
+      "tick": 3,
+      "priority": 3,
+      "order": 197
+    },
+    {
+      "pos": [
+        -30,
+        6,
+        32
+      ],
+      "type": 2,
+      "tick": 5,
+      "priority": 1,
+      "order": 198
+    },
+    {
+      "pos": [
+        -16,
+        6,
+        48
+      ],
+      "type": 0,
+      "tick": 7,
+      "priority": -1,
+      "order": 199
+    },
+    {
+      "pos": [
+        1,
+        6,
+        -48
+      ],
+      "type": 1,
+      "tick": 9,
+      "priority": -3,
+      "order": 200
+    },
+    {
+      "pos": [
+        1,
+        6,
+        -48
+      ],
+      "type": 1,
+      "tick": 0,
+      "priority": -3,
+      "order": 201
+    },
+    {
+      "pos": [
+        18,
+        6,
+        -32
+      ],
+      "type": 2,
+      "tick": 0,
+      "priority": 2,
+      "order": 202
+    },
+    {
+      "pos": [
+        32,
+        6,
+        -16
+      ],
+      "type": 0,
+      "tick": 2,
+      "priority": 0,
+      "order": 203
+    },
+    {
+      "pos": [
+        49,
+        6,
+        0
+      ],
+      "type": 1,
+      "tick": 4,
+      "priority": -2,
+      "order": 204
+    },
+    {
+      "pos": [
+        66,
+        6,
+        16
+      ],
+      "type": 2,
+      "tick": 6,
+      "priority": 3,
+      "order": 205
+    }
+  ],
+  "probes": [
+    {
+      "pos": [
+        -64,
+        0,
+        -48
+      ],
+      "type": 0,
+      "tick": 0,
+      "priority": -3,
+      "order": 0
+    },
+    {
+      "pos": [
+        -47,
+        0,
+        -32
+      ],
+      "type": 1,
+      "tick": 2,
+      "priority": 2,
+      "order": 2
+    },
+    {
+      "pos": [
+        1,
+        0,
+        16
+      ],
+      "type": 1,
+      "tick": 8,
+      "priority": 3,
+      "order": 5
+    },
+    {
+      "pos": [
+        66,
+        0,
+        -32
+      ],
+      "type": 2,
+      "tick": 5,
+      "priority": 2,
+      "order": 10
+    },
+    {
+      "pos": [
+        49,
+        0,
+        -16
+      ],
+      "type": 1,
+      "tick": 10,
+      "priority": 0,
+      "order": 19
+    },
+    {
+      "pos": [
+        -16,
+        1,
+        -16
+      ],
+      "type": 0,
+      "tick": 5,
+      "priority": 0,
+      "order": 35
+    },
+    {
+      "pos": [
+        49,
+        2,
+        32
+      ],
+      "type": 1,
+      "tick": 1,
+      "priority": 1,
+      "order": 70
+    },
+    {
+      "pos": [
+        18,
+        4,
+        0
+      ],
+      "type": 2,
+      "tick": 2,
+      "priority": -2,
+      "order": 140
+    },
+    {
+      "pos": [
+        1,
+        5,
+        0
+      ],
+      "type": 1,
+      "tick": 6,
+      "priority": -2,
+      "order": 180
+    }
+  ],
+  "runs": [
+    {
+      "tick": 10,
+      "limit": 11,
+      "injections": [
+        {
+          "after": 0,
+          "event": {
+            "pos": [
+              -47,
+              0,
+              -32
+            ],
+            "type": 1,
+            "tick": 10,
+            "priority": -2,
+            "order": 206
+          }
+        },
+        {
+          "after": 3,
+          "event": {
+            "pos": [
+              -64,
+              0,
+              -48
+            ],
+            "type": 0,
+            "tick": 10,
+            "priority": 1,
+            "order": 207
+          }
+        }
+      ],
+      "events": [
+        {
+          "pos": [
+            -64,
+            0,
+            -48
+          ],
+          "type": 0,
+          "queued": "011111111",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -30,
+            2,
+            -48
+          ],
+          "type": 2,
+          "queued": "011111111",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -64,
+            2,
+            -48
+          ],
+          "type": 0,
+          "queued": "011111111",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            18,
+            2,
+            -48
+          ],
+          "type": 2,
+          "queued": "111111111",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -16,
+            3,
+            -48
+          ],
+          "type": 0,
+          "queued": "111111111",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            32,
+            3,
+            -48
+          ],
+          "type": 0,
+          "queued": "111111111",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            1,
+            4,
+            -48
+          ],
+          "type": 1,
+          "queued": "111111111",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -30,
+            4,
+            -48
+          ],
+          "type": 2,
+          "queued": "111111111",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -64,
+            4,
+            -48
+          ],
+          "type": 0,
+          "queued": "111111111",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            49,
+            4,
+            -48
+          ],
+          "type": 1,
+          "queued": "111111111",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            49,
+            0,
+            -48
+          ],
+          "type": 1,
+          "queued": "111111111",
+          "collected": "000000000"
+        }
+      ],
+      "remaining": 170
+    },
+    {
+      "tick": 11,
+      "limit": 11,
+      "injections": [
+        {
+          "after": 0,
+          "event": {
+            "pos": [
+              -47,
+              0,
+              -32
+            ],
+            "type": 1,
+            "tick": 11,
+            "priority": -2,
+            "order": 208
+          }
+        },
+        {
+          "after": 3,
+          "event": {
+            "pos": [
+              -64,
+              0,
+              -48
+            ],
+            "type": 0,
+            "tick": 11,
+            "priority": 1,
+            "order": 209
+          }
+        }
+      ],
+      "events": [
+        {
+          "pos": [
+            49,
+            2,
+            -48
+          ],
+          "type": 1,
+          "queued": "111111111",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            18,
+            5,
+            -48
+          ],
+          "type": 2,
+          "queued": "111111111",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            18,
+            0,
+            -48
+          ],
+          "type": 2,
+          "queued": "111111111",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -16,
+            5,
+            -48
+          ],
+          "type": 0,
+          "queued": "111111111",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -16,
+            0,
+            -48
+          ],
+          "type": 0,
+          "queued": "111111111",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -47,
+            5,
+            -48
+          ],
+          "type": 1,
+          "queued": "111111111",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -47,
+            1,
+            -48
+          ],
+          "type": 1,
+          "queued": "111111111",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -47,
+            3,
+            -48
+          ],
+          "type": 1,
+          "queued": "111111111",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            66,
+            5,
+            -48
+          ],
+          "type": 2,
+          "queued": "111111111",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            66,
+            1,
+            -48
+          ],
+          "type": 2,
+          "queued": "111111111",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            66,
+            3,
+            -48
+          ],
+          "type": 2,
+          "queued": "111111111",
+          "collected": "000000000"
+        }
+      ],
+      "remaining": 159
+    },
+    {
+      "tick": 12,
+      "limit": 11,
+      "injections": [
+        {
+          "after": 0,
+          "event": {
+            "pos": [
+              -47,
+              0,
+              -32
+            ],
+            "type": 1,
+            "tick": 12,
+            "priority": -2,
+            "order": 210
+          }
+        },
+        {
+          "after": 3,
+          "event": {
+            "pos": [
+              -64,
+              0,
+              -48
+            ],
+            "type": 0,
+            "tick": 12,
+            "priority": 1,
+            "order": 211
+          }
+        }
+      ],
+      "events": [
+        {
+          "pos": [
+            32,
+            6,
+            -48
+          ],
+          "type": 0,
+          "queued": "111111101",
+          "collected": "000000010"
+        },
+        {
+          "pos": [
+            32,
+            1,
+            -48
+          ],
+          "type": 0,
+          "queued": "111111101",
+          "collected": "000000010"
+        },
+        {
+          "pos": [
+            1,
+            6,
+            -48
+          ],
+          "type": 1,
+          "queued": "111111101",
+          "collected": "000000010"
+        },
+        {
+          "pos": [
+            1,
+            1,
+            -48
+          ],
+          "type": 1,
+          "queued": "111111101",
+          "collected": "000000010"
+        },
+        {
+          "pos": [
+            -16,
+            2,
+            0
+          ],
+          "type": 0,
+          "queued": "111111101",
+          "collected": "000000010"
+        },
+        {
+          "pos": [
+            -47,
+            2,
+            0
+          ],
+          "type": 1,
+          "queued": "111111101",
+          "collected": "000000010"
+        },
+        {
+          "pos": [
+            1,
+            3,
+            0
+          ],
+          "type": 1,
+          "queued": "111111101",
+          "collected": "000000010"
+        },
+        {
+          "pos": [
+            -30,
+            3,
+            0
+          ],
+          "type": 2,
+          "queued": "111111101",
+          "collected": "000000010"
+        },
+        {
+          "pos": [
+            18,
+            4,
+            0
+          ],
+          "type": 2,
+          "queued": "111111101",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            18,
+            2,
+            0
+          ],
+          "type": 2,
+          "queued": "111111101",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -16,
+            4,
+            0
+          ],
+          "type": 0,
+          "queued": "111111101",
+          "collected": "000000000"
+        }
+      ],
+      "remaining": 148
+    },
+    {
+      "tick": 13,
+      "limit": 11,
+      "injections": [
+        {
+          "after": 0,
+          "event": {
+            "pos": [
+              -47,
+              0,
+              -32
+            ],
+            "type": 1,
+            "tick": 13,
+            "priority": -2,
+            "order": 212
+          }
+        },
+        {
+          "after": 3,
+          "event": {
+            "pos": [
+              -64,
+              0,
+              -48
+            ],
+            "type": 0,
+            "tick": 13,
+            "priority": 1,
+            "order": 213
+          }
+        }
+      ],
+      "events": [
+        {
+          "pos": [
+            -16,
+            0,
+            0
+          ],
+          "type": 0,
+          "queued": "111111100",
+          "collected": "000000001"
+        },
+        {
+          "pos": [
+            -47,
+            5,
+            0
+          ],
+          "type": 1,
+          "queued": "111111100",
+          "collected": "000000001"
+        },
+        {
+          "pos": [
+            -47,
+            0,
+            0
+          ],
+          "type": 1,
+          "queued": "111111100",
+          "collected": "000000001"
+        },
+        {
+          "pos": [
+            66,
+            5,
+            0
+          ],
+          "type": 2,
+          "queued": "111111100",
+          "collected": "000000001"
+        },
+        {
+          "pos": [
+            66,
+            0,
+            0
+          ],
+          "type": 2,
+          "queued": "111111100",
+          "collected": "000000001"
+        },
+        {
+          "pos": [
+            66,
+            2,
+            0
+          ],
+          "type": 2,
+          "queued": "111111100",
+          "collected": "000000001"
+        },
+        {
+          "pos": [
+            32,
+            5,
+            0
+          ],
+          "type": 0,
+          "queued": "111111100",
+          "collected": "000000001"
+        },
+        {
+          "pos": [
+            32,
+            0,
+            0
+          ],
+          "type": 0,
+          "queued": "111111100",
+          "collected": "000000001"
+        },
+        {
+          "pos": [
+            32,
+            3,
+            0
+          ],
+          "type": 0,
+          "queued": "111111100",
+          "collected": "000000001"
+        },
+        {
+          "pos": [
+            1,
+            5,
+            0
+          ],
+          "type": 1,
+          "queued": "111111100",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            1,
+            1,
+            0
+          ],
+          "type": 1,
+          "queued": "111111100",
+          "collected": "000000000"
+        }
+      ],
+      "remaining": 137
+    },
+    {
+      "tick": 14,
+      "limit": 11,
+      "injections": [],
+      "events": [
+        {
+          "pos": [
+            -30,
+            6,
+            0
+          ],
+          "type": 2,
+          "queued": "111111100",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -30,
+            1,
+            0
+          ],
+          "type": 2,
+          "queued": "111111100",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -64,
+            6,
+            0
+          ],
+          "type": 0,
+          "queued": "111111100",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -64,
+            1,
+            0
+          ],
+          "type": 0,
+          "queued": "111111100",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -64,
+            4,
+            0
+          ],
+          "type": 0,
+          "queued": "111111100",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            49,
+            6,
+            0
+          ],
+          "type": 1,
+          "queued": "111111100",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            49,
+            1,
+            0
+          ],
+          "type": 1,
+          "queued": "111111100",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            49,
+            4,
+            0
+          ],
+          "type": 1,
+          "queued": "111111100",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -47,
+            2,
+            48
+          ],
+          "type": 1,
+          "queued": "111111100",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            66,
+            2,
+            48
+          ],
+          "type": 2,
+          "queued": "111111100",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -30,
+            3,
+            48
+          ],
+          "type": 2,
+          "queued": "111111100",
+          "collected": "000000000"
+        }
+      ],
+      "remaining": 126
+    },
+    {
+      "tick": 15,
+      "limit": 11,
+      "injections": [],
+      "events": [
+        {
+          "pos": [
+            -64,
+            3,
+            48
+          ],
+          "type": 0,
+          "queued": "111111100",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -16,
+            4,
+            48
+          ],
+          "type": 0,
+          "queued": "111111100",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -47,
+            4,
+            48
+          ],
+          "type": 1,
+          "queued": "111111100",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            66,
+            4,
+            48
+          ],
+          "type": 2,
+          "queued": "111111100",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            32,
+            4,
+            48
+          ],
+          "type": 0,
+          "queued": "111111100",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            32,
+            0,
+            48
+          ],
+          "type": 0,
+          "queued": "111111100",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            32,
+            2,
+            48
+          ],
+          "type": 0,
+          "queued": "111111100",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            1,
+            5,
+            48
+          ],
+          "type": 1,
+          "queued": "111111100",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            1,
+            0,
+            48
+          ],
+          "type": 1,
+          "queued": "111111100",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            1,
+            2,
+            48
+          ],
+          "type": 1,
+          "queued": "111111100",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -30,
+            5,
+            48
+          ],
+          "type": 2,
+          "queued": "111111100",
+          "collected": "000000000"
+        }
+      ],
+      "remaining": 115
+    },
+    {
+      "tick": 16,
+      "limit": 11,
+      "injections": [],
+      "events": [
+        {
+          "pos": [
+            -30,
+            0,
+            48
+          ],
+          "type": 2,
+          "queued": "111111100",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -64,
+            5,
+            48
+          ],
+          "type": 0,
+          "queued": "111111100",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -64,
+            1,
+            48
+          ],
+          "type": 0,
+          "queued": "111111100",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            49,
+            5,
+            48
+          ],
+          "type": 1,
+          "queued": "111111100",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            49,
+            1,
+            48
+          ],
+          "type": 1,
+          "queued": "111111100",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            49,
+            3,
+            48
+          ],
+          "type": 1,
+          "queued": "111111100",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            18,
+            6,
+            48
+          ],
+          "type": 2,
+          "queued": "111111100",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            18,
+            1,
+            48
+          ],
+          "type": 2,
+          "queued": "111111100",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            18,
+            3,
+            48
+          ],
+          "type": 2,
+          "queued": "111111100",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -16,
+            6,
+            48
+          ],
+          "type": 0,
+          "queued": "111111100",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -16,
+            1,
+            48
+          ],
+          "type": 0,
+          "queued": "111111100",
+          "collected": "000000000"
+        }
+      ],
+      "remaining": 104
+    },
+    {
+      "tick": 17,
+      "limit": 11,
+      "injections": [],
+      "events": [
+        {
+          "pos": [
+            66,
+            1,
+            -16
+          ],
+          "type": 2,
+          "queued": "111111100",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -64,
+            2,
+            -16
+          ],
+          "type": 0,
+          "queued": "111111100",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            49,
+            2,
+            -16
+          ],
+          "type": 1,
+          "queued": "111111100",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -47,
+            3,
+            -16
+          ],
+          "type": 1,
+          "queued": "111111100",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            66,
+            3,
+            -16
+          ],
+          "type": 2,
+          "queued": "111111100",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            1,
+            4,
+            -16
+          ],
+          "type": 1,
+          "queued": "111111100",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            1,
+            2,
+            -16
+          ],
+          "type": 1,
+          "queued": "111111100",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -30,
+            4,
+            -16
+          ],
+          "type": 2,
+          "queued": "111111100",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -30,
+            0,
+            -16
+          ],
+          "type": 2,
+          "queued": "111111100",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -30,
+            2,
+            -16
+          ],
+          "type": 2,
+          "queued": "111111100",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -64,
+            5,
+            -16
+          ],
+          "type": 0,
+          "queued": "111111100",
+          "collected": "000000000"
+        }
+      ],
+      "remaining": 93
+    },
+    {
+      "tick": 18,
+      "limit": 11,
+      "injections": [],
+      "events": [
+        {
+          "pos": [
+            -64,
+            0,
+            -16
+          ],
+          "type": 0,
+          "queued": "111100100",
+          "collected": "000011000"
+        },
+        {
+          "pos": [
+            49,
+            5,
+            -16
+          ],
+          "type": 1,
+          "queued": "111100100",
+          "collected": "000011000"
+        },
+        {
+          "pos": [
+            49,
+            0,
+            -16
+          ],
+          "type": 1,
+          "queued": "111100100",
+          "collected": "000001000"
+        },
+        {
+          "pos": [
+            18,
+            5,
+            -16
+          ],
+          "type": 2,
+          "queued": "111100100",
+          "collected": "000001000"
+        },
+        {
+          "pos": [
+            18,
+            0,
+            -16
+          ],
+          "type": 2,
+          "queued": "111100100",
+          "collected": "000001000"
+        },
+        {
+          "pos": [
+            18,
+            3,
+            -16
+          ],
+          "type": 2,
+          "queued": "111100100",
+          "collected": "000001000"
+        },
+        {
+          "pos": [
+            -16,
+            5,
+            -16
+          ],
+          "type": 0,
+          "queued": "111100100",
+          "collected": "000001000"
+        },
+        {
+          "pos": [
+            -16,
+            1,
+            -16
+          ],
+          "type": 0,
+          "queued": "111100100",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -16,
+            3,
+            -16
+          ],
+          "type": 0,
+          "queued": "111100100",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -47,
+            6,
+            -16
+          ],
+          "type": 1,
+          "queued": "111100100",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -47,
+            1,
+            -16
+          ],
+          "type": 1,
+          "queued": "111100100",
+          "collected": "000000000"
+        }
+      ],
+      "remaining": 82
+    },
+    {
+      "tick": 19,
+      "limit": 11,
+      "injections": [],
+      "events": [
+        {
+          "pos": [
+            66,
+            6,
+            -16
+          ],
+          "type": 2,
+          "queued": "111100000",
+          "collected": "000000100"
+        },
+        {
+          "pos": [
+            32,
+            6,
+            -16
+          ],
+          "type": 0,
+          "queued": "111100000",
+          "collected": "000000100"
+        },
+        {
+          "pos": [
+            32,
+            1,
+            -16
+          ],
+          "type": 0,
+          "queued": "111100000",
+          "collected": "000000100"
+        },
+        {
+          "pos": [
+            32,
+            4,
+            -16
+          ],
+          "type": 0,
+          "queued": "111100000",
+          "collected": "000000100"
+        },
+        {
+          "pos": [
+            32,
+            1,
+            32
+          ],
+          "type": 0,
+          "queued": "111100000",
+          "collected": "000000100"
+        },
+        {
+          "pos": [
+            49,
+            2,
+            32
+          ],
+          "type": 1,
+          "queued": "111100000",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            18,
+            2,
+            32
+          ],
+          "type": 2,
+          "queued": "111100000",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            66,
+            3,
+            32
+          ],
+          "type": 2,
+          "queued": "111100000",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            32,
+            3,
+            32
+          ],
+          "type": 0,
+          "queued": "111100000",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -30,
+            4,
+            32
+          ],
+          "type": 2,
+          "queued": "111100000",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -64,
+            4,
+            32
+          ],
+          "type": 0,
+          "queued": "111100000",
+          "collected": "000000000"
+        }
+      ],
+      "remaining": 71
+    },
+    {
+      "tick": 20,
+      "limit": 11,
+      "injections": [],
+      "events": [
+        {
+          "pos": [
+            -64,
+            2,
+            32
+          ],
+          "type": 0,
+          "queued": "111100000",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            49,
+            4,
+            32
+          ],
+          "type": 1,
+          "queued": "111100000",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            18,
+            4,
+            32
+          ],
+          "type": 2,
+          "queued": "111100000",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            18,
+            0,
+            32
+          ],
+          "type": 2,
+          "queued": "111100000",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -16,
+            5,
+            32
+          ],
+          "type": 0,
+          "queued": "111100000",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -16,
+            0,
+            32
+          ],
+          "type": 0,
+          "queued": "111100000",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -16,
+            2,
+            32
+          ],
+          "type": 0,
+          "queued": "111100000",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -47,
+            5,
+            32
+          ],
+          "type": 1,
+          "queued": "111100000",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -47,
+            0,
+            32
+          ],
+          "type": 1,
+          "queued": "111100000",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -47,
+            3,
+            32
+          ],
+          "type": 1,
+          "queued": "111100000",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            66,
+            5,
+            32
+          ],
+          "type": 2,
+          "queued": "111100000",
+          "collected": "000000000"
+        }
+      ],
+      "remaining": 60
+    },
+    {
+      "tick": 21,
+      "limit": 11,
+      "injections": [],
+      "events": [
+        {
+          "pos": [
+            66,
+            0,
+            32
+          ],
+          "type": 2,
+          "queued": "011100000",
+          "collected": "100000000"
+        },
+        {
+          "pos": [
+            32,
+            5,
+            32
+          ],
+          "type": 0,
+          "queued": "011100000",
+          "collected": "100000000"
+        },
+        {
+          "pos": [
+            1,
+            6,
+            32
+          ],
+          "type": 1,
+          "queued": "011100000",
+          "collected": "100000000"
+        },
+        {
+          "pos": [
+            1,
+            1,
+            32
+          ],
+          "type": 1,
+          "queued": "011100000",
+          "collected": "100000000"
+        },
+        {
+          "pos": [
+            1,
+            3,
+            32
+          ],
+          "type": 1,
+          "queued": "011100000",
+          "collected": "100000000"
+        },
+        {
+          "pos": [
+            -30,
+            6,
+            32
+          ],
+          "type": 2,
+          "queued": "011100000",
+          "collected": "100000000"
+        },
+        {
+          "pos": [
+            -30,
+            1,
+            32
+          ],
+          "type": 2,
+          "queued": "011100000",
+          "collected": "100000000"
+        },
+        {
+          "pos": [
+            -64,
+            0,
+            -48
+          ],
+          "type": 0,
+          "queued": "011100000",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            1,
+            0,
+            -32
+          ],
+          "type": 1,
+          "queued": "011100000",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -16,
+            2,
+            -32
+          ],
+          "type": 0,
+          "queued": "011100000",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            32,
+            2,
+            -32
+          ],
+          "type": 0,
+          "queued": "011100000",
+          "collected": "000000000"
+        }
+      ],
+      "remaining": 49
+    },
+    {
+      "tick": 22,
+      "limit": 11,
+      "injections": [],
+      "events": [
+        {
+          "pos": [
+            1,
+            3,
+            -32
+          ],
+          "type": 1,
+          "queued": "001000000",
+          "collected": "010100000"
+        },
+        {
+          "pos": [
+            -64,
+            3,
+            -32
+          ],
+          "type": 0,
+          "queued": "001000000",
+          "collected": "010100000"
+        },
+        {
+          "pos": [
+            49,
+            3,
+            -32
+          ],
+          "type": 1,
+          "queued": "001000000",
+          "collected": "010100000"
+        },
+        {
+          "pos": [
+            -16,
+            4,
+            -32
+          ],
+          "type": 0,
+          "queued": "001000000",
+          "collected": "010100000"
+        },
+        {
+          "pos": [
+            -47,
+            4,
+            -32
+          ],
+          "type": 1,
+          "queued": "001000000",
+          "collected": "010100000"
+        },
+        {
+          "pos": [
+            -47,
+            0,
+            -32
+          ],
+          "type": 1,
+          "queued": "001000000",
+          "collected": "000100000"
+        },
+        {
+          "pos": [
+            -47,
+            2,
+            -32
+          ],
+          "type": 1,
+          "queued": "001000000",
+          "collected": "000100000"
+        },
+        {
+          "pos": [
+            66,
+            4,
+            -32
+          ],
+          "type": 2,
+          "queued": "001000000",
+          "collected": "000100000"
+        },
+        {
+          "pos": [
+            66,
+            0,
+            -32
+          ],
+          "type": 2,
+          "queued": "001000000",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            66,
+            2,
+            -32
+          ],
+          "type": 2,
+          "queued": "001000000",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            32,
+            5,
+            -32
+          ],
+          "type": 0,
+          "queued": "001000000",
+          "collected": "000000000"
+        }
+      ],
+      "remaining": 38
+    },
+    {
+      "tick": 23,
+      "limit": 11,
+      "injections": [],
+      "events": [
+        {
+          "pos": [
+            32,
+            0,
+            -32
+          ],
+          "type": 0,
+          "queued": "001000000",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            1,
+            5,
+            -32
+          ],
+          "type": 1,
+          "queued": "001000000",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -30,
+            5,
+            -32
+          ],
+          "type": 2,
+          "queued": "001000000",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -30,
+            1,
+            -32
+          ],
+          "type": 2,
+          "queued": "001000000",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -30,
+            3,
+            -32
+          ],
+          "type": 2,
+          "queued": "001000000",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -64,
+            6,
+            -32
+          ],
+          "type": 0,
+          "queued": "001000000",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -64,
+            1,
+            -32
+          ],
+          "type": 0,
+          "queued": "001000000",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            49,
+            6,
+            -32
+          ],
+          "type": 1,
+          "queued": "001000000",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            49,
+            1,
+            -32
+          ],
+          "type": 1,
+          "queued": "001000000",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            18,
+            6,
+            -32
+          ],
+          "type": 2,
+          "queued": "001000000",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            18,
+            1,
+            -32
+          ],
+          "type": 2,
+          "queued": "001000000",
+          "collected": "000000000"
+        }
+      ],
+      "remaining": 27
+    },
+    {
+      "tick": 24,
+      "limit": 11,
+      "injections": [],
+      "events": [
+        {
+          "pos": [
+            18,
+            4,
+            -32
+          ],
+          "type": 2,
+          "queued": "000000000",
+          "collected": "001000000"
+        },
+        {
+          "pos": [
+            -30,
+            0,
+            16
+          ],
+          "type": 2,
+          "queued": "000000000",
+          "collected": "001000000"
+        },
+        {
+          "pos": [
+            1,
+            2,
+            16
+          ],
+          "type": 1,
+          "queued": "000000000",
+          "collected": "001000000"
+        },
+        {
+          "pos": [
+            -30,
+            2,
+            16
+          ],
+          "type": 2,
+          "queued": "000000000",
+          "collected": "001000000"
+        },
+        {
+          "pos": [
+            49,
+            3,
+            16
+          ],
+          "type": 1,
+          "queued": "000000000",
+          "collected": "001000000"
+        },
+        {
+          "pos": [
+            18,
+            3,
+            16
+          ],
+          "type": 2,
+          "queued": "000000000",
+          "collected": "001000000"
+        },
+        {
+          "pos": [
+            66,
+            4,
+            16
+          ],
+          "type": 2,
+          "queued": "000000000",
+          "collected": "001000000"
+        },
+        {
+          "pos": [
+            32,
+            4,
+            16
+          ],
+          "type": 0,
+          "queued": "000000000",
+          "collected": "001000000"
+        },
+        {
+          "pos": [
+            32,
+            2,
+            16
+          ],
+          "type": 0,
+          "queued": "000000000",
+          "collected": "001000000"
+        },
+        {
+          "pos": [
+            1,
+            4,
+            16
+          ],
+          "type": 1,
+          "queued": "000000000",
+          "collected": "001000000"
+        },
+        {
+          "pos": [
+            1,
+            0,
+            16
+          ],
+          "type": 1,
+          "queued": "000000000",
+          "collected": "000000000"
+        }
+      ],
+      "remaining": 16
+    },
+    {
+      "tick": 25,
+      "limit": 65536,
+      "injections": [],
+      "events": [
+        {
+          "pos": [
+            -30,
+            5,
+            16
+          ],
+          "type": 2,
+          "queued": "000000000",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -64,
+            5,
+            16
+          ],
+          "type": 0,
+          "queued": "000000000",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -64,
+            0,
+            16
+          ],
+          "type": 0,
+          "queued": "000000000",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -64,
+            3,
+            16
+          ],
+          "type": 0,
+          "queued": "000000000",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            49,
+            5,
+            16
+          ],
+          "type": 1,
+          "queued": "000000000",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            49,
+            0,
+            16
+          ],
+          "type": 1,
+          "queued": "000000000",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            18,
+            5,
+            16
+          ],
+          "type": 2,
+          "queued": "000000000",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            18,
+            1,
+            16
+          ],
+          "type": 2,
+          "queued": "000000000",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -16,
+            6,
+            16
+          ],
+          "type": 0,
+          "queued": "000000000",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -16,
+            1,
+            16
+          ],
+          "type": 0,
+          "queued": "000000000",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -16,
+            3,
+            16
+          ],
+          "type": 0,
+          "queued": "000000000",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -47,
+            6,
+            16
+          ],
+          "type": 1,
+          "queued": "000000000",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -47,
+            1,
+            16
+          ],
+          "type": 1,
+          "queued": "000000000",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            -47,
+            4,
+            16
+          ],
+          "type": 1,
+          "queued": "000000000",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            66,
+            6,
+            16
+          ],
+          "type": 2,
+          "queued": "000000000",
+          "collected": "000000000"
+        },
+        {
+          "pos": [
+            66,
+            1,
+            16
+          ],
+          "type": 2,
+          "queued": "000000000",
+          "collected": "000000000"
+        }
+      ],
+      "remaining": 0
+    },
+    {
+      "tick": 26,
+      "limit": 65536,
+      "injections": [],
+      "events": [],
+      "remaining": 0
+    },
+    {
+      "tick": 27,
+      "limit": 65536,
+      "injections": [],
+      "events": [],
+      "remaining": 0
+    },
+    {
+      "tick": 28,
+      "limit": 65536,
+      "injections": [],
+      "events": [],
+      "remaining": 0
+    },
+    {
+      "tick": 29,
+      "limit": 65536,
+      "injections": [],
+      "events": [],
+      "remaining": 0
+    },
+    {
+      "tick": 30,
+      "limit": 65536,
+      "injections": [],
+      "events": [],
+      "remaining": 0
+    }
+  ]
+}

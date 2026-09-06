@@ -40,6 +40,7 @@ public:
     Json catalog() const;
     bool has(StateId id, const std::string& property) const { return type(id).properties.contains(property); }
     std::size_t stateCount() const { return states.size(); }
+    std::size_t typeCount() const { return types.size(); }
     std::uint32_t itemId(const std::string& name) const;
     const ItemInfo& item(std::uint32_t id) const { return items.at(id); }
     Json itemCatalog() const;

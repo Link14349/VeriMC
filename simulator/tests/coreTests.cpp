@@ -15,7 +15,63 @@ int main() {
         std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/blockStates.json"); auto source = Json::parse(file);
         for (const auto& block : source["blocks"]) for (const auto& state : block["states"]) expect(r.state(block["name"], state["properties"]) == state["id"].get<StateId>(), "state mismatch: " + block["name"].get<std::string>());
     });
-    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers", "java26_2Hoppers", "java26_2Torches", "java26_2Rails"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
+    test("Java 26.2 chunk scheduler: backlog, limits and callback queue membership", [&] {
+        std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/../tests/fixtures/java26_2Scheduler.json");
+        auto fixture = Json::parse(file); BlockTicks ticks;
+        auto read = [](const Json& row) { return ScheduledEvent{row.at("tick"), row.at("priority"), row.at("order"), row.at("pos").get<BlockPos>(), row.at("type")}; };
+        for (const auto& row : fixture.at("initial")) ticks.schedule(read(row));
+        for (const auto& run : fixture.at("runs")) {
+            ticks.collect(run.at("tick"), run.at("limit"));
+            std::size_t index = 0;
+            while (ticks.hasBatch()) {
+                const auto event = ticks.pop();
+                expect(index < run.at("events").size(), "extra collected tick");
+                const auto& expected = run.at("events").at(index);
+                expect(event.pos == expected.at("pos").get<BlockPos>() && event.type == expected.at("type"), "cross-chunk drain order differs");
+                for (const auto& injection : run.at("injections")) if (injection.at("after") == index) ticks.schedule(read(injection.at("event")));
+                std::string queued, collected;
+                for (const auto& row : fixture.at("probes")) {
+                    auto probe = read(row);
+                    queued += ticks.hasScheduled(probe.pos, probe.type) ? '1' : '0';
+                    collected += ticks.willTick(probe.pos, probe.type) ? '1' : '0';
+                }
+                expect(queued == expected.at("queued").get<std::string>() && collected == expected.at("collected").get<std::string>(), "hasScheduled / willTick membership differs");
+                ++index;
+            }
+            expect(index == run.at("events").size() && ticks.size() == run.at("remaining"), "collection limit or deferred callbacks differ");
+        }
+    });
+    test("block tick cap defers backlog and zero delay waits for next collection", [&] {
+        BlockTicks ticks;
+        for (std::uint64_t i = 0; i < 65537; ++i) ticks.schedule({1, 0, i, {static_cast<int>(i), 0, 0}, 1});
+        ticks.collect(1);
+        expect(ticks.batchEvents().size() == 65536 && ticks.queuedEvents().size() == 1, "vanilla per-tick limit");
+        while (ticks.hasBatch()) ticks.pop();
+        expect(ticks.nextTick() == 2, "overdue tick ran in the same collection");
+        ticks.collect(2); expect(ticks.pop().order == 65536, "deferred tick lost");
+        ticks.finishThrough(100); ticks.schedule({100, 0, 65537, {0, 0, 0}, 1});
+        expect(ticks.nextTick() == 101, "zero delay after idle ran before next tick");
+    });
+    test("checkpoint resumes a collected batch with a future tick at the same position", [&] {
+        Simulator s(r); BlockPos first{0,0,0}, second{1,0,0};
+        s.world.set(first, r.state("observer", {{"facing", "east"}}));
+        s.world.set(second, r.state("observer", {{"facing", "west"}}));
+        s.schedule(first, 2); s.schedule(second, 2); s.stepEvent();
+        auto saved = s.saveProject("batch", true);
+        expect(saved.at("blockTickState").at("batch").size() == 1, "lost current batch");
+        expect(s.hasScheduled(second), "observer could not queue while its current tick was collected");
+        Simulator restored(r); restored.loadProject(saved);
+        auto clone = s.clone();
+        for (int i = 0; i < 12; ++i) {
+            s.stepEvent(); restored.stepEvent(); clone->stepEvent();
+            expect(s.saveProject("batch", true) == restored.saveProject("batch", true) && s.saveProject("batch", true) == clone->saveProject("batch", true), "batch checkpoint continuation diverged");
+        }
+        auto invalid = saved; invalid["blockTickState"]["batch"].push_back(invalid["blockTickState"]["batch"][0]);
+        auto before = restored.saveProject("before", true); bool threw = false;
+        try { restored.loadProject(invalid); } catch (...) { threw = true; }
+        expect(threw && before == restored.saveProject("before", true), "invalid batch import changed world");
+    });
+    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers", "java26_2Hoppers", "java26_2Torches", "java26_2Rails", "java26_2TickBatches"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
         std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/../tests/fixtures/" + fixtureName + ".json"); expect(static_cast<bool>(file), "missing vanilla reference fixture");
         auto fixture = Json::parse(file); auto origin = fixture["origin"].get<BlockPos>(); Simulator s(r);
         auto absolute = [&](const Json& p) { auto pos = p.get<BlockPos>(); return BlockPos{origin.x + pos.x, origin.y + pos.y, origin.z + pos.z}; };
