@@ -8,6 +8,11 @@ namespace simulator {
 struct Cell { BlockPos pos; StateId state; };
 class World {
 public:
+    World() = default;
+    World(const World& other);
+    World& operator=(const World& other);
+    World(World&&) noexcept = default;
+    World& operator=(World&&) noexcept = default;
     StateId get(BlockPos pos) const;
     StateId set(BlockPos pos, StateId state);
     std::vector<Cell> cells() const;

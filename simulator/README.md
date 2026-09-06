@@ -2,7 +2,60 @@
 
 VeriMC 的 Minecraft 红石电路模拟子项目。C++20 原生执行，Three.js 浏览器界面；全部实现位于本目录。
 
-当前正在实现基础版本。完整进度与已验证范围见 [实施记录](docs/implementationStatus.md)，目标范围见 [设计文档](../docs/module-1-design.md)。尚未完成的机制不能视为已兼容 Java Edition 26.2。
+目前是可运行的首个预览版本，完成基础电路的搭建、运行和调试闭环。**整个模块仍在开发中，尚未完整覆盖红石器件。** 完整进度与已验证范围见 [实施记录](docs/implementationStatus.md)，目标范围见 [设计文档](../docs/module-1-design.md)。
+
+## 启动
+
+当前验证平台：macOS / Apple Silicon，Apple Clang 17，Boost 1.90，nlohmann-json 3.12，Node 20.11。日常使用无需 Java 或 Minecraft。
+
+```sh
+# 安装构建依赖（已安装则跳过）
+brew install cmake boost nlohmann-json node
+
+# 在仓库根目录运行；构建后自动打开默认浏览器
+python3 simulator/runSimulator.py
+
+# 已构建后直接启动
+python3 simulator/runSimulator.py --no-build
+```
+
+服务只监听 `127.0.0.1:28765`。保留终端运行，Ctrl+C 停止。`--no-open` 不打开浏览器，`--port` 指定另一个本机端口。
+
+## 使用
+
+- 初始样例：拉杆经过两级中继器控制红石灯；按钮驱动铜灯记忆电路。
+- 左侧选择器件，按 `2` 或点击放置工具，在当前 Y 层左键放置。右侧可铺底板和调整方向，`R` 旋转。
+- 右键拖动旋转、中键平移、滚轮缩放。支持俯视、适合画面和编辑层剖切。
+- `1` 选择；`3` 移除；`4` 放置探针；`5` 操作拉杆、按钮等。Space 运行/暂停，`S` 前进一个游戏刻。
+- 属性面板检查坐标、方块状态和信号强度；中继器、比较器的朝向属性指向输入。
+- 波形支持缩放、跟随、双游标和触发暂停；探针菜单的 `↑` 或 `↓` 设置边沿断点。Shift 单击波形放置 B 游标。
+- 工程菜单导出/导入 JSON 电路或运行快照。快照包含计划事件、器件内部状态与探针历史。VCD 一个游戏刻对应 50 ms，同刻边沿保留順序，不虚构物理子刻时间。
+- Cmd/Ctrl+Z 撤销、Shift+Cmd/Ctrl+Z 重做，采用原生内存快照并控制历史预算。Cmd/Ctrl+C、Cmd/Ctrl+V 复制/粘贴当前器件。
+
+## 当前覆盖
+
+可用：结构支撑方块、红石块、拉杆、按钮、粉线、火把、中继器、比较器、侦测器、红石灯、铜灯和标靶刺激 API。界面不开放尚未实现的活塞、容器等器件。原版状态表的覆盖范围大于实际仿真覆盖范围。
+
+## 验证
+
+```sh
+cd simulator
+cmake --preset release
+cmake --build --preset release -j 6
+ctest --preset release
+
+cmake --preset debug
+cmake --build --preset debug -j 6
+ctest --preset debug
+
+# 服务启动后，验证 HTTP / WebSocket 完整流程
+python3 tests/serverTests.py
+
+# 有实际驱动的中继器链基准
+./build/simulatorCli --benchmark 1000
+```
+
+Release、ASan/UBSan、原版 GameTest 差分和浏览器实操分别验证。参考生成流程及边界见 [参考验证](docs/referenceValidation.md)。
 
 ## 开发约定
 

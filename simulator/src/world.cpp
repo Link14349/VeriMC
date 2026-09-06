@@ -2,6 +2,11 @@
 #include <algorithm>
 
 namespace simulator {
+World::World(const World& other) : blockCount(other.blockCount) {
+    chunks.reserve(other.chunks.size());
+    for (const auto& [pos, chunk] : other.chunks) chunks.emplace(pos, std::make_unique<Chunk>(*chunk));
+}
+World& World::operator=(const World& other) { if (this != &other) { World copy(other); *this = std::move(copy); } return *this; }
 StateId World::get(BlockPos pos) const {
     auto found = chunks.find(chunkPos(pos));
     return found == chunks.end() ? 0 : found->second->states[offset(pos)];

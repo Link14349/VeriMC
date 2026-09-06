@@ -61,6 +61,9 @@ public:
     Json saveProject(const std::string& name = "未命名电路", bool checkpoint = false) const;
     void loadProject(const Json& data);
     std::string exportVcd() const;
+    std::unique_ptr<Simulator> clone() const;
+    void restore(const Simulator& snapshot);
+    std::size_t estimatedBytes() const { return world.storageBytes() + trace.size() * sizeof(TraceEdge) + runtime.size() * 512 + scheduled.size() * 96; }
 private:
     enum class UpdateKind { neighbor, shape, multi };
     struct Update { UpdateKind kind; BlockPos pos; Direction direction{Direction::down}; StateId neighborState{}; int index{}, skip{-1}, depth{512}; unsigned flags{2}; };

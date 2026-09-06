@@ -1,0 +1,149 @@
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { connection, type BlockCell, type BlockDef, type Pos, posKey } from './api';
+import { shortName } from './blockLabels';
+
+type Tool = 'select' | 'place' | 'erase' | 'probe' | 'interact';
+type Handle = { pool: InstancePool; index: number };
+const box = new THREE.BoxGeometry(1, 1, 1);
+const cylinder = new THREE.CylinderGeometry(.5, .5, 1, 8);
+const color = new THREE.Color();
+const matrix = new THREE.Matrix4();
+const quaternion = new THREE.Quaternion();
+const vector = new THREE.Vector3();
+const scaleVector = new THREE.Vector3();
+const material = new THREE.MeshStandardMaterial({ roughness: .84, metalness: .08 });
+const directionVectors: Record<string, [number, number, number]> = { east: [1,0,0], west: [-1,0,0], up: [0,1,0], down: [0,-1,0], north: [0,0,-1], south: [0,0,1] };
+class InstancePool {
+  mesh: THREE.InstancedMesh;
+  positions: Array<Pos | undefined> = [];
+  private free: number[] = [];
+  private count = 0;
+  private capacity = 32;
+  constructor(readonly group: THREE.Group, readonly geometry: THREE.BufferGeometry) { this.mesh = this.create(); }
+  private create() {
+    const mesh = new THREE.InstancedMesh(this.geometry, material, this.capacity); mesh.count = this.count;
+    mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage); mesh.castShadow = false; mesh.receiveShadow = true;
+    mesh.boundingSphere = new THREE.Sphere(new THREE.Vector3(8,8,8), 15); mesh.userData.pool = this; this.group.add(mesh); return mesh;
+  }
+  add(pos: Pos, transform: THREE.Matrix4, tint: number): Handle {
+    let index = this.free.pop(); if (index === undefined) index = this.count++;
+    if (index >= this.capacity) {
+      const old = this.mesh; this.capacity *= 2; this.mesh = this.create();
+      for (let i = 0; i < old.count; ++i) { old.getMatrixAt(i, matrix); this.mesh.setMatrixAt(i, matrix); old.getColorAt(i, color); this.mesh.setColorAt(i, color); }
+      this.group.remove(old); old.dispose();
+    }
+    this.positions[index] = pos; this.mesh.count = this.count; this.mesh.setMatrixAt(index, transform); this.mesh.setColorAt(index, color.setHex(tint)); this.dirty(); return { pool: this, index };
+  }
+  remove(index: number) { this.positions[index] = undefined; this.free.push(index); this.mesh.setMatrixAt(index, new THREE.Matrix4().makeScale(0,0,0)); this.dirty(); }
+  private dirty() { this.mesh.instanceMatrix.needsUpdate = true; if (this.mesh.instanceColor) this.mesh.instanceColor.needsUpdate = true; }
+  dispose() { this.group.remove(this.mesh); this.mesh.dispose(); }
+}
+type Chunk = { group: THREE.Group; box: InstancePool; cylinder: InstancePool };
+export class CircuitViewport {
+  renderer: THREE.WebGLRenderer;
+  scene = new THREE.Scene();
+  camera = new THREE.PerspectiveCamera(42, 1, .1, 3000);
+  controls: OrbitControls;
+  tool: Tool = 'select';
+  layer = 1;
+  cutaway = false;
+  hover: Pos | null = null;
+  private chunks = new Map<string, Chunk>();
+  private handles = new Map<string, Handle[]>();
+  private raycaster = new THREE.Raycaster();
+  private pointer = new THREE.Vector2();
+  private plane = new THREE.Plane(new THREE.Vector3(0,1,0), -1);
+  private grid: THREE.GridHelper;
+  private selection = new THREE.Box3Helper(new THREE.Box3(new THREE.Vector3(), new THREE.Vector3(1,1,1)), 0xf0c88a);
+  private ghost = new THREE.Mesh(new THREE.BoxGeometry(1.005,1.005,1.005), new THREE.MeshBasicMaterial({ color: 0xf0c88a, transparent: true, opacity: .16, depthWrite: false }));
+  private clipPlane = new THREE.Plane(new THREE.Vector3(0,-1,0), 2000000);
+  private resizeObserver: ResizeObserver;
+  private frameId = 0;
+  private down: [number,number] | null = null;
+  private selected: Pos | null = null;
+  private lastFps = performance.now(); private frameCount = 0;
+  onPick: (pos: Pos, tool: Tool, additive: boolean) => void = () => {};
+  onHover: (pos: Pos | null) => void = () => {};
+  onFps: (value: number) => void = () => {};
+  constructor(readonly container: HTMLDivElement) {
+    this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
+    this.renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); this.renderer.setClearColor(0x20272b); this.renderer.outputColorSpace = THREE.SRGBColorSpace; this.renderer.localClippingEnabled = true;
+    material.clippingPlanes = [this.clipPlane];
+    container.appendChild(this.renderer.domElement);
+    this.scene.add(new THREE.HemisphereLight(0xf2f2e4, 0x4c5b69, 2.7)); const light = new THREE.DirectionalLight(0xffefcf, 3.1); light.position.set(-12,30,15); this.scene.add(light);
+    this.camera.position.set(18,18,22); this.controls = new OrbitControls(this.camera, this.renderer.domElement); this.controls.target.set(4,0,2); this.controls.enableDamping = true; this.controls.dampingFactor = .12; this.controls.minDistance = 2; this.controls.maxDistance = 700;
+    this.controls.mouseButtons = { LEFT: -1 as THREE.MOUSE, MIDDLE: THREE.MOUSE.PAN, RIGHT: THREE.MOUSE.ROTATE };
+    this.grid = new THREE.GridHelper(128,128,0x5c6668,0x343e42); this.grid.position.y = -.008; this.scene.add(this.grid);
+    const axes = new THREE.AxesHelper(2.2); axes.position.set(-.5,.025,-.5); this.scene.add(axes);
+    this.selection.visible = false; this.ghost.visible = false; this.scene.add(this.selection, this.ghost);
+    this.resizeObserver = new ResizeObserver(() => this.resize()); this.resizeObserver.observe(container);
+    this.renderer.domElement.addEventListener('pointerdown', this.pointerDown); this.renderer.domElement.addEventListener('pointerup', this.pointerUp); this.renderer.domElement.addEventListener('pointermove', this.pointerMove); this.renderer.domElement.addEventListener('contextmenu', event => event.preventDefault());
+    connection.addEventListener('cells', this.applyChanges); this.rebuild(); this.animate();
+  }
+  private resize() { const { clientWidth: w, clientHeight: h } = this.container; this.renderer.setSize(w, h); this.camera.aspect = w / Math.max(h,1); this.camera.updateProjectionMatrix(); }
+  private getChunk(pos: Pos): Chunk {
+    const origin: Pos = pos.map(v => Math.floor(v / 16) * 16) as Pos, key = posKey(origin); let chunk = this.chunks.get(key);
+    if (!chunk) { const group = new THREE.Group(); group.position.fromArray(origin); this.scene.add(group); chunk = { group, box: new InstancePool(group, box), cylinder: new InstancePool(group, cylinder) }; this.chunks.set(key, chunk); } return chunk;
+  }
+  private drawCell(cell: BlockCell) {
+    const key = posKey(cell.pos); for (const handle of this.handles.get(key) ?? []) handle.pool.remove(handle.index); this.handles.delete(key);
+    if (cell.stateId === 0) return;
+    const def = connection.states.get(cell.stateId); if (!def) return;
+    const name = shortName(def.name), p = def.properties, chunk = this.getChunk(cell.pos), handles: Handle[] = [];
+    const x = cell.pos[0] - chunk.group.position.x, y = cell.pos[1] - chunk.group.position.y, z = cell.pos[2] - chunk.group.position.z;
+    const transform = new THREE.Matrix4();
+    const part = (center: [number,number,number], size: [number,number,number], tint: number, shape: 'box'|'cylinder' = 'box', rotation = 0) => {
+      quaternion.setFromAxisAngle(vector.set(0,1,0), rotation); transform.compose(vector.set(x + center[0], y + center[1], z + center[2]), quaternion, scaleVector.fromArray(size)); handles.push(chunk[shape].add(cell.pos, transform, tint));
+    };
+    const on = cell.value > 0, red = on ? new THREE.Color().setRGB(.28 + cell.value / 22,.035 + cell.value / 110,.025).getHex() : 0x4d2728;
+    const facing = p.facing ?? 'north', dir = directionVectors[facing], angle = Math.atan2(dir[0], dir[2]);
+    const torch = (cx: number, cz: number, lit: boolean, height = .5) => { part([cx,height / 2,cz],[.11,height,.11],0x9c7651,'cylinder'); part([cx,height,cz],[.2,.14,.2],lit ? 0xff5541 : 0x713637); };
+    if (name === 'redstone_wire') {
+      part([.5,.024,.5],[.22,.042,.22],red);
+      for (const d of ['north','east','south','west']) if (p[d] !== 'none') { const v = directionVectors[d]; part([.5 + v[0] * .27,.023,.5 + v[2] * .27], v[0] ? [.54,.04,.095] : [.095,.04,.54],red); if (p[d] === 'up') part([.5 + v[0] * .49,.5,.5 + v[2] * .49],v[0] ? [.045,1,.095] : [.095,1,.045],red); }
+    } else if (name === 'repeater' || name === 'comparator') {
+      part([.5,.065,.5],[.94,.13,.94],0xb2b7ac); part([.5,.14,.5],[.12,.025,.65],red,'box',angle);
+      const v = directionVectors[facing]; torch(.5 - v[0]*.29,.5 - v[2]*.29,on,.31);
+      if (name === 'repeater') torch(.5 + v[0]*(.3 - (Number(p.delay)-1)*.11),.5 + v[2]*(.3 - (Number(p.delay)-1)*.11),on,.31);
+      else { torch(.5+v[0]*.27+v[2]*.21,.5+v[2]*.27-v[0]*.21,on,.31); torch(.5+v[0]*.27-v[2]*.21,.5+v[2]*.27+v[0]*.21,on,.31); }
+      if (p.locked === 'true') part([.5,.28,.5],[.8,.12,.14],0x343b40,'box',angle);
+    } else if (name.includes('redstone_torch')) torch(.5,.5,on,.62);
+    else if (name === 'lever') { part([.5,.09,.5],[.46,.18,.46],0x747d7d); part([on ? .65 : .35,.36,.5],[.12,.5,.12],0xc4ad80); part([on ? .65 : .35,.6,.5],[.18,.09,.18],on ? 0xee6550 : 0x80776b); }
+    else if (name.endsWith('_button')) part([.5,on ? .035 : .08,.5],[.35,on ? .07 : .16,.5],name.includes('stone') ? 0x9b9f95 : 0xba8c58);
+    else if (name === 'redstone_lamp') {
+      part([.5,.5,.5],[.98,.98,.98],on ? 0xffcf82 : 0x5c4938);
+      for (const v of [.08,.5,.92]) { part([v,.5,.999],[.045,1,.02],0x564536); part([.5,v,.999],[1,.045,.02],0x564536); part([.999,.5,v],[.02,1,.045],0x564536); part([.999,v,.5],[.02,.045,1],0x564536); part([v,.999,.5],[.045,.02,1],0x564536); part([.5,.999,v],[1,.02,.045],0x564536); }
+    } else if (name.endsWith('copper_bulb')) {
+      const oxidized = name.includes('oxidized') || name.includes('weathered'); part([.5,.5,.5],[.98,.98,.98],oxidized ? 0x527b65 : 0xac7151);
+      for (const v of [.25,.5,.75]) { part([v,.996,.5],[.11,.014,.66],on ? 0xffda8c : 0x3f4944); part([.996,.5,v],[.014,.66,.11],on ? 0xffda8c : 0x3f4944); part([v,.5,.996],[.11,.66,.014],on ? 0xffda8c : 0x3f4944); }
+    } else if (name === 'observer') {
+      part([.5,.5,.5],[.98,.98,.98],0x818b8c); part([.5,.998,.5],[.58,.016,.65],0x515d60); part([.5,.998,.5],[.12,.025,.55],0x9aadaa,'box',angle);
+      const v = directionVectors[facing]; for (const sign of [-1,1]) part([.5+v[0]*.5+v[2]*.2,.6,.5+v[2]*.5-v[0]*.2*sign],[v[0] ? .018 : .14,.12,v[0] ? .14 : .018],0x20292c);
+      part([.5-v[0]*.5,.48,.5-v[2]*.5],[v[0] ? .025 : .22,.22,v[0] ? .22 : .025],red);
+    } else if (name === 'target') { part([.5,.5,.5],[.98,.98,.98],0xd5cbb4); for (const size of [.7,.38,.12]) part([.5,1 + .001 / size,.5],[size,.005,size],size === .38 ? 0xd5cbb4 : 0xa94a3f); }
+    else {
+      const colors: Record<string, number> = { stone:0x747c80,smooth_stone:0xa3aaa8,white_concrete:0xc5c8bb,light_gray_concrete:0x93978c,red_concrete:0x975347,blue_concrete:0x516f96,white_wool:0xd2cfc0,redstone_block:0xb2372a,glass:0x719d9e,slime_block:0x84b85f,honey_block:0xb99b42,obsidian:0x353041,bedrock:0x474b50,glowstone:0xb8a673,sea_lantern:0xb6cebe };
+      const height = name.endsWith('_slab') && p.type !== 'double' ? .5 : 1; part([.5,height / 2,.5],[.99,height*.99,.99],colors[name] ?? 0x9b9c89);
+    }
+    this.handles.set(key, handles);
+  }
+  private applyChanges = (event: Event) => { const { full, changes } = (event as CustomEvent<{ full: boolean; changes: BlockCell[] }>).detail; if (full) this.rebuild(); else for (const cell of changes) this.drawCell(cell); };
+  private rebuild() { for (const chunk of this.chunks.values()) { chunk.box.dispose(); chunk.cylinder.dispose(); this.scene.remove(chunk.group); } this.chunks.clear(); this.handles.clear(); for (const cell of connection.cells.values()) this.drawCell(cell); }
+  setLayer(layer: number, cutaway: boolean) { this.layer = layer; this.cutaway = cutaway; this.plane.constant = -layer; this.clipPlane.constant = cutaway ? layer + 1.01 : 2000000; }
+  select(pos: Pos | null) { this.selected = pos; this.selection.visible = !!pos; if (pos) { this.selection.box.min.fromArray(pos).addScalar(-.007); this.selection.box.max.fromArray(pos).addScalar(1.007); } }
+  fit() { const bounds = new THREE.Box3(); for (const cell of connection.cells.values()) bounds.expandByPoint(new THREE.Vector3(...cell.pos)); if (bounds.isEmpty()) bounds.set(new THREE.Vector3(-4,0,-4),new THREE.Vector3(4,0,4)); const center = bounds.getCenter(new THREE.Vector3()), size = bounds.getSize(new THREE.Vector3()).length(); this.controls.target.copy(center); this.camera.position.copy(center).add(new THREE.Vector3(1,1.25,1.4).multiplyScalar(Math.max(size*.65,8))); }
+  top() { this.camera.position.copy(this.controls.target).add(new THREE.Vector3(0,Math.max(this.camera.position.distanceTo(this.controls.target),15),.001)); }
+  private locate(event: PointerEvent): Pos | null {
+    const rect = this.renderer.domElement.getBoundingClientRect(); this.pointer.set((event.clientX-rect.left)/rect.width*2-1,-(event.clientY-rect.top)/rect.height*2+1); this.raycaster.setFromCamera(this.pointer,this.camera);
+    if (this.tool === 'place') { const hit = this.raycaster.ray.intersectPlane(this.plane, new THREE.Vector3()); return hit ? [Math.floor(hit.x),this.layer,Math.floor(hit.z)] : null; }
+    const meshes: THREE.Object3D[] = []; for (const chunk of this.chunks.values()) meshes.push(chunk.box.mesh,chunk.cylinder.mesh);
+    for (const hit of this.raycaster.intersectObjects(meshes)) { const pool = hit.object.userData.pool as InstancePool; const pos = pool.positions[hit.instanceId!]; if (pos && (!this.cutaway || pos[1] <= this.layer)) return pos; }
+    return null;
+  }
+  private pointerDown = (event: PointerEvent) => { if (event.button === 0) this.down = [event.clientX,event.clientY]; };
+  private pointerUp = (event: PointerEvent) => { if (event.button === 0 && this.down && Math.hypot(event.clientX-this.down[0],event.clientY-this.down[1]) < 5) { const pos = this.locate(event); if (pos) this.onPick(pos,this.tool,event.shiftKey); } this.down = null; };
+  private pointerMove = (event: PointerEvent) => { const pos = this.locate(event); if (posKey(pos ?? [0,0,0]) !== posKey(this.hover ?? [0,0,0])) this.onHover(pos); this.hover = pos; this.ghost.visible = this.tool === 'place' && !!pos; if (pos) this.ghost.position.set(pos[0]+.5,pos[1]+.5,pos[2]+.5); };
+  private animate = () => { this.frameId = requestAnimationFrame(this.animate); this.controls.update(); this.renderer.render(this.scene,this.camera); this.frameCount++; const now = performance.now(); if (now-this.lastFps > 1000) { this.onFps(Math.round(this.frameCount*1000/(now-this.lastFps))); this.lastFps=now; this.frameCount=0; } };
+  dispose() { cancelAnimationFrame(this.frameId); this.resizeObserver.disconnect(); connection.removeEventListener('cells',this.applyChanges); this.controls.dispose(); for (const c of this.chunks.values()) { c.box.dispose(); c.cylinder.dispose(); } this.renderer.dispose(); this.renderer.domElement.remove(); }
+}

@@ -3,6 +3,17 @@
 #include <cctype>
 
 namespace simulator {
+std::unique_ptr<Simulator> Simulator::clone() const {
+    auto result = std::make_unique<Simulator>(registry); result->restore(*this); return result;
+}
+void Simulator::restore(const Simulator& snapshot) {
+    if (&registry != &snapshot.registry) throw std::invalid_argument("运行快照的注册表不匹配");
+    world = snapshot.world; runtime = snapshot.runtime; scheduled = snapshot.scheduled; scheduledKeys = snapshot.scheduledKeys;
+    probes = snapshot.probes; probeDependencies = snapshot.probeDependencies; trace = snapshot.trace;
+    currentTick = snapshot.currentTick; nextOrder = snapshot.nextOrder; sequence = snapshot.sequence; nextProbeId = snapshot.nextProbeId;
+    traceDropped = snapshot.traceDropped; traceCapacity = snapshot.traceCapacity; updateBudget = snapshot.updateBudget; statistics = snapshot.statistics;
+    breakRequested = snapshot.breakRequested; pauseReason = snapshot.pauseReason; changes.clear(); ++revision;
+}
 Json Simulator::saveProject(const std::string& name, bool checkpoint) const {
     Json data{{"format", "verimc.simulator"}, {"formatVersion", 1}, {"minecraftVersion", "26.2"}, {"edition", "java"}, {"kind", checkpoint ? "checkpoint" : "circuit"}, {"name", name}};
     data["profile"] = {{"experimentalRedstone", false}, {"naturalRandomTicks", false}, {"loadedRegionOnly", true}};
