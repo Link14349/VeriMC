@@ -1,6 +1,6 @@
 export type Pos = [number, number, number];
 export type BlockDef = { stateId: number; name: string; properties: Record<string, string> };
-export type BlockCell = { pos: Pos; stateId: number; value: number };
+export type BlockCell = { pos: Pos; stateId: number; value: number; renderStateId: number; motion: number };
 export type CatalogItem = { name: string; defaultState: number; device: number; properties: Record<string, string[]>; supportLevel: string };
 export type Probe = { id: number; pos: Pos; name: string; value: number; mode: string; trigger: string };
 export type Edge = [number, number, number, number];
@@ -39,13 +39,13 @@ export class SimulatorConnection extends EventTarget {
   }
   private receive(data: string | ArrayBuffer) {
     if (data instanceof ArrayBuffer) {
-      const view = new DataView(data); if (view.byteLength < 32 || view.getUint32(0, true) !== 0x31434d56) { this.error('不支持的内核数据格式'); return; }
+      const view = new DataView(data); if (view.byteLength < 32 || view.getUint32(0, true) !== 0x32434d56) { this.error('不支持的内核数据格式，请同步重启内核并刷新界面'); return; }
       const full = view.getUint32(4, true) === 1, frameId = view.getUint32(8, true), count = view.getUint32(12, true);
-      if (view.byteLength !== 32 + count * 20) { this.error('内核数据长度异常'); return; }
+      if (view.byteLength !== 32 + count * 28) { this.error('内核数据长度异常'); return; }
       if (full) this.cells.clear();
       const changes: BlockCell[] = [];
-      for (let i = 0, offset = 32; i < count; ++i, offset += 20) {
-        const cell: BlockCell = { pos: [view.getInt32(offset, true), view.getInt32(offset + 4, true), view.getInt32(offset + 8, true)], stateId: view.getUint32(offset + 12, true), value: view.getUint32(offset + 16, true) };
+      for (let i = 0, offset = 32; i < count; ++i, offset += 28) {
+        const cell: BlockCell = { pos: [view.getInt32(offset, true), view.getInt32(offset + 4, true), view.getInt32(offset + 8, true)], stateId: view.getUint32(offset + 12, true), value: view.getUint32(offset + 16, true), renderStateId: view.getUint32(offset + 20, true), motion: view.getUint32(offset + 24, true) };
         if (cell.stateId === 0) this.cells.delete(posKey(cell.pos)); else this.cells.set(posKey(cell.pos), cell); changes.push(cell);
       }
       this.dispatchEvent(new CustomEvent('cells', { detail: { full, changes } })); this.socket?.send(JSON.stringify({ cmd: 'ack', frameId })); return;

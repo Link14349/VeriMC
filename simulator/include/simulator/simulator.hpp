@@ -9,14 +9,16 @@
 namespace simulator {
 struct ScheduledEvent {
     Tick tick{}; int priority{}; std::uint64_t order{}; BlockPos pos{}; std::uint16_t type{};
-    auto key() const { return std::tuple(tick, priority, order); }
+    std::uint8_t phase{}; std::uint64_t data{};
+    auto key() const { return std::tuple(tick, phase, priority, order); }
 };
 struct EventLater { bool operator()(const ScheduledEvent& a, const ScheduledEvent& b) const { return a.key() > b.key(); } };
-struct EventKey { BlockPos pos; std::uint16_t type; bool operator==(const EventKey&) const = default; };
-struct EventKeyHash { std::size_t operator()(const EventKey& k) const { return PosHash{}(k.pos) ^ (static_cast<std::size_t>(k.type) * 65537); } };
+struct EventKey { BlockPos pos; std::uint16_t type; std::uint8_t phase{}; std::uint64_t data{}; bool operator==(const EventKey&) const = default; };
+struct EventKeyHash { std::size_t operator()(const EventKey& k) const { return PosHash{}(k.pos) ^ (static_cast<std::size_t>(k.type) * 65537) ^ (static_cast<std::size_t>(k.phase) * 31) ^ static_cast<std::size_t>(k.data * 16777619); } };
 struct TraceEdge { std::uint32_t probeId{}; Tick tick{}; std::uint64_t sequence{}; std::uint8_t value{}; };
 struct Probe { std::uint32_t id{}; BlockPos pos{}; std::string name; std::string mode{"output"}; Direction direction{Direction::up}; int lastValue{-1}; std::string trigger{"none"}; int triggerValue{15}; };
 struct RuntimeData { int output{}; std::deque<Tick> torchToggles; Json values = Json::object(); };
+struct PistonMotion { StateId movedState{}; Direction facing{}; bool extending{}, source{}; unsigned progress{}, previousProgress{}; Tick lastTicked{}; std::uint64_t generation{}; };
 struct Statistics { std::uint64_t updates{}, scheduledEvents{}, stateChanges{}; std::uint64_t simulationMicros{}; };
 class Simulator {
 public:
@@ -26,6 +28,7 @@ public:
     Tick currentTick{};
     Statistics statistics;
     bool breakRequested{};
+    bool faulted{};
     std::string pauseReason;
     std::size_t updateBudget{1000000};
     std::size_t traceCapacity{500000};
@@ -64,6 +67,7 @@ public:
     std::unique_ptr<Simulator> clone() const;
     void restore(const Simulator& snapshot);
     std::size_t estimatedBytes() const { return world.storageBytes() + trace.size() * sizeof(TraceEdge) + runtime.size() * 512 + scheduled.size() * 96; }
+    const PistonMotion* motionAt(BlockPos pos) const { auto it = motions.find(pos); return it == motions.end() ? nullptr : &it->second; }
 private:
     enum class UpdateKind { neighbor, shape, multi };
     struct Update { UpdateKind kind; BlockPos pos; Direction direction{Direction::down}; StateId neighborState{}; int index{}, skip{-1}, depth{512}; unsigned flags{2}; };
@@ -73,12 +77,14 @@ private:
     std::priority_queue<ScheduledEvent, std::vector<ScheduledEvent>, EventLater> scheduled;
     std::unordered_set<EventKey, EventKeyHash> scheduledKeys;
     std::unordered_map<BlockPos, RuntimeData, PosHash> runtime;
+    std::unordered_map<BlockPos, PistonMotion, PosHash> motions;
     std::unordered_map<BlockPos, StateId, PosHash> changes;
     std::vector<Probe> probes;
     std::unordered_map<BlockPos, std::vector<std::uint32_t>, PosHash> probeDependencies;
     std::deque<TraceEdge> trace;
     std::uint32_t nextProbeId{1};
     std::uint64_t nextOrder{}, sequence{};
+    std::uint8_t currentPhase{3};
     void enqueue(Update update);
     void executeNeighbor(BlockPos pos);
     void executeShape(const Update& update);
@@ -104,5 +110,16 @@ private:
     void sampleAffected(BlockPos pos);
     void sampleProbe(Probe& probe);
     void rebuildProbeDependencies();
+    struct PistonPlan { bool valid{}; std::vector<BlockPos> push, destroy; };
+    bool pistonPowered(BlockPos pos) const;
+    bool pushable(BlockPos pos, Direction movement, bool allowDestroy, Direction connection) const;
+    PistonPlan resolvePiston(BlockPos pos, Direction facing, bool extending) const;
+    void checkPiston(BlockPos pos);
+    void pistonEvent(const ScheduledEvent& event);
+    bool movePistonBlocks(BlockPos pos, Direction facing, bool extending);
+    void addMotion(BlockPos pos, StateId state, Direction facing, bool extending, bool source);
+    void tickMotion(const ScheduledEvent& event);
+    void finishMotion(BlockPos pos, bool force);
+    void schedulePhase(BlockPos pos, Tick when, std::uint8_t phase, std::uint64_t data);
 };
 }

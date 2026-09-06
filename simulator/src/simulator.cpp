@@ -54,7 +54,7 @@ int Simulator::displayValue(BlockPos pos) const {
 }
 void Simulator::enqueue(Update update) {
     if (++updateCount > updateBudget) {
-        breakRequested = true; pauseReason = "邻居更新超过预算，电路状态已停止；请修改电路或提高预算后从快照重启";
+        breakRequested = true; faulted = true; pauseReason = "邻居更新超过预算，电路状态已停止；请从快照恢复或撤销本次操作";
         throw std::runtime_error(pauseReason);
     }
     if (updating) { addedUpdates.push_back(update); return; }
@@ -80,7 +80,7 @@ void Simulator::enqueue(Update update) {
     } catch (...) {
         // A budget/error poisons this run, rather than silently continuing after dropped updates.
         updating = false; updateStack.clear(); addedUpdates.clear(); updateCount = 0;
-        breakRequested = true; throw;
+        breakRequested = true; faulted = true; throw;
     }
 }
 void Simulator::updateNeighbors(BlockPos p, int skip) { Update u{UpdateKind::multi, p}; u.skip = skip; enqueue(u); }
@@ -88,6 +88,7 @@ void Simulator::neighborChanged(BlockPos p) { enqueue({UpdateKind::neighbor, p})
 void Simulator::notifyFront(BlockPos p, Direction facing) { auto out = p.relative(opposite(facing)); neighborChanged(out); updateNeighbors(out, static_cast<int>(facing)); }
 void Simulator::notifyAttached(BlockPos p, Direction connected) { updateNeighbors(p); updateNeighbors(p.relative(opposite(connected))); }
 void Simulator::setBlock(BlockPos p, StateId id, unsigned flags, int depth) {
+    if (faulted) throw std::runtime_error("当前执行已中止，请撤销、加载快照或新建电路");
     const auto old = world.get(p);
     if (old == id) return;
     const auto& state = registry[id]; const auto& oldState = registry[old];
@@ -95,6 +96,7 @@ void Simulator::setBlock(BlockPos p, StateId id, unsigned flags, int depth) {
     sampleAffected(p);
     if (oldState.type != state.type) {
         runtime.erase(p);
+        motions.erase(p);
         if ((flags & 1u) != 0 && (flags & 64u) == 0) onRemove(p, old);
     }
     onPlace(p, id, old);
@@ -117,11 +119,13 @@ bool Simulator::survives(BlockPos p, StateId id) const {
     case Device::lever: case Device::button: return (at(p.relative(opposite(s.connectedDirection))).supportMask & (1u << static_cast<unsigned>(s.connectedDirection))) != 0;
     case Device::pressurePlate: case Device::weightedPlate: return (below.rigidMask & 2u) != 0 || (below.centerMask & 2u) != 0;
     case Device::rail: case Device::poweredRail: case Device::activatorRail: case Device::detectorRail: return (below.supportMask & 2u) != 0;
+    case Device::pistonHead: { const auto& base = at(p.relative(opposite(s.facing))); return (base.device == Device::piston && base.extended && base.facing == s.facing && base.sticky == (registry.property(id, "type") == "sticky")) || (base.device == Device::movingPiston && base.facing == s.facing); }
     default: return true;
     }
 }
 void Simulator::place(BlockPos p, StateId id) {
     if (registry.type(id).supportLevel == "unimplemented") throw std::invalid_argument("该器件尚未实现：" + registry.type(id).name);
+    if (registry[id].device == Device::movingPiston || registry[id].device == Device::pistonHead) throw std::invalid_argument("活塞运动状态由仿真产生，不能直接放置");
     if (!survives(p, id)) throw std::invalid_argument("这个位置缺少器件所需的支撑面");
     if (registry[id].device == Device::wire) {
         for (auto d : horizontal) id = registry.with(id, directionNames[static_cast<unsigned>(d)], std::string("side"));
@@ -140,6 +144,7 @@ void Simulator::onPlace(BlockPos p, StateId id, StateId old) {
     case Device::torch: case Device::wallTorch: for (auto d : directions) updateNeighbors(p.relative(d)); break;
     case Device::observer: if (s.powered && !hasScheduled(p)) { setBlock(p, registry.withBool(id, "powered", false), 18); notifyFront(p, s.facing); } break;
     case Device::bulb: executeNeighbor(p); break;
+    case Device::piston: checkPiston(p); break;
     default: break;
     }
 }
@@ -151,6 +156,7 @@ void Simulator::onRemove(BlockPos p, StateId old) {
     case Device::lever: case Device::button: if (s.powered) notifyAttached(p, s.connectedDirection); break;
     case Device::repeater: case Device::comparator: notifyFront(p, s.facing); break;
     case Device::observer: if (s.powered) notifyFront(p, s.facing); break;
+    case Device::pistonHead: { auto base = p.relative(opposite(s.facing)); if (at(base).device == Device::piston && at(base).extended && at(base).facing == s.facing) setBlock(base, 0); break; }
     default: break;
     }
 }
@@ -279,6 +285,8 @@ void Simulator::executeNeighbor(BlockPos p) {
     }
     case Device::lamp: if (s.lit != (bestSignal(p) > 0)) { if (s.lit) schedule(p, 4); else setBlock(p, registry.withBool(id, "lit", true), 2); } break;
     case Device::bulb: { bool powered = bestSignal(p) > 0; if (powered != s.powered) { auto next = registry.withBool(id, "powered", powered); if (!s.powered) next = registry.withBool(next, "lit", !s.lit); setBlock(p, next); } break; }
+    case Device::piston: checkPiston(p); break;
+    case Device::pistonHead: if (survives(p, id)) neighborChanged(p.relative(opposite(s.facing))); break;
     default: break;
     }
 }
@@ -314,13 +322,19 @@ void Simulator::executeTick(const ScheduledEvent& event) {
     }
 }
 bool Simulator::stepEvent() {
+    if (faulted) throw std::runtime_error("当前执行已中止，请从有效快照恢复");
     if (scheduled.empty() || breakRequested) return false;
-    auto event = scheduled.top(); scheduled.pop(); scheduledKeys.erase({event.pos, event.type});
+    auto event = scheduled.top(); scheduled.pop(); scheduledKeys.erase({event.pos, event.type, event.phase, event.data});
     currentTick = std::max(currentTick, event.tick); ++sequence;
-    if (at(event.pos).type == event.type) { executeTick(event); ++statistics.scheduledEvents; }
+    currentPhase = event.phase;
+    try {
+        if (at(event.pos).type == event.type) { if (event.phase == 1) pistonEvent(event); else if (event.phase == 2) tickMotion(event); else executeTick(event); ++statistics.scheduledEvents; }
+    } catch (...) { currentPhase = 3; throw; }
+    currentPhase = 3;
     return true;
 }
 std::size_t Simulator::advanceTo(Tick target, std::size_t eventBudget, std::chrono::microseconds wallBudget) {
+    if (faulted) throw std::runtime_error("当前执行已中止，请从有效快照恢复");
     if (target < currentTick) throw std::invalid_argument("不能倒退时间，请加载运行快照");
     auto start = std::chrono::steady_clock::now(); std::size_t count = 0;
     while (!scheduled.empty() && scheduled.top().tick <= target && !breakRequested && count < eventBudget) {
@@ -355,8 +369,8 @@ void Simulator::stimulate(BlockPos p, const Json& input) {
     throw std::invalid_argument("该器件尚不支持这类环境刺激");
 }
 void Simulator::clear() {
-    world.clear(); runtime.clear(); scheduled = {}; scheduledKeys.clear(); changes.clear(); currentTick = 0; nextOrder = 0; sequence = 0;
-    probes.clear(); probeDependencies.clear(); nextProbeId = 1; trace.clear(); traceDropped = 0; statistics = {}; breakRequested = false; pauseReason.clear(); ++revision;
+    world.clear(); runtime.clear(); motions.clear(); scheduled = {}; scheduledKeys.clear(); changes.clear(); currentTick = 0; nextOrder = 0; sequence = 0; currentPhase = 3;
+    probes.clear(); probeDependencies.clear(); nextProbeId = 1; trace.clear(); traceDropped = 0; statistics = {}; breakRequested = false; faulted = false; pauseReason.clear(); ++revision;
 }
 std::vector<Cell> Simulator::takeChanges() { std::vector<Cell> result; result.reserve(changes.size()); for (const auto& [p, id] : changes) result.push_back({p, id}); changes.clear(); return result; }
 void Simulator::rebuildProbeDependencies() {
@@ -395,6 +409,7 @@ Json Simulator::inspect(BlockPos p) const {
     result["pos"] = p; result["value"] = displayValue(p); result["input"] = bestSignal(p); result["analog"] = analogOutput(p);
     result["supportLevel"] = registry.type(id).supportLevel;
     auto it = runtime.find(p); result["runtime"] = it == runtime.end() ? Json::object() : it->second.values;
+    if (auto motion = motionAt(p)) result["motion"] = {{"movedBlock", registry.describe(motion->movedState)}, {"progress", motion->progress * 0.5}, {"extending", motion->extending}, {"source", motion->source}};
     return result;
 }
 }

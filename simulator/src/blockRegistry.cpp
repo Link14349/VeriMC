@@ -45,7 +45,7 @@ BlockRegistry::BlockRegistry(const std::string& path) {
         typeInfo.name = b.at("name"); typeInfo.className = b.at("className");
         typeInfo.defaultState = b.at("defaultState"); typeInfo.firstState = b.at("states")[0].at("id");
         typeInfo.device = classify(typeInfo.name, typeInfo.className);
-        typeInfo.supportLevel = (typeInfo.device <= Device::bulb || typeInfo.device == Device::target) ? "implemented" : "unimplemented";
+        typeInfo.supportLevel = (typeInfo.device <= Device::movingPiston || typeInfo.device == Device::target) ? "implemented" : "unimplemented";
         auto typeId = static_cast<std::uint16_t>(types.size());
         names.emplace(typeInfo.name, typeId);
         for (const auto& s : b.at("states")) for (const auto& [key, value] : s.at("properties").items()) {

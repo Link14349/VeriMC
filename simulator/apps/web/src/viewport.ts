@@ -89,14 +89,17 @@ export class CircuitViewport {
   private drawCell(cell: BlockCell) {
     const key = posKey(cell.pos); for (const handle of this.handles.get(key) ?? []) handle.pool.remove(handle.index); this.handles.delete(key);
     if (cell.stateId === 0) return;
-    const def = connection.states.get(cell.stateId); if (!def) return;
+    const def = connection.states.get(cell.renderStateId); if (!def) return;
     const name = shortName(def.name), p = def.properties, chunk = this.getChunk(cell.pos), handles: Handle[] = [];
-    const x = cell.pos[0] - chunk.group.position.x, y = cell.pos[1] - chunk.group.position.y, z = cell.pos[2] - chunk.group.position.z;
+    let x = cell.pos[0] - chunk.group.position.x, y = cell.pos[1] - chunk.group.position.y, z = cell.pos[2] - chunk.group.position.z;
+    const moving = (cell.motion & 1) !== 0, extending = (cell.motion & 2) !== 0, source = (cell.motion & 4) !== 0, progress = ((cell.motion >> 6) & 3) / 2;
+    const motionDir = directionVectors[['down','up','north','south','west','east'][(cell.motion >> 3) & 7]] ?? [0,0,0];
+    if (moving && !(source && !extending)) { const offset = extending ? progress - 1 : 1 - progress; x += motionDir[0] * offset; y += motionDir[1] * offset; z += motionDir[2] * offset; }
     const transform = new THREE.Matrix4();
     const part = (center: [number,number,number], size: [number,number,number], tint: number, shape: 'box'|'cylinder' = 'box', rotation = 0) => {
       quaternion.setFromAxisAngle(vector.set(0,1,0), rotation); transform.compose(vector.set(x + center[0], y + center[1], z + center[2]), quaternion, scaleVector.fromArray(size)); handles.push(chunk[shape].add(cell.pos, transform, tint));
     };
-    const on = cell.value > 0, red = on ? new THREE.Color().setRGB(.28 + cell.value / 22,.035 + cell.value / 110,.025).getHex() : 0x4d2728;
+    const on = p.lit === 'true' || cell.value > 0, red = on ? new THREE.Color().setRGB(.28 + cell.value / 22,.035 + cell.value / 110,.025).getHex() : 0x4d2728;
     const facing = p.facing ?? 'north', dir = directionVectors[facing], angle = Math.atan2(dir[0], dir[2]);
     const torch = (cx: number, cz: number, lit: boolean, height = .5) => { part([cx,height / 2,cz],[.11,height,.11],0x9c7651,'cylinder'); part([cx,height,cz],[.2,.14,.2],lit ? 0xff5541 : 0x713637); };
     if (name === 'redstone_wire') {
@@ -121,6 +124,15 @@ export class CircuitViewport {
       part([.5,.5,.5],[.98,.98,.98],0x818b8c); part([.5,.998,.5],[.58,.016,.65],0x515d60); part([.5,.998,.5],[.12,.025,.55],0x9aadaa,'box',angle);
       const v = directionVectors[facing]; for (const sign of [-1,1]) part([.5+v[0]*.5+v[2]*.2,.6,.5+v[2]*.5-v[0]*.2*sign],[v[0] ? .018 : .14,.12,v[0] ? .14 : .018],0x20292c);
       part([.5-v[0]*.5,.48,.5-v[2]*.5],[v[0] ? .025 : .22,.22,v[0] ? .22 : .025],red);
+    } else if (name === 'piston' || name === 'sticky_piston' || name === 'piston_head') {
+      const v = directionVectors[facing], sticky = name === 'sticky_piston' || p.type === 'sticky';
+      const pistonPart = (offset: number, length: number, width: number, tint: number) => part([.5+v[0]*offset,.5+v[1]*offset,.5+v[2]*offset],[v[0]?length:width,v[1]?length:width,v[2]?length:width],tint);
+      if (name === 'piston_head') { pistonPart(.37,.25,.99,sticky?0x8da96a:0xbb9f70); pistonPart(-.12,.75,.22,0xa8a38c); }
+      else {
+        const open = p.extended === 'true' || (moving && source); pistonPart(open?-.125:0,open?.75:.99,.99,0x727d7a);
+        if (!open || (moving && source && !extending)) { const headOffset = moving ? 1-progress : 0; pistonPart(.37+headOffset,.25,.99,sticky?0x8da96a:0xbb9f70); if(moving)pistonPart(headOffset*.5,.8,.22,0xaaa58e); }
+        for (const offset of [-.25,0,.25]) part([.5,.995,.5+offset],[.77,.01,.045],0x48534f);
+      }
     } else if (name === 'target') { part([.5,.5,.5],[.98,.98,.98],0xd5cbb4); for (const size of [.7,.38,.12]) part([.5,1 + .001 / size,.5],[size,.005,size],size === .38 ? 0xd5cbb4 : 0xa94a3f); }
     else {
       const colors: Record<string, number> = { stone:0x747c80,smooth_stone:0xa3aaa8,white_concrete:0xc5c8bb,light_gray_concrete:0x93978c,red_concrete:0x975347,blue_concrete:0x516f96,white_wool:0xd2cfc0,redstone_block:0xb2372a,glass:0x719d9e,slime_block:0x84b85f,honey_block:0xb99b42,obsidian:0x353041,bedrock:0x474b50,glowstone:0xb8a673,sea_lantern:0xb6cebe };

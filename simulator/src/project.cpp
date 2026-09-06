@@ -8,13 +8,14 @@ std::unique_ptr<Simulator> Simulator::clone() const {
 }
 void Simulator::restore(const Simulator& snapshot) {
     if (&registry != &snapshot.registry) throw std::invalid_argument("运行快照的注册表不匹配");
-    world = snapshot.world; runtime = snapshot.runtime; scheduled = snapshot.scheduled; scheduledKeys = snapshot.scheduledKeys;
+    world = snapshot.world; runtime = snapshot.runtime; motions = snapshot.motions; scheduled = snapshot.scheduled; scheduledKeys = snapshot.scheduledKeys;
     probes = snapshot.probes; probeDependencies = snapshot.probeDependencies; trace = snapshot.trace;
     currentTick = snapshot.currentTick; nextOrder = snapshot.nextOrder; sequence = snapshot.sequence; nextProbeId = snapshot.nextProbeId;
     traceDropped = snapshot.traceDropped; traceCapacity = snapshot.traceCapacity; updateBudget = snapshot.updateBudget; statistics = snapshot.statistics;
-    breakRequested = snapshot.breakRequested; pauseReason = snapshot.pauseReason; changes.clear(); ++revision;
+    breakRequested = snapshot.breakRequested; faulted = snapshot.faulted; pauseReason = snapshot.pauseReason; changes.clear(); ++revision;
 }
 Json Simulator::saveProject(const std::string& name, bool checkpoint) const {
+    if (!checkpoint && !motions.empty()) throw std::invalid_argument("活塞正在运动，请导出运行快照，或等待动作完成后导出电路");
     Json data{{"format", "verimc.simulator"}, {"formatVersion", 1}, {"minecraftVersion", "26.2"}, {"edition", "java"}, {"kind", checkpoint ? "checkpoint" : "circuit"}, {"name", name}};
     data["profile"] = {{"experimentalRedstone", false}, {"naturalRandomTicks", false}, {"loadedRegionOnly", true}};
     data["blocks"] = Json::array();
@@ -28,15 +29,19 @@ Json Simulator::saveProject(const std::string& name, bool checkpoint) const {
         data["blockData"].push_back(std::move(row));
     }
     if (checkpoint) {
+        data["faulted"] = faulted;
         data["tick"] = currentTick; data["nextOrder"] = nextOrder; data["sequence"] = sequence; data["nextProbeId"] = nextProbeId;
         data["events"] = Json::array(); auto queue = scheduled;
-        while (!queue.empty()) { const auto e = queue.top(); queue.pop(); data["events"].push_back({{"tick", e.tick}, {"priority", e.priority}, {"order", e.order}, {"pos", e.pos}, {"type", e.type}}); }
+        while (!queue.empty()) { const auto e = queue.top(); queue.pop(); data["events"].push_back({{"tick", e.tick}, {"priority", e.priority}, {"order", e.order}, {"pos", e.pos}, {"type", e.type}, {"phase", e.phase}, {"data", e.data}}); }
+        data["motions"] = Json::array();
+        for (const auto& [p, m] : motions) data["motions"].push_back({{"pos", p}, {"movedState", m.movedState}, {"facing", static_cast<unsigned>(m.facing)}, {"extending", m.extending}, {"source", m.source}, {"progress", m.progress}, {"previousProgress", m.previousProgress}, {"lastTicked", m.lastTicked}, {"generation", m.generation}});
         data["trace"] = Json::array(); for (const auto& e : trace) data["trace"].push_back({e.probeId, e.tick, e.sequence, e.value});
         data["traceDropped"] = traceDropped;
     }
     return data;
 }
 void Simulator::loadProject(const Json& data) {
+    if (data.value("faulted", false)) throw std::invalid_argument("此记录来自中止的执行，仅供检查，不能作为可运行快照加载");
     if (data.at("format") != "verimc.simulator" || data.at("formatVersion") != 1 || data.at("minecraftVersion") != "26.2" || data.at("edition") != "java") throw std::invalid_argument("工程格式或 Minecraft 版本不匹配");
     const auto& profile = data.at("profile");
     if (profile.at("experimentalRedstone") != false || profile.at("naturalRandomTicks") != false || profile.at("loadedRegionOnly") != true) throw std::invalid_argument("工程要求尚未支持的仿真规则");
@@ -48,6 +53,7 @@ void Simulator::loadProject(const Json& data) {
     for (const auto& row : data.at("blocks")) {
         auto p = row.at("pos").get<BlockPos>(); auto id = registry.state(row.at("name"), row.at("properties"));
         if (registry.type(id).supportLevel == "unimplemented") throw std::invalid_argument("工程包含尚未支持的器件：" + registry.type(id).name);
+        if (!checkpoint && registry[id].device == Device::movingPiston) throw std::invalid_argument("运动中的活塞需要包含内部状态的运行快照");
         if (!occupied.insert(p).second) throw std::invalid_argument("工程包含重复坐标");
         candidate.world.set(p, id);
     }
@@ -61,10 +67,17 @@ void Simulator::loadProject(const Json& data) {
         candidate.currentTick = data.at("tick"); candidate.nextOrder = data.at("nextOrder"); candidate.sequence = data.at("sequence");
         if (data.at("events").size() > 2000000) throw std::invalid_argument("工程计划事件过多");
         for (const auto& row : data.at("events")) {
-            ScheduledEvent e{row.at("tick"), row.at("priority"), row.at("order"), row.at("pos").get<BlockPos>(), row.at("type")};
-            if (e.tick < candidate.currentTick || e.priority < -3 || e.priority > 3 || e.order >= candidate.nextOrder || !candidate.scheduledKeys.insert({e.pos, e.type}).second) throw std::invalid_argument("无效的运行队列");
+            ScheduledEvent e{row.at("tick"), row.at("priority"), row.at("order"), row.at("pos").get<BlockPos>(), row.at("type"), row.value("phase", std::uint8_t{0}), row.value("data", std::uint64_t{0})};
+            if (e.phase == 1 && ((e.data & 3u) > 2 || (e.data >> 2) > 5)) throw std::invalid_argument("无效活塞方块事件");
+            if (e.tick < candidate.currentTick || e.priority < -3 || e.priority > 3 || e.phase > 2 || e.order >= candidate.nextOrder || !candidate.scheduledKeys.insert({e.pos, e.type, e.phase, e.data}).second) throw std::invalid_argument("无效的运行队列");
             candidate.scheduled.push(e);
         }
+        for (const auto& row : data.value("motions", Json::array())) {
+            auto p = row.at("pos").get<BlockPos>(); auto direction = row.at("facing").get<unsigned>(); auto moved = row.at("movedState").get<StateId>();
+            if (direction > 5 || moved >= registry.stateCount() || candidate.at(p).device != Device::movingPiston || row.at("progress").get<unsigned>() > 2 || row.at("previousProgress").get<unsigned>() > 2) throw std::invalid_argument("无效活塞运动状态");
+            candidate.motions[p] = {moved, static_cast<Direction>(direction), row.at("extending"), row.at("source"), row.at("progress"), row.at("previousProgress"), row.at("lastTicked"), row.at("generation")};
+        }
+        for (const auto& cell : candidate.world.cells()) if (registry[cell.state].device == Device::movingPiston && !candidate.motions.contains(cell.pos)) throw std::invalid_argument("运行快照缺少活塞运动数据");
     } else {
         for (const auto& cell : candidate.world.cells()) candidate.onPlace(cell.pos, cell.state, 0);
         for (const auto& cell : candidate.world.cells()) candidate.neighborChanged(cell.pos);
@@ -80,10 +93,10 @@ void Simulator::loadProject(const Json& data) {
         candidate.traceDropped = data.at("traceDropped");
     }
     using std::swap;
-    swap(world, candidate.world); swap(runtime, candidate.runtime); swap(scheduled, candidate.scheduled); swap(scheduledKeys, candidate.scheduledKeys);
+    swap(world, candidate.world); swap(runtime, candidate.runtime); swap(motions, candidate.motions); swap(scheduled, candidate.scheduled); swap(scheduledKeys, candidate.scheduledKeys);
     swap(probes, candidate.probes); swap(probeDependencies, candidate.probeDependencies); swap(trace, candidate.trace);
     currentTick = candidate.currentTick; nextOrder = candidate.nextOrder; sequence = candidate.sequence; nextProbeId = candidate.nextProbeId; traceDropped = candidate.traceDropped;
-    statistics = {}; changes.clear(); breakRequested = false; pauseReason.clear(); ++revision;
+    statistics = {}; changes.clear(); breakRequested = false; faulted = false; pauseReason.clear(); ++revision;
 }
 std::string Simulator::exportVcd() const {
     std::ostringstream out;

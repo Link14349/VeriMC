@@ -49,6 +49,21 @@ setBlock(0, (3, 2, 18), 'comparator', facing='west'); setBlock(0, (4, 2, 18), 'r
 setBlock(10, (3, 2, 18), 'comparator', facing='west', mode='subtract'); setBlock(10, (3, 2, 19), 'redstone_block')
 # Lock transition while main input is high.
 setBlock(0, (3, 1, 23), 'stone'); setBlock(0, (3, 2, 22), 'repeater', facing='west'); setBlock(0, (3, 2, 23), 'repeater', facing='south', powered='true'); setBlock(0, (2, 2, 22), 'redstone_block'); setBlock(10, (3, 2, 23), 'air'); watch.append([3,2,22])
+# Normal push, sticky pull and short-pulse block dropping.
+for z, piston, pulse in [(26, 'piston', 8), (30, 'sticky_piston', 8), (34, 'sticky_piston', 1)]:
+    setBlock(0, (2,2,z), piston, facing='east'); setBlock(0, (3,2,z), 'stone')
+    setBlock(0, (1,2,z), 'redstone_block'); setBlock(pulse, (1,2,z), 'air')
+    watch += [[x,2,z] for x in range(2,5)]
+# Quasi-connectivity requires an actual neighbor notification.
+setBlock(0, (2,2,38), 'piston', facing='east'); setBlock(0, (2,4,38), 'redstone_block')
+setBlock(4, (1,2,38), 'stone'); setBlock(10, (2,4,38), 'air'); setBlock(14, (1,2,38), 'air'); watch += [[2,2,38],[3,2,38]]
+# Slime branches, with an adjacent honey block that must not stick.
+setBlock(0, (2,2,42), 'sticky_piston', facing='east'); setBlock(0, (3,2,42), 'slime_block'); setBlock(0, (3,3,42), 'stone'); setBlock(0, (3,2,43), 'honey_block')
+setBlock(0, (1,2,42), 'redstone_block'); setBlock(10, (1,2,42), 'air'); watch += [[2,2,42],[3,2,42],[4,2,42],[3,3,42],[4,3,42],[3,2,43]]
+# A thirteenth block blocks the whole move.
+setBlock(0, (2,2,46), 'piston', facing='east')
+for x in range(3,16): setBlock(0, (x,2,46), 'stone')
+setBlock(0, (1,2,46), 'redstone_block'); watch += [[2,2,46],[3,2,46],[15,2,46]]
 scenarioPath = cacheDir / 'redstoneScenario.json'
 scenarioPath.write_text(json.dumps({'endTick': 24, 'commands': commands, 'watch': watch}, indent=2))
 outputPath = rootDir / 'tests/fixtures/java26_2Redstone.json'

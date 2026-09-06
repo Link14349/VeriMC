@@ -62,8 +62,8 @@ def receive():
     payload = b''.join(parts)
     if messageOpcode == 2:
         magic, kind, frameId, count = struct.unpack_from('<IIII', payload)
-        assert magic == 0x31434d56 and kind in (1, 2)
-        assert len(payload) == 32 + count * 20
+        assert magic == 0x32434d56 and kind in (1, 2)
+        assert len(payload) == 32 + count * 28
         send({'cmd': 'ack', 'frameId': frameId}); frames += 1; return {}
     result = json.loads(payload)
     if result.get('type') == 'status': latestStatus = result
@@ -99,6 +99,17 @@ try:
     assert '#200' in command('vcd')['text']
     command('load', project=checkpoint)
     assert command('inspect', pos=[4,1,0])['properties']['lit'] == 'true'
+    command('demo', kind='pistons')
+    command('interact', pos=[0,1,4]); command('step', count=1)
+    assert command('inspect', pos=[5,1,4])['name'] == 'minecraft:moving_piston'
+    moving = command('save', checkpoint=True)
+    assert moving['motions'], 'motion data missing from checkpoint'
+    command('step', count=3)
+    assert command('inspect', pos=[5,1,4])['name'] == 'minecraft:slime_block'
+    command('load', project=moving); command('step', count=3)
+    command('interact', pos=[0,1,4]); command('step', count=3)
+    assert command('inspect', pos=[4,1,4])['name'] == 'minecraft:slime_block'
+    assert command('inspect', pos=[5,1,4])['name'] == 'minecraft:air'
     assert frames > 0
     print(f'PASS: HTTP host validation, binary frames ({frames}), circuit editing, delay, probes, VCD, atomic errors, native undo/redo, checkpoint import')
 finally:

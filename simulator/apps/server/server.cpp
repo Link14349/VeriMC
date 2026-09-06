@@ -46,7 +46,7 @@ struct Hub {
         return {{"type", "status"}, {"tick", sim.currentTick}, {"running", running}, {"speed", speed}, {"measuredTps", measuredTps}, {"blocks", sim.world.size()}, {"pending", sim.pendingEvents()}, {"updates", sim.statistics.updates}, {"events", sim.statistics.scheduledEvents}, {"storageBytes", sim.world.storageBytes()}, {"traceDropped", sim.traceDropped}, {"pauseReason", sim.pauseReason}, {"revision", sim.revision}, {"probes", probes}, {"canUndo", !undo.empty()}, {"canRedo", !redo.empty()}, {"name", projectName}};
     }
     void remember() { undo.push_back({projectName, sim.clone()}); std::size_t bytes = 0; for (const auto& entry : undo) bytes += entry.state->estimatedBytes(); while (undo.size() > 1 && (undo.size() > 32 || bytes > 128u * 1024u * 1024u)) { bytes -= undo.front().state->estimatedBytes(); undo.pop_front(); } redo.clear(); runStart.reset(); }
-    void demo();
+    void demo(const std::string& kind = "basic");
     void start();
     void publish(bool full = false);
     void command(const std::shared_ptr<Client>& client, const Json& message);
@@ -69,7 +69,7 @@ public:
         socket.set_option(ws::stream_base::timeout::suggested(beast::role_type::server)); socket.read_message_max(64 * 1024 * 1024);
         socket.async_accept(request, [self = shared_from_this()](beast::error_code ec) {
             if (ec) { self->alive = false; return; }
-            self->hub.clients.push_back(self); self->sendJson({{"type", "ready"}, {"version", "26.2"}, {"catalog", self->hub.registry.catalog()}});
+            self->hub.clients.push_back(self); self->sendJson({{"type", "ready"}, {"version", "26.2"}, {"protocolVersion", 2}, {"catalog", self->hub.registry.catalog()}});
             self->frame(self->hub.sim.world.cells(), true, ++self->hub.frameId); self->sendJson(self->hub.status()); self->read();
         });
     }
@@ -96,13 +96,13 @@ public:
         });
     }
     void frame(const std::vector<Cell>& cells, bool full, std::uint32_t id) {
-        Json definitions = Json::array(); for (const auto& cell : cells) if (knownStates.insert(cell.state).second) definitions.push_back(hub.registry.describe(cell.state));
+        Json definitions = Json::array(); for (const auto& cell : cells) { if (knownStates.insert(cell.state).second) definitions.push_back(hub.registry.describe(cell.state)); if (auto motion = hub.sim.motionAt(cell.pos); motion && knownStates.insert(motion->movedState).second) definitions.push_back(hub.registry.describe(motion->movedState)); }
         if (!definitions.empty()) sendJson({{"type", "states"}, {"states", definitions}});
-        std::string binary; binary.reserve(32 + cells.size() * 20);
+        std::string binary; binary.reserve(32 + cells.size() * 28);
         auto u32 = [&](std::uint32_t value) { for (int byte = 0; byte < 4; ++byte) binary.push_back(static_cast<char>((value >> (byte * 8)) & 255u)); };
         auto u64 = [&](std::uint64_t value) { u32(static_cast<std::uint32_t>(value)); u32(static_cast<std::uint32_t>(value >> 32)); };
-        u32(0x31434d56); u32(full ? 1 : 2); u32(id); u32(static_cast<std::uint32_t>(cells.size())); u64(hub.sim.currentTick); u64(hub.sim.revision);
-        for (const auto& cell : cells) { u32(static_cast<std::uint32_t>(cell.pos.x)); u32(static_cast<std::uint32_t>(cell.pos.y)); u32(static_cast<std::uint32_t>(cell.pos.z)); u32(cell.state); u32(static_cast<std::uint32_t>(hub.sim.displayValue(cell.pos))); }
+        u32(0x32434d56); u32(full ? 1 : 2); u32(id); u32(static_cast<std::uint32_t>(cells.size())); u64(hub.sim.currentTick); u64(hub.sim.revision);
+        for (const auto& cell : cells) { u32(static_cast<std::uint32_t>(cell.pos.x)); u32(static_cast<std::uint32_t>(cell.pos.y)); u32(static_cast<std::uint32_t>(cell.pos.z)); u32(cell.state); u32(static_cast<std::uint32_t>(hub.sim.displayValue(cell.pos))); auto motion = hub.sim.motionAt(cell.pos); u32(motion ? motion->movedState : cell.state); u32(motion ? 1u | (motion->extending ? 2u : 0u) | (motion->source ? 4u : 0u) | (static_cast<unsigned>(motion->facing) << 3) | (motion->progress << 6) | (motion->previousProgress << 8) : 0u); }
         awaitingAck = true; outstandingFrame = id; sentAt = Clock::now(); send(std::move(binary), true);
         const auto& trace = hub.sim.getTrace(); const auto first = hub.sim.traceDropped;
         Json edges = Json::array();
@@ -113,8 +113,21 @@ public:
         if (!edges.empty() || full) sendJson({{"type", "trace"}, {"reset", full}, {"edges", edges}, {"dropped", first}});
     }
 };
-void Hub::demo() {
+void Hub::demo(const std::string& kind) {
     sim.clear(); projectName = "脉冲与记忆 · 入门电路";
+    if (kind == "pistons") {
+        projectName = "活塞实验 · 推动与黏连";
+        for (int x = -1; x <= 8; ++x) for (int z = -1; z <= 5; ++z) sim.world.set({x,0,z},registry.state("obsidian"));
+        for (int z : {0,4}) {
+            sim.place({0,1,z},registry.state("lever",{{"face","floor"}}));
+            sim.place({1,1,z},registry.state("redstone_wire")); sim.place({2,1,z},registry.state("redstone_wire"));
+            sim.place({3,1,z},registry.state(z == 0 ? "piston" : "sticky_piston",{{"facing","east"}}));
+            sim.place({4,1,z},registry.state(z == 0 ? "stone" : "slime_block"));
+            if (z == 4) sim.place({4,2,z},registry.state("redstone_lamp"));
+            sim.addProbe({0,1,z},z == 0 ? "推动输入" : "黏连输入"); sim.addProbe({3,1,z},z == 0 ? "活塞伸出" : "黏性活塞伸出");
+        }
+        runStart = sim.clone(); return;
+    }
     for (int x = -1; x <= 12; ++x) for (int z = -1; z <= 5; ++z) sim.world.set({x, 0, z}, registry.state((z == 0 || z == 4) ? "white_concrete" : "stone"));
     auto wire = registry.state("redstone_wire");
     sim.place({0, 1, 0}, registry.state("lever", {{"face", "floor"}}));
@@ -145,7 +158,7 @@ void Hub::start() {
         if (running) {
             try {
                 Tick target = sim.currentTick;
-                if (speed == 0) target += 100000;
+                if (speed == 0) { if (sim.pendingEvents() == 0) { running = false; sim.pauseReason = "电路已稳定，没有待执行事件"; } else target += 100000; }
                 else { fractionalTicks += std::min(elapsed, 0.1) * speed; auto ticks = static_cast<Tick>(fractionalTicks); fractionalTicks -= static_cast<double>(ticks); target += ticks; }
                 sim.advanceTo(target, 8192, std::chrono::milliseconds(5)); if (sim.breakRequested) running = false;
             } catch (const std::exception& error) { running = false; sim.pauseReason = error.what(); }
@@ -168,7 +181,7 @@ void Hub::command(const std::shared_ptr<Client>& client, const Json& message) {
     std::string cmd = message.at("cmd"); auto requestId = message.value("requestId", 0);
     if (cmd == "ack") { if (message.at("frameId") == client->outstandingFrame) client->awaitingAck = false; return; }
     Json result = Json::object(); bool full = false;
-    if (cmd == "play") { sim.breakRequested = false; sim.pauseReason.clear(); if (!runStart) runStart = sim.clone(); running = true; fractionalTicks = 0; lastPump = Clock::now(); }
+    if (cmd == "play") { if (sim.faulted) throw std::invalid_argument("执行已中止，请先撤销或加载快照"); sim.breakRequested = false; sim.pauseReason.clear(); if (!runStart) runStart = sim.clone(); running = true; fractionalTicks = 0; lastPump = Clock::now(); }
     else if (cmd == "pause") { running = false; }
     else if (cmd == "speed") { double next = message.at("value"); if (!std::isfinite(next) || next < 0 || next > 1000000) throw std::invalid_argument("无效运行速度"); speed = next; }
     else if (cmd == "step" || cmd == "stepEvent") { running = false; sim.breakRequested = false; sim.pauseReason.clear(); if (!runStart) runStart = sim.clone(); if (cmd == "stepEvent") sim.stepEvent(); else { int count = message.value("count", 1); if (count < 1 || count > 10000) throw std::invalid_argument("单步范围为 1–10000 gt"); sim.advanceTo(sim.currentTick + static_cast<Tick>(count), 100000, std::chrono::milliseconds(40)); } }
@@ -190,7 +203,7 @@ void Hub::command(const std::shared_ptr<Client>& client, const Json& message) {
         running = false; auto savedRunStart = resumeAfter ? std::move(runStart) : nullptr; remember();
         try {
             if (cmd == "new") { sim.clear(); projectName = "未命名电路"; full = true; }
-            else if (cmd == "demo") { demo(); full = true; }
+            else if (cmd == "demo") { demo(message.value("kind", std::string("basic"))); full = true; }
             else if (cmd == "load") { sim.loadProject(message.at("project")); projectName = message.at("project").value("name", std::string("导入电路")); full = true; }
             else if (cmd == "edit") {
                 if (message.at("blocks").size() > 100000) throw std::invalid_argument("一次编辑最多 10 万个方块");
