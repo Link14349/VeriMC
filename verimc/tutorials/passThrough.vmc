@@ -1,0 +1,9 @@
+language "0.1";
+package lessons;
+
+module PassThrough {
+    input a: bit;
+    output y: bit;
+
+    connect y = a;
+}

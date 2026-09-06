@@ -1,0 +1,29 @@
+language "0.1";
+package lessons;
+
+module Selector {
+    input a: bit;
+    input b: bit;
+    input chooseB: bit;
+    output y: bit;
+
+    comb {
+        if chooseB {
+            y = b;
+        } else {
+            y = a;
+        }
+    }
+}
+
+test selectorPractice for Selector mode logical {
+    drive a = true;
+    drive b = false;
+    drive chooseB = false;
+    sample;
+    expect y == true;
+
+    drive chooseB = true;
+    sample;
+    expect y == false;
+}

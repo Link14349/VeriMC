@@ -1,0 +1,15 @@
+language "0.1";
+package lessons;
+import "inverter.vmc" as gates;
+
+module DoubleInverter {
+    input a: bit;
+    output y: bit;
+
+    inst first: gates::Inverter;
+    inst second: gates::Inverter;
+
+    connect first.a = a;
+    connect second.a = first.y;
+    connect y = second.y;
+}

@@ -1,0 +1,43 @@
+language "0.1";
+package lessons;
+
+module Counter(width: nat = 4) {
+    require width >= 1;
+
+    input clk: clock;
+    input reset: bit;
+    input enable: bit;
+    output count: uint<width>;
+
+    reg value: uint<width> reset u(width, 0);
+
+    on rising(clk) reset(reset) {
+        if enable {
+            next value = wrapAdd(value, u(width, 1));
+        }
+    }
+
+    connect count = value;
+}
+
+test counterPractice for Counter(width = 4) mode logical {
+    drive reset = true;
+    drive enable = true;
+    cycle clk;
+    expect count == u(4, 0);
+
+    drive reset = false;
+    cycle clk;
+    expect count == u(4, 1);
+
+    drive enable = false;
+    repeat 3 { cycle clk; }
+    expect count == u(4, 1);
+
+    drive enable = true;
+    repeat 14 { cycle clk; }
+    expect count == u(4, 15);
+
+    cycle clk;
+    expect count == u(4, 0);
+}

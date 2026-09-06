@@ -1,0 +1,15 @@
+language "0.1";
+package lessons;
+
+module Adder4 {
+    input a: uint<4>;
+    input b: uint<4>;
+    output sum: uint<4>;
+    output carry: bit;
+
+    wire total: uint<5>;
+
+    connect total = a + b;
+    connect sum = asUint(total[0:4]);
+    connect carry = total[4];
+}

@@ -1,0 +1,17 @@
+language "0.1";
+package lessons;
+
+module OneBitMemory {
+    input clk: clock;
+    input reset: bit;
+    input dataIn: bit;
+    output dataOut: bit;
+
+    reg saved: bit reset false;
+
+    on rising(clk) reset(reset) {
+        next saved = dataIn;
+    }
+
+    connect dataOut = saved;
+}
