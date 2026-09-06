@@ -1,0 +1,35 @@
+language "0.1";
+package examples;
+
+module Adder(width: nat = 4) {
+    require width >= 1;
+    input a: uint<width>;
+    input b: uint<width>;
+    output sum: uint<width>;
+    output carry: bit;
+
+    wire total: uint<width + 1>;
+    connect total = a + b;
+    connect sum = asUint(total[0:width]);
+    connect carry = total[width];
+}
+
+test adderVectors for Adder(width = 4) mode logical {
+    drive a = u(4, 0);
+    drive b = u(4, 0);
+    sample;
+    expect sum == u(4, 0);
+    expect carry == false;
+
+    drive a = u(4, 9);
+    drive b = u(4, 8);
+    sample;
+    expect sum == u(4, 1);
+    expect carry == true;
+
+    drive a = u(4, 15);
+    drive b = u(4, 15);
+    sample;
+    expect sum == u(4, 14);
+    expect carry == true;
+}

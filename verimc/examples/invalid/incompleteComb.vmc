@@ -1,0 +1,8 @@
+language "0.1";
+package invalidExamples;
+module IncompleteChoice {
+    input choose: bit;
+    input a: bit;
+    output y: bit;
+    comb { if choose { y = a; } }
+}

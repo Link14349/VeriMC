@@ -1,0 +1,8 @@
+language "0.1";
+package invalidExamples;
+module LevelArithmetic {
+    input a: level;
+    input b: level;
+    output y: level;
+    connect y = a + b;
+}

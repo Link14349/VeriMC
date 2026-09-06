@@ -1,0 +1,15 @@
+language "0.1";
+package invalidExamples;
+module NextConflict {
+    input clk: clock;
+    input reset: bit;
+    input first: bit;
+    input second: bit;
+    output y: bit;
+    reg value: bit reset false;
+    on rising(clk) reset(reset) {
+        if first { next value = true; }
+        if second { next value = false; }
+    }
+    connect y = value;
+}

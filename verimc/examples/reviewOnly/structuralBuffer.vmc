@@ -1,0 +1,17 @@
+language "0.1";
+package physicalExamples;
+
+// 只有接口示例；不随文档提供虚构的已验证 Buffer4 组件。
+cell Buffer4 {
+    input dataIn: uint<4>;
+    output dataOut: uint<4>;
+    source "cells/buffer4.vmcell.json";
+}
+
+module StructuralBuffer {
+    input a: uint<4>;
+    output y: uint<4>;
+    inst bufferUnit: Buffer4;
+    connect bufferUnit.dataIn = a;
+    connect y = bufferUnit.dataOut;
+}

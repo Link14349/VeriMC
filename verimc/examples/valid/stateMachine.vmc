@@ -1,0 +1,44 @@
+language "0.1";
+package examples;
+
+enum Phase { idle, active, done }
+
+module Controller {
+    input clk: clock;
+    input reset: bit;
+    input start: bit;
+    output busy: bit;
+    reg phase: Phase reset Phase::idle;
+
+    on rising(clk) reset(reset) {
+        match phase {
+            case Phase::idle {
+                if start { next phase = Phase::active; }
+            }
+            case Phase::active { next phase = Phase::done; }
+            case Phase::done {
+                if !start { next phase = Phase::idle; }
+            }
+        }
+    }
+    comb {
+        match phase {
+            case Phase::idle { busy = false; }
+            case Phase::active { busy = true; }
+            case Phase::done { busy = false; }
+        }
+    }
+}
+
+test controllerSequence for Controller mode logical {
+    drive reset = true;
+    drive start = false;
+    cycle clk;
+    expect busy == false;
+    drive reset = false;
+    drive start = true;
+    cycle clk;
+    expect busy == true;
+    cycle clk;
+    expect busy == false;
+}

@@ -1,0 +1,119 @@
+// VeriMC 0.1 normative syntax. Semantic restrictions are in docs/languageSpec.md.
+// This is a grammar artifact, not an implemented compiler or runtime.
+start: source_file
+source_file: ["\ufeff"] "language" STRING ";" "package" qualified_name ";" import_decl* declaration*
+import_decl: "import" STRING "as" IDENT ";"
+?declaration: const_decl | enum_decl | function_decl | module_decl | cell_decl | build_decl | test_decl
+
+name: IDENT | "reset"
+qualified_name: IDENT ("::" IDENT)*
+value_name: name ("::" IDENT)*
+reference: name reference_suffix*
+?reference_suffix: "." name | "[" expr "]" | "[" expr ":" expr "]"
+
+const_decl: "const" name ":" type "=" expr ";"
+enum_decl: "enum" IDENT "{" IDENT ("," IDENT)+ "}"
+function_decl: "fn" IDENT "(" [function_params] ")" "->" type "{" let_stmt* "return" expr ";" "}"
+function_params: function_param ("," function_param)*
+function_param: name ":" type
+parameters: "(" [parameter ("," parameter)*] ")"
+parameter: name ":" compile_type ["=" expr]
+?compile_type: "nat" | "integer" | "bit"
+module_ref: qualified_name ["(" [named_arg ("," named_arg)*] ")"]
+named_arg: name "=" expr
+
+module_decl: "module" IDENT [parameters] "{" module_item* "}"
+?module_item: port_decl | reg_decl | on_block | generate_item
+?generate_item: const_decl | require_stmt | wire_decl | inst_decl | unused_stmt | connect_stmt | comb_block | generate_block
+port_decl: ("input" | "output") name ":" type ";"
+wire_decl: "wire" name ":" type ";"
+reg_decl: "reg" name ":" type "reset" expr ";"
+require_stmt: "require" expr ";"
+inst_decl: "inst" name ":" module_ref ";"
+unused_stmt: "unused" reference ";"
+connect_stmt: "connect" reference "=" expr ";"
+generate_block: "generate" name "for" name "in" expr ".." expr "{" generate_item* "}"
+
+comb_block: "comb" comb_body
+comb_body: "{" comb_stmt* "}"
+?comb_stmt: assignment | let_stmt | comb_if | comb_match
+assignment: reference "=" expr ";"
+let_stmt: "let" name "=" expr ";"
+comb_if: "if" expr comb_body ["else" (comb_body | comb_if)]
+comb_match: "match" expr "{" comb_case+ [comb_default] "}"
+comb_case: "case" expr comb_body
+comb_default: "default" comb_body
+
+on_block: "on" "rising" "(" reference ")" "reset" "(" expr ")" seq_body
+seq_body: "{" seq_stmt* "}"
+?seq_stmt: next_stmt | let_stmt | seq_if | seq_match
+next_stmt: "next" name "=" expr ";"
+seq_if: "if" expr seq_body ["else" (seq_body | seq_if)]
+seq_match: "match" expr "{" seq_case+ [seq_default] "}"
+seq_case: "case" expr seq_body
+seq_default: "default" seq_body
+
+?type: "bit" | "bits" "<" size_expr ">" | "uint" "<" size_expr ">" | "int" "<" size_expr ">"
+     | "level" | "clock" | "nat" | "integer" | qualified_name | "[" type ";" size_expr "]"
+?size_expr: size_sum
+?size_sum: size_product (("+" | "-") size_product)*
+?size_product: size_unary (("*" | "/" | "%") size_unary)*
+?size_unary: ("+" | "-") size_unary | size_atom
+?size_atom: INTEGER | value_name | "(" size_expr ")" | qualified_name "(" [size_expr ("," size_expr)*] ")"
+
+?expr: conditional
+?conditional: logical_or ["?" expr ":" conditional]
+?logical_or: logical_and ("||" logical_and)*
+?logical_and: bit_or ("&&" bit_or)*
+?bit_or: bit_xor ("|" bit_xor)*
+?bit_xor: bit_and ("^" bit_and)*
+?bit_and: equality ("&" equality)*
+?equality: relation [("==" | "!=") relation]
+?relation: shift [("<" | "<=" | ">" | ">=") shift]
+?shift: sum (("<<" | ">>") sum)*
+?sum: product (("+" | "-") product)*
+?product: unary (("*" | "/" | "%") unary)*
+?unary: ("!" | "~" | "-" | "+") unary | postfix
+?postfix: atom reference_suffix*
+?atom: INTEGER | "true" | "false" | value_name | call | "(" expr ")" | array_expr
+call: qualified_name "(" [expr ("," expr)*] ")"
+array_expr: "[" expr ("," expr)* "]"
+
+cell_decl: "cell" IDENT "{" port_decl* "source" STRING ";" "}"
+build_decl: "build" IDENT "for" module_ref "{" build_item* "}"
+?build_item: target_stmt | library_stmt | bounds_stmt | clock_constraint | input_constraint | output_constraint
+           | port_constraint | map_stmt | place_stmt | route_stmt | objective_stmt
+target_stmt: "target" STRING ";"
+library_stmt: "library" STRING ";"
+bounds_stmt: "bounds" coordinate ".." coordinate ";"
+clock_constraint: "clock" reference "{" "period" duration ";" "high" duration ";" "}"
+input_constraint: "input" reference "{" "setup" duration ";" "hold" duration ";" "}"
+output_constraint: "output" reference "{" "settle" duration ";" "}"
+port_constraint: "port" reference "at" coordinate "face" face ["stride" coordinate] ";"
+map_stmt: "map" reference "using" STRING ";"
+place_stmt: "place" reference "at" coordinate "facing" facing ";"
+route_stmt: "route" "auto" ";"
+objective_stmt: "objective" ("volume" | "materials") ";"
+coordinate: "(" expr "," expr "," expr ")"
+duration: size_expr ("gt" | "rt")
+face: facing | "up" | "down"
+facing: "north" | "south" | "west" | "east"
+
+test_decl: "test" IDENT "for" module_ref "mode" test_mode "{" test_body "}"
+test_mode: "logical" | "physical"
+?test_body: cycle_item* | watch_stmt* at_block+
+?cycle_item: drive_stmt | expect_stmt | cycle_stmt | sample_stmt | watch_stmt | let_stmt | repeat_stmt
+drive_stmt: "drive" reference "=" expr ";"
+expect_stmt: "expect" expr ["message" STRING] ";"
+cycle_stmt: "cycle" reference ";"
+sample_stmt: "sample" ";"
+watch_stmt: "watch" reference ";"
+repeat_stmt: "repeat" size_expr "{" cycle_item* "}"
+at_block: "at" duration "{" (drive_stmt | expect_stmt)* "}"
+
+INTEGER: /0x[0-9a-fA-F](?:_?[0-9a-fA-F])*|0b[01](?:_?[01])*|[1-9](?:_?[0-9])*|0/
+STRING: /"(?:[^"\\\x00-\x1f]|\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4}))*"/
+IDENT: /(?!(?:language|package|import|as|const|enum|fn|return|module|cell|source|require|input|output|wire|reg|reset|inst|unused|connect|comb|let|if|else|match|case|default|on|rising|next|generate|for|in|bit|bits|uint|int|level|clock|nat|integer|true|false|build|target|library|bounds|period|high|setup|hold|settle|port|at|face|stride|map|using|place|facing|route|auto|objective|volume|materials|test|mode|logical|physical|drive|expect|message|cycle|repeat|sample|watch|north|south|west|east|up|down|gt|rt)\b)[A-Za-z][A-Za-z0-9_]*/
+%ignore /[ \t\f\r\n]+/
+%ignore /\/\/[^\r\n]*/
+%ignore /\/\*(?s:.*?)\*\//

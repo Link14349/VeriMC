@@ -1,0 +1,28 @@
+{
+  "format": "verimc.specExamples",
+  "formatVersion": 1,
+  "cases": [
+    {"file": "valid/adder.vmc", "syntax": "accept", "stage": "logical", "expected": "pass"},
+    {"file": "valid/counter.vmc", "syntax": "accept", "stage": "logical", "expected": "pass"},
+    {"file": "valid/rippleAdder.vmc", "syntax": "accept", "stage": "static", "expected": "pass"},
+    {"file": "valid/counterPair.vmc", "syntax": "accept", "stage": "logical", "expected": "pass"},
+    {"file": "valid/stateMachine.vmc", "syntax": "accept", "stage": "logical", "expected": "pass"},
+    {"file": "valid/valueOperations.vmc", "syntax": "accept", "stage": "logical", "expected": "pass"},
+    {"file": "valid/registerSwap.vmc", "syntax": "accept", "stage": "logical", "expected": "pass"},
+    {"file": "reviewOnly/physicalCounter.vmc", "syntax": "accept", "stage": "resources", "expected": "EResourceMissing"},
+    {"file": "reviewOnly/structuralBuffer.vmc", "syntax": "accept", "stage": "resources", "expected": "EResourceMissing"},
+    {"file": "invalid/implicitNarrowing.vmc", "syntax": "accept", "stage": "static", "expected": "ETypeMismatch"},
+    {"file": "invalid/implicitLevel.vmc", "syntax": "accept", "stage": "static", "expected": "ELevelConversion"},
+    {"file": "invalid/incompleteComb.vmc", "syntax": "accept", "stage": "static", "expected": "EUndriven"},
+    {"file": "invalid/nextConflict.vmc", "syntax": "accept", "stage": "static", "expected": "ENextConflict"},
+    {"file": "invalid/twoClocks.vmc", "syntax": "accept", "stage": "static", "expected": "EClockDomain"},
+    {"file": "invalid/missingReset.vmc", "syntax": "accept", "stage": "logical", "expected": "EInvalidValue"},
+    {"file": "invalid/overlappingDrive.vmc", "syntax": "accept", "stage": "static", "expected": "EMultipleDriver"},
+    {"file": "invalid/combCycle.vmc", "syntax": "accept", "stage": "static", "expected": "ECombinationalCycle"},
+    {"file": "invalid/uncommittedDrive.vmc", "syntax": "accept", "stage": "logical", "expected": "ETestUncommittedDrive"},
+    {"file": "invalid/levelArithmetic.vmc", "syntax": "accept", "stage": "static", "expected": "EOperatorDomain"},
+    {"file": "invalid/missingSemicolon.vmc", "syntax": "reject", "stage": "syntax", "expected": "ESyntax"},
+    {"file": "invalid/chainedComparison.vmc", "syntax": "reject", "stage": "syntax", "expected": "ESyntax"},
+    {"file": "invalid/reservedName.vmc", "syntax": "reject", "stage": "syntax", "expected": "ESyntax"}
+  ]
+}

@@ -1,0 +1,41 @@
+language "0.1";
+package examples;
+import "counter.vmc" as counters;
+import "adder.vmc" as arithmetic;
+
+module CounterPair {
+    input clk: clock;
+    input reset: bit;
+    input enableA: bit;
+    input enableB: bit;
+    output sum: uint<4>;
+    output carry: bit;
+
+    inst left: counters::Counter(width = 4);
+    inst right: counters::Counter(width = 4);
+    inst sumUnit: arithmetic::Adder(width = 4);
+    connect left.clk = clk;
+    connect right.clk = clk;
+    connect left.reset = reset;
+    connect right.reset = reset;
+    connect left.enable = enableA;
+    connect right.enable = enableB;
+    connect sumUnit.a = left.count;
+    connect sumUnit.b = right.count;
+    connect sum = sumUnit.sum;
+    connect carry = sumUnit.carry;
+}
+
+test pairSequence for CounterPair mode logical {
+    drive reset = true;
+    drive enableA = false;
+    drive enableB = false;
+    cycle clk;
+    expect sum == u(4, 0);
+    drive reset = false;
+    drive enableA = true;
+    drive enableB = true;
+    cycle clk;
+    expect sum == u(4, 2);
+    expect carry == false;
+}

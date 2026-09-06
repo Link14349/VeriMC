@@ -1,0 +1,32 @@
+language "0.1";
+package examples;
+
+module FullAdder {
+    input a: bit;
+    input b: bit;
+    input carryIn: bit;
+    output sum: bit;
+    output carryOut: bit;
+    connect sum = a ^ b ^ carryIn;
+    connect carryOut = (a & b) | ((a ^ b) & carryIn);
+}
+
+module RippleAdder(width: nat = 4) {
+    require width >= 1;
+    input a: uint<width>;
+    input b: uint<width>;
+    output sum: uint<width>;
+    output carry: bit;
+
+    wire carryChain: bits<width + 1>;
+    connect carryChain[0] = false;
+    generate lanes for i in 0..width {
+        inst unit: FullAdder;
+        connect unit.a = a[i];
+        connect unit.b = b[i];
+        connect unit.carryIn = carryChain[i];
+        connect sum[i] = unit.sum;
+        connect carryChain[i + 1] = unit.carryOut;
+    }
+    connect carry = carryChain[width];
+}

@@ -1,0 +1,46 @@
+language "0.1";
+package physicalExamples;
+import "../valid/counter.vmc" as counters;
+
+// 只用于审阅构建语法。引用的目标和器件库尚未提供。
+// 所有尺寸/时长是示范约束，不是已验证的红石性能。
+build Counter4 for counters::Counter(width = 4) {
+    target "targets/java26_2.target.json";
+    library "cells/main.vmlib.json";
+    bounds (0, 0, 0)..(64, 32, 64);
+    clock clk { period 80gt; high 40gt; }
+    input reset { setup 8gt; hold 4gt; }
+    input enable { setup 8gt; hold 4gt; }
+    output count { settle 12gt; }
+    port count at (0, 1, 0) face west stride (0, 0, 2);
+    map value using "demo:register4";
+    place value at (8, 1, 8) facing north;
+    route auto;
+    objective volume;
+}
+
+test physicalCount for Counter4 mode physical {
+    watch count;
+    drive reset = true;
+    drive enable = false;
+    cycle clk;
+    expect count == u(4, 0);
+    drive reset = false;
+    drive enable = true;
+    cycle clk;
+    expect count == u(4, 1);
+}
+
+test rawReset for Counter4 mode physical {
+    watch count;
+    at 0gt {
+        drive clk = false;
+        drive reset = true;
+        drive enable = false;
+    }
+    at 40gt { drive clk = true; }
+    at 80gt {
+        drive clk = false;
+        expect count == u(4, 0);
+    }
+}

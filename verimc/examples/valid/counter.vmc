@@ -1,0 +1,38 @@
+language "0.1";
+package examples;
+
+module Counter(width: nat = 4) {
+    require width >= 1;
+    input clk: clock;
+    input reset: bit;
+    input enable: bit;
+    output count: uint<width>;
+
+    reg value: uint<width> reset u(width, 0);
+
+    on rising(clk) reset(reset) {
+        if enable {
+            next value = wrapAdd(value, u(width, 1));
+        }
+    }
+
+    connect count = value;
+}
+
+test counterSequence for Counter(width = 4) mode logical {
+    watch count;
+    drive reset = true;
+    drive enable = true;
+    cycle clk;
+    expect count == u(4, 0) message "复位优先于使能";
+
+    drive reset = false;
+    repeat 15 { cycle clk; }
+    expect count == u(4, 15);
+    cycle clk;
+    expect count == u(4, 0) message "四位计数回绕";
+
+    drive enable = false;
+    cycle clk;
+    expect count == u(4, 0) message "未使能时保持";
+}

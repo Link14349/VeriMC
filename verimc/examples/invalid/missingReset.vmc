@@ -1,0 +1,9 @@
+language "0.1";
+package invalidExamples;
+import "../valid/counter.vmc" as counters;
+test beforeReset for counters::Counter mode logical {
+    drive reset = false;
+    drive enable = false;
+    cycle clk;
+    expect count == u(4, 0);
+}

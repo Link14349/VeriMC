@@ -1,0 +1,21 @@
+language "0.1";
+package invalidExamples;
+import "../valid/counter.vmc" as counters;
+module TwoClocks {
+    input clkA: clock;
+    input clkB: clock;
+    input reset: bit;
+    input enable: bit;
+    output a: uint<4>;
+    output b: uint<4>;
+    inst left: counters::Counter;
+    inst right: counters::Counter;
+    connect left.clk = clkA;
+    connect right.clk = clkB;
+    connect left.reset = reset;
+    connect right.reset = reset;
+    connect left.enable = enable;
+    connect right.enable = enable;
+    connect a = left.count;
+    connect b = right.count;
+}

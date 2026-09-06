@@ -1,0 +1,7 @@
+language "0.1";
+package invalidExamples;
+module LevelConfusion {
+    input a: level;
+    output y: uint<4>;
+    connect y = a;
+}

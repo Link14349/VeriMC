@@ -1,0 +1,9 @@
+language "0.1";
+package invalidExamples;
+module ChainedComparison {
+    input a: uint<4>;
+    input b: uint<4>;
+    input c: uint<4>;
+    output y: bit;
+    connect y = a < b < c;
+}

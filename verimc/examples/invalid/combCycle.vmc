@@ -1,0 +1,8 @@
+language "0.1";
+package invalidExamples;
+module CombCycle {
+    output y: bit;
+    wire feedback: bit;
+    connect feedback = !y;
+    connect y = feedback;
+}

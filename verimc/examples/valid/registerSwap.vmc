@@ -1,0 +1,28 @@
+language "0.1";
+package examples;
+
+module RegisterSwap {
+    input clk: clock;
+    input reset: bit;
+    output a: uint<4>;
+    output b: uint<4>;
+    reg left: uint<4> reset u(4, 1);
+    reg right: uint<4> reset u(4, 2);
+    on rising(clk) reset(reset) {
+        next left = right;
+        next right = left;
+    }
+    connect a = left;
+    connect b = right;
+}
+
+test swapSequence for RegisterSwap mode logical {
+    drive reset = true;
+    cycle clk;
+    expect a == u(4, 1);
+    expect b == u(4, 2);
+    drive reset = false;
+    cycle clk;
+    expect a == u(4, 2);
+    expect b == u(4, 1);
+}

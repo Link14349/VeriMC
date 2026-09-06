@@ -1,0 +1,7 @@
+language "0.1";
+package invalidExamples;
+module MissingSemicolon {
+    input a: bit
+    output y: bit;
+    connect y = a;
+}

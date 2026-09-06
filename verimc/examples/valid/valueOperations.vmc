@@ -1,0 +1,48 @@
+language "0.1";
+package examples;
+
+fn invertWord(value: bits<4>) -> bits<4> {
+    let inverted = ~value;
+    return inverted;
+}
+
+module BitBuffer {
+    input a: bit;
+    output y: bit;
+    connect y = a;
+}
+
+module WordChoice {
+    input chooseB: bit;
+    input a: bits<4>;
+    input b: bits<4>;
+    output y: bits<4>;
+    comb {
+        let invertedA = invertWord(a);
+        if chooseB { y = b; }
+        else { y = invertedA; }
+    }
+}
+
+module SignalArray {
+    input a: [bit; 4];
+    output y: [bit; 4];
+    generate lanes for i in 0..4 {
+        inst unit: BitBuffer;
+        connect unit.a = a[i];
+        connect y[i] = unit.y;
+    }
+}
+
+test conversions for WordChoice mode logical {
+    drive chooseB = false;
+    drive a = b(4, 0b1010);
+    drive b = b(4, 0b0011);
+    sample;
+    expect y == b(4, 0b0101);
+    expect asInt(u(4, 15)) == s(4, -1);
+    expect (s(4, -1) >> 8) == s(4, -1);
+    expect (u(4, 15) << 4) == u(4, 0);
+    expect (u(4, 0) - u(4, 1)) == s(5, -1);
+    expect widen(s(4, -2), 8) == s(8, -2);
+}

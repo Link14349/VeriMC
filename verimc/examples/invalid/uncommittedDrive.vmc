@@ -1,0 +1,8 @@
+language "0.1";
+package invalidExamples;
+import "../valid/adder.vmc" as arithmetic;
+test earlySample for arithmetic::Adder mode logical {
+    drive a = u(4, 0);
+    drive b = u(4, 0);
+    expect sum == u(4, 0);
+}
