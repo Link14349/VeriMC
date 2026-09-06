@@ -25,7 +25,7 @@ if(simulatorSanitizers AND NOT MSVC)
   target_link_options(simulatorOptions INTERFACE -fsanitize=address,undefined)
 endif()
 
-add_library(simulatorCore src/blockRegistry.cpp src/world.cpp src/simulator.cpp src/project.cpp src/pistons.cpp src/devices.cpp src/containers.cpp src/hoppers.cpp)
+add_library(simulatorCore src/blockRegistry.cpp src/world.cpp src/simulator.cpp src/project.cpp src/pistons.cpp src/devices.cpp src/containers.cpp src/hoppers.cpp src/rails.cpp)
 target_include_directories(simulatorCore PUBLIC include)
 target_link_libraries(simulatorCore PUBLIC nlohmann_json::nlohmann_json simulatorOptions Threads::Threads)
 target_compile_definitions(simulatorCore PUBLIC SIMULATOR_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/data")

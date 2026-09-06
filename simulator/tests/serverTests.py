@@ -149,6 +149,18 @@ try:
     hopper = command('save', checkpoint=True)
     command('step', count=8)
     assert command('inspect', pos=[1,0,0])['inventory'][0]['count'] == 2
+    command('demo', kind='rails')
+    command('stimulate', pos=[0,1,0], stimulus={'carts':[{'type':'chest_minecart','inventory':[]}]})
+    assert command('inspect', pos=[0,1,0])['inventorySize'] == 27
+    assert command('inspect', pos=[9,1,0])['properties']['powered'] == 'true'
+    assert command('inspect', pos=[10,1,0])['properties']['powered'] == 'false'
+    command('stimulate', pos=[0,1,0], stimulus={'cartInventory':[{'slot':0,'item':'stone','count':64}]})
+    command('step', count=22)
+    assert command('inspect', pos=[0,1,1])['value'] == 1
+    command('stimulate', pos=[0,1,0], stimulus={'carts':[]})
+    assert command('inspect', pos=[0,1,0])['properties']['powered'] == 'true'
+    command('step', count=18)
+    assert command('inspect', pos=[0,1,0])['properties']['powered'] == 'false'
     command('load', project=hopper)
     command('step', count=8)
     assert command('inspect', pos=[1,0,0])['inventory'][0]['count'] == 2

@@ -90,6 +90,7 @@ void Simulator::loadProject(const Json& data) {
             if (!data.contains("torchToggles")) for (auto tick : row.value("torchToggles", std::vector<Tick>{})) candidate.recentTorchToggles.push_back({p, tick});
         }
         if (row.contains("inventory")) candidate.setInventory(p, row.at("inventory"), false, false);
+        if (candidate.at(p).device == Device::detectorRail) state.values["carts"] = candidate.normalizeCarts(state.values.value("carts", Json::array()));
         candidate.validateRuntime(p);
     }
     if (checkpoint) {

@@ -133,6 +133,39 @@ export class CircuitViewport {
         if (!open || (moving && source && !extending)) { const headOffset = moving ? 1-progress : 0; pistonPart(.37+headOffset,.25,.99,sticky?0x8da96a:0xbb9f70); if(moving)pistonPart(headOffset*.5,.8,.22,0xaaa58e); }
         for (const offset of [-.25,0,.25]) part([.5,.995,.5+offset],[.77,.01,.045],0x48534f);
       }
+    } else if (name === 'rail' || name.endsWith('_rail')) {
+      const shape = p.shape ?? 'north_south';
+      const powered = p.powered === 'true';
+      const tint = name === 'powered_rail' ? (powered ? 0xf2b365 : 0xaa935d) : name === 'activator_rail' ? (powered ? 0xe87f62 : 0x875953) : 0xa6b0ac;
+      const railLine = (from: [number,number,number], to: [number,number,number], shade: number, width = .065, height = .05) => {
+        const delta = new THREE.Vector3(to[0]-from[0], to[1]-from[1], to[2]-from[2]);
+        const length = delta.length(); quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1), delta.normalize());
+        transform.compose(vector.set(x+(from[0]+to[0])/2,y+(from[1]+to[1])/2,z+(from[2]+to[2])/2),quaternion,scaleVector.set(width,height,length));
+        handles.push(chunk.box.add(cell.pos,transform,shade));
+      };
+      const corner: Record<string,[number,number,number]> = {south_east:[1,1,Math.PI],south_west:[0,1,-Math.PI/2],north_west:[0,0,0],north_east:[1,0,Math.PI/2]};
+      if (corner[shape]) {
+        const [cx,cz,start] = corner[shape];
+        const point = (angle: number, radius: number, h: number): [number,number,number] => [cx+Math.cos(angle)*radius,h,cz+Math.sin(angle)*radius];
+        for (let i=0;i<4;++i) {
+          const a=start+i*Math.PI/8, b=a+Math.PI/8;
+          for (const radius of [.28,.72]) railLine(point(a,radius,.085),point(b,radius,.085),tint);
+          railLine(point((a+b)/2,.17,.03),point((a+b)/2,.83,.03),0x7c6b51,.13,.04);
+        }
+      } else {
+        const eastWest = shape === 'east_west' || shape === 'ascending_east' || shape === 'ascending_west';
+        const coordinate = (along: number, across: number, h: number): [number,number,number] => {
+          const rise = shape === 'ascending_east' || shape === 'ascending_south' ? along : shape.startsWith('ascending_') ? 1-along : 0;
+          return eastWest ? [along,h+rise,across] : [across,h+rise,along];
+        };
+        for (const across of [.28,.72]) railLine(coordinate(0,across,.085),coordinate(1,across,.085),tint);
+        for (const along of [.15,.5,.85]) railLine(coordinate(along,.12,.03),coordinate(along,.88,.03),0x7c6b51,.13,.04);
+        if (name === 'detector_rail') railLine(coordinate(.2,.5,.1),coordinate(.8,.5,.1),powered ? 0xdf9774 : 0x9b8980,.34,.04);
+      }
+      if ((cell.motion & 2048) !== 0) {
+        part([.5,.24,.5],[.8,.16,.8],0x465155);
+        for (const edge of [.14,.86]) { part([edge,.48,.5],[.12,.38,.84],0x9ba7a8); part([.5,.48,edge],[.6,.38,.12],0x9ba7a8); }
+      }
     } else if (name === 'hopper') {
       const tint = p.enabled === 'false' ? 0x596369 : 0x788487;
       for (const edge of [.0625,.9375]) { part([edge,.8,.5],[.125,.4,1],tint); part([.5,.8,edge],[.75,.4,.125],tint); }

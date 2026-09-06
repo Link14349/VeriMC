@@ -11,7 +11,7 @@
 5. `python3 tools/reference/captureRedstone.py`：用本项目原创输入场景运行原版 GameTest，生成 `tests/fixtures/java26_2Redstone.json`。测试世界仅位于忽略的 `.cache/reference/captureWorld/`，重跑时替换该缓存世界。
 6. 构建后执行 `ctest --preset release`，独立 C++ 内核按相同绝对坐标、放置顺序和游戏刻逐帧比较状态 ID 与比较器内部输出。
 
-扩展数据与场景：生成报告后运行 `python3 tools/reference/exportItems.py` 导出默认物品堆叠上限；`captureDevices.py`、`captureContainers.py` 和 `captureHoppers.py` 分别生成环境器件、库存与传输场景。`runReferenceTool.py ExportDaylight <绝对输出路径>` 生成阳光探测器数值对照。五种 GameTest 生成脚本共享缓存世界，请顺序运行。
+扩展数据与场景：生成报告后运行 `python3 tools/reference/exportItems.py` 导出默认物品堆叠上限；`captureDevices.py`、`captureContainers.py` 和 `captureHoppers.py` 分别生成环境器件、库存与传输场景。`runReferenceTool.py ExportDaylight <绝对输出路径>` 生成阳光探测器数值对照。六种 GameTest 生成脚本共享缓存世界，请顺序运行。
 
 正常构建、启动、仿真和测试不依赖 Java 或 Minecraft 安装；注册表和场景观测结果随项目提供。JAR、反编译参考源码、游戏资源和缓存世界不进入 Git。
 
@@ -33,3 +33,5 @@
 扩展差分覆盖另有 29 刻 / 32 点环境器件和 17 刻 / 14 点容器，以及 65 刻 / 25 点漏斗槽位传输；详细机制与边界见 [环境输入](environmentInputs.md) 和 [库存模型](inventoryModel.md)。阳光公式的 11,536 个数值样本不等于世界光照仿真测试。
 
 `captureTorches.py` 另外生成 195 刻 / 5 点火把烧毁与重放置对照。世界级熄灭历史保留原版 60 gt 窗口、8 次阈值和 160 gt 恢复计划；移除方块不删除该历史，按坐标计数但按世界时间统一过期。
+
+`captureRails.py` 生成 45 刻 / 93 点轨道场景，覆盖连接、坡道、岔路、供电路径、支撑及真实矿车接触/库存；机制边界详见 [rails.md](rails.md)。

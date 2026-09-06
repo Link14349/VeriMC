@@ -38,12 +38,12 @@ void Simulator::updateComparatorNeighbors(BlockPos pos) {
     }
 }
 
-void Simulator::runtimeChanged(BlockPos pos) {
+void Simulator::runtimeChanged(BlockPos pos, bool notifyComparators) {
     ++revision;
     ++sequence;
     changes[pos] = world.get(pos);
     sampleAffected(pos);
-    updateComparatorNeighbors(pos);
+    if (notifyComparators) updateComparatorNeighbors(pos);
     if (!hoppers.empty()) wakeHoppers(pos);
 }
 
@@ -128,6 +128,7 @@ bool Simulator::stimulateDevice(BlockPos pos, const Json& stimulus) {
     if (!stimulus.is_object()) throw std::invalid_argument("环境输入必须是对象");
     auto id = world.get(pos);
     const auto& state = registry[id];
+    if (state.device == Device::detectorRail) { setCartInput(pos, stimulus); return true; }
     if (state.device == Device::container || state.device == Device::hopper) {
         if (stimulus.contains("inventory")) setInventory(pos, stimulus.at("inventory"));
         else if (state.device == Device::container && stimulus.contains("viewers")) setViewers(pos, integerInRange(stimulus, "viewers", 0, 1000000));
@@ -189,6 +190,7 @@ void Simulator::validateRuntime(BlockPos pos) const {
     const auto& data = runtime.at(pos);
     if (!data.values.is_object() || data.output < 0 || data.output > 15) throw std::invalid_argument("无效器件内部状态");
     auto device = at(pos).device;
+    if (device == Device::detectorRail) normalizeCarts(data.values.value("carts", Json::array()));
     if (inventorySize(world.get(pos))) integerInRange(data.values, "viewers", 0, 1000000);
     if (device == Device::pressurePlate || device == Device::weightedPlate) {
         int entities = integerInRange(data.values, "entities", 0, 1000000);

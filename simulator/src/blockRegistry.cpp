@@ -61,6 +61,8 @@ BlockRegistry::BlockRegistry(const std::string& path) {
         if (std::find(environmentReadouts.begin(), environmentReadouts.end(), typeInfo.className) != environmentReadouts.end()) typeInfo.supportLevel = "externalStimulus";
         if (typeInfo.className == "ChestBlock" || typeInfo.className == "TrappedChestBlock" || typeInfo.className == "BarrelBlock") typeInfo.supportLevel = "implemented";
         if (typeInfo.device == Device::hopper) typeInfo.supportLevel = "implemented";
+        if (typeInfo.device == Device::rail || typeInfo.device == Device::poweredRail || typeInfo.device == Device::activatorRail) typeInfo.supportLevel = "implemented";
+        if (typeInfo.device == Device::detectorRail) typeInfo.supportLevel = "externalStimulus";
         auto typeId = static_cast<std::uint16_t>(types.size());
         names.emplace(typeInfo.name, typeId);
         for (const auto& s : b.at("states")) for (const auto& [key, value] : s.at("properties").items()) {

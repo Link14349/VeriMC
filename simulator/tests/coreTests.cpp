@@ -15,7 +15,7 @@ int main() {
         std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/blockStates.json"); auto source = Json::parse(file);
         for (const auto& block : source["blocks"]) for (const auto& state : block["states"]) expect(r.state(block["name"], state["properties"]) == state["id"].get<StateId>(), "state mismatch: " + block["name"].get<std::string>());
     });
-    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers", "java26_2Hoppers", "java26_2Torches"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
+    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers", "java26_2Hoppers", "java26_2Torches", "java26_2Rails"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
         std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/../tests/fixtures/" + fixtureName + ".json"); expect(static_cast<bool>(file), "missing vanilla reference fixture");
         auto fixture = Json::parse(file); auto origin = fixture["origin"].get<BlockPos>(); Simulator s(r);
         auto absolute = [&](const Json& p) { auto pos = p.get<BlockPos>(); return BlockPos{origin.x + pos.x, origin.y + pos.y, origin.z + pos.z}; };
@@ -181,6 +181,30 @@ int main() {
             sim->advanceTo(190); expect(sim->at(torch).lit, "burnout did not recover");
         }
         expect(s.saveProject("torch", true) == restored.saveProject("torch", true), "torch history continuation diverged");
+    });
+    test("detector cart inventory selection, delayed release and checkpoint", [&] {
+        Simulator s(r); floor(s); const BlockPos detector{0,1,0};
+        s.place(detector, r.state("detector_rail"));
+        s.place({0,1,1}, r.state("comparator", {{"facing","north"}}));
+        Json full = Json::array(); for (int i = 0; i < 5; ++i) full.push_back({{"slot",i},{"item","stone"},{"count",64}});
+        s.stimulate(detector, {{"carts", Json::array({{{"type","minecart"}},{{"type","chest_minecart"},{"inventory",Json::array({{{"slot",0},{"item","wooden_sword"},{"count",1}}})}},{{"type","hopper_minecart"},{"inventory",full}}})}});
+        expect(s.cartCount(detector)==3 && s.analogOutput(detector)==1, "did not select first container cart");
+        s.advanceTo(2); expect(s.analogOutput({0,1,1})==1, "comparator did not read cart");
+        s.advanceTo(5); s.stimulate(detector, {{"carts",Json::array()}});
+        expect(s.at(detector).powered && s.analogOutput(detector)==0, "cart departure should retain rail power until poll");
+        auto checkpoint=s.saveProject("cart",true); Simulator restored(r); restored.loadProject(checkpoint);
+        s.advanceTo(19); expect(s.at(detector).powered,"early detector release");
+        s.advanceTo(22); restored.advanceTo(22);
+        expect(!s.at(detector).powered && s.analogOutput({0,1,1})==0,"detector did not release");
+        expect(s.saveProject("cart",true)==restored.saveProject("cart",true),"cart checkpoint diverged");
+        auto before=s.saveProject("before",true); bool threw=false;
+        try { s.stimulate(detector, {{"carts",Json::array({{{"type","hopper_minecart"},{"inventory",Json::array({{{"slot",5},{"item","stone"},{"count",1}}})}}})}}); } catch (...) {threw=true;}
+        expect(threw&&s.saveProject("before",true)==before,"invalid cart inventory partially changed state");
+    });
+    test("powered rail state is observable without emitting redstone", [&] {
+        Simulator s(r); floor(s); s.place({0,1,0},r.state("powered_rail")); s.place({-1,1,0},r.state("redstone_block"));
+        expect(s.at({0,1,0}).powered&&s.displayValue({0,1,0})==15,"rail power not visible");
+        for (auto direction:directions) expect(s.signal({0,1,0},direction)==0,"powered rail emitted external redstone");
     });
     std::cout << passed << " passed, " << failed << " failed\n"; return failed ? 1 : 0;
 }

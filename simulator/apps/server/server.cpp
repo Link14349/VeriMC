@@ -102,7 +102,14 @@ public:
         auto u32 = [&](std::uint32_t value) { for (int byte = 0; byte < 4; ++byte) binary.push_back(static_cast<char>((value >> (byte * 8)) & 255u)); };
         auto u64 = [&](std::uint64_t value) { u32(static_cast<std::uint32_t>(value)); u32(static_cast<std::uint32_t>(value >> 32)); };
         u32(0x32434d56); u32(full ? 1 : 2); u32(id); u32(static_cast<std::uint32_t>(cells.size())); u64(hub.sim.currentTick); u64(hub.sim.revision);
-        for (const auto& cell : cells) { u32(static_cast<std::uint32_t>(cell.pos.x)); u32(static_cast<std::uint32_t>(cell.pos.y)); u32(static_cast<std::uint32_t>(cell.pos.z)); u32(cell.state); u32(static_cast<std::uint32_t>(hub.sim.displayValue(cell.pos))); auto motion = hub.sim.motionAt(cell.pos); u32(motion ? motion->movedState : cell.state); u32(motion ? 1u | (motion->extending ? 2u : 0u) | (motion->source ? 4u : 0u) | (static_cast<unsigned>(motion->facing) << 3) | (motion->progress << 6) | (motion->previousProgress << 8) : hub.sim.viewerCount(cell.pos) > 0 ? 1024u : 0u); }
+        for (const auto& cell : cells) {
+            u32(static_cast<std::uint32_t>(cell.pos.x)); u32(static_cast<std::uint32_t>(cell.pos.y)); u32(static_cast<std::uint32_t>(cell.pos.z));
+            u32(cell.state); u32(static_cast<std::uint32_t>(hub.sim.displayValue(cell.pos)));
+            auto motion = hub.sim.motionAt(cell.pos); u32(motion ? motion->movedState : cell.state);
+            auto flags = (hub.sim.viewerCount(cell.pos) > 0 ? 1024u : 0u) | (hub.sim.cartCount(cell.pos) > 0 ? 2048u : 0u);
+            if (motion) flags |= 1u | (motion->extending ? 2u : 0u) | (motion->source ? 4u : 0u) | (static_cast<unsigned>(motion->facing) << 3) | (motion->progress << 6) | (motion->previousProgress << 8);
+            u32(flags);
+        }
         awaitingAck = true; outstandingFrame = id; sentAt = Clock::now(); send(std::move(binary), true);
         const auto& trace = hub.sim.getTrace(); const auto first = hub.sim.traceDropped;
         Json edges = Json::array();
@@ -115,6 +122,20 @@ public:
 };
 void Hub::demo(const std::string& kind) {
     sim.clear(); projectName = "脉冲与记忆 · 入门电路";
+    if (kind == "rails") {
+        projectName = "铁轨实验 · 检测与传导";
+        for (int x = -1; x <= 12; ++x) for (int z = -1; z <= 8; ++z) sim.world.set({x,0,z}, registry.state("white_concrete"));
+        sim.place({0,1,0}, registry.state("detector_rail", {{"shape","east_west"}}));
+        for (int x = 1; x <= 10; ++x) sim.place({x,1,0}, registry.state("powered_rail", {{"shape","east_west"}}));
+        sim.place({0,1,1}, registry.state("comparator", {{"facing","north"}}));
+        sim.place({0,1,2}, registry.state("redstone_wire")); sim.place({0,1,3}, registry.state("redstone_lamp"));
+        for (int x = 0; x < 5; ++x) sim.place({x,1,6}, registry.state("activator_rail", {{"shape","east_west"}}));
+        sim.place({-1,1,6}, registry.state("lever", {{"face","floor"}}));
+        for (auto pos : {BlockPos{8,1,6}, BlockPos{8,1,5}, BlockPos{8,1,7}, BlockPos{9,1,6}}) sim.place(pos, registry.state("rail"));
+        sim.place({7,1,6}, registry.state("lever", {{"face","floor"}}));
+        sim.addProbe({0,1,0}, "矿车检测"); sim.addProbe({0,1,1}, "矿车库存"); sim.addProbe({9,1,0}, "传导末端"); sim.addProbe({0,1,6}, "激活接口");
+        runStart = sim.clone(); return;
+    }
     if (kind == "inventory") {
         projectName = "漏斗实验 · 传输与锁定";
         for (int x = -1; x <= 7; ++x) for (int z = -1; z <= 4; ++z) sim.world.set({x,0,z}, registry.state("white_concrete"));

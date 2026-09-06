@@ -105,23 +105,29 @@ Json Simulator::inventoryJson(BlockPos pos, bool combined) const {
     return result;
 }
 
+std::vector<std::pair<std::size_t, ItemStack>> Simulator::parseInventory(const Json& values, std::size_t size) const {
+    if (!values.is_array() || values.size() > size) throw std::invalid_argument("库存修改必须是有效槽位数组");
+    std::vector<std::pair<std::size_t, ItemStack>> edits;
+    std::set<std::size_t> edited;
+    for (const auto& value : values) {
+        if (!value.at("slot").is_number_integer() || !value.at("count").is_number_integer() || value.at("slot").get<std::int64_t>() < 0 || value.at("slot").get<std::int64_t>() >= static_cast<std::int64_t>(size) || value.at("count").get<std::int64_t>() < 0 || value.at("count").get<std::int64_t>() > 99) throw std::invalid_argument("库存槽位和数量必须是有效整数");
+        auto slot = value.at("slot").get<int>(), count = value.at("count").get<int>();
+        if (slot < 0 || static_cast<std::size_t>(slot) >= size || !edited.insert(static_cast<std::size_t>(slot)).second) throw std::invalid_argument("库存槽位越界或重复");
+        if (value.contains("components") && !value.at("components").empty()) throw std::invalid_argument("自定义物品组件尚未实现，请使用默认物品");
+        std::uint32_t item = count == 0 ? 0 : registry.itemId(value.at("item"));
+        if (count < 0 || count > registry.item(item).maxStack || (count > 0 && registry.item(item).name == "minecraft:air")) throw std::invalid_argument("物品数量超出该物品的堆叠上限");
+        edits.push_back({static_cast<std::size_t>(slot), {item, static_cast<std::uint16_t>(count)}});
+    }
+    std::sort(edits.begin(), edits.end(), [](const auto& a, const auto& b) { return a.first < b.first; });
+    return edits;
+}
+
 void Simulator::setInventory(BlockPos pos, const Json& values, bool combined, bool notify) {
     auto slots = combined ? containerSlots(pos) : std::vector<InventorySlot>{};
     if (!combined) for (std::size_t i = 0; i < inventorySize(world.get(pos)); ++i) slots.push_back({pos, i});
     if (slots.empty()) throw std::invalid_argument("这个器件没有库存槽位");
-    if (!values.is_array() || values.size() > slots.size()) throw std::invalid_argument("库存修改必须是有效槽位数组");
-    std::vector<std::pair<InventorySlot, ItemStack>> edits;
-    std::set<std::size_t> edited;
-    for (const auto& value : values) {
-        if (!value.at("slot").is_number_integer() || !value.at("count").is_number_integer() || value.at("slot").get<std::int64_t>() < 0 || value.at("slot").get<std::int64_t>() >= static_cast<std::int64_t>(slots.size()) || value.at("count").get<std::int64_t>() < 0 || value.at("count").get<std::int64_t>() > 99) throw std::invalid_argument("库存槽位和数量必须是有效整数");
-        auto slot = value.at("slot").get<int>(), count = value.at("count").get<int>();
-        if (slot < 0 || static_cast<std::size_t>(slot) >= slots.size() || !edited.insert(static_cast<std::size_t>(slot)).second) throw std::invalid_argument("库存槽位越界或重复");
-        if (value.contains("components") && !value.at("components").empty()) throw std::invalid_argument("自定义物品组件尚未实现，请使用默认物品");
-        std::uint32_t item = count == 0 ? 0 : registry.itemId(value.at("item"));
-        if (count < 0 || count > registry.item(item).maxStack || (count > 0 && registry.item(item).name == "minecraft:air")) throw std::invalid_argument("物品数量超出该物品的堆叠上限");
-        edits.push_back({slots[static_cast<std::size_t>(slot)], {item, static_cast<std::uint16_t>(count)}});
-    }
-    for (const auto& [slot, stack] : edits) {
+    for (const auto& [index, stack] : parseInventory(values, slots.size())) {
+        const auto& slot = slots[index];
         auto& inventory = runtime[slot.pos].inventory;
         inventory.resize(inventorySize(world.get(slot.pos)));
         inventory[slot.index] = stack;

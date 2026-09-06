@@ -12,7 +12,8 @@ export function EnvironmentControls({ pos, block, command }: Props) {
   const [inspection, setInspection] = useState<Record<string, unknown>>({});
   const name = shortName(block.name), plate = name.endsWith('pressure_plate'), daylight = name === 'daylight_detector';
   const lectern = name === 'lectern', rod = name.endsWith('lightning_rod'), target = name === 'target';
-  const supported = plate || daylight || lectern || rod || target;
+  const detector = name === 'detector_rail';
+  const supported = plate || daylight || lectern || rod || target || detector;
   const key = posKey(pos);
   useEffect(() => {
     let active = true, requesting = false;
@@ -33,9 +34,18 @@ export function EnvironmentControls({ pos, block, command }: Props) {
   if (!supported) return null;
   const stimulus = (values: Record<string, unknown>) => command('stimulate', { pos, stimulus: values });
   const runtime = (inspection.runtime ?? {}) as Record<string, number>;
+  const carts = (inspection.runtime as {carts?: Array<{type: string}>})?.carts ?? [];
   const numberField = (label: string, value: number, change: (next: number) => void, maximum: number, minimum = 0) =>
     <label className="propertyRow"><span>{label}</span><input aria-label={label} type="number" min={minimum} max={maximum} value={value} onChange={e => change(Number(e.target.value))}/></label>;
   return <div className="inspectorSection environmentControls"><label className="miniLabel"><Zap size={12}/>环境输入</label>
+    {detector && <>
+      <p className="subtleText">提供检测区内的矿车接触，轨道自动输出信号。</p>
+      <button className="wideButton" onClick={() => stimulus({carts:[{type:'minecart'}]})}>普通矿车进入</button>
+      <button className="wideButton" onClick={() => stimulus({carts:[{type:'chest_minecart',inventory:[]}]})}>箱子矿车进入</button>
+      <button className="wideButton" onClick={() => stimulus({carts:[{type:'hopper_minecart',inventory:[]}]})}>漏斗矿车进入</button>
+      <button className="wideButton" onClick={() => stimulus({carts:[]})}>矿车全部离开</button>
+      <p className="subtleText">当前 {carts.length} 辆。离开与库存通知在下一次 20 gt 检查时生效；三维矿车是接触标记，不计算运动。</p>
+    </>}
     {plate && <>
       <p className="subtleText">输入触及压力板的实体数量，已排除旁观者和不触发方块的实体。</p>
       {numberField('实体总数', entities, setEntities, 1000000)}

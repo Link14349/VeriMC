@@ -17,6 +17,7 @@ import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.entity.LecternBlockEntity;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
@@ -48,7 +49,35 @@ public class CaptureRedstone extends TestFunctionLoader {
                 return;
             }
             var input = command.getAsJsonObject("stimulus");
-            if (level.getBlockEntity(pos) instanceof Container localContainer) {
+            if (state.getBlock() instanceof DetectorRailBlock detector) {
+                if (input.has("carts")) {
+                    for (var entity : occupants.getOrDefault(pos, List.of())) entity.discard();
+                    var list = new ArrayList<Entity>(); occupants.put(pos, list);
+                    for (var value : input.getAsJsonArray("carts")) {
+                        var cart = value.getAsJsonObject();
+                        var entityType = BuiltInRegistries.ENTITY_TYPE.getValue(Identifier.withDefaultNamespace(cart.get("type").getAsString()));
+                        var entity = entityType.create(level, EntitySpawnReason.COMMAND);
+                        entity.setPos(pos.getX() + .5, pos.getY() + .0625, pos.getZ() + .5); entity.setNoGravity(true);
+                        if (entity instanceof Container container && cart.has("inventory")) for (var item : cart.getAsJsonArray("inventory")) {
+                            var row = item.getAsJsonObject(); int count = row.get("count").getAsInt();
+                            container.setItem(row.get("slot").getAsInt(), count == 0 ? ItemStack.EMPTY : new ItemStack(BuiltInRegistries.ITEM.getValue(Identifier.parse(row.get("item").getAsString())), count));
+                        }
+                        level.addFreshEntity(entity); list.add(entity);
+                    }
+                } else if (input.has("cartInventory")) {
+                    for (var entity : occupants.getOrDefault(pos, List.of())) if (entity instanceof Container container) {
+                        for (var item : input.getAsJsonArray("cartInventory")) {
+                            var row = item.getAsJsonObject(); int count = row.get("count").getAsInt();
+                            container.setItem(row.get("slot").getAsInt(), count == 0 ? ItemStack.EMPTY : new ItemStack(BuiltInRegistries.ITEM.getValue(Identifier.parse(row.get("item").getAsString())), count));
+                        }
+                        break;
+                    }
+                }
+                if (!state.getValue(DetectorRailBlock.POWERED)) {
+                    var method = DetectorRailBlock.class.getDeclaredMethod("checkPressed", Level.class, BlockPos.class, BlockState.class);
+                    method.setAccessible(true); method.invoke(detector, level, pos, state);
+                }
+            } else if (level.getBlockEntity(pos) instanceof Container localContainer) {
                 Container container = state.getBlock() instanceof ChestBlock chest ? ChestBlock.getContainer(chest, state, level, pos, true) : localContainer;
                 if (input.has("inventory")) {
                     for (var value : input.getAsJsonArray("inventory")) {

@@ -51,6 +51,12 @@ public:
     int analogOutput(BlockPos pos) const;
     int displayValue(BlockPos pos) const;
     int viewerCount(BlockPos pos) const { auto found = runtime.find(pos); return found == runtime.end() ? 0 : found->second.values.value("viewers", 0); }
+    std::size_t cartCount(BlockPos pos) const {
+        auto found = runtime.find(pos);
+        if (found == runtime.end()) return 0;
+        auto carts = found->second.values.find("carts");
+        return carts == found->second.values.end() ? 0 : carts->size();
+    }
     void updateNeighbors(BlockPos pos, int skip = -1, StateId source = UINT32_MAX);
     void neighborChanged(BlockPos pos, StateId source = 0);
     void schedule(BlockPos pos, Tick delay, int priority = 0);
@@ -141,7 +147,7 @@ private:
     std::uint64_t registerEntity(BlockPos pos);
     void pruneEvents();
     void updateComparatorNeighbors(BlockPos pos);
-    void runtimeChanged(BlockPos pos);
+    void runtimeChanged(BlockPos pos, bool notifyComparators = true);
     void updatePressurePlate(BlockPos pos);
     void updateDaylight(BlockPos pos);
     bool interactDevice(BlockPos pos);
@@ -156,6 +162,7 @@ private:
     ItemStack stackAt(const InventorySlot& slot) const;
     int containerAnalog(BlockPos pos) const;
     void setInventory(BlockPos pos, const Json& slots, bool combined = true, bool notify = true);
+    std::vector<std::pair<std::size_t, ItemStack>> parseInventory(const Json& values, std::size_t size) const;
     void setViewers(BlockPos pos, int viewers);
     void writeStack(const InventorySlot& slot, ItemStack stack, bool notify = true);
     void containerChanged(BlockPos pos);
@@ -166,5 +173,14 @@ private:
     void wakeHoppers(BlockPos changed);
     void tickHopper(const ScheduledEvent& event);
     void startHopper(BlockPos pos);
+    void placeRail(BlockPos pos);
+    void updateRail(BlockPos pos, StateId source);
+    void removeRail(BlockPos pos, StateId state);
+    bool poweredRailPath(BlockPos pos, StateId state, bool forward, int depth) const;
+    void updateDetectorRail(BlockPos pos);
+    void setCartInput(BlockPos pos, const Json& input);
+    Json normalizeCarts(const Json& carts) const;
+    const Json* firstContainerCart(BlockPos pos) const;
+    int cartAnalog(BlockPos pos) const;
 };
 }

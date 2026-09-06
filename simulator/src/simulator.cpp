@@ -41,6 +41,7 @@ int Simulator::analogOutput(BlockPos pos) const {
     auto it = runtime.find(pos);
     if (state.device == Device::comparator) return it == runtime.end() ? 0 : it->second.output;
     if (state.device == Device::bulb) return state.lit ? 15 : 0;
+    if (state.device == Device::detectorRail) return state.powered ? cartAnalog(pos) : 0;
     if (inventorySize(id)) return containerAnalog(pos);
     if (state.device == Device::analog) return state.staticAnalog;
     if (state.device == Device::lectern) {
@@ -58,6 +59,7 @@ int Simulator::displayValue(BlockPos pos) const {
     if (state.device == Device::lamp || state.device == Device::bulb || state.device == Device::torch || state.device == Device::wallTorch) return state.lit ? 15 : 0;
     if (inventorySize(world.get(pos)) && registry.type(world.get(pos)).name != "minecraft:trapped_chest") return containerAnalog(pos);
     if (state.device == Device::piston) return state.extended ? 15 : 0;
+    if (state.device == Device::poweredRail || state.device == Device::activatorRail) return state.powered ? 15 : 0;
     if (state.device == Device::door || state.device == Device::trapdoor || state.device == Device::fenceGate) return registry.property(world.get(pos), "open") == "true" ? 15 : 0;
     int value = 0; for (auto d : directions) value = std::max(value, signal(pos, d));
     return value;
@@ -116,8 +118,8 @@ void Simulator::setBlock(BlockPos p, StateId id, unsigned flags, int depth) {
             hoppers.erase(hopper);
         }
         entityOrders.erase(p);
-        if ((flags & 1u) != 0 && (flags & 64u) == 0) onRemove(p, old);
     }
+    if ((oldState.type != state.type || isRail(state.device)) && (flags & 1u) != 0 && (flags & 64u) == 0) onRemove(p, old);
     if ((flags & 512u) == 0) onPlace(p, id, old);
     if (world.get(p) != id) return;
     if ((flags & 1u) != 0) { updateNeighbors(p, -1, old); if (state.analogSource) updateComparatorNeighbors(p); }
@@ -138,7 +140,7 @@ bool Simulator::survives(BlockPos p, StateId id) const {
     case Device::wallTorch: return (at(p.relative(opposite(s.facing))).supportMask & (1u << static_cast<unsigned>(s.facing))) != 0;
     case Device::lever: case Device::button: return (at(p.relative(opposite(s.connectedDirection))).supportMask & (1u << static_cast<unsigned>(s.connectedDirection))) != 0;
     case Device::pressurePlate: case Device::weightedPlate: return (below.rigidMask & 2u) != 0 || (below.centerMask & 2u) != 0;
-    case Device::rail: case Device::poweredRail: case Device::activatorRail: case Device::detectorRail: return (below.supportMask & 2u) != 0;
+    case Device::rail: case Device::poweredRail: case Device::activatorRail: case Device::detectorRail: return (below.rigidMask & 2u) != 0;
     case Device::door: return registry.property(id, "half") == "lower" ? (below.supportMask & 2u) != 0 : below.type == s.type;
     case Device::pistonHead: { const auto& base = at(p.relative(opposite(s.facing))); return (base.device == Device::piston && base.extended && base.facing == s.facing && base.sticky == (registry.property(id, "type") == "sticky")) || (base.device == Device::movingPiston && base.facing == s.facing); }
     default: return true;
@@ -182,6 +184,7 @@ void Simulator::onPlace(BlockPos p, StateId id, StateId old) {
     case Device::bulb: executeNeighbor(p); break;
     case Device::daylight: schedulePhase(p, currentTick + 20 - currentTick % 20, 2, 0); break;
     case Device::hopper: executeNeighbor(p); startHopper(p); break;
+    case Device::rail: case Device::poweredRail: case Device::activatorRail: case Device::detectorRail: placeRail(p); break;
     case Device::piston: checkPiston(p); break;
     default: break;
     }
@@ -198,6 +201,7 @@ void Simulator::onRemove(BlockPos p, StateId old) {
     case Device::lightningRod: if (s.powered) updateNeighbors(p.relative(opposite(s.facing)), -1, old); break;
     case Device::lectern: if (s.powered) updateNeighbors(p.relative(Direction::down), -1, old); break;
     case Device::container: case Device::hopper: updateComparatorNeighbors(p); break;
+    case Device::rail: case Device::poweredRail: case Device::activatorRail: case Device::detectorRail: removeRail(p, old); break;
     case Device::pistonHead: { auto base = p.relative(opposite(s.facing)); if (at(base).device == Device::piston && at(base).extended && at(base).facing == s.facing) setBlock(base, 0); break; }
     default: break;
     }
@@ -269,6 +273,7 @@ void Simulator::indirectShapes(BlockPos p, StateId id, unsigned flags, int depth
 }
 void Simulator::executeShape(const Update& u) {
     auto id = world.get(u.pos); const auto& s = registry[id];
+    if (isRail(s.device)) return; // Rail support is checked by neighborChanged.
     if (s.device == Device::door && axis(u.direction) == 0 && ((registry.property(id, "half") == "lower") == (u.direction == Direction::up))) {
         bool fits = registry[u.neighborState].device == Device::door && registry.property(u.neighborState, "half") != registry.property(id, "half");
         auto next = fits ? registry.with(u.neighborState, "half", registry.property(id, "half")) : 0;
@@ -345,6 +350,7 @@ void Simulator::executeNeighbor(BlockPos p, StateId source) {
     }
     case Device::piston: checkPiston(p); break;
     case Device::pistonHead: if (survives(p, id)) neighborChanged(p.relative(opposite(s.facing))); break;
+    case Device::rail: case Device::poweredRail: case Device::activatorRail: case Device::detectorRail: updateRail(p, source); break;
     case Device::hopper: {
         bool enabled = bestSignal(p) == 0;
         if ((registry.property(id, "enabled") == "true") != enabled) setBlock(p, registry.withBool(id, "enabled", enabled), 2);
@@ -393,6 +399,7 @@ void Simulator::executeTick(const ScheduledEvent& event) {
     case Device::pressurePlate: case Device::weightedPlate: if (s.powered || s.power > 0) updatePressurePlate(p); break;
     case Device::lightningRod: setBlock(p, registry.withBool(id, "powered", false)); updateNeighbors(p.relative(opposite(s.facing)), -1, id); break;
     case Device::lectern: setBlock(p, registry.withBool(id, "powered", false)); updateNeighbors(p.relative(Direction::down), -1, id); break;
+    case Device::detectorRail: if (s.powered) updateDetectorRail(p); break;
     default: break;
     }
 }
@@ -506,6 +513,11 @@ Json Simulator::inspect(BlockPos p) const {
     result["pos"] = p; result["value"] = displayValue(p); result["input"] = bestSignal(p); result["analog"] = analogOutput(p);
     result["supportLevel"] = registry.type(id).supportLevel;
     if (inventorySize(id)) { result["inventory"] = inventoryJson(p); result["inventorySize"] = containerSlots(p).size(); }
+    if (at(p).device == Device::detectorRail) {
+        auto cart = firstContainerCart(p);
+        result["inventory"] = cart ? cart->at("inventory") : Json::array();
+        result["inventorySize"] = cart ? (cart->at("type") == "chest_minecart" ? 27 : 5) : 0;
+    }
     auto it = runtime.find(p); result["runtime"] = it == runtime.end() ? Json::object() : it->second.values;
     if (auto motion = motionAt(p)) result["motion"] = {{"movedBlock", registry.describe(motion->movedState)}, {"progress", motion->progress * 0.5}, {"extending", motion->extending}, {"source", motion->source}};
     return result;
