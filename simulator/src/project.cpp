@@ -66,6 +66,7 @@ Json Simulator::saveProject(const std::string& name, bool checkpoint) const {
         if(sensor.candidate || sensor.current || registry.property(world.get(pos),"sculk_sensor_phase")!="inactive")throw std::invalid_argument("感测体正在接收振动或冷却，请保存运行快照，或等待空闲后导出电路");
     if(!checkpoint) for(const auto& event:scheduledKeys)
         if(event.phase==1 && event.type==registry[registry.state("note_block")].type)throw std::invalid_argument("音符盒等待演奏，请保存运行快照，或执行方块事件后导出电路");
+    if(!checkpoint)for(const auto& [pos,data]:runtime)if(at(pos).device==Device::bell && data.values.value("ringing",false))throw std::invalid_argument("钟仍在摆动，请保存运行快照或等待停止");
     Json data{{"format", "verimc.simulator"}, {"formatVersion", 1}, {"minecraftVersion", "26.2"}, {"edition", "java"}, {"kind", checkpoint ? "checkpoint" : "circuit"}, {"name", name}};
     data["profile"] = {{"experimentalRedstone", false}, {"naturalRandomTicks", false}, {"loadedRegionOnly", true}};
     data["randomSource"] = {{"algorithm", "javaLegacy48"}, {"seed", std::to_string(randomSeed)}};
@@ -78,6 +79,7 @@ Json Simulator::saveProject(const std::string& name, bool checkpoint) const {
     for (const auto& [pos, state] : runtime) {
         Json row{{"pos", pos}, {"values", state.values}};
         if(!checkpoint && at(pos).device==Device::noteBlock) {row["values"].erase("lastPlayed");row["values"].erase("playCount");}
+        if(!checkpoint && at(pos).device==Device::bell)row["values"]=Json::object();
         if (inventorySize(world.get(pos))) row["inventory"] = inventoryJson(pos, false);
         if (checkpoint) row["output"] = state.output;
         data["blockData"].push_back(std::move(row));
@@ -155,7 +157,7 @@ void Simulator::loadProject(const Json& data) {
     for (const auto& row : data.value("entityOrder", Json::array())) {
         auto pos = row.at("pos").get<BlockPos>(); auto rank = row.at("order").get<std::uint64_t>();
         auto device = candidate.at(pos).device;
-        if ((device != Device::hopper && device != Device::daylight && device != Device::movingPiston && !isSensor(device)) || rank >= candidate.nextEntityOrder || !usedRanks.insert(rank).second || !candidate.entityOrders.emplace(pos, rank).second) throw std::invalid_argument("无效方块实体执行顺序");
+        if ((device != Device::hopper && device != Device::daylight && device != Device::movingPiston && device != Device::bell && !isSensor(device)) || rank >= candidate.nextEntityOrder || !usedRanks.insert(rank).second || !candidate.entityOrders.emplace(pos, rank).second) throw std::invalid_argument("无效方块实体执行顺序");
     }
     for (const auto& row : data.value("blockData", Json::array())) {
         auto p = row.at("pos").get<BlockPos>();
@@ -190,6 +192,7 @@ void Simulator::loadProject(const Json& data) {
             }
             if (e.phase == 1 && ((e.data & 3u) > 2 || (e.data >> 2) > 5)) throw std::invalid_argument("无效活塞方块事件");
             if(e.phase==1 && e.type==registry[registry.state("note_block")].type && e.data!=0)throw std::invalid_argument("无效音符盒方块事件");
+            if(e.phase==1 && e.type==registry[registry.state("bell")].type && ((e.data&3u)!=1 || (e.data>>2)<2))throw std::invalid_argument("无效钟方块事件");
             if (e.phase == 3 && (candidate.at(e.pos).type != e.type || (candidate.at(e.pos).device != Device::tripwire && candidate.at(e.pos).device != Device::button) || e.data != 0 || e.entityOrder != 0)) throw std::invalid_argument("无效的环境接触事件");
             if ((e.phase != 0 && e.tick < candidate.currentTick) || e.type >= registry.typeCount() || e.priority < -3 || e.priority > 3 || e.phase > 3 || e.order >= candidate.nextOrder || !usedOrders.insert(e.order).second) throw std::invalid_argument("无效的运行队列");
             if (e.phase == 0) {
@@ -254,6 +257,22 @@ void Simulator::loadProject(const Json& data) {
             if(found==candidate.sensors.end() || found->second.wakeAt!=event.tick || found->second.generation!=event.data)throw std::invalid_argument("感测体与运行事件不一致");
         }
         candidate.rebuildSensorIndex();
+        auto bellQueue=candidate.scheduled;std::unordered_set<BlockPos,PosHash> queuedBells,pendingBells;
+        while(!bellQueue.empty()) {
+            const auto event=bellQueue.top();bellQueue.pop();if(candidate.at(event.pos).device!=Device::bell || event.type!=candidate.at(event.pos).type)continue;
+            if(event.phase==1)pendingBells.insert(event.pos);
+            if(event.phase!=2)continue;
+            if(!candidate.runtime.contains(event.pos))throw std::invalid_argument("钟缺少运行数据");
+            const auto& values=candidate.runtime.at(event.pos).values;
+            if(!values.value("ringing",false) || values.at("bellWakeAt")!=event.tick || values.at("bellGeneration")!=event.data || !queuedBells.insert(event.pos).second)throw std::invalid_argument("钟摆动与队列不一致");
+        }
+        for(const auto& cell:candidate.world.cells())if(registry[cell.state].device==Device::bell) {
+            if(!candidate.entityOrders.contains(cell.pos))throw std::invalid_argument("钟缺少方块实体顺序");
+            if(!candidate.runtime.contains(cell.pos))continue;
+            const auto& values=candidate.runtime.at(cell.pos).values;
+            if(values.value("ringing",false) && !queuedBells.contains(cell.pos) && !pendingBells.contains(cell.pos))throw std::invalid_argument("钟缺少停止摆动事件");
+            if(values.contains("bellWakeAt") && !queuedBells.contains(cell.pos))throw std::invalid_argument("钟的结束时间缺少事件");
+        }
         for (const auto& row : data.value("motions", Json::array())) {
             auto p = row.at("pos").get<BlockPos>(); auto direction = row.at("facing").get<unsigned>(); auto moved = row.at("movedState").get<StateId>();
             if (direction > 5 || moved >= registry.stateCount() || candidate.at(p).device != Device::movingPiston || row.at("progress").get<unsigned>() > 2 || row.at("previousProgress").get<unsigned>() > 2) throw std::invalid_argument("无效活塞运动状态");

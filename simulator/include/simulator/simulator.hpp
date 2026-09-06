@@ -66,6 +66,7 @@ public:
     int analogOutput(BlockPos pos) const;
     int displayValue(BlockPos pos) const;
     int viewerCount(BlockPos pos) const { auto found = runtime.find(pos); return found == runtime.end() ? 0 : found->second.values.value("viewers", 0); }
+    bool bellRinging(BlockPos pos) const { auto found=runtime.find(pos);return found!=runtime.end() && found->second.values.value("ringing",false); }
     std::size_t cartCount(BlockPos pos) const {
         auto found = runtime.find(pos);
         if (found == runtime.end()) return 0;
@@ -112,6 +113,11 @@ private:
     bool stimulateNote(BlockPos pos, const Json& input);
     static std::string soundId(const Json& value);
     void validateNoteRuntime(BlockPos pos) const;
+    Direction bellSupport(StateId state) const;
+    void ringBell(BlockPos pos, Direction direction);
+    bool stimulateBell(BlockPos pos, const Json& input);
+    void bellEvent(const ScheduledEvent& event);
+    void finishBell(const ScheduledEvent& event);
     void startSensor(BlockPos pos);
     void removeSensor(BlockPos pos, std::uint16_t oldType);
     void rebuildSensorIndex();
@@ -133,6 +139,7 @@ private:
     std::size_t advance(Tick target, std::size_t eventBudget, std::chrono::microseconds wallBudget, bool fillIdle);
     enum class UpdateKind { neighbor, shape, multi };
     struct Update { UpdateKind kind; BlockPos pos; Direction direction{Direction::down}; StateId neighborState{}; int index{}, skip{-1}, depth{512}; unsigned flags{2}; };
+    void updateBellShape(const Update& update);
     std::vector<Update> updateStack, addedUpdates;
     bool updating{};
     std::size_t updateCount{};

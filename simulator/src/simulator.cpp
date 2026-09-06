@@ -111,6 +111,7 @@ void Simulator::setBlock(BlockPos p, StateId id, unsigned flags, int depth) {
     world.set(p, id); changes[p] = id; ++revision; ++sequence; ++statistics.stateChanges;
     sampleAffected(p);
     if (oldState.type != state.type) {
+        if(oldState.device==Device::bell && runtime.contains(p) && runtime.at(p).values.contains("bellGeneration"))scheduledKeys.erase({p,oldState.type,2,runtime.at(p).values.at("bellGeneration")});
         if(isSensor(oldState.device)) removeSensor(p,oldState.type);
         if (!(oldState.device==Device::container && state.device==Device::container && isCopperChest(old) && isCopperChest(id))) runtime.erase(p);
         scheduledKeys.erase({p, oldState.type, 3, 0});
@@ -127,6 +128,7 @@ void Simulator::setBlock(BlockPos p, StateId id, unsigned flags, int depth) {
     }
     if ((oldState.type != state.type || isRail(state.device)) && (flags & 1u) != 0 && (flags & 64u) == 0) onRemove(p, old);
     if(oldState.type!=state.type && isSensor(state.device))startSensor(p);
+    if(oldState.type!=state.type && state.device==Device::bell)registerEntity(p);
     if ((flags & 512u) == 0) onPlace(p, id, old);
     if (world.get(p) != id) return;
     if ((flags & 1u) != 0) { updateNeighbors(p, -1, old); if (state.analogSource) updateComparatorNeighbors(p); }
@@ -148,6 +150,7 @@ bool Simulator::survives(BlockPos p, StateId id) const {
     const auto& s = registry[id]; const auto& below = at(p.relative(Direction::down));
     if(s.device==Device::solid && registry.type(id).className=="WoolCarpetBlock")return below.device!=Device::air;
     switch (s.device) {
+    case Device::bell: {auto support=bellSupport(id);const auto& neighbor=at(p.relative(support));return support==Direction::up?(neighbor.device!=Device::fenceGate && (neighbor.centerMask&1u)!=0):(neighbor.supportMask&(1u<<static_cast<unsigned>(opposite(support))))!=0;}
     case Device::wire: return (below.supportMask & 2u) != 0 || below.device == Device::hopper;
     case Device::repeater: case Device::comparator: return (below.rigidMask & 2u) != 0;
     case Device::torch: return (below.centerMask & 2u) != 0;
@@ -201,6 +204,7 @@ void Simulator::onPlace(BlockPos p, StateId id, StateId old) {
     if (s.device == Device::torch || s.device == Device::wallTorch) { for (auto d : directions) updateNeighbors(p.relative(d)); return; }
     if (registry[old].type == s.type) return;
     switch (s.device) {
+    case Device::bell: registerEntity(p);break;
     case Device::sculkSensor: case Device::calibratedSensor:
         startSensor(p);if(s.power && !hasScheduled(p))setBlock(p,registry.with(id,"power",0),18);break;
     case Device::target: if (s.power && !hasScheduled(p)) setBlock(p, registry.with(id, "power", 0), 18); break;
@@ -210,7 +214,6 @@ void Simulator::onPlace(BlockPos p, StateId id, StateId old) {
     case Device::daylight: schedulePhase(p, currentTick + 20 - currentTick % 20, 2, 0); break;
     case Device::hopper: executeNeighbor(p); startHopper(p); break;
     case Device::rail: case Device::poweredRail: case Device::activatorRail: case Device::detectorRail: placeRail(p); break;
-    case Device::noteBlock: {bool powered=bestSignal(p)>0;if(powered!=s.powered){if(powered)playNote(p,id);setBlock(p,registry.withBool(id,"powered",powered));}break;}
     case Device::piston: checkPiston(p); break;
     case Device::tripwire:
         updateTripwireSource(p, id);
@@ -308,6 +311,7 @@ void Simulator::indirectShapes(BlockPos p, StateId id, unsigned flags, int depth
 }
 void Simulator::executeShape(const Update& u) {
     auto id = world.get(u.pos); const auto& s = registry[id];
+    if(s.device==Device::bell){updateBellShape(u);return;}
     if(s.device==Device::noteBlock && axis(u.direction)==0) {setBlock(u.pos,noteInstrument(u.pos,id),u.flags,u.depth);return;}
     if (isRail(s.device)) return; // Rail support is checked by neighborChanged.
     if (s.device == Device::tripwireHook) {
@@ -406,6 +410,7 @@ void Simulator::executeNeighbor(BlockPos p, StateId source) {
         }
         break;
     }
+    case Device::bell: {bool powered=bestSignal(p)>0;if(powered!=s.powered){if(powered)ringBell(p,s.facing);setBlock(p,registry.withBool(id,"powered",powered));}break;}
     case Device::noteBlock: {bool powered=bestSignal(p)>0;if(powered!=s.powered){if(powered)playNote(p,id);setBlock(p,registry.withBool(id,"powered",powered));}break;}
     case Device::piston: checkPiston(p); break;
     case Device::pistonHead: if (survives(p, id)) neighborChanged(p.relative(opposite(s.facing))); break;
@@ -490,7 +495,7 @@ bool Simulator::stepEvent() {
     currentEntityOrder = event.entityOrder;
     try {
         if (at(event.pos).type == event.type) {
-            if (event.phase == 1) {if(at(event.pos).device==Device::noteBlock)noteEvent(event.pos);else pistonEvent(event);}
+            if (event.phase == 1) {if(at(event.pos).device==Device::noteBlock)noteEvent(event.pos);else if(at(event.pos).device==Device::bell)bellEvent(event);else pistonEvent(event);}
             else if (event.phase == 3) {
                 if (at(event.pos).device == Device::button) buttonContact(event.pos);
                 else tripwireContact(event.pos);
@@ -499,6 +504,7 @@ bool Simulator::stepEvent() {
                 if (at(event.pos).device == Device::daylight) updateDaylight(event.pos);
                 else if (at(event.pos).device == Device::hopper) tickHopper(event);
                 else if (isSensor(at(event.pos).device)) tickVibration(event);
+                else if(at(event.pos).device==Device::bell)finishBell(event);
                 else tickMotion(event);
             } else executeTick(event);
             ++statistics.scheduledEvents;
@@ -545,6 +551,7 @@ void Simulator::interact(BlockPos p) {
     if (faulted) throw std::runtime_error("当前执行已中止，请从有效快照恢复");
     auto id = world.get(p); const auto& s = registry[id];
     switch (s.device) {
+    case Device::bell: {auto direction=s.facing;const auto attachment=registry.property(id,"attachment");if(attachment=="single_wall" || attachment=="double_wall")direction=axis(direction)==1?Direction::east:Direction::north;ringBell(p,direction);break;}
     case Device::noteBlock: {auto next=registry.with(id,"note",(std::stoi(registry.property(id,"note"))+1)%25);setBlock(p,next);playNote(p,next);break;}
     case Device::lever: setBlock(p, registry.withBool(id, "powered", !s.powered)); notifyAttached(p, s.connectedDirection); emitGameEvent(s.powered?"block_deactivate":"block_activate",p);break;
     case Device::button: if (!s.powered) { setBlock(p, registry.withBool(id, "powered", true)); notifyAttached(p, s.connectedDirection); const auto& name = registry.type(id).name; schedule(p, name == "minecraft:stone_button" || name == "minecraft:polished_blackstone_button" ? 20 : 30); emitGameEvent("block_activate",p); } break;
@@ -563,7 +570,7 @@ void Simulator::stimulate(BlockPos p, const Json& input) {
     if (faulted) throw std::runtime_error("当前执行已中止，请从有效快照恢复");
     if(input.contains("gameEvent")) {stimulateVibration(p,input);return;}
     if (!input.is_object())throw std::invalid_argument("环境输入必须是对象");
-    if(stimulateNote(p,input))return;
+    if(stimulateNote(p,input) || stimulateBell(p,input))return;
     if (stimulateDevice(p, input)) return;
     throw std::invalid_argument("该器件尚不支持这类环境刺激");
 }

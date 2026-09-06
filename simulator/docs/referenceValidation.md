@@ -55,3 +55,5 @@
 `exportVibrations.py` 从固定 JAR 的注册表和标签导出 61 种游戏事件、频率、潜行过滤与羊毛/地毯/共振材质。`captureVibrations.py` 和 `captureDeviceVibrations.py` 增加第十五、十六组 GameTest，分别为 161 刻 / 13 点和 155 刻 / 31 点。前者对照显式事件，后者由原版器件自行产生事件；详细机制和未覆盖来源见 [振动说明](vibrations.md)。
 
 `runReferenceTool.py ExportNotes <绝对输出路径>` 导出完整乐器映射、27 种乐器与 25 个音高。`captureNotes.py` 增加第十七组 GameTest，100 刻 / 34 点；`ExportNoteRandom` 使用与 `ExportDropperMotion` 相同的四路径参数格式，运行 112 次隔离声音事件。详见[音符盒说明](notes.md)。
+
+`captureBells.py` 增加第十八组 GameTest，123 刻 / 34 点，额外逐刻比较原版钟的摆动状态。`runReferenceTool.py ExportBellHits <绝对输出路径>` 生成 2,688 次方向和浮点边界对照。已有电源旁新放音符盒/钟的通知行为也在场景中，详见[钟的说明](bells.md)。

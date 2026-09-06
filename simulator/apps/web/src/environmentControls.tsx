@@ -19,8 +19,9 @@ export function EnvironmentControls({ pos, block, command }: Props) {
   const detector = name === 'detector_rail', tripwire = name === 'tripwire';
   const sensor=name==='sculk_sensor'||name==='calibrated_sculk_sensor';
   const note=name==='note_block',head=name==='player_head'||name==='player_wall_head';
+  const bell=name==='bell';const [bellFace,setBellFace]=useState('north'),[bellHeight,setBellHeight]=useState(.5);
   const button = name.endsWith('_button'), stoneButton = name === 'stone_button' || name === 'polished_blackstone_button';
-  const supported = plate || daylight || lectern || rod || target || detector || tripwire || button || sensor || note || head;
+  const supported = plate || daylight || lectern || rod || target || detector || tripwire || button || sensor || note || head || bell;
   const key = posKey(pos);
   useEffect(() => {
     if (!supported) return;
@@ -43,6 +44,14 @@ export function EnvironmentControls({ pos, block, command }: Props) {
   return <div className="inspectorSection environmentControls"><label className="miniLabel"><Zap size={12}/>环境输入</label>
     {sensor&&<VibrationControls key={key} pos={pos} inspection={inspection} command={command}/>}
     {(note||head)&&<NoteControls key={key} pos={pos} head={head} inspection={inspection} command={command}/>}
+    {bell&&<>
+      <button className="wideButton accentOutline" onClick={()=>command('interact',{pos})}>敲钟</button>
+      <label className="propertyRow"><span>敲击面</span><select aria-label="敲击面" value={bellFace} onChange={e=>setBellFace(e.target.value)}>{[['north','北'],['south','南'],['west','西'],['east','东'],['up','上'],['down','下']].map(([value,label])=><option key={value} value={value}>{label}</option>)}</select></label>
+      {numberField('格内敲击高度',bellHeight,setBellHeight,1)}
+      <button className="wideButton" onClick={()=>stimulus({face:bellFace,height:bellHeight})}>按指定位置敲击</button>
+      <p className="subtleText">已敲击 {runtime.ringCount??0} 次 · {runtime.ringing?'正在摆动':'已停止'}。水平侧面在有效高度内才可敲响，允许的轴向由支撑形式决定。供电上升沿也会敲响。</p>
+      <p className="subtleText">敲响产生频率 11 的振动。当前没有生物响应或声音播放，三维颜色标记摆动状态。</p>
+    </>}
     {button && <>
       <button className="wideButton accentOutline" onClick={() => stimulus({arrows:1})}>箭留在按钮内</button>
       <button className="wideButton" onClick={() => stimulus({arrows:1, pressedArrows:0})}>箭只触及弹起部分</button>

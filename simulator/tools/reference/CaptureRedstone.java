@@ -59,6 +59,11 @@ public class CaptureRedstone extends TestFunctionLoader {
             if (command.has("interact")) {
                 if (state.getBlock() instanceof DoorBlock door) door.setOpen(null, level, state, pos, !state.getValue(DoorBlock.OPEN));
                 else if (state.getBlock() instanceof LeverBlock lever) lever.pull(state, level, pos, null);
+                else if(state.getBlock() instanceof BellBlock bell) {
+                    var direction=state.getValue(BellBlock.FACING);var attachment=state.getValue(BellBlock.ATTACHMENT);
+                    if(attachment==net.minecraft.world.level.block.state.properties.BellAttachType.SINGLE_WALL || attachment==net.minecraft.world.level.block.state.properties.BellAttachType.DOUBLE_WALL)direction=direction.getAxis()==Direction.Axis.Z?Direction.EAST:Direction.NORTH;
+                    bell.attemptToRing(level,pos,direction);
+                }
                 else if (state.getBlock() instanceof ButtonBlock button) { if (!state.getValue(ButtonBlock.POWERED)) button.press(state, level, pos, null); }
                 else if (state.getBlock() instanceof NoteBlock note) {
                     var player=helper.makeMockPlayer(GameType.CREATIVE);
@@ -90,6 +95,13 @@ public class CaptureRedstone extends TestFunctionLoader {
                     affected=BuiltInRegistries.BLOCK.getValue(Identifier.parse(block.get("name").getAsString())).defaultBlockState();
                 }
                 level.gameEvent(event,location,new net.minecraft.world.level.gameevent.GameEvent.Context(source,affected));
+            } else if(state.getBlock() instanceof BellBlock bell) {
+                if(input.has("ring"))bell.attemptToRing(level,pos,null);
+                else {
+                    var direction=Direction.byName(input.get("face").getAsString());
+                    var hit=new net.minecraft.world.phys.BlockHitResult(new net.minecraft.world.phys.Vec3(pos.getX()+.5,pos.getY()+input.get("height").getAsDouble(),pos.getZ()+.5),direction,pos,false);
+                    bell.onHit(level,state,hit,null,true);
+                }
             } else if (state.getBlock() instanceof NoteBlock note) {
                 var player=helper.makeMockPlayer(GameType.CREATIVE);
                 var method=NoteBlock.class.getDeclaredMethod("attack",BlockState.class,Level.class,BlockPos.class,Player.class);
@@ -254,12 +266,13 @@ public class CaptureRedstone extends TestFunctionLoader {
                     var bounds = net.minecraft.world.phys.AABB.encapsulatingFullBlocks(helper.absolutePos(new BlockPos(-4,-4,-4)), helper.absolutePos(new BlockPos(52,10,52)));
                     for (var drop : helper.getLevel().getEntitiesOfClass(ItemEntity.class, bounds)) drop.discard();
                 }
-                JsonObject frame = new JsonObject(); frame.addProperty("tick", tick); JsonArray states = new JsonArray(); JsonArray analogs = new JsonArray(); JsonArray inventories = new JsonArray();
+                JsonObject frame = new JsonObject(); frame.addProperty("tick", tick); JsonArray states = new JsonArray(); JsonArray analogs = new JsonArray(); JsonArray inventories = new JsonArray();JsonArray bells=new JsonArray();
                 for (var value : scenario.getAsJsonArray("watch")) {
                     var absolute = helper.absolutePos(pos(value.getAsJsonArray()));
                     states.add(Block.getId(helper.getLevel().getBlockState(absolute)));
                     var entity = helper.getLevel().getBlockEntity(absolute);
                     var state = helper.getLevel().getBlockState(absolute);
+                    bells.add(entity instanceof net.minecraft.world.level.block.entity.BellBlockEntity bell && bell.shaking);
                     analogs.add(entity instanceof ComparatorBlockEntity comparator ? comparator.getOutputSignal() : state.hasAnalogOutputSignal() ? state.getAnalogOutputSignal(helper.getLevel(), absolute, Direction.NORTH) : -1);
                     JsonArray inventory = new JsonArray();
                     if (entity instanceof Container container) for (int slot = 0; slot < container.getContainerSize(); ++slot) {
@@ -269,6 +282,7 @@ public class CaptureRedstone extends TestFunctionLoader {
                     inventories.add(inventory);
                 }
                 frame.add("states", states); frame.add("analogs", analogs); frame.add("inventories", inventories); frames.add(frame);
+                if(scenario.has("watchBells"))frame.add("bells",bells);
                 if (tick == end) {
                     try { Files.writeString(output, new GsonBuilder().setPrettyPrinting().create().toJson(result)); }
                     catch (Exception e) { throw new RuntimeException(e); }

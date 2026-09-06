@@ -190,6 +190,18 @@ export class CircuitViewport {
         part([.5,.24,.5],[.8,.16,.8],0x465155);
         for (const edge of [.14,.86]) { part([edge,.48,.5],[.12,.38,.84],0x9ba7a8); part([.5,.48,edge],[.6,.38,.12],0x9ba7a8); }
       }
+    } else if(name==='bell') {
+      const ringing=(cell.motion&4096)!==0,attachment=p.attachment,v=directionVectors[facing];
+      part([.5,.57,.5],[.38,.44,.38],ringing?0xf7d47c:0xc7a45d);
+      part([.5,.3,.5],[.5,.13,.5],ringing?0xffdfa0:0xd9b56d);
+      part([.5,.22,.5],[.12,.18,.12],0x74603a);
+      if(attachment==='ceiling')part([.5,.9,.5],[.125,.2,.125],0x6a6862);
+      else if(attachment==='floor') {
+        for(const side of [-1,1])part([.5+(v[0]?0:side*.44),.48,.5+(v[2]?0:side*.44)],[.12,.96,.12],0x66513c);
+        part([.5,.95,.5],[v[0]?.13:1,.12,v[2]?.13:1],0x66513c);
+      }else {
+        const double=attachment==='double_wall';part([.5+(double?0:v[0]*.2),.88,.5+(double?0:v[2]*.2)],[v[0]?(double?1:.6):.125,.125,v[2]?(double?1:.6):.125],0x66513c);
+      }
     } else if (name === 'note_block') {
       part([.5,.5,.5],[1,1,1],0x79523b);
       part([.5,1.006,.5],[.88,.015,.88],p.powered==='true'?0xd4a675:0xad8056);

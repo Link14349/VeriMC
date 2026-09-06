@@ -267,6 +267,12 @@ void Simulator::validateRuntime(BlockPos pos) const {
     if (!data.values.is_object() || data.output < 0 || data.output > 15) throw std::invalid_argument("无效器件内部状态");
     auto device = at(pos).device;
     validateNoteRuntime(pos);
+    if(device==Device::bell) {
+        for(const auto* field:{"ringCount","lastRingTick","bellWakeAt","bellGeneration"})if(data.values.contains(field) && (!data.values.at(field).is_number_integer() || data.values.at(field)<0))throw std::invalid_argument("无效钟运行字段");
+        if(data.values.contains("ringing") && !data.values.at("ringing").is_boolean())throw std::invalid_argument("无效钟摆动状态");
+        if(data.values.contains("ringDirection") && axis(parseDirection(data.values.at("ringDirection")))==0)throw std::invalid_argument("钟的敲击方向必须水平");
+        if(data.values.contains("bellWakeAt")!=data.values.contains("bellGeneration"))throw std::invalid_argument("钟的结束时间与事件标记不一致");
+    }
     if(isSensor(device)) integerInRange(data.values,"lastVibrationFrequency",0,15);
     if(isBookshelf(world.get(pos)) && data.values.contains("lastInteractedSlot")) {
         const auto& last=data.values.at("lastInteractedSlot");

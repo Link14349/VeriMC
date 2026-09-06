@@ -7,7 +7,7 @@ namespace simulator {
 namespace {
 Device classify(const std::string& name, const std::string& c) {
     static const std::unordered_map<std::string, Device> classes{
-        {"AirBlock", Device::air}, {"RedStoneWireBlock", Device::wire}, {"RedstoneBlock", Device::source},
+        {"BellBlock", Device::bell}, {"AirBlock", Device::air}, {"RedStoneWireBlock", Device::wire}, {"RedstoneBlock", Device::source},
         {"LeverBlock", Device::lever}, {"ButtonBlock", Device::button}, {"RedstoneTorchBlock", Device::torch},
         {"RedstoneWallTorchBlock", Device::wallTorch}, {"RepeaterBlock", Device::repeater}, {"ComparatorBlock", Device::comparator},
         {"ObserverBlock", Device::observer}, {"RedstoneLampBlock", Device::lamp}, {"CopperBulbBlock", Device::bulb},
@@ -85,7 +85,7 @@ BlockRegistry::BlockRegistry(const std::string& path) {
         if (typeInfo.className == "CopperChestBlock" || typeInfo.className == "WeatheringCopperChestBlock") typeInfo.supportLevel = "implemented";
         if (typeInfo.device == Device::hopper) typeInfo.supportLevel = "implemented";
         if (typeInfo.device == Device::dropper) typeInfo.supportLevel = "partial";
-        if(typeInfo.device==Device::noteBlock || typeInfo.className.find("SkullBlock")!=std::string::npos || typeInfo.className=="PlayerHeadBlock" || typeInfo.className=="PlayerWallHeadBlock")typeInfo.supportLevel="partial";
+        if(typeInfo.device==Device::bell || typeInfo.device==Device::noteBlock || typeInfo.className.find("SkullBlock")!=std::string::npos || typeInfo.className=="PlayerHeadBlock" || typeInfo.className=="PlayerWallHeadBlock")typeInfo.supportLevel="partial";
         if (typeInfo.className == "ChiseledBookShelfBlock") typeInfo.supportLevel = "partial";
         if (typeInfo.className == "DecoratedPotBlock") typeInfo.supportLevel = "partial";
         if (typeInfo.device == Device::sculkSensor || typeInfo.device == Device::calibratedSensor) typeInfo.supportLevel = "partial";

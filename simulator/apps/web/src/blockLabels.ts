@@ -19,3 +19,5 @@ Object.assign(propertyLabels,{sculk_sensor_phase:'感测阶段'});Object.assign(
 Object.assign(propertyLabels,{note:"音符",instrument:"乐器",rotation:"旋转"});
 Object.assign(valueLabels,{harp:"竖琴",basedrum:"底鼓",snare:"军鼓",hat:"踩镲",bass:"贝斯",flute:"长笛",bell:"钟琴",guitar:"吉他",chime:"风铃",xylophone:"木琴",iron_xylophone:"铁琴",cow_bell:"牛铃",didgeridoo:"迪吉里杜管",bit:"方波",banjo:"班卓琴",pling:"电钢琴",trumpet:"小号",trumpet_exposed:"斑驳小号",trumpet_weathered:"锈蚀小号",trumpet_oxidized:"氧化小号",zombie:"僵尸",skeleton:"骷髅",creeper:"苦力怕",dragon:"末影龙",wither_skeleton:"凋灵骷髅",piglin:"猪灵",custom_head:"自定义头颅"});
 Object.assign(labels,{clay:"黏土块",gold_block:"金块",packed_ice:"浮冰",bone_block:"骨块",iron_block:"铁块",soul_sand:"灵魂沙",pumpkin:"南瓜",emerald_block:"绿宝石块",hay_block:"干草块",copper_block:"铜块",exposed_copper:"斑驳铜块",weathered_copper:"锈蚀铜块",oxidized_copper:"氧化铜块",zombie_head:"僵尸头颅",skeleton_skull:"骷髅头颅",wither_skeleton_skull:"凋灵骷髅头颅",creeper_head:"苦力怕头颅",dragon_head:"龙首",piglin_head:"猪灵头颅",player_head:"玩家头颅"});
+
+Object.assign(labels,{bell:"钟"});Object.assign(propertyLabels,{attachment:"支撑形式"});Object.assign(valueLabels,{single_wall:"单墙",double_wall:"双墙"});

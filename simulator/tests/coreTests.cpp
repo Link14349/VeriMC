@@ -180,7 +180,7 @@ int main() {
         try { restored.loadProject(invalid); } catch (...) { threw = true; }
         expect(threw && before == restored.saveProject("before", true), "invalid batch import changed world");
     });
-    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers", "java26_2Hoppers", "java26_2Torches", "java26_2Rails", "java26_2TickBatches", "java26_2Tripwire", "java26_2Buttons", "java26_2Droppers", "java26_2Targets", "java26_2CopperChests", "java26_2Bookshelves", "java26_2Pots", "java26_2Vibrations", "java26_2DeviceVibrations", "java26_2Notes"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
+    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers", "java26_2Hoppers", "java26_2Torches", "java26_2Rails", "java26_2TickBatches", "java26_2Tripwire", "java26_2Buttons", "java26_2Droppers", "java26_2Targets", "java26_2CopperChests", "java26_2Bookshelves", "java26_2Pots", "java26_2Vibrations", "java26_2DeviceVibrations", "java26_2Notes", "java26_2Bells"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
         std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/../tests/fixtures/" + fixtureName + ".json"); expect(static_cast<bool>(file), "missing vanilla reference fixture");
         auto fixture = Json::parse(file); auto origin = fixture["origin"].get<BlockPos>(); Simulator s(r);
         auto absolute = [&](const Json& p) { auto pos = p.get<BlockPos>(); return BlockPos{origin.x + pos.x, origin.y + pos.y, origin.z + pos.z}; };
@@ -197,8 +197,39 @@ int main() {
                 auto p = absolute(fixture["watch"][i]); auto expected = frame["states"][i].get<StateId>();
                 expect(s.world.get(p) == expected, "tick " + std::to_string(tick) + " position " + fixture["watch"][i].dump() + " expected " + r.describe(expected).dump() + " got " + r.describe(s.world.get(p)).dump());
                 if (frame["analogs"][i] != -1) expect(s.analogOutput(p) == frame["analogs"][i].get<int>(), "analog mismatch at " + std::to_string(tick) + " " + fixture["watch"][i].dump());
+                if(frame.contains("bells"))expect(s.inspect(p)["runtime"].value("ringing",false)==frame["bells"][i].get<bool>(),"bell shaking differs at "+std::to_string(tick)+" "+fixture["watch"][i].dump());
                 if (frame.contains("inventories")) expect(s.inventoryJson(p, false) == frame["inventories"][i], "inventory mismatch at " + std::to_string(tick) + " " + fixture["watch"][i].dump() + " expected " + frame["inventories"][i].dump() + " got " + s.inventoryJson(p, false).dump());
             }
+        }
+    });
+    test("bell hit faces and float boundary match original across attachments and world heights", [&] {
+        std::ifstream file(std::string(SIMULATOR_DATA_DIR)+"/../tests/fixtures/java26_2BellHits.json");auto fixture=Json::parse(file);
+        for(const auto& row:fixture.at("cases")) {
+            Simulator s(r);BlockPos pos{0,row.at("y"),0};s.setBlock(pos,r.state("bell",{{"facing",row.at("facing")},{"attachment",row.at("attachment")}}));
+            s.stimulate(pos,{{"face",row.at("face")},{"height",row.at("height")}});
+            expect((s.inspect(pos)["runtime"].value("ringCount",0)==1)==row.at("ring").get<bool>(),"bell hit differs: "+row.dump());
+        }
+    });
+    test("bell re-ringing, ordered events, idle sleep and checkpoint cancellation", [&] {
+        Simulator s(r);s.place({0,-1,0},r.state("stone"));s.place({0,0,0},r.state("bell"));s.interact({0,0,0});
+        auto pending=s.saveProject("bell",true);Simulator restored(r);restored.loadProject(pending);s.advanceTo(2);restored.advanceTo(2);
+        expect(s.saveProject("bell",true)==restored.saveProject("bell",true),"bell pending checkpoint diverged");
+        s.advanceTo(10);s.stimulate({0,0,0},{{"face","south"},{"height",.5}});s.stimulate({0,0,0},{{"face","north"},{"height",.5}});s.advanceTo(11);
+        expect(s.inspect({0,0,0})["runtime"]["ringDirection"]=="north","bell events reordered");
+        auto moving=s.saveProject("bell",true);restored.loadProject(moving);s.advanceTo(59);restored.advanceTo(59);
+        expect(s.inspect({0,0,0})["runtime"]["ringing"]==true && s.saveProject("bell",true)==restored.saveProject("bell",true),"re-ring stop/checkpoint changed");
+        s.advanceTo(60);expect(s.inspect({0,0,0})["runtime"]["ringing"]==false,"bell did not stop after 50 ticks");
+        const auto events=s.statistics.scheduledEvents;s.advanceTo(1000000);expect(s.statistics.scheduledEvents==events && s.pendingEvents()==0,"idle bell kept ticking");
+        expect(s.saveProject("bell",true)["randomSource"]["draws"]=="0","bell consumed world RNG");
+        auto broken=moving;broken["events"]=Json::array();bool threw=false;try{s.loadProject(broken);}catch(...){threw=true;}expect(threw,"bell accepted missing completion event");
+        s.interact({0,0,0});s.advanceTo(1000001);s.setBlock({0,0,0},0);s.place({0,0,0},r.state("bell"));
+        auto replacement=s.saveProject("bell",true);restored.loadProject(replacement);restored.advanceTo(1000060);expect(!restored.inspect({0,0,0})["runtime"].value("ringing",false),"replacement inherited old bell event");
+    });
+    test("note and bell placement wait for a real neighbor update beside existing power", [&] {
+        for(const auto* name:{"note_block","bell"}) {
+            Simulator s(r);s.place({0,-1,0},r.state("stone"));s.place({-1,0,0},r.state("redstone_block"));s.place({0,0,0},r.state(name));
+            expect(!s.at({0,0,0}).powered && s.pendingEvents()==0,"placement manufactured neighbor notification");
+            s.place({0,0,1},r.state("stone"));expect(s.at({0,0,0}).powered && s.pendingEvents()>0,"real neighbor notification did not trigger");
         }
     });
     test("notes preserve event deduplication, execution-time state and checkpoint random draws", [&] {

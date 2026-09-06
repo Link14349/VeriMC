@@ -114,6 +114,7 @@ public:
             u32(cell.state); u32(static_cast<std::uint32_t>(hub.sim.displayValue(cell.pos)));
             auto motion = hub.sim.motionAt(cell.pos); u32(motion ? motion->movedState : cell.state);
             auto flags = (hub.sim.viewerCount(cell.pos) > 0 ? 1024u : 0u) | (hub.sim.cartCount(cell.pos) > 0 ? 2048u : 0u);
+            if(hub.registry[cell.state].device==Device::bell && hub.sim.bellRinging(cell.pos))flags|=4096u;
             if (motion) flags |= 1u | (motion->extending ? 2u : 0u) | (motion->source ? 4u : 0u) | (static_cast<unsigned>(motion->facing) << 3) | (motion->progress << 6) | (motion->previousProgress << 8);
             u32(flags);
         }
