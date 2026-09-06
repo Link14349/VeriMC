@@ -1,0 +1,9 @@
+{
+  "version": 6,
+  "configurePresets": [
+    {"name": "release", "generator": "Unix Makefiles", "binaryDir": "${sourceDir}/build", "cacheVariables": {"CMAKE_BUILD_TYPE": "Release"}},
+    {"name": "debug", "inherits": "release", "binaryDir": "${sourceDir}/buildDebug", "cacheVariables": {"CMAKE_BUILD_TYPE": "Debug", "simulatorSanitizers": "ON"}}
+  ],
+  "buildPresets": [{"name": "release", "configurePreset": "release"}, {"name": "debug", "configurePreset": "debug"}],
+  "testPresets": [{"name": "release", "configurePreset": "release", "output": {"outputOnFailure": true}}, {"name": "debug", "configurePreset": "debug", "output": {"outputOnFailure": true}}]
+}

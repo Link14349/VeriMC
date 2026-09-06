@@ -1,0 +1,400 @@
+#include "simulator/simulator.hpp"
+#include <algorithm>
+#include <cmath>
+#include <limits>
+
+namespace simulator {
+namespace {
+bool isDiode(Device d) { return d == Device::repeater || d == Device::comparator; }
+std::size_t sideIndex(Direction d) { for (std::size_t i = 0; i < 4; ++i) if (horizontal[i] == d) return i; return 0; }
+unsigned javaPosBucket(BlockPos p) {
+    auto hash = (static_cast<std::uint32_t>(p.y) + static_cast<std::uint32_t>(p.z) * 31u) * 31u + static_cast<std::uint32_t>(p.x);
+    return (hash ^ (hash >> 16u)) & 15u;
+}
+}
+int Simulator::directSignal(BlockPos pos, Direction dir, bool includeWire) const {
+    auto id = world.get(pos); const auto& state = registry[id];
+    if (state.device == Device::wire) {
+        if (!includeWire || dir == Direction::down || state.power == 0) return 0;
+        return dir == Direction::up || connectionSides(pos, id)[sideIndex(opposite(dir))] != 0 ? state.power : 0;
+    }
+    if (state.device == Device::comparator) return state.powered && dir == state.facing ? analogOutput(pos) : 0;
+    if (state.device == Device::container && registry.type(id).name == "minecraft:trapped_chest") {
+        auto it = runtime.find(pos); return dir == Direction::up && it != runtime.end() ? std::clamp(it->second.values.value("viewers", 0), 0, 15) : 0;
+    }
+    return state.strong[static_cast<unsigned>(dir)];
+}
+int Simulator::signal(BlockPos pos, Direction dir, bool includeWire) const {
+    const auto& state = at(pos);
+    int result = state.device == Device::wire || state.device == Device::comparator ? directSignal(pos, dir, includeWire) : state.weak[static_cast<unsigned>(dir)];
+    if (state.device == Device::container && registry.type(world.get(pos)).name == "minecraft:trapped_chest") { auto it = runtime.find(pos); result = it == runtime.end() ? 0 : std::clamp(it->second.values.value("viewers", 0), 0, 15); }
+    if (state.conductor) for (auto d : directions) { result = std::max(result, directSignal(pos.relative(d), d, includeWire)); if (result == 15) break; }
+    return result;
+}
+int Simulator::bestSignal(BlockPos pos, bool includeWire) const {
+    int result = 0;
+    for (auto dir : directions) { result = std::max(result, signal(pos.relative(dir), dir, includeWire)); if (result == 15) break; }
+    return result;
+}
+int Simulator::analogOutput(BlockPos pos) const {
+    auto id = world.get(pos); const auto& state = registry[id];
+    auto it = runtime.find(pos);
+    if (state.device == Device::comparator) return it == runtime.end() ? 0 : it->second.output;
+    if (state.device == Device::bulb) return state.lit ? 15 : 0;
+    return it == runtime.end() ? 0 : it->second.output;
+}
+int Simulator::displayValue(BlockPos pos) const {
+    const auto& state = at(pos);
+    if (state.device == Device::wire || state.device == Device::target || state.device == Device::daylight || state.device == Device::weightedPlate) return state.power;
+    if (state.device == Device::comparator) return analogOutput(pos);
+    if (state.device == Device::lamp || state.device == Device::bulb || state.device == Device::torch || state.device == Device::wallTorch) return state.lit ? 15 : 0;
+    if (state.device == Device::piston) return state.extended ? 15 : 0;
+    int value = 0; for (auto d : directions) value = std::max(value, signal(pos, d));
+    return value;
+}
+void Simulator::enqueue(Update update) {
+    if (++updateCount > updateBudget) {
+        breakRequested = true; pauseReason = "邻居更新超过预算，电路状态已停止；请修改电路或提高预算后从快照重启";
+        throw std::runtime_error(pauseReason);
+    }
+    if (updating) { addedUpdates.push_back(update); return; }
+    updating = true; updateStack.push_back(update);
+    try {
+        while (!updateStack.empty() || !addedUpdates.empty()) {
+            for (auto it = addedUpdates.rbegin(); it != addedUpdates.rend(); ++it) updateStack.push_back(*it);
+            addedUpdates.clear();
+            auto current = updateStack.back();
+            if (current.kind == UpdateKind::multi) {
+                while (current.index < 6 && static_cast<int>(updateOrder[static_cast<std::size_t>(current.index)]) == current.skip) ++current.index;
+                if (current.index >= 6) { updateStack.pop_back(); continue; }
+                auto d = updateOrder[static_cast<std::size_t>(current.index++)];
+                updateStack.back().index = current.index;
+                executeNeighbor(current.pos.relative(d));
+            } else {
+                updateStack.pop_back();
+                if (current.kind == UpdateKind::shape) executeShape(current); else executeNeighbor(current.pos);
+            }
+            ++statistics.updates;
+        }
+        updating = false; updateCount = 0;
+    } catch (...) {
+        // A budget/error poisons this run, rather than silently continuing after dropped updates.
+        updating = false; updateStack.clear(); addedUpdates.clear(); updateCount = 0;
+        breakRequested = true; throw;
+    }
+}
+void Simulator::updateNeighbors(BlockPos p, int skip) { Update u{UpdateKind::multi, p}; u.skip = skip; enqueue(u); }
+void Simulator::neighborChanged(BlockPos p) { enqueue({UpdateKind::neighbor, p}); }
+void Simulator::notifyFront(BlockPos p, Direction facing) { auto out = p.relative(opposite(facing)); neighborChanged(out); updateNeighbors(out, static_cast<int>(facing)); }
+void Simulator::notifyAttached(BlockPos p, Direction connected) { updateNeighbors(p); updateNeighbors(p.relative(opposite(connected))); }
+void Simulator::setBlock(BlockPos p, StateId id, unsigned flags, int depth) {
+    const auto old = world.get(p);
+    if (old == id) return;
+    const auto& state = registry[id]; const auto& oldState = registry[old];
+    world.set(p, id); changes[p] = id; ++revision; ++sequence; ++statistics.stateChanges;
+    sampleAffected(p);
+    if (oldState.type != state.type) {
+        runtime.erase(p);
+        if ((flags & 1u) != 0 && (flags & 64u) == 0) onRemove(p, old);
+    }
+    onPlace(p, id, old);
+    if (world.get(p) != id) return;
+    if ((flags & 1u) != 0) updateNeighbors(p);
+    if ((flags & 16u) == 0 && depth > 0) {
+        const unsigned nextFlags = flags & ~33u;
+        indirectShapes(p, old, nextFlags, depth - 1);
+        for (auto dir : shapeOrder) enqueue({UpdateKind::shape, p.relative(dir), opposite(dir), id, 0, -1, depth - 1, nextFlags});
+        indirectShapes(p, id, nextFlags, depth - 1);
+    }
+}
+bool Simulator::survives(BlockPos p, StateId id) const {
+    const auto& s = registry[id]; const auto& below = at(p.relative(Direction::down));
+    switch (s.device) {
+    case Device::wire: return (below.supportMask & 2u) != 0 || below.device == Device::hopper;
+    case Device::repeater: case Device::comparator: return (below.rigidMask & 2u) != 0;
+    case Device::torch: return (below.centerMask & 2u) != 0;
+    case Device::wallTorch: return (at(p.relative(opposite(s.facing))).supportMask & (1u << static_cast<unsigned>(s.facing))) != 0;
+    case Device::lever: case Device::button: return (at(p.relative(opposite(s.connectedDirection))).supportMask & (1u << static_cast<unsigned>(s.connectedDirection))) != 0;
+    case Device::pressurePlate: case Device::weightedPlate: return (below.rigidMask & 2u) != 0 || (below.centerMask & 2u) != 0;
+    case Device::rail: case Device::poweredRail: case Device::activatorRail: case Device::detectorRail: return (below.supportMask & 2u) != 0;
+    default: return true;
+    }
+}
+void Simulator::place(BlockPos p, StateId id) {
+    if (registry.type(id).supportLevel == "unimplemented") throw std::invalid_argument("该器件尚未实现：" + registry.type(id).name);
+    if (!survives(p, id)) throw std::invalid_argument("这个位置缺少器件所需的支撑面");
+    if (registry[id].device == Device::wire) {
+        for (auto d : horizontal) id = registry.with(id, directionNames[static_cast<unsigned>(d)], std::string("side"));
+        id = wireConnections(p, id);
+    }
+    if (registry[id].device == Device::lamp) id = registry.withBool(id, "lit", bestSignal(p) != 0);
+    setBlock(p, id);
+    if (isDiode(registry[id].device) && (registry[id].device == Device::comparator ? comparatorInput(p) : diodeInput(p)) > 0) schedule(p, 1);
+}
+void Simulator::onPlace(BlockPos p, StateId id, StateId old) {
+    const auto& s = registry[id];
+    if (isDiode(s.device)) { notifyFront(p, s.facing); return; }
+    if (registry[old].type == s.type) return;
+    switch (s.device) {
+    case Device::wire: updateWire(p, id); updateNeighbors(p.relative(Direction::up)); updateNeighbors(p.relative(Direction::down)); wireCorners(p); break;
+    case Device::torch: case Device::wallTorch: for (auto d : directions) updateNeighbors(p.relative(d)); break;
+    case Device::observer: if (s.powered && !hasScheduled(p)) { setBlock(p, registry.withBool(id, "powered", false), 18); notifyFront(p, s.facing); } break;
+    case Device::bulb: executeNeighbor(p); break;
+    default: break;
+    }
+}
+void Simulator::onRemove(BlockPos p, StateId old) {
+    const auto& s = registry[old];
+    switch (s.device) {
+    case Device::wire: for (auto d : directions) updateNeighbors(p.relative(d)); updateWire(p, old); wireCorners(p); break;
+    case Device::torch: case Device::wallTorch: for (auto d : directions) updateNeighbors(p.relative(d)); break;
+    case Device::lever: case Device::button: if (s.powered) notifyAttached(p, s.connectedDirection); break;
+    case Device::repeater: case Device::comparator: notifyFront(p, s.facing); break;
+    case Device::observer: if (s.powered) notifyFront(p, s.facing); break;
+    default: break;
+    }
+}
+bool Simulator::connectsWire(StateId id, int direction) const {
+    const auto& s = registry[id];
+    if (s.device == Device::wire) return true;
+    if (direction < 0) return false;
+    auto dir = static_cast<Direction>(direction);
+    if (s.device == Device::repeater) return s.facing == dir || s.facing == opposite(dir);
+    if (s.device == Device::observer) return s.facing == dir;
+    return s.signalSource;
+}
+std::uint8_t Simulator::wireSide(BlockPos p, Direction d) const {
+    auto q = p.relative(d); const auto& n = at(q);
+    if (!at(p.relative(Direction::up)).conductor && (n.device == Device::trapdoor || (n.supportMask & 2u) != 0 || n.device == Device::hopper) && connectsWire(world.get(q.relative(Direction::up)), -1)) return (n.supportMask & (1u << static_cast<unsigned>(opposite(d)))) != 0 ? 2 : 1;
+    return connectsWire(world.get(q), static_cast<int>(d)) || (!n.conductor && connectsWire(world.get(q.relative(Direction::down)), -1)) ? 1 : 0;
+}
+std::array<std::uint8_t, 4> Simulator::connectionSides(BlockPos p, StateId id) const {
+    auto sides = registry[id].wireSides;
+    const bool wasDot = std::all_of(sides.begin(), sides.end(), [](auto s) { return s == 0; });
+    for (std::size_t i = 0; i < 4; ++i) sides[i] = wireSide(p, horizontal[i]);
+    const bool dot = std::all_of(sides.begin(), sides.end(), [](auto s) { return s == 0; });
+    if (!(wasDot && dot)) {
+        bool northSouth = sides[0] != 0 || sides[2] != 0, eastWest = sides[1] != 0 || sides[3] != 0;
+        if (!northSouth) { if (!sides[1]) sides[1] = 1; if (!sides[3]) sides[3] = 1; }
+        if (!eastWest) { if (!sides[0]) sides[0] = 1; if (!sides[2]) sides[2] = 1; }
+    }
+    return sides;
+}
+StateId Simulator::wireConnections(BlockPos p, StateId id) const {
+    const auto sides = connectionSides(p, id);
+    for (std::size_t i = 0; i < 4; ++i) id = registry.with(id, directionNames[static_cast<unsigned>(horizontal[i])], std::string(sides[i] == 2 ? "up" : sides[i] == 1 ? "side" : "none"));
+    return id;
+}
+void Simulator::updateWire(BlockPos p, StateId id) {
+    int power = bestSignal(p, false), neighborPower = 0;
+    if (power < 15) for (auto d : horizontal) {
+        auto q = p.relative(d); const auto& n = at(q);
+        if (n.device == Device::wire) neighborPower = std::max(neighborPower, static_cast<int>(n.power));
+        if (n.conductor && !at(p.relative(Direction::up)).conductor) q = q.relative(Direction::up);
+        else if (!n.conductor) q = q.relative(Direction::down);
+        else continue;
+        if (at(q).device == Device::wire) neighborPower = std::max(neighborPower, static_cast<int>(at(q).power));
+    }
+    power = std::max(power, neighborPower - 1);
+    if (registry[id].power == power) return;
+    if (world.get(p) == id) setBlock(p, registry.with(id, "power", power), 2);
+    // Java 26.2's seven-entry HashSet iteration affects locational redstone.
+    std::array<BlockPos, 7> affected{p}; for (std::size_t i = 0; i < 6; ++i) affected[i + 1] = p.relative(directions[i]);
+    std::stable_sort(affected.begin(), affected.end(), [](BlockPos a, BlockPos b) { return javaPosBucket(a) < javaPosBucket(b); });
+    for (auto q : affected) updateNeighbors(q);
+}
+void Simulator::wireCorners(BlockPos p) {
+    auto check = [&](BlockPos q) { if (at(q).device == Device::wire) { updateNeighbors(q); for (auto d : directions) updateNeighbors(q.relative(d)); } };
+    for (auto d : horizontal) check(p.relative(d));
+    for (auto d : horizontal) { auto q = p.relative(d); check(q.relative(at(q).conductor ? Direction::up : Direction::down)); }
+}
+void Simulator::indirectShapes(BlockPos p, StateId id, unsigned flags, int depth) {
+    if (registry[id].device != Device::wire) return;
+    for (std::size_t i = 0; i < 4; ++i) if (registry[id].wireSides[i] != 0) {
+        auto d = horizontal[i]; auto q = p.relative(d);
+        if (at(q).device == Device::wire) continue;
+        for (auto vertical : {Direction::down, Direction::up}) {
+            auto diagonal = q.relative(vertical);
+            if (at(diagonal).device == Device::wire) enqueue({UpdateKind::shape, diagonal, opposite(d), world.get(p.relative(vertical)), 0, -1, depth, flags});
+        }
+    }
+}
+void Simulator::executeShape(const Update& u) {
+    auto id = world.get(u.pos); const auto& s = registry[id];
+    if (!survives(u.pos, id)) { setBlock(u.pos, 0, u.flags, u.depth); return; }
+    if (s.device == Device::observer && u.direction == s.facing && !s.powered && !hasScheduled(u.pos)) schedule(u.pos, 2);
+    if (s.device == Device::repeater && axis(u.direction) != 0 && axis(u.direction) != axis(s.facing)) setBlock(u.pos, registry.withBool(id, "locked", diodeSideInput(u.pos) > 0), u.flags, u.depth);
+    if (s.device == Device::wire && u.direction != Direction::down) {
+        StateId next = id;
+        if (u.direction == Direction::up) next = wireConnections(u.pos, id);
+        else {
+            auto side = wireSide(u.pos, u.direction); auto index = sideIndex(u.direction);
+            const bool cross = std::all_of(s.wireSides.begin(), s.wireSides.end(), [](auto value) { return value != 0; });
+            if ((side != 0) == (s.wireSides[index] != 0) && !cross) next = registry.with(id, directionNames[static_cast<unsigned>(u.direction)], std::string(side == 2 ? "up" : side == 1 ? "side" : "none"));
+            else { for (auto d : horizontal) next = registry.with(next, directionNames[static_cast<unsigned>(d)], std::string("side")); next = wireConnections(u.pos, next); }
+        }
+        setBlock(u.pos, next, u.flags, u.depth);
+    }
+}
+int Simulator::diodeInput(BlockPos p) const { auto d = at(p).facing; auto q = p.relative(d); return std::max(signal(q, d), at(q).device == Device::wire ? static_cast<int>(at(q).power) : 0); }
+int Simulator::diodeSideInput(BlockPos p) const {
+    const auto& s = at(p); int result = 0;
+    for (auto d : horizontal) if (axis(d) != axis(s.facing)) {
+        auto q = p.relative(d); const auto& n = at(q);
+        if (s.device == Device::repeater && !isDiode(n.device)) continue;
+        int value = n.device == Device::source ? 15 : n.device == Device::wire ? n.power : n.signalSource ? directSignal(q, d) : 0;
+        result = std::max(result, value);
+    }
+    return result;
+}
+bool Simulator::prioritizeDiode(BlockPos p) const { auto d = opposite(at(p).facing); const auto& n = at(p.relative(d)); return isDiode(n.device) && n.facing != d; }
+bool Simulator::torchInput(BlockPos p) const { const auto& s = at(p); auto d = s.device == Device::torch ? Direction::down : opposite(s.facing); return signal(p.relative(d), d) != 0; }
+int Simulator::comparatorInput(BlockPos p) const {
+    auto d = at(p).facing; auto q = p.relative(d); int input = diodeInput(p);
+    if (at(q).analogSource) return analogOutput(q);
+    if (input < 15 && at(q).conductor && at(q.relative(d)).analogSource) return analogOutput(q.relative(d));
+    return input;
+}
+void Simulator::refreshComparator(BlockPos p) {
+    auto id = world.get(p); const auto& s = registry[id]; int input = comparatorInput(p), side = diodeSideInput(p);
+    int output = input == 0 || side > input ? 0 : s.subtract ? input - side : input;
+    bool shouldOn = input != 0 && (input > side || (input == side && !s.subtract));
+    auto& data = runtime[p]; int old = data.output; data.output = output;
+    if (old != output || !s.subtract) {
+        if (s.powered != shouldOn) setBlock(p, registry.withBool(id, "powered", shouldOn), 2);
+        ++sequence; sampleAffected(p); changes[p] = world.get(p); notifyFront(p, s.facing);
+    }
+}
+void Simulator::executeNeighbor(BlockPos p) {
+    auto id = world.get(p); const auto& s = registry[id];
+    switch (s.device) {
+    case Device::wire: if (survives(p, id)) updateWire(p, id); else setBlock(p, 0); break;
+    case Device::torch: case Device::wallTorch: if (s.lit == torchInput(p)) schedule(p, 2); break;
+    case Device::repeater: if (diodeSideInput(p) == 0 && s.powered != (diodeInput(p) > 0)) schedule(p, static_cast<Tick>(s.delay) * 2, prioritizeDiode(p) ? -3 : s.powered ? -2 : -1); break;
+    case Device::comparator: {
+        int input = comparatorInput(p), side = diodeSideInput(p); int output = input == 0 || side > input ? 0 : s.subtract ? input - side : input;
+        bool shouldOn = input > 0 && (input > side || (input == side && !s.subtract));
+        if (output != analogOutput(p) || s.powered != shouldOn) schedule(p, 2, prioritizeDiode(p) ? -1 : 0);
+        break;
+    }
+    case Device::lamp: if (s.lit != (bestSignal(p) > 0)) { if (s.lit) schedule(p, 4); else setBlock(p, registry.withBool(id, "lit", true), 2); } break;
+    case Device::bulb: { bool powered = bestSignal(p) > 0; if (powered != s.powered) { auto next = registry.withBool(id, "powered", powered); if (!s.powered) next = registry.withBool(next, "lit", !s.lit); setBlock(p, next); } break; }
+    default: break;
+    }
+}
+void Simulator::schedule(BlockPos p, Tick delay, int priority) {
+    auto type = at(p).type;
+    if (scheduledKeys.insert({p, type}).second) scheduled.push({currentTick + delay, priority, nextOrder++, p, type});
+}
+bool Simulator::hasScheduled(BlockPos p) const { return scheduledKeys.contains({p, at(p).type}); }
+void Simulator::executeTick(const ScheduledEvent& event) {
+    auto p = event.pos; auto id = world.get(p); const auto& s = registry[id];
+    switch (s.device) {
+    case Device::repeater:
+        if (diodeSideInput(p) == 0) {
+            bool input = diodeInput(p) > 0;
+            if (s.powered && !input) setBlock(p, registry.withBool(id, "powered", false), 2);
+            else if (!s.powered) { setBlock(p, registry.withBool(id, "powered", true), 2); if (!input) schedule(p, static_cast<Tick>(s.delay) * 2, -2); }
+        }
+        break;
+    case Device::comparator: refreshComparator(p); break;
+    case Device::observer: setBlock(p, registry.withBool(id, "powered", !s.powered), 2); if (!s.powered) schedule(p, 2); notifyFront(p, s.facing); break;
+    case Device::lamp: if (s.lit && bestSignal(p) == 0) setBlock(p, registry.withBool(id, "lit", false), 2); break;
+    case Device::torch: case Device::wallTorch: {
+        auto& toggles = runtime[p].torchToggles;
+        while (!toggles.empty() && currentTick - toggles.front() > 60) toggles.pop_front();
+        bool input = torchInput(p);
+        if (s.lit && input) { setBlock(p, registry.withBool(id, "lit", false)); toggles.push_back(currentTick); if (toggles.size() >= 8) schedule(p, 160); }
+        else if (!s.lit && !input && toggles.size() < 8) setBlock(p, registry.withBool(id, "lit", true));
+        break;
+    }
+    case Device::button: if (s.powered) { setBlock(p, registry.withBool(id, "powered", false)); notifyAttached(p, s.connectedDirection); } break;
+    case Device::target: setBlock(p, registry.with(id, "power", 0)); break;
+    default: break;
+    }
+}
+bool Simulator::stepEvent() {
+    if (scheduled.empty() || breakRequested) return false;
+    auto event = scheduled.top(); scheduled.pop(); scheduledKeys.erase({event.pos, event.type});
+    currentTick = std::max(currentTick, event.tick); ++sequence;
+    if (at(event.pos).type == event.type) { executeTick(event); ++statistics.scheduledEvents; }
+    return true;
+}
+std::size_t Simulator::advanceTo(Tick target, std::size_t eventBudget, std::chrono::microseconds wallBudget) {
+    if (target < currentTick) throw std::invalid_argument("不能倒退时间，请加载运行快照");
+    auto start = std::chrono::steady_clock::now(); std::size_t count = 0;
+    while (!scheduled.empty() && scheduled.top().tick <= target && !breakRequested && count < eventBudget) {
+        if ((count & 63u) == 0 && std::chrono::steady_clock::now() - start >= wallBudget) break;
+        stepEvent(); ++count;
+    }
+    if (!breakRequested && (scheduled.empty() || scheduled.top().tick > target)) currentTick = target;
+    statistics.simulationMicros += static_cast<std::uint64_t>(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - start).count());
+    return count;
+}
+void Simulator::interact(BlockPos p) {
+    auto id = world.get(p); const auto& s = registry[id];
+    switch (s.device) {
+    case Device::lever: setBlock(p, registry.withBool(id, "powered", !s.powered)); notifyAttached(p, s.connectedDirection); break;
+    case Device::button: if (!s.powered) { setBlock(p, registry.withBool(id, "powered", true)); notifyAttached(p, s.connectedDirection); const auto& name = registry.type(id).name; schedule(p, name == "minecraft:stone_button" || name == "minecraft:polished_blackstone_button" ? 20 : 30); } break;
+    case Device::repeater: setBlock(p, registry.with(id, "delay", s.delay % 4 + 1)); break;
+    case Device::comparator: setBlock(p, registry.with(id, "mode", std::string(s.subtract ? "compare" : "subtract")), 2); refreshComparator(p); break;
+    case Device::wire: {
+        bool dot = std::all_of(s.wireSides.begin(), s.wireSides.end(), [](auto x) { return x == 0; });
+        bool cross = std::all_of(s.wireSides.begin(), s.wireSides.end(), [](auto x) { return x != 0; });
+        if (dot || cross) { auto next = id; for (auto d : horizontal) next = registry.with(next, directionNames[static_cast<unsigned>(d)], std::string(dot ? "side" : "none")); setBlock(p, wireConnections(p, next)); for (auto d : horizontal) if (at(p.relative(d)).conductor) updateNeighbors(p.relative(d), static_cast<int>(opposite(d))); }
+        break;
+    }
+    default: throw std::invalid_argument("该器件没有直接点击操作；请编辑属性或使用环境刺激");
+    }
+}
+void Simulator::stimulate(BlockPos p, const Json& input) {
+    auto id = world.get(p); const auto& s = registry[id];
+    const int value = input.value("value", 0);
+    if (value < 0 || value > 15) throw std::invalid_argument("刺激强度应为 0–15");
+    if (s.device == Device::target) { if (!hasScheduled(p)) { setBlock(p, registry.with(id, "power", value)); schedule(p, input.value("arrow", true) ? 20 : 8); } return; }
+    throw std::invalid_argument("该器件尚不支持这类环境刺激");
+}
+void Simulator::clear() {
+    world.clear(); runtime.clear(); scheduled = {}; scheduledKeys.clear(); changes.clear(); currentTick = 0; nextOrder = 0; sequence = 0;
+    probes.clear(); probeDependencies.clear(); nextProbeId = 1; trace.clear(); traceDropped = 0; statistics = {}; breakRequested = false; pauseReason.clear(); ++revision;
+}
+std::vector<Cell> Simulator::takeChanges() { std::vector<Cell> result; result.reserve(changes.size()); for (const auto& [p, id] : changes) result.push_back({p, id}); changes.clear(); return result; }
+void Simulator::rebuildProbeDependencies() {
+    probeDependencies.clear();
+    for (const auto& probe : probes) {
+        std::unordered_set<BlockPos, PosHash> affected{probe.pos};
+        for (auto a : directions) { auto q = probe.pos.relative(a); affected.insert(q); for (auto b : directions) affected.insert(q.relative(b)); }
+        for (auto p : affected) probeDependencies[p].push_back(probe.id);
+    }
+}
+void Simulator::sampleProbe(Probe& probe) {
+    int value = probe.mode == "input" ? bestSignal(probe.pos) : probe.mode == "direction" ? signal(probe.pos, probe.direction) : displayValue(probe.pos);
+    if (value == probe.lastValue) return;
+    bool trigger = (probe.trigger == "rising" && probe.lastValue == 0 && value > 0) || (probe.trigger == "falling" && probe.lastValue > 0 && value == 0) || (probe.trigger == "value" && value == probe.triggerValue && probe.lastValue >= 0);
+    if (trace.size() >= traceCapacity) { trace.pop_front(); ++traceDropped; }
+    trace.push_back({probe.id, currentTick, sequence, static_cast<std::uint8_t>(value)}); probe.lastValue = value;
+    if (trigger) { breakRequested = true; pauseReason = "探针「" + probe.name + "」触发断点"; }
+}
+void Simulator::sampleAffected(BlockPos p) {
+    auto found = probeDependencies.find(p); if (found == probeDependencies.end()) return;
+    for (auto id : found->second) for (auto& probe : probes) if (probe.id == id) { sampleProbe(probe); break; }
+}
+std::uint32_t Simulator::addProbe(BlockPos p, const std::string& name, const std::string& mode, Direction direction) {
+    if (probes.size() >= 256) throw std::invalid_argument("最多支持 256 个探针");
+    if (mode != "output" && mode != "input" && mode != "direction") throw std::invalid_argument("未知探针模式");
+    auto id = nextProbeId++; probes.push_back({id, p, name.empty() ? "P" + std::to_string(id) : name, mode, direction}); rebuildProbeDependencies(); sampleProbe(probes.back()); return id;
+}
+void Simulator::removeProbe(std::uint32_t id) { std::erase_if(probes, [id](const Probe& p) { return p.id == id; }); rebuildProbeDependencies(); }
+void Simulator::configureProbe(std::uint32_t id, const Json& config) {
+    for (auto& p : probes) if (p.id == id) { p.name = config.value("name", p.name); p.trigger = config.value("trigger", p.trigger); p.triggerValue = config.value("triggerValue", p.triggerValue); return; }
+    throw std::invalid_argument("探针不存在");
+}
+void Simulator::clearTrace() { trace.clear(); traceDropped = 0; for (auto& probe : probes) { probe.lastValue = -1; sampleProbe(probe); } }
+Json Simulator::inspect(BlockPos p) const {
+    auto id = world.get(p); auto result = registry.describe(id);
+    result["pos"] = p; result["value"] = displayValue(p); result["input"] = bestSignal(p); result["analog"] = analogOutput(p);
+    result["supportLevel"] = registry.type(id).supportLevel;
+    auto it = runtime.find(p); result["runtime"] = it == runtime.end() ? Json::object() : it->second.values;
+    return result;
+}
+}

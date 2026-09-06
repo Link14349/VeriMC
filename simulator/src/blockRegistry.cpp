@@ -1,0 +1,126 @@
+#include "simulator/blockRegistry.hpp"
+#include <fstream>
+#include <algorithm>
+
+namespace simulator {
+namespace {
+Device classify(const std::string& name, const std::string& c) {
+    static const std::unordered_map<std::string, Device> classes{
+        {"AirBlock", Device::air}, {"RedStoneWireBlock", Device::wire}, {"RedstoneBlock", Device::source},
+        {"LeverBlock", Device::lever}, {"ButtonBlock", Device::button}, {"RedstoneTorchBlock", Device::torch},
+        {"RedstoneWallTorchBlock", Device::wallTorch}, {"RepeaterBlock", Device::repeater}, {"ComparatorBlock", Device::comparator},
+        {"ObserverBlock", Device::observer}, {"RedstoneLampBlock", Device::lamp}, {"CopperBulbBlock", Device::bulb},
+        {"WeatheringCopperBulbBlock", Device::bulb}, {"PistonBaseBlock", Device::piston}, {"PistonHeadBlock", Device::pistonHead},
+        {"MovingPistonBlock", Device::movingPiston}, {"HopperBlock", Device::hopper}, {"ChestBlock", Device::container},
+        {"TrappedChestBlock", Device::container}, {"BarrelBlock", Device::container}, {"ShulkerBoxBlock", Device::container},
+        {"CopperChestBlock", Device::container}, {"WeatheringCopperChestBlock", Device::container},
+        {"DispenserBlock", Device::dispenser}, {"DropperBlock", Device::dropper}, {"CrafterBlock", Device::crafter},
+        {"FurnaceBlock", Device::furnace}, {"BlastFurnaceBlock", Device::furnace}, {"SmokerBlock", Device::furnace},
+        {"DoorBlock", Device::door}, {"TrapDoorBlock", Device::trapdoor}, {"WeatheringCopperDoorBlock", Device::door},
+        {"WeatheringCopperTrapDoorBlock", Device::trapdoor}, {"FenceGateBlock", Device::fenceGate}, {"NoteBlock", Device::noteBlock},
+        {"RailBlock", Device::rail}, {"PoweredRailBlock", Device::poweredRail}, {"DetectorRailBlock", Device::detectorRail},
+        {"PressurePlateBlock", Device::pressurePlate}, {"WeightedPressurePlateBlock", Device::weightedPlate},
+        {"TargetBlock", Device::target}, {"DaylightDetectorBlock", Device::daylight},
+        {"LightningRodBlock", Device::lightningRod}, {"WeatheringLightningRodBlock", Device::lightningRod},
+        {"SculkSensorBlock", Device::sculkSensor}, {"CalibratedSculkSensorBlock", Device::calibratedSensor},
+        {"TripWireBlock", Device::tripwire}, {"TripWireHookBlock", Device::tripwireHook}, {"LecternBlock", Device::lectern}
+    };
+    if (name == "minecraft:activator_rail") return Device::activatorRail;
+    if (auto it = classes.find(c); it != classes.end()) return it->second;
+    if (name == "minecraft:redstone_block") return Device::source;
+    static const std::vector<std::string> analogClasses{"ComposterBlock", "CakeBlock", "CandleCakeBlock", "CauldronBlock", "LayeredCauldronBlock", "LavaCauldronBlock", "ChiseledBookShelfBlock", "DecoratedPotBlock", "JukeboxBlock", "CopperGolemStatueBlock", "WeatheringCopperGolemStatueBlock", "RespawnAnchorBlock", "BeehiveBlock", "EndPortalFrameBlock"};
+    if (std::find(analogClasses.begin(), analogClasses.end(), c) != analogClasses.end()) return Device::analog;
+    // The palette admits a deliberate structural whitelist. Unknown behavior stays explicit.
+    if (name == "minecraft:slime_block" || name == "minecraft:honey_block" || name == "minecraft:obsidian" || name == "minecraft:bedrock" || name == "minecraft:stone" || name == "minecraft:smooth_stone" || name == "minecraft:glass" || name == "minecraft:glowstone" || name == "minecraft:sea_lantern" || name == "minecraft:target" || name.ends_with("_wool") || name.ends_with("_concrete") || name.ends_with("_planks") || name.ends_with("_terracotta") || name.ends_with("_stained_glass") || name.ends_with("_slab") || name.ends_with("_stairs")) return Device::solid;
+    return Device::unsupported;
+}
+}
+BlockRegistry::BlockRegistry(const std::string& path) {
+    std::ifstream file(path);
+    if (!file) throw std::runtime_error("找不到方块注册表：" + path);
+    const Json data = Json::parse(file);
+    if (data.at("version") != "26.2") throw std::runtime_error("需要 Minecraft 26.2 数据");
+    for (const auto& b : data.at("blocks")) {
+        BlockType typeInfo;
+        typeInfo.name = b.at("name"); typeInfo.className = b.at("className");
+        typeInfo.defaultState = b.at("defaultState"); typeInfo.firstState = b.at("states")[0].at("id");
+        typeInfo.device = classify(typeInfo.name, typeInfo.className);
+        typeInfo.supportLevel = (typeInfo.device <= Device::bulb || typeInfo.device == Device::target) ? "implemented" : "unimplemented";
+        auto typeId = static_cast<std::uint16_t>(types.size());
+        names.emplace(typeInfo.name, typeId);
+        for (const auto& s : b.at("states")) for (const auto& [key, value] : s.at("properties").items()) {
+            auto& values = typeInfo.properties[key].values;
+            const auto str = value.get<std::string>();
+            if (std::find(values.begin(), values.end(), str) == values.end()) values.push_back(str);
+        }
+        for (auto& [key, prop] : typeInfo.properties) {
+            prop.stride = 1;
+            if (prop.values.size() > 1) for (const auto& s : b.at("states")) {
+                if (s.at("properties").at(key) == prop.values[1]) { prop.stride = s.at("id").get<StateId>() - typeInfo.firstState; break; }
+            }
+        }
+        types.push_back(typeInfo);
+        for (const auto& s : b.at("states")) {
+            StateId id = s.at("id");
+            if (states.size() <= id) states.resize(static_cast<std::size_t>(id) + 1);
+            auto& st = states[id]; st.type = typeId; st.device = typeInfo.device;
+            st.conductor = s.at("conductor"); st.fullCube = s.at("fullCube"); st.analogSource = s.at("analogSource");
+            st.blockEntity = s.at("blockEntity"); st.replaceable = s.at("replaceable"); st.signalSource = s.at("signalSource");
+            st.supportMask = s.at("supportMask"); st.rigidMask = s.at("rigidMask"); st.centerMask = s.at("centerMask");
+            st.weak = s.at("weakSignal").get<decltype(st.weak)>(); st.strong = s.at("strongSignal").get<decltype(st.strong)>();
+            auto reaction = s.at("pushReaction").get<std::string>();
+            st.pushReaction = reaction == "NORMAL" ? 0 : reaction == "DESTROY" ? 1 : reaction == "BLOCK" ? 2 : reaction == "PUSH_ONLY" ? 3 : 4;
+            const auto& p = s.at("properties");
+            auto val = [&](const char* key, const char* fallback) { return p.value(key, std::string(fallback)); };
+            st.facing = parseDirection(val("facing", "north"));
+            st.power = static_cast<std::uint8_t>(std::stoi(val("power", "0"))); st.delay = static_cast<std::uint8_t>(std::stoi(val("delay", "1")));
+            st.powered = val("powered", "false") == "true"; st.lit = val("lit", "false") == "true";
+            st.locked = val("locked", "false") == "true"; st.extended = val("extended", "false") == "true";
+            st.subtract = val("mode", "compare") == "subtract"; st.sticky = typeInfo.name == "minecraft:sticky_piston";
+            auto face = val("face", "floor"); st.connectedDirection = face == "floor" ? Direction::up : face == "ceiling" ? Direction::down : st.facing;
+            for (std::size_t i = 0; i < 4; ++i) { auto side = val(directionNames[static_cast<unsigned>(horizontal[i])], "none"); st.wireSides[i] = side == "up" ? 2 : side == "side" ? 1 : 0; }
+        }
+    }
+}
+StateId BlockRegistry::state(const std::string& name, const Json& props) const {
+    std::string key = name.find(':') == std::string::npos ? "minecraft:" + name : name;
+    auto found = names.find(key);
+    if (found == names.end()) throw std::invalid_argument("未知方块：" + name);
+    StateId id = types[found->second].defaultState;
+    for (const auto& [prop, v] : props.items()) id = with(id, prop, v.is_string() ? v.get<std::string>() : v.dump());
+    return id;
+}
+StateId BlockRegistry::with(StateId id, const std::string& key, const std::string& value) const {
+    const auto& t = type(id);
+    auto found = t.properties.find(key);
+    if (found == t.properties.end()) throw std::invalid_argument(t.name + " 没有属性 " + key);
+    const auto& p = found->second;
+    auto vi = std::find(p.values.begin(), p.values.end(), value);
+    if (vi == p.values.end()) throw std::invalid_argument("无效属性 " + key + "=" + value);
+    auto oldIndex = ((id - t.firstState) / p.stride) % p.values.size();
+    auto next = static_cast<std::int64_t>(id) + (std::distance(p.values.begin(), vi) - static_cast<std::int64_t>(oldIndex)) * p.stride;
+    if (next < 0 || static_cast<std::size_t>(next) >= states.size() || states[static_cast<std::size_t>(next)].type != states[id].type) throw std::logic_error("方块状态索引不一致");
+    return static_cast<StateId>(next);
+}
+std::string BlockRegistry::property(StateId id, const std::string& key, const std::string& fallback) const {
+    const auto& t = type(id);
+    auto found = t.properties.find(key);
+    if (found == t.properties.end()) return fallback;
+    const auto& p = found->second;
+    return p.values[((id - t.firstState) / p.stride) % p.values.size()];
+}
+Json BlockRegistry::describe(StateId id) const {
+    const auto& t = type(id); Json props = Json::object();
+    for (const auto& [key, p] : t.properties) props[key] = property(id, key);
+    return {{"stateId", id}, {"name", t.name}, {"properties", props}};
+}
+Json BlockRegistry::catalog() const {
+    Json result = Json::array();
+    for (const auto& t : types) {
+        if (t.supportLevel == "unimplemented" || t.device == Device::air || t.device == Device::movingPiston || t.device == Device::pistonHead) continue;
+        Json props = Json::object(); for (const auto& [key, p] : t.properties) props[key] = p.values;
+        result.push_back({{"name", t.name}, {"defaultState", t.defaultState}, {"device", static_cast<unsigned>(t.device)}, {"properties", props}, {"supportLevel", t.supportLevel}});
+    }
+    return result;
+}
+}

@@ -1,0 +1,29 @@
+# Minecraft 26.2 参考与验证
+
+参考版本固定为 Java Edition 26.2 正式版，非实验性红石。官方版本清单、服务端下载地址和 SHA-1 记录于 `data/referenceVersion.json`；原版 DataVersion 为 4903。
+
+## 可重现流程
+
+1. 安装 Java 25 或更高版本。
+2. `python3 tools/reference/fetchReference.py`：下载并校验服务端，提取游戏 JAR，缓存留在 `.cache/reference/`。
+3. 在缓存目录运行 `java -DbundlerMainClass=net.minecraft.data.Main -jar server.jar --reports --output reports`，同时提取运行依赖。
+4. `python3 tools/reference/runReferenceTool.py`：通过原版 API 导出状态 ID、属性、导电、支撑、推动反应和方向输出表。
+5. `python3 tools/reference/captureRedstone.py`：用本项目原创输入场景运行原版 GameTest，生成 `tests/fixtures/java26_2Redstone.json`。测试世界仅位于忽略的 `.cache/reference/captureWorld/`，重跑时替换该缓存世界。
+6. 构建后执行 `ctest --preset release`，独立 C++ 内核按相同绝对坐标、放置顺序和游戏刻逐帧比较状态 ID 与比较器内部输出。
+
+正常构建、启动、仿真和测试不依赖 Java 或 Minecraft 安装；注册表和场景观测结果随项目提供。JAR、反编译参考源码、游戏资源和缓存世界不进入 Git。
+
+## 已核查的规则来源
+
+在校验后的官方服务端中核查 `Level`、`LevelChunk`、`CollectingNeighborUpdater`、`DefaultRedstoneWireEvaluator`、`RedStoneWireBlock`、`DiodeBlock`、`RepeaterBlock`、`ComparatorBlock`、`ObserverBlock`、`RedstoneTorchBlock`、`LeverBlock`、`ButtonBlock`、`CopperBulbBlock` 和 `RedstoneLampBlock` 的行为。C++ 为独立实现；原版源码不随项目分发。
+
+- 邻居通知顺序：西、东、下、上、北、南；形状更新顺序：西、东、北、南、下、上。
+- 红石粉无虚构游戏刻延迟，保留原版局部 HashSet 的位置相关遍历次序。
+- 中继器的朝向属性指向输入，脉冲保持、侧向锁定和计划优先级分别建模。
+- 侦测器响应检测面形状更新；比较器保留内部输出；铜灯在上升沿翻转。
+
+## 验证边界
+
+当前差分覆盖粉线衰减、中继器短脉冲、锁定/解锁、侦测器、铜灯、火把/灯状态和比较器读出/减法。没有证据的复杂场景不能因基本测试通过而自动标为兼容。
+
+当前计划刻队列使用全局时间、优先级和加入序号；跨区块同刻事件的原版批量收集细节尚需专项差分。立即更新预算耗尽会使本次运行报错并停止，需从快照恢复，不允许丢弃事件后继续运行。
