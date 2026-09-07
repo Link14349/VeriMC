@@ -1,9 +1,69 @@
+# 系统与编辑器临时文件
 .DS_Store
-simulator/build*/
-simulator/.cache/
-simulator/runtime/
-simulator/apps/web/node_modules/
-simulator/apps/web/dist/
-simulator/testResults/
-**/__pycache__/
+._*
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
+*~
+
+# C++ / CMake 构建产物与本机配置
+/simulator/build*/
+/verimc/build*/
+build/
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+CMakeUserPresets.json
+compile_commands.json
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dylib
+*.dll
+*.exe
+*.dSYM/
+
+# 网页依赖、构建输出与测试报告；保留 package-lock.json
+node_modules/
+dist/
+*.tsbuildinfo
+coverage/
+playwright-report/
+test-results/
+
+# Python 环境与缓存
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# 下载缓存、参考游戏 / 解析器 JAR 与本地运行数据
+.cache/
+*.jar
+/simulator/runtime/
+testResults/
 *.log
+
+# 本地环境配置与私钥；允许提交不含密钥的配置模板
+.env
+.env.*
+!.env.example
+!.env.sample
+!.env.template
+!.env.*.example
+*.key
+*.pem
+*.p12
+*.pfx
+
+# 不按扩展名忽略 .vmc、.vmcl、.vmcb，保留示例和测试夹具。
+# 临时网表放在 verimc/build/，本地工程放在 simulator/runtime/。
