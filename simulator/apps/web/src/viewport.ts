@@ -72,11 +72,15 @@ export class CircuitViewport {
     this.renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); this.renderer.setClearColor(0x20272b); this.renderer.outputColorSpace = THREE.SRGBColorSpace; this.renderer.localClippingEnabled = true;
     material.clippingPlanes = [this.clipPlane];
     this.renderer.domElement.tabIndex = 0;
-    this.renderer.domElement.setAttribute('aria-label', '三维工作台，方向键平移视角');
+    this.renderer.domElement.setAttribute('aria-label', '三维工作台，WASD 平移视角');
     container.appendChild(this.renderer.domElement);
     this.scene.add(new THREE.HemisphereLight(0xf2f2e4, 0x4c5b69, 2.7)); const light = new THREE.DirectionalLight(0xffefcf, 3.1); light.position.set(-12,30,15); this.scene.add(light);
     this.camera.position.set(18,18,22); this.controls = new OrbitControls(this.camera, this.renderer.domElement); this.controls.target.set(4,0,2); this.controls.enableDamping = true; this.controls.dampingFactor = .12; this.controls.minDistance = 2; this.controls.maxDistance = 700;
     this.controls.mouseButtons = { LEFT: -1 as THREE.MOUSE, MIDDLE: THREE.MOUSE.PAN, RIGHT: THREE.MOUSE.ROTATE };
+    this.controls.keys = { UP: 'KeyW', LEFT: 'KeyA', BOTTOM: 'KeyS', RIGHT: 'KeyD' };
+    this.controls.keyPanSpeed = 21;
+    // Ctrl/Cmd+S 等组合键保留给应用快捷键，不触发键盘旋转。
+    this.controls.keyRotateSpeed = 0;
     this.controls.listenToKeyEvents(this.renderer.domElement);
     this.grid = new THREE.GridHelper(128,128,0x5c6668,0x343e42); this.grid.position.y = -.008; this.scene.add(this.grid);
     const axes = new THREE.AxesHelper(2.2); axes.position.set(-.5,.025,-.5); this.scene.add(axes);
