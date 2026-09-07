@@ -1,6 +1,8 @@
 # `.vmcl` 逻辑电路中间格式 v1
 
-2026-09-07。扩展名固定为 `.vmcl`，内容为 UTF-8 JSON。格式标识 `verimc.logic`，格式版本整数 `1`，语言版本 `0.1`。实现入口为 `validateLogicGraph`；CLI `validate` 可独立读取文件，不需要源文件或 Minecraft。
+2026-09-07。扩展名固定为 `.vmcl`，内容为 UTF-8 JSON。格式标识 `verimc.logic`，格式版本整数 `1`，语言版本 `0.1`。文件适配器入口为 `readVmclJson` / `writeVmclJson`，逻辑校验由 `validateLogicGraph(const LogicGraph&)` 完成；CLI `validate` 可独立读取文件，不需要源文件或 Minecraft。
+
+本文件只定义序列化协议；各编译阶段共用的内存结构见 [共享逻辑 IR](logicIr.md)。
 
 ## 1. 用途与版本
 

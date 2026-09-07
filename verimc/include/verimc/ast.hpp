@@ -1,27 +1,14 @@
 #pragma once
+#include "verimc/diagnostic.hpp"
 #include <cstddef>
 #include <filesystem>
 #include <map>
 #include <memory>
-#include <nlohmann/json.hpp>
 #include <stdexcept>
 #include <string>
 #include <vector>
 
 namespace verimc {
-struct SourceSpan {
-    std::string file;
-    std::size_t start = 0, end = 0, line = 1, column = 1;
-};
-nlohmann::json toJson(const SourceSpan& span);
-class Diagnostic : public std::runtime_error {
-  public:
-    std::string code, sourceSha256, instance;
-    SourceSpan span;
-    std::vector<SourceSpan> related;
-    nlohmann::json json() const;
-    Diagnostic(std::string code, const SourceSpan& span, std::string message);
-};
 struct Expr;
 using ExprPtr = std::shared_ptr<const Expr>;
 struct Expr {

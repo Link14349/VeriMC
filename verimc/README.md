@@ -5,6 +5,7 @@ VeriMC 的硬件描述语言与编译工具子项目，面向 Minecraft Java Edi
 **当前阶段：已有 C++20 编译前端，可将纯逻辑 VeriMC 源码编译为 `.vmcl` 逻辑网表。** 红石组件映射、已验证器件库和自动布局布线仍待实现。
 
 - [编译器设计方案](docs/compilerDesign.md)：分层、ANTLR4 选择、实现边界和后端路线。
+- [共享逻辑 IR](docs/logicIr.md)：独立于文件格式的内存模型与 C++ 接口。
 - [.vmcl 格式](docs/vmclFormat.md)：可独立读取的逻辑中间体。
 - [编译器实施与验证](docs/compilerStatus.md)：本次实际覆盖和后续缺口。
 - [从零入门教程](docs/languageTutorial.md)：一步步学习连接、comb、参数、寄存器、计数器和测试，附七个完整源文件与练习答案。
@@ -36,7 +37,7 @@ verimc/build/verimcCli compile verimc/examples/valid/adder.vmc --top Adder --par
 
 省略 `-o` 时输出在源文件旁，沿用文件名主干和 `.vmcl` 扩展名。已有输出须显式 `--force`。顶层模块用 `--top` 指定；默认导入根为输入文件所在目录，需要跨子目录导入时通过 `--root` 指定项目根。源文件中的 test/build 声明只做语法解析，不因 compile 成功而标记测试通过或物理可实现。
 
-`parse input.vmc` 只检查该文件句法并建立 AST；`compile` 检查所选顶层展开后的逻辑；`validate input.vmcl` 不重新读取源文件。错误以 JSON 写到 stderr，退出码非零；成功消息写到 stdout。C++ 接口为 `compileFile(CompileOptions)` 与 `validateLogicGraph(json)`。
+`parse input.vmc` 只检查该文件句法并建立 AST；`compile` 检查所选顶层展开后的逻辑；`validate input.vmcl` 不重新读取源文件。错误以 JSON 写到 stderr，退出码非零；成功消息写到 stdout。C++ 接口 `compileFile(CompileOptions)` 返回独立的 `LogicGraph`，`validateLogicGraph(const LogicGraph&)` 直接校验内存模型。`.vmcl` 导入导出通过 `readVmclJson` / `writeVmclJson` 适配器完成，详见 [IR 模型和独立构建](docs/logicIr.md)。
 
 消毒器检查：
 

@@ -1,6 +1,9 @@
+#include "verimc/ast.hpp"
 #include "verimc/compiler.hpp"
+#include "verimc/vmclJson.hpp"
 #include <fstream>
 #include <iostream>
+#include <nlohmann/json.hpp>
 #include <random>
 #include <set>
 #include <sstream>
@@ -51,22 +54,7 @@ int main(int argc, char** argv) {
         if (command == "validate") {
             if (argc != 3)
                 throw std::runtime_error("Unexpected validate arguments");
-            std::vector<std::set<std::string>> keys;
-            auto callback = [&](int depth, Json::parse_event_t event, Json& parsed) {
-                if (depth > 128)
-                    throw verimc::Diagnostic("EElaborationLimit", {}, "JSON nesting budget exceeded");
-                if (event == Json::parse_event_t::object_start)
-                    keys.emplace_back();
-                else if (event == Json::parse_event_t::object_end)
-                    keys.pop_back();
-                else if (event == Json::parse_event_t::key &&
-                         !keys.back().insert(parsed.get<std::string>()).second)
-                    throw verimc::Diagnostic("EArtifactInvalid", {}, "Duplicate JSON key");
-                if (keys.size() > 128)
-                    throw std::runtime_error("JSON nesting budget exceeded");
-                return true;
-            };
-            verimc::validateLogicGraph(Json::parse(read(input), callback));
+            verimc::readVmclJson(read(input));
             std::cout << "Valid logical graph\n";
             return 0;
         }
@@ -126,7 +114,7 @@ int main(int argc, char** argv) {
         if (std::filesystem::exists(output) && !force)
             throw std::runtime_error("Output exists; use --force to replace it");
         auto graph = verimc::compileFile(options);
-        auto bytes = graph.dump(2) + "\n";
+        auto bytes = verimc::writeVmclJson(graph);
         // A sibling temporary directory keeps writes on the same filesystem.
         // A failed compile/write never truncates the previous successful artifact.
         auto parent = std::filesystem::absolute(output).parent_path();
@@ -159,11 +147,11 @@ int main(int argc, char** argv) {
         else
             std::filesystem::create_hard_link(
                 staged, output); // Exclusive publication, even if another writer raced us.
-        std::cout << output.string() << ": " << graph["nodes"].size() << " nodes, "
-                  << graph["connections"].size() << " connections\n";
+        std::cout << output.string() << ": " << graph.nodes.size() << " nodes, " << graph.connections.size()
+                  << " connections\n";
         return 0;
     } catch (const verimc::Diagnostic& e) {
-        std::cerr << e.json().dump() << '\n';
+        std::cerr << verimc::writeDiagnosticJson(e) << '\n';
         return 1;
     } catch (const std::exception& e) {
         std::cerr << Json({{"code", "ECompiler"}, {"message", e.what()}}).dump() << '\n';

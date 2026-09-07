@@ -1,4 +1,5 @@
 #include "verimc/compiler.hpp"
+#include "verimc/ast.hpp"
 #include <algorithm>
 #include <boost/multiprecision/cpp_int.hpp>
 #include <fstream>
@@ -9,59 +10,22 @@
 
 namespace verimc {
 namespace {
-using Json = nlohmann::json;
-using Integer = boost::multiprecision::cpp_int;
-struct Type {
-    std::string kind = "integer", identity;
-    std::size_t width = 0, length = 0;
-    std::vector<std::string> members;
-    std::shared_ptr<Type> element;
-    bool compileTime() const {
-        return kind == "nat" || kind == "integer";
-    }
-    bool number() const {
-        return kind == "uint" || kind == "int";
-    }
-    bool word() const {
-        return number() || kind == "bits";
-    }
-    bool digital() const {
-        return word() || kind == "bit";
-    }
-    std::size_t bits() const {
-        return kind == "array" ? length * element->bits() : width;
-    }
-    bool operator==(const Type& o) const {
-        return kind == o.kind && width == o.width && identity == o.identity && length == o.length &&
-               (kind != "array" || *element == *o.element);
-    }
-    Json json() const {
-        Json j = {{"kind", kind}, {"width", width}};
-        if (kind == "array") {
-            j["length"] = length;
-            j["element"] = element->json();
-        }
-        if (kind == "enum") {
-            j["identity"] = identity;
-            j["members"] = members;
-        }
-        return j;
-    }
-};
+using Type = LogicType;
+using Node = LogicNode;
 Type scalar(const std::string& kind, std::size_t width = 0) {
     Type t;
-    t.kind = kind;
+    t.kind = typeKindFromName(kind);
     t.width = width;
     return t;
 }
 struct Value {
     Type type;
-    int node = -1;
+    NodeId node = invalidNodeId;
     std::optional<Integer> constant;
     // Arithmetic invalidity is deferred until selected; static type errors are never deferred.
     std::shared_ptr<Diagnostic> invalidConstant;
     Value() = default;
-    Value(Type t, int id, std::optional<Integer> value, std::shared_ptr<Diagnostic> invalid = nullptr)
+    Value(Type t, NodeId id, std::optional<Integer> value, std::shared_ptr<Diagnostic> invalid = nullptr)
         : type(std::move(t)), node(id), constant(std::move(value)), invalidConstant(std::move(invalid)) {}
 };
 struct Symbol {
@@ -84,16 +48,8 @@ struct FileState {
     std::map<std::string, const Declaration*> declarations;
     Scope* globals = nullptr;
 };
-struct Node {
-    std::string op;
-    Type type;
-    std::vector<int> inputs;
-    Json attrs = Json::object();
-    SourceSpan span;
-    std::string instance;
-};
 struct Target {
-    int node;
+    NodeId node;
     std::size_t offset, width;
     Type type;
     std::string role;
@@ -104,7 +60,7 @@ struct Write {
     Value value;
     SourceSpan span;
 };
-using Writes = std::map<std::pair<int, std::size_t>, Write>;
+using Writes = std::map<std::pair<NodeId, std::size_t>, Write>;
 Integer mask(std::size_t width) {
     return (Integer(1) << width) - 1;
 }
@@ -112,7 +68,8 @@ Integer normalized(Integer value, const Type& type) {
     if (type.compileTime())
         return value;
     value &= mask(type.bits());
-    if (type.kind == "int" && boost::multiprecision::bit_test(value, static_cast<unsigned>(type.width - 1)))
+    if (type.kind == TypeKind::Int &&
+        boost::multiprecision::bit_test(value, static_cast<unsigned>(type.width - 1)))
         value -= Integer(1) << type.width;
     return value;
 }
@@ -156,13 +113,14 @@ class Compiler {
     std::vector<std::unique_ptr<Scope>> scopes;
     std::vector<Node> nodes;
     std::vector<Write> connections;
-    std::vector<Json> ports, instances;
+    std::vector<LogicPort> ports;
+    std::vector<LogicInstance> instances;
     std::vector<std::pair<const Statement*, Scope*>> pending;
     std::set<std::pair<FileState*, std::string>> activeModules, activeFunctions;
     std::set<std::pair<std::string, std::string>> packageNames;
     std::size_t steps = 0, bitCount = 0, depth = 0, instanceCount = 0, sourceBytes = 0;
-    std::set<int> ownedRegisters;
-    std::map<std::pair<int, std::size_t>, SourceSpan> driven;
+    std::set<NodeId> ownedRegisters;
+    std::map<std::pair<NodeId, std::size_t>, SourceSpan> driven;
     SourceSpan location;
     std::string currentInstance;
     void fail(const std::string& code, const SourceSpan& s, const std::string& message,
@@ -352,7 +310,8 @@ class Compiler {
         if (k == "array") {
             Type t = scalar(k);
             t.element = std::make_shared<Type>(resolveType(*syntax.element, s));
-            if (t.element->kind == "array" || t.element->kind == "clock" || t.element->compileTime())
+            if (t.element->kind == TypeKind::Array || t.element->kind == TypeKind::Clock ||
+                t.element->compileTime())
                 fail("ETypeMismatch", syntax.span, "Unsupported array element type");
             t.length = natural(eval(syntax.size, s), syntax.span, 65536);
             if (t.length == 0)
@@ -380,45 +339,47 @@ class Compiler {
                 return v;
             }
             requireConstant(v, s);
-            if (type.kind == "nat" && *v.constant < 0)
+            if (type.kind == TypeKind::Nat && *v.constant < 0)
                 fail("ETypeMismatch", s, "Negative nat");
             v.type = type;
             return v;
         }
         if (!(v.type == type))
-            fail(v.type.kind == "level" || type.kind == "level" ? "ELevelConversion" : "ETypeMismatch", s,
-                 "Type mismatch: " + v.type.json().dump() + " -> " + type.json().dump());
+            fail(v.type.kind == TypeKind::Level || type.kind == TypeKind::Level ? "ELevelConversion"
+                                                                                : "ETypeMismatch",
+                 s, "Type mismatch: " + v.type.describe() + " -> " + type.describe());
         return v;
     }
-    int node(std::string op, const Type& type, std::vector<int> inputs, Json attrs, const SourceSpan& span,
-             Scope* s) {
+    NodeId node(std::string op, const Type& type, std::vector<NodeId> inputs, NodeAttributes attrs,
+                const SourceSpan& span, Scope* s) {
         step(span);
         checkType(type, span);
         if (nodes.size() >= options.maxNodes || type.bits() > options.maxBits - bitCount)
             fail("EElaborationLimit", span, "Logic graph budget exceeded");
         bitCount += type.bits();
-        auto id = static_cast<int>(nodes.size());
-        nodes.push_back({std::move(op), type, std::move(inputs), std::move(attrs), span, s ? s->path : ""});
+        auto id = static_cast<NodeId>(nodes.size());
+        nodes.push_back(
+            {nodeKindFromName(op), type, std::move(inputs), std::move(attrs), span, s ? s->path : ""});
         return id;
     }
     Value constant(const Type& type, Integer value, const SourceSpan& span) {
         checkInteger(value, span);
         return {type, -1, normalized(std::move(value), type)};
     }
-    int materialize(Value v, const SourceSpan& span, Scope* s) {
+    NodeId materialize(Value v, const SourceSpan& span, Scope* s) {
         if (v.type.compileTime())
             fail("ETypeMismatch", span, "Compile-time integer cannot drive hardware");
         if (v.node >= 0)
             return v.node;
         requireConstant(v, span);
-        return node("constant", v.type, {}, {{"value", v.constant->str()}}, span, s);
+        return node("constant", v.type, {}, ConstantAttributes{*v.constant}, span, s);
     }
     Value operation(const std::string& op, const Type& type, const std::vector<Value>& args,
-                    const SourceSpan& span, Scope* s, Json attrs = Json::object()) {
+                    const SourceSpan& span, Scope* s, NodeAttributes attrs = {}) {
         for (auto& a : args)
             if (a.invalidConstant)
                 return {type, -1, std::nullopt, a.invalidConstant};
-        std::vector<int> inputs;
+        std::vector<NodeId> inputs;
         for (auto& a : args)
             inputs.push_back(materialize(a, span, s));
         return {type, node(op, type, std::move(inputs), std::move(attrs), span, s), std::nullopt};
@@ -426,12 +387,12 @@ class Compiler {
     Value slice(Value base, std::size_t offset, const Type& type, const SourceSpan& span, Scope* s) {
         if (base.constant)
             return constant(type, (*base.constant >> offset) & mask(type.bits()), span);
-        return operation("slice", type, {base}, span, s, {{"offset", offset}});
+        return operation("slice", type, {base}, span, s, SliceAttributes{offset});
     }
     Value unary(const std::string& op, Value a, const SourceSpan& span, Scope* s) {
         Type result = a.type;
         if (op == "!") {
-            if (a.type.kind != "bit")
+            if (a.type.kind != TypeKind::Bit)
                 fail("EOperatorDomain", span, "! requires bit");
         } else if (op == "~") {
             if (!a.type.digital())
@@ -477,13 +438,13 @@ class Compiler {
                 fail("EOperatorDomain", span, "Shift count must be a nonnegative compile-time integer");
             shiftBy = *b.constant >= a.type.width ? a.type.width : b.constant->convert_to<std::size_t>();
         } else if (logical) {
-            if (a.type.kind != "bit")
+            if (a.type.kind != TypeKind::Bit)
                 fail("EOperatorDomain", span, "Logical operators require bit");
         } else if (bits) {
             if (!a.type.digital())
                 fail("EOperatorDomain", span, "Bitwise operators require digital values");
         } else if (equality || relation) {
-            if (!ct && !(relation ? a.type.number() : (a.type.digital() || a.type.kind == "enum")))
+            if (!ct && !(relation ? a.type.number() : (a.type.digital() || a.type.kind == TypeKind::Enum)))
                 fail("EOperatorDomain", span, "Comparison is not supported for this type");
             result = scalar("bit", 1);
         } else {
@@ -492,7 +453,7 @@ class Compiler {
             if ((op == "*" || op == "/" || op == "%") && !ct)
                 fail("EOperatorDomain", span, "Multiply/divide/modulo are compile-time only");
             if (!ct)
-                result = scalar(op == "-" ? "int" : a.type.kind, a.type.width + 1);
+                result = scalar(op == "-" ? "int" : typeKindName(a.type.kind), a.type.width + 1);
         }
         checkType(result, span);
         if (logical && a.constant && ((op == "&&" && *a.constant == 0) || (op == "||" && *a.constant != 0)))
@@ -554,11 +515,11 @@ class Compiler {
             {"!=", "ne"}, {"<", "lt"},          {"<=", "le"},        {">", "gt"},
             {">=", "ge"}, {"<<", "shiftLeft"},  {">>", "shiftRight"}};
         if (shift)
-            return operation(names.at(op), result, {a}, span, s, {{"amount", shiftBy}});
+            return operation(names.at(op), result, {a}, span, s, ShiftAttributes{shiftBy});
         return operation(names.at(op), result, {a, b}, span, s);
     }
     Value select(Value c, Value a, Value b, const SourceSpan& span, Scope* s) {
-        if (c.type.kind != "bit")
+        if (c.type.kind != TypeKind::Bit)
             fail("ETypeMismatch", span, "Condition must have type bit");
         if (a.type.compileTime() && b.type.compileTime()) {
             a.type = scalar("integer");
@@ -566,8 +527,8 @@ class Compiler {
         }
         if (!(a.type == b.type))
             fail("ETypeMismatch", span, "Selection branches have different types");
-        if (a.type.kind == "level" || a.type.kind == "clock" ||
-            (a.type.kind == "array" && a.type.element->kind == "level"))
+        if (a.type.kind == TypeKind::Level || a.type.kind == TypeKind::Clock ||
+            (a.type.kind == TypeKind::Array && a.type.element->kind == TypeKind::Level))
             fail("EOperatorDomain", span, "Cannot select level or clock");
         if (c.invalidConstant)
             return {a.type, -1, std::nullopt, c.invalidConstant};
@@ -589,7 +550,7 @@ class Compiler {
 
   public:
     explicit Compiler(CompileOptions o) : options(std::move(o)) {}
-    Json run();
+    LogicGraph run();
 };
 Value Compiler::builtin(const Expr& e, const std::vector<Value>& a, Scope* s) {
     auto arity = [&](std::size_t n) {
@@ -613,8 +574,8 @@ Value Compiler::builtin(const Expr& e, const std::vector<Value>& a, Scope* s) {
             return {t, -1, std::nullopt, a[1].invalidConstant};
         requireConstant(a[1], e.span);
         auto v = *a[1].constant;
-        Integer min = t.kind == "int" ? -(Integer(1) << (width - 1)) : Integer(0);
-        Integer max = t.kind == "int" ? (Integer(1) << (width - 1)) - 1 : mask(width);
+        Integer min = t.kind == TypeKind::Int ? -(Integer(1) << (width - 1)) : Integer(0);
+        Integer max = t.kind == TypeKind::Int ? (Integer(1) << (width - 1)) - 1 : mask(width);
         if (v < min || v > max)
             fail("ELiteralRange", e.span, "Constant is outside the declared width");
         return constant(t, v, e.span);
@@ -638,7 +599,7 @@ Value Compiler::builtin(const Expr& e, const std::vector<Value>& a, Scope* s) {
     }
     if (op == "asBits" || op == "asUint" || op == "asInt") {
         arity(1);
-        if (!a[0].type.digital() || (op == "asBits" && a[0].type.kind == "bits"))
+        if (!a[0].type.digital() || (op == "asBits" && a[0].type.kind == TypeKind::Bits))
             fail("EOperatorDomain", e.span, "Invalid reinterpretation");
         auto t = scalar(op == "asBits" ? "bits" : op == "asUint" ? "uint" : "int", a[0].type.width);
         if (a[0].constant)
@@ -691,7 +652,7 @@ Value Compiler::builtin(const Expr& e, const std::vector<Value>& a, Scope* s) {
         bool allConstant = true;
         Integer v = 0;
         for (auto& part : parts) {
-            if (part.type.kind != "bit" && part.type.kind != "bits")
+            if (part.type.kind != TypeKind::Bit && part.type.kind != TypeKind::Bits)
                 fail("EOperatorDomain", e.span, "concat/repeatBits require bit or bits");
             width += part.type.width;
             allConstant &= part.constant.has_value();
@@ -718,7 +679,7 @@ Value Compiler::builtin(const Expr& e, const std::vector<Value>& a, Scope* s) {
     for (std::size_t i = 0; i < a.size(); ++i) {
         auto& p = d->parameters[i];
         auto t = resolveType(p.type, locals);
-        if (t.kind == "level" || t.kind == "clock")
+        if (t.kind == TypeKind::Level || t.kind == TypeKind::Clock)
             fail("ETypeMismatch", p.span, "Function parameters cannot be level or clock");
         compileFunction |= t.compileTime();
         bind(locals, p.name, coerce(a[i], t, p.span), "constant", p.span);
@@ -731,7 +692,7 @@ Value Compiler::builtin(const Expr& e, const std::vector<Value>& a, Scope* s) {
         bind(locals, st.name, v, "let", st.span);
     }
     auto result = coerce(eval(d->value, locals), resolveType(d->type, locals), d->span);
-    if (result.type.kind == "level" || result.type.kind == "clock")
+    if (result.type.kind == TypeKind::Level || result.type.kind == TypeKind::Clock)
         fail("ETypeMismatch", d->span, "Invalid function return type");
     activeFunctions.erase({f, d->name});
     return result;
@@ -779,7 +740,7 @@ Target Compiler::target(ExprPtr e, Scope* s, bool writing, bool sequential) {
     if (e->kind == "index" || e->kind == "slice") {
         auto t = target(e->args[0], s, writing, sequential);
         auto index = natural(eval(e->args[1], s), e->span);
-        if (t.type.kind == "array") {
+        if (t.type.kind == TypeKind::Array) {
             if (e->kind == "slice" || index >= t.type.length)
                 fail("EWidthRange", e->span, "Array index outside range");
             Type element = *t.type.element;
@@ -867,7 +828,7 @@ Value Compiler::eval(ExprPtr e, Scope* s) {
     if (e->kind == "index" || e->kind == "slice") {
         auto base = eval(e->args[0], s);
         auto index = natural(eval(e->args[1], s), e->span);
-        if (base.type.kind == "array") {
+        if (base.type.kind == TypeKind::Array) {
             if (e->kind == "slice" || index >= base.type.length)
                 fail("EWidthRange", e->span, "Array index outside range");
             return slice(base, index * base.type.element->bits(), *base.type.element, e->span, s);
@@ -901,7 +862,8 @@ Value Compiler::eval(ExprPtr e, Scope* s) {
         Type t = scalar("array");
         t.element = std::make_shared<Type>(args.at(0).type);
         t.length = args.size();
-        if (t.element->compileTime() || t.element->kind == "clock" || t.element->kind == "array")
+        if (t.element->compileTime() || t.element->kind == TypeKind::Clock ||
+            t.element->kind == TypeKind::Array)
             fail("ETypeMismatch", e->span, "Invalid array element");
         bool ct = true;
         Integer value = 0;
@@ -929,7 +891,7 @@ void Compiler::expand(const Declaration& d, FileState* f, Scope* s,
         fail("ERecursiveDesign", d.span, "Recursive module instantiation");
     if (++instanceCount > options.maxInstances)
         fail("EElaborationLimit", d.span, "Instance budget exceeded");
-    Json parameters = Json::object();
+    std::map<std::string, Integer> parameters;
     std::set<std::string> consumed;
     for (auto& p : d.parameters) {
         auto it = args.find(p.name);
@@ -945,14 +907,11 @@ void Compiler::expand(const Declaration& d, FileState* f, Scope* s,
         v = coerce(v, resolveType(p.type, s), p.span);
         requireConstant(v, p.span);
         bind(s, p.name, v, "constant", p.span);
-        parameters[p.name] = v.constant->str();
+        parameters[p.name] = *v.constant;
     }
     if (consumed.size() != args.size())
         fail("EName", d.span, "Unknown module parameter");
-    instances.push_back({{"path", s->path},
-                         {"module", f->source.package + "::" + d.name},
-                         {"parameters", parameters},
-                         {"source", toJson(d.span)}});
+    instances.push_back({s->path, f->source.package + "::" + d.name, std::move(parameters), d.span});
     declareItems(d.body, s);
     activeModules.erase({f, d.name});
 }
@@ -969,7 +928,7 @@ void Compiler::declareItems(const std::vector<Statement>& body, Scope* s) {
         } else if (k == "requireStmt") {
             auto v = eval(st.exprs.at(0), s);
             requireConstant(v, st.span);
-            if (v.type.kind != "bit")
+            if (v.type.kind != TypeKind::Bit)
                 fail("ETypeMismatch", st.span, "require expects bit");
             if (*v.constant == 0)
                 fail("ERequire", st.span, "require failed in " + s->path);
@@ -978,16 +937,17 @@ void Compiler::declareItems(const std::vector<Statement>& body, Scope* s) {
             if (t.compileTime())
                 fail("ETypeMismatch", st.span, "Compile-time type cannot be a signal");
             bool reg = k == "regDecl";
-            if (reg &&
-                (t.kind == "level" || t.kind == "clock" || (t.kind == "array" && t.element->kind == "level")))
+            if (reg && (t.kind == TypeKind::Level || t.kind == TypeKind::Clock ||
+                        (t.kind == TypeKind::Array && t.element->kind == TypeKind::Level)))
                 fail("ETypeMismatch", st.span, "Invalid register type");
             auto role = reg ? "register" : k == "wireDecl" ? "wire" : k;
-            Json attrs = {{"name", s->path + "." + st.name}, {"role", role}};
+            NodeAttributes attrs;
+            if (!reg)
+                attrs = SignalAttributes{s->path + "." + st.name, signalRoleFromName(role)};
             if (reg) {
                 auto reset = coerce(eval(st.exprs.at(0), s), t, st.span);
                 requireConstant(reset, st.span);
-                attrs["resetValue"] = reset.constant->str();
-                attrs["initialState"] = "invalid";
+                attrs = RegisterAttributes{s->path + "." + st.name, *reset.constant};
             }
             auto id = node(reg                                             ? "register"
                            : k == "input" && s->parent == s->file->globals ? "input"
@@ -1010,7 +970,7 @@ void Compiler::declareItems(const std::vector<Statement>& body, Scope* s) {
             // Imported module scopes also have globals as parent; only root inputs are sources.
             for (auto& [name, sym] : child->symbols)
                 if (sym.role == "input")
-                    nodes.at(sym.value.node).op = "signal";
+                    nodes.at(sym.value.node).op = NodeKind::Signal;
         } else if (k == "generateBlock") {
             nameFree(s, st.name, st.span);
             auto begin = natural(eval(st.exprs.at(0), s), st.span),
@@ -1053,7 +1013,7 @@ Writes Compiler::control(const std::vector<Statement>& body, Scope* outer, bool 
             result.emplace(std::make_pair(t.node, t.offset), Write{t, value, span});
             return result;
         }
-        auto leaf = t.type.kind == "array" ? *t.type.element : t.type;
+        auto leaf = t.type.kind == TypeKind::Array ? *t.type.element : t.type;
         auto atomWidth = leaf.word() ? std::size_t(1) : leaf.bits();
         auto atomType = leaf.word() ? scalar("bit", 1) : leaf;
         for (std::size_t off = 0; off < t.width; off += atomWidth) {
@@ -1066,7 +1026,7 @@ Writes Compiler::control(const std::vector<Statement>& body, Scope* outer, bool 
     };
     auto choose = [&](Value condition, const Writes& yes, const Writes& no, const SourceSpan& span) {
         Writes result;
-        std::set<std::pair<int, std::size_t>> keys;
+        std::set<std::pair<NodeId, std::size_t>> keys;
         for (auto& [key, w] : yes)
             keys.insert(key);
         for (auto& [key, w] : no)
@@ -1099,7 +1059,7 @@ Writes Compiler::control(const std::vector<Statement>& body, Scope* outer, bool 
         }
         if (st.kind == "if") {
             auto condition = eval(st.exprs.at(0), s);
-            if (condition.type.kind != "bit")
+            if (condition.type.kind != TypeKind::Bit)
                 fail("ETypeMismatch", st.span, "if requires bit");
             auto yes = control(st.body, s, sequential), no = control(st.otherwise, s, sequential);
             mergeUnique(choose(condition, yes, no, st.span));
@@ -1107,7 +1067,7 @@ Writes Compiler::control(const std::vector<Statement>& body, Scope* outer, bool 
         }
         if (st.kind == "match") {
             auto subject = eval(st.exprs.at(0), s);
-            if (!subject.type.digital() && subject.type.kind != "enum")
+            if (!subject.type.digital() && subject.type.kind != TypeKind::Enum)
                 fail("EOperatorDomain", st.span, "Invalid match type");
             std::vector<std::pair<Value, Writes>> cases;
             Writes fallback;
@@ -1126,8 +1086,9 @@ Writes Compiler::control(const std::vector<Statement>& body, Scope* outer, bool 
                     cases.emplace_back(binary("==", subject, label, branch.span, s), std::move(ws));
                 }
             }
-            bool exhaustive = (subject.type.kind == "bit" && labels.size() == 2) ||
-                              (subject.type.kind == "enum" && labels.size() == subject.type.members.size());
+            bool exhaustive =
+                (subject.type.kind == TypeKind::Bit && labels.size() == 2) ||
+                (subject.type.kind == TypeKind::Enum && labels.size() == subject.type.members.size());
             if (!hasDefault && !exhaustive)
                 fail("EUndriven", st.span, "match requires default or complete bit/enum cases");
             if (!hasDefault) {
@@ -1169,10 +1130,10 @@ void Compiler::process(const Statement& st, Scope* s) {
         if (clockTarget.role != "input" && clockTarget.role != "wire")
             fail("EClockDomain", st.span, "on requires a module input or wire clock alias");
         auto clk = eval(st.exprs.at(0), s);
-        if (clk.type.kind != "clock")
+        if (clk.type.kind != TypeKind::Clock)
             fail("EClockDomain", st.span, "on requires clock input or alias");
         auto reset = eval(st.exprs.at(1), s);
-        if (reset.type.kind != "bit")
+        if (reset.type.kind != TypeKind::Bit)
             fail("ETypeMismatch", st.span, "reset requires bit");
         auto ws = control(st.body, s, true);
         for (auto& [key, w] : ws) {
@@ -1185,7 +1146,7 @@ void Compiler::process(const Statement& st, Scope* s) {
     } else
         fail("ECapability", st.span, "Unsupported module statement: " + st.kind);
 }
-Json Compiler::run() {
+LogicGraph Compiler::run() {
     if (options.maxNodes == 0 || options.maxNodes > 1000000 || options.maxBits == 0 ||
         options.maxBits > 10000000 || options.maxDepth == 0 || options.maxDepth > 256 ||
         options.maxSteps == 0 || options.maxSteps > 1000000000 || options.maxInstances == 0 ||
@@ -1210,93 +1171,55 @@ Json Compiler::run() {
     // Pending statements point to stable ASTs, so forward signal references now resolve.
     for (auto& [st, s] : pending)
         process(*st, s);
-    Json edges = Json::array();
+    std::vector<LogicConnection> edges;
     for (auto& w : connections) {
         auto source = materialize(w.value, w.span, nullptr);
         if (w.value.node < 0)
             nodes.at(source).instance = nodes.at(w.target.node).instance;
-        edges.push_back({{"target", w.target.node},
-                         {"targetOffset", w.target.offset},
-                         {"source", source},
-                         {"sourceOffset", 0},
-                         {"width", w.target.width},
-                         {"type", w.target.type.json()},
-                         {"sourceSpan", toJson(w.span)}});
+        edges.push_back({w.target.node, w.target.offset, source, 0, w.target.width, w.target.type, w.span});
     }
     for (std::size_t id = 0; id < nodes.size(); ++id) {
         auto& n = nodes[id];
         currentInstance = n.instance;
-        if (n.op == "signal")
+        if (n.op == NodeKind::Signal)
             for (std::size_t bit = 0; bit < n.type.bits(); ++bit)
-                if (!driven.contains({static_cast<int>(id), bit}))
+                if (!driven.contains({static_cast<NodeId>(id), bit}))
                     fail("EUndriven", n.span,
-                         "Undriven signal bit: " + n.attrs.value("name", "") + "[" + std::to_string(bit) +
-                             "]");
-        if (n.op == "register" && !ownedRegisters.contains(static_cast<int>(id)))
+                         "Undriven signal bit: " + std::get<SignalAttributes>(n.attrs).name + "[" +
+                             std::to_string(bit) + "]");
+        if (n.op == NodeKind::Register && !ownedRegisters.contains(static_cast<NodeId>(id)))
             fail("EUnownedRegister", n.span, "Register has no next owner");
     }
     for (auto& st : d->body)
         if (st.kind == "input" || st.kind == "output") {
             auto& sym = top->symbols.at(st.name);
-            ports.push_back({{"name", st.name}, {"direction", st.kind}, {"node", sym.value.node}});
+            ports.push_back(
+                {st.name, st.kind == "input" ? PortDirection::Input : PortDirection::Output, sym.value.node});
         }
     std::size_t clockCount = 0;
     for (auto& port : ports)
-        if (port["direction"] == "input" && nodes.at(port["node"].get<int>()).type.kind == "clock")
+        if (port.direction == PortDirection::Input && nodes.at(port.node).type.kind == TypeKind::Clock)
             ++clockCount;
     if (clockCount > 1) {
         currentInstance = top->path;
         fail("EClockDomain", d->span, "Only one top-level clock is allowed");
     }
-    Json sources = Json::array();
+    LogicGraph graph;
+    graph.top = targetFile->source.package + "::" + d->name;
+    graph.limits = options;
     for (auto& [path, state] : files)
-        sources.push_back(
-            {{"path", path}, {"sha256", state->source.sha256}, {"byteLength", state->source.byteLength}});
-    Json graphNodes = Json::array();
-    for (std::size_t i = 0; i < nodes.size(); ++i) {
-        auto& n = nodes[i];
-        graphNodes.push_back({{"id", i},
-                              {"op", n.op},
-                              {"type", n.type.json()},
-                              {"inputs", n.inputs},
-                              {"attributes", n.attrs},
-                              {"source", toJson(n.span)},
-                              {"instance", n.instance}});
-    }
-    Json graph = {{"format", "verimc.logic"},
-                  {"formatVersion", 1},
-                  {"languageVersion", "0.1"},
-                  {"compilerVersion", "0.1.0"},
-                  {"top", targetFile->source.package + "::" + d->name},
-                  {"sources", sources},
-                  {"instances", instances},
-                  {"ports", ports},
-                  {"nodes", graphNodes},
-                  {"connections", edges},
-                  {"semantics",
-                   {{"clockEdge", "rising"},
-                    {"reset", "synchronousHigh"},
-                    {"stateUpdate", "simultaneous"},
-                    {"initialRegisters", "invalid"}}},
-                  {"limits",
-                   {{"maxNodes", options.maxNodes},
-                    {"maxBits", options.maxBits},
-                    {"maxInstances", options.maxInstances},
-                    {"maxSteps", options.maxSteps},
-                    {"maxDepth", options.maxDepth},
-                    {"maxSourceBytes", options.maxSourceBytes},
-                    {"maxWidth", 4096},
-                    {"maxArrayLength", 65536},
-                    {"maxIntegerBits", 65536}}},
-                  {"validation",
-                   {{"stage", "logicalGraph"}, {"physicalVerified", false}, {"sourceTestsExecuted", false}}}};
+        graph.sources.push_back({path, state->source.sha256, state->source.byteLength});
+    graph.instances = std::move(instances);
+    graph.ports = std::move(ports);
+    graph.nodes = std::move(nodes);
+    graph.connections = std::move(edges);
     try {
         validateLogicGraph(graph);
     } catch (Diagnostic& error) {
         auto file = files.find(error.span.file);
         if (file != files.end())
             error.sourceSha256 = file->second->source.sha256;
-        for (auto& n : nodes)
+        for (auto& n : graph.nodes)
             if (n.span.file == error.span.file && n.span.start == error.span.start) {
                 error.instance = n.instance;
                 break;
@@ -1306,7 +1229,7 @@ Json Compiler::run() {
     return graph;
 }
 } // namespace
-Json compileFile(const CompileOptions& options) {
+LogicGraph compileFile(const CompileOptions& options) {
     return Compiler(options).run();
 }
 } // namespace verimc
