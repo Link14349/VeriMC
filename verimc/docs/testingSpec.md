@@ -1,6 +1,6 @@
 # VeriMC 0.1：测试、诊断与验收
 
-本规范定义未来测试执行器的行为；当前只有规范和样例，没有 HDL 运行结果或物理综合结果。
+本规范定义源语言测试执行器的行为。当前编译前端通过独立 `.vmcl` 消费者做逻辑回归；源文件中 test 的执行器及物理综合仍未实现，详见 [实施记录](compilerStatus.md)。
 
 ## 1. 测试声明与可见范围
 
@@ -129,6 +129,7 @@ test pulseProbe for Counter4 mode physical {
 | `EInitialization` / `ECapability` / `EArtifactVersion` | 初始化失败 / 必需能力缺失 / 产物版本不支持 |
 | `ETestUncommittedDrive` / `ETestClockDrive` / `ETestTimeline` | 未提交输入即观测 / 时钟被非法驱动 / 时间线非法 |
 | `EExpectation` | 有效断言结果为 false |
+| `EImport` / `EArtifactInvalid` | 导入路径超出项目根 / `.vmcl` 文件结构或语义无效 |
 | `WUnused` / `WStyle` | 未消费的资源或输出 / 命名或排版建议 |
 
 诊断阶段顺序为词法句法 → 导入/名称/展开 → 类型 → 驱动与时钟 → 模型/映射 → 物理约束 → 测试执行。多个错误按源文件规范路径和字节位置排序；后阶段只在前置数据有效时执行，避免虚构级联错误。反例目录为每个用例记录一个主要预期错误，不要求实现输出完全相同的全部附属错误。

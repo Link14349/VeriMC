@@ -15,6 +15,8 @@ from lark import Lark, UnexpectedInput
 def checkDocuments(projectRoot):
     linkCount = 0
     for filePath in sorted(projectRoot.rglob("*.md")):
+        if any(part.startswith("build") or part in {".cache", "testResults"} for part in filePath.relative_to(projectRoot).parts):
+            continue
         content = filePath.read_text(encoding="utf-8")
         if not content.endswith("\n") or content.count("```") % 2:
             raise ValueError(f"文档换行或代码块不完整：{filePath}")
