@@ -71,10 +71,13 @@ export class CircuitViewport {
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
     this.renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); this.renderer.setClearColor(0x20272b); this.renderer.outputColorSpace = THREE.SRGBColorSpace; this.renderer.localClippingEnabled = true;
     material.clippingPlanes = [this.clipPlane];
+    this.renderer.domElement.tabIndex = 0;
+    this.renderer.domElement.setAttribute('aria-label', '三维工作台，方向键平移视角');
     container.appendChild(this.renderer.domElement);
     this.scene.add(new THREE.HemisphereLight(0xf2f2e4, 0x4c5b69, 2.7)); const light = new THREE.DirectionalLight(0xffefcf, 3.1); light.position.set(-12,30,15); this.scene.add(light);
     this.camera.position.set(18,18,22); this.controls = new OrbitControls(this.camera, this.renderer.domElement); this.controls.target.set(4,0,2); this.controls.enableDamping = true; this.controls.dampingFactor = .12; this.controls.minDistance = 2; this.controls.maxDistance = 700;
     this.controls.mouseButtons = { LEFT: -1 as THREE.MOUSE, MIDDLE: THREE.MOUSE.PAN, RIGHT: THREE.MOUSE.ROTATE };
+    this.controls.listenToKeyEvents(this.renderer.domElement);
     this.grid = new THREE.GridHelper(128,128,0x5c6668,0x343e42); this.grid.position.y = -.008; this.scene.add(this.grid);
     const axes = new THREE.AxesHelper(2.2); axes.position.set(-.5,.025,-.5); this.scene.add(axes);
     this.selection.visible = false; this.ghost.visible = false; this.scene.add(this.selection, this.ghost);
@@ -352,7 +355,7 @@ export class CircuitViewport {
     for (const hit of this.raycaster.intersectObjects(meshes)) { const pool = hit.object.userData.pool as InstancePool; const pos = pool.positions[hit.instanceId!]; if (pos && (!this.cutaway || pos[1] <= this.layer)) return pos; }
     return null;
   }
-  private pointerDown = (event: PointerEvent) => { if (event.button === 0) this.down = [event.clientX,event.clientY]; };
+  private pointerDown = (event: PointerEvent) => { this.renderer.domElement.focus({ preventScroll: true }); if (event.button === 0) this.down = [event.clientX,event.clientY]; };
   private pointerUp = (event: PointerEvent) => { if (event.button === 0 && this.down && Math.hypot(event.clientX-this.down[0],event.clientY-this.down[1]) < 5) { const pos = this.locate(event); if (pos) this.onPick(pos,this.tool,event.shiftKey); } this.down = null; };
   private pointerMove = (event: PointerEvent) => { const pos = this.locate(event); if (posKey(pos ?? [0,0,0]) !== posKey(this.hover ?? [0,0,0])) this.onHover(pos); this.hover = pos; this.ghost.visible = this.tool === 'place' && !!pos; if (pos) this.ghost.position.set(pos[0]+.5,pos[1]+.5,pos[2]+.5); };
   private animate = () => { this.frameId = requestAnimationFrame(this.animate); this.controls.update(); this.renderer.render(this.scene,this.camera); this.frameCount++; const now = performance.now(); if (now-this.lastFps > 1000) { this.onFps(Math.round(this.frameCount*1000/(now-this.lastFps))); this.lastFps=now; this.frameCount=0; } };
