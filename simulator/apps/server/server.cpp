@@ -45,7 +45,7 @@ struct Hub {
     asio::thread_pool fileWorkers{1};
     ~Hub() { for (auto& [id, job] : fileJobs) { (void)id; job->cancelled = true; } fileWorkers.join(); }
     std::shared_ptr<FileJob> beginFileJob(const std::string& operation);
-    void exportFile(const std::shared_ptr<FileJob>& job, bool checkpoint, bool json);
+    void exportFile(const std::shared_ptr<FileJob>& job, bool checkpoint);
     void importFile(const std::shared_ptr<FileJob>& job);
     void endFileJob(const std::shared_ptr<FileJob>& job, const std::string& error = {});
     void trimHistory();
@@ -369,9 +369,9 @@ void Hub::command(const std::shared_ptr<Client>& client, const Json& message) {
     else if (cmd == "exportFile" || cmd == "importFile") {
         const auto checkpoint = message.value("checkpoint", false);
         const auto format = message.value("format", std::string("vmcb"));
-        if (format != "vmcb" && format != "json") throw std::invalid_argument("未知文件格式");
+        if (format != "vmcb") throw std::invalid_argument("工程仅导出 .vmcb；JSON 仅用于导入旧工程");
         auto job = beginFileJob(cmd == "exportFile" ? "export" : "import"); result = job->status();
-        if (cmd == "exportFile") exportFile(job, checkpoint, format == "json");
+        if (cmd == "exportFile") exportFile(job, checkpoint);
     }
     else if (cmd == "fileStatus" || cmd == "cancelFile") {
         auto found = fileJobs.find(message.at("id").get<std::string>());
@@ -434,25 +434,20 @@ void Hub::endFileJob(const std::shared_ptr<FileJob>& job, const std::string& err
     job->finish(error); if (activeFileJob == job) activeFileJob.reset();
     for (const auto& weak : clients) if (auto client = weak.lock()) client->sendJson(status());
 }
-void Hub::exportFile(const std::shared_ptr<FileJob>& job, bool checkpoint, bool json) {
+void Hub::exportFile(const std::shared_ptr<FileJob>& job, bool checkpoint) {
     try {
         // Clone on the owner thread at a completed event boundary. The worker
         // owns this copy; the live World's mutable lookup cache is never shared.
         auto snapshot = sim.clone();
-        asio::post(fileWorkers, [this, job, checkpoint, json, snapshot = std::move(snapshot)] {
+        asio::post(fileWorkers, [this, job, checkpoint, snapshot = std::move(snapshot)] {
             std::string error;
             try {
                 std::ofstream output(job->path, std::ios::binary | std::ios::trunc);
                 if (!output) throw std::runtime_error("无法写入临时工程文件");
-                if (json) {
-                    job->progress("编码旧 JSON", 0, 0);
-                    auto value = snapshot->saveProject(job->info.name, checkpoint, [job] { job->progress("编码旧 JSON", 0, 0); });
-                    output << value.dump(2);
-                    job->progress("文件已生成", static_cast<std::uint64_t>(output.tellp()), static_cast<std::uint64_t>(output.tellp()));
-                } else writeVmcb(output, *snapshot, job->info, checkpoint, job->options());
+                writeVmcb(output, *snapshot, job->info, checkpoint, job->options());
                 output.close();
                 if (!output) throw std::runtime_error("关闭工程文件失败");
-                job->info.name += checkpoint ? (json ? ".snapshot.verimc.json" : ".snapshot.vmcb") : (json ? ".verimc.json" : ".vmcb");
+                job->info.name += checkpoint ? ".snapshot.vmcb" : ".vmcb";
             } catch (const std::exception& exception) { error = exception.what(); }
             asio::post(io, [this, job, error] { endFileJob(job, error); });
         });
@@ -578,7 +573,7 @@ class HttpSession : public std::enable_shared_from_this<HttpSession> {
             reply(http::status::method_not_allowed, "Unsupported file operation"); return;
         }
         if (request.method() != http::verb::get) { reply(http::status::method_not_allowed, "GET only"); return; }
-        if (target == "/api/bootstrap") { reply(http::status::ok, Json{{"token", hub.token}, {"version", "26.2"}}.dump(), "application/json"); return; }
+        if (target == "/api/bootstrap") { reply(http::status::ok, Json{{"token", hub.token}, {"version", "26.2"}, {"projectFileVersion", 1}}.dump(), "application/json"); return; }
         if (target == "/health") { reply(http::status::ok, "ok"); return; }
         if (target == "/") target = "/index.html";
         if (target.find("..") != std::string::npos || target.find('%') != std::string::npos || target.find('\\') != std::string::npos) { reply(http::status::bad_request, "Invalid path"); return; }

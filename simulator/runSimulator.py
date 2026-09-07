@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Build and launch the native simulator with the system browser."""
 import argparse
+import json
 from pathlib import Path
 import shutil
 import subprocess
@@ -22,6 +23,9 @@ def isReady():
         with urllib.request.urlopen(url + '/health', timeout=.4) as response: return response.read() == b'ok'
     except OSError: return False
 if isReady():
+    with urllib.request.urlopen(url + '/api/bootstrap', timeout=2) as response: runningService = json.load(response)
+    if runningService.get('projectFileVersion') != 1:
+        raise SystemExit(f'检测到旧版模拟器后台：{url}\n当前后台不支持 .vmcb 文件接口。请先保留当前工程，再在原终端停止服务，重新运行本命令。仅刷新浏览器不会更新后台。')
     print(f'模拟器已经运行：{url}\n如需重新构建，请先在原终端停止服务，或选择其他 --port。')
     if not args.noOpen: webbrowser.open(url)
     raise SystemExit(0)

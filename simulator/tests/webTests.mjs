@@ -20,6 +20,11 @@ const frame = (from, edges, reset = false, epoch = 1) => ({ frameId: 1, from, ne
 
 const flush = () => new Promise(resolve => setImmediate(resolve));
 const deferred = () => { let resolve, reject; const promise = new Promise((a,b) => { resolve=a; reject=b; }); return {promise,resolve,reject}; };
+test('old backend rejects project transfers before sending an unknown command', async () => {
+  const connection = new SimulatorConnection();
+  connection.request = () => assert.fail('old backend received a file command');
+  await assert.rejects(connection.projectFile({ signal: new AbortController().signal, progress: assert.fail }), /后台仍是旧版本.*重启模拟器服务/);
+});
 test('inspector reads final state after updates during both initial and trailing requests', async () => {
   const reads=[], shown=[];
   const refresh=createCoalescedRefresh(() => { const read=deferred();reads.push(read);return read.promise; }, value => shown.push(value), assert.fail);

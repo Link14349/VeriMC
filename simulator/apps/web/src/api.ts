@@ -24,11 +24,13 @@ export class SimulatorConnection extends EventTarget {
   private stopped = false;
   private frame?: { id: number; full: boolean };
   private sessionToken = '';
+  private projectFileVersion = 0;
   async connect() {
     try {
       const boot = await fetch('/api/bootstrap').then(r => { if (!r.ok) throw new Error('本地服务无法连接'); return r.json(); });
       if (this.stopped) return;
       this.sessionToken = boot.token;
+      this.projectFileVersion = boot.projectFileVersion ?? 0;
       const socket = new WebSocket(`ws://${location.host}/socket?token=${encodeURIComponent(boot.token)}`); this.socket = socket; socket.binaryType = 'arraybuffer';
       socket.onopen = () => { this.connected = true; this.dispatchEvent(new Event('status')); };
       socket.onmessage = (event) => { try { this.receive(event.data); } catch (error) { this.error(String(error)); this.stop(); } };
@@ -44,9 +46,10 @@ export class SimulatorConnection extends EventTarget {
       this.pending.set(requestId, { resolve, reject, timer }); this.socket!.send(JSON.stringify({ ...body, cmd, requestId }));
     });
   }
-  async projectFile(options: { file?: File; checkpoint?: boolean; format?: 'vmcb' | 'json'; signal: AbortSignal; progress: (value: FileProgress) => void }): Promise<void> {
+  async projectFile(options: { file?: File; checkpoint?: boolean; signal: AbortSignal; progress: (value: FileProgress) => void }): Promise<void> {
     if (options.signal.aborted) throw new Error('文件操作已取消');
-    const job = await this.request(options.file ? 'importFile' : 'exportFile', { checkpoint: options.checkpoint ?? false, format: options.format ?? 'vmcb' }) as FileProgress;
+    if (this.projectFileVersion !== 1) throw new Error('本地后台仍是旧版本，尚未支持 .vmcb。请保存当前工程后重启模拟器服务，再刷新页面；只刷新页面不会更新后台。');
+    const job = await this.request(options.file ? 'importFile' : 'exportFile', { checkpoint: options.checkpoint ?? false }) as FileProgress;
     const id = job.id;
     let upload: XMLHttpRequest | undefined;
     const cancel = () => { void this.request('cancelFile', { id }).catch(() => {}); upload?.abort(); };

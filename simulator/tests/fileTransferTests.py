@@ -16,7 +16,8 @@ def http(method,path,body=None,headers=None):
     response=connection.getresponse();status=response.status;responseHeaders=dict(response.getheaders());content=response.read();connection.close()
     return status,responseHeaders,content
 
-token=json.loads(http('GET','/api/bootstrap')[2])['token']
+bootstrap=json.loads(http('GET','/api/bootstrap')[2]);assert bootstrap['projectFileVersion']==1
+token=bootstrap['token']
 headers={'X-Simulator-Token':token,'Origin':f'http://127.0.0.1:{port}','Content-Type':'application/octet-stream'}
 def wait(job):
     deadline=time.monotonic()+45
@@ -29,13 +30,13 @@ def wait(job):
     raise AssertionError('file job timed out')
 def canonical(value):return {key:value for key,value in value.items() if key not in ('type','cmd','requestId')}
 def snapshot():return canonical(command('save',checkpoint=True))
-def export(format='vmcb',checkpoint=True):
-    job=command('exportFile',format=format,checkpoint=checkpoint);assert job['type']=='reply',job
+def export(checkpoint=True):
+    job=command('exportFile',checkpoint=checkpoint);assert job['type']=='reply',job
     result=wait(job['id']);assert result['state']=='done',result
     status,responseHeaders,content=http('GET',f'/api/files/{job["id"]}/download?token={token}')
     assert status==200 and responseHeaders['Content-Type']=='application/octet-stream',(status,content)
     assert 'attachment;' in responseHeaders['Content-Disposition']
-    assert responseHeaders['Content-Disposition'].endswith('.json' if format=='json' else '.vmcb'),'download lost its extension'
+    assert responseHeaders['Content-Disposition'].endswith('.vmcb'),'download lost its extension'
     return content
 
 def upload(content):
@@ -45,17 +46,19 @@ def upload(content):
     return wait(job['id'])
 original=snapshot()
 try:
+    rejected=command('exportFile',format='json');assert rejected['type']=='error' and '仅导出 .vmcb' in rejected['message'],'JSON export was allowed'
     command('new');command('place',pos=[0,0,0],name='stone');command('place',pos=[0,1,0],name='stone_button',properties={'face':'floor'});command('probe',pos=[0,1,0],name='input');command('interact',pos=[0,1,0]);command('step',count=7)
     expected=snapshot();binary=export();assert binary.startswith(b'VMCB\r\n\x1a\n')
-    legacy=export('json');assert json.loads(legacy)==expected
+    legacy=json.dumps(expected,ensure_ascii=False,indent=2).encode()
     command('new');empty=snapshot();assert upload(binary)['state']=='done';assert snapshot()==expected
     command('undo');assert snapshot()==empty;command('redo');assert snapshot()==expected
     command('step',count=13);assert command('inspect',pos=[0,1,0])['properties']['powered']=='false'
     assert upload(legacy)['state']=='done';assert snapshot()==expected
     large=json.loads(legacy);large['sequence']=2**53+37
     assert upload(json.dumps(large).encode())['state']=='done'
-    assert json.loads(export('json'))['sequence']==2**53+37,'JSON passed through JS Number'
-    command('rename',name='x'*200);export();export('json')
+    assert snapshot()['sequence']==2**53+37,'JSON passed through JS Number'
+    assert upload(export())['state']=='done' and snapshot()['sequence']==2**53+37,'VMCB migration lost large integers'
+    command('rename',name='x'*200);export()
     before=snapshot();history=(client.latestStatus.get('canUndo'),client.latestStatus.get('canRedo'))
     bad=bytearray(binary);bad[60]^=1
     result=upload(bad);assert result['state']=='failed',result;assert snapshot()==before
@@ -78,6 +81,6 @@ try:
     response=connection.getresponse();assert response.status==413;response.read();connection.close()
     assert wait(job['id'])['state']=='failed' and snapshot()==before,'oversized upload changed world'
     command('new');design=export(checkpoint=False);assert upload(design)['state']=='done' and not snapshot()['blocks']
-    print('PASS file transfers: VMCB + JSON, exact integers, continuation, undo/redo, invalid/cancelled/interrupted imports and session checks')
+    print('PASS file transfers: VMCB export, legacy JSON import, JSON export rejection, exact integers, continuation, undo/redo and invalid/cancelled/interrupted uploads')
 finally:
     command('load',project=original);client.close()
