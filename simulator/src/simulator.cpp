@@ -153,19 +153,20 @@ void Simulator::setBlock(BlockPos p, StateId id, unsigned flags, int depth) {
     }
 }
 bool Simulator::survives(BlockPos p, StateId id) const {
-    const auto& s = registry[id]; const auto& below = at(p.relative(Direction::down));
-    if(s.device==Device::solid && registry.type(id).className=="WoolCarpetBlock")return below.device!=Device::air;
+    const auto& s = registry[id];
+    auto below = [&]() -> const BlockState& { return at(p.relative(Direction::down)); };
+    if(s.device==Device::solid && registry.type(id).className=="WoolCarpetBlock")return below().device!=Device::air;
     switch (s.device) {
     case Device::bell: {auto support=bellSupport(id);const auto& neighbor=at(p.relative(support));return support==Direction::up?(neighbor.device!=Device::fenceGate && (neighbor.centerMask&1u)!=0):(neighbor.supportMask&(1u<<static_cast<unsigned>(opposite(support))))!=0;}
-    case Device::wire: return (below.supportMask & 2u) != 0 || below.device == Device::hopper;
-    case Device::repeater: case Device::comparator: return (below.rigidMask & 2u) != 0;
-    case Device::torch: return (below.centerMask & 2u) != 0;
+    case Device::wire: { const auto& support = below(); return (support.supportMask & 2u) != 0 || support.device == Device::hopper; }
+    case Device::repeater: case Device::comparator: return (below().rigidMask & 2u) != 0;
+    case Device::torch: return (below().centerMask & 2u) != 0;
     case Device::wallTorch: return (at(p.relative(opposite(s.facing))).supportMask & (1u << static_cast<unsigned>(s.facing))) != 0;
     case Device::tripwireHook: return axis(s.facing) != 0 && (at(p.relative(opposite(s.facing))).supportMask & (1u << static_cast<unsigned>(s.facing))) != 0;
     case Device::lever: case Device::button: return (at(p.relative(opposite(s.connectedDirection))).supportMask & (1u << static_cast<unsigned>(s.connectedDirection))) != 0;
-    case Device::pressurePlate: case Device::weightedPlate: return (below.rigidMask & 2u) != 0 || (below.centerMask & 2u) != 0;
-    case Device::rail: case Device::poweredRail: case Device::activatorRail: case Device::detectorRail: return (below.rigidMask & 2u) != 0;
-    case Device::door: return registry.property(id, "half") == "lower" ? (below.supportMask & 2u) != 0 : below.type == s.type;
+    case Device::pressurePlate: case Device::weightedPlate: { const auto& support = below(); return (support.rigidMask & 2u) != 0 || (support.centerMask & 2u) != 0; }
+    case Device::rail: case Device::poweredRail: case Device::activatorRail: case Device::detectorRail: return (below().rigidMask & 2u) != 0;
+    case Device::door: return registry.property(id, "half") == "lower" ? (below().supportMask & 2u) != 0 : below().type == s.type;
     case Device::pistonHead: { const auto& base = at(p.relative(opposite(s.facing))); return (base.device == Device::piston && base.extended && base.facing == s.facing && base.sticky == (registry.property(id, "type") == "sticky")) || (base.device == Device::movingPiston && base.facing == s.facing); }
     default: return true;
     }
@@ -382,7 +383,18 @@ void Simulator::refreshComparator(BlockPos p) {
     }
 }
 void Simulator::executeNeighbor(BlockPos p, StateId source) {
-    auto id = world.get(p); const auto& s = registry[id];
+    const auto id = world.get(p);
+    // These classes have no neighborChanged behavior. Their shape updates
+    // still run separately, and enqueue still counts every notification.
+    // Keep this common path outside the large reactive handler's stack frame.
+    switch (registry[id].device) {
+    case Device::air: case Device::solid: case Device::source:
+    case Device::lever: case Device::button: return;
+    default: executeReactiveNeighbor(p, id, source); break;
+    }
+}
+void Simulator::executeReactiveNeighbor(BlockPos p, StateId id, StateId source) {
+    const auto& s = registry[id];
     switch (s.device) {
     case Device::dropper: {
         bool powered = bestSignal(p) > 0 || bestSignal(p.relative(Direction::up)) > 0;

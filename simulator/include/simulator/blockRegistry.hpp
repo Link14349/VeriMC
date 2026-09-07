@@ -19,7 +19,9 @@ struct BlockType {
     bool occludesVibrations{}, dampensVibrations{}, vibrationResonator{};
     std::uint8_t instrument{};
 };
-struct BlockState {
+// A power-of-two stride avoids division by 40 in each checked vector lookup.
+// Each immutable state also stays inside one aligned 64-byte region.
+struct alignas(64) BlockState {
     std::uint16_t type{};
     Device device{Device::air};
     Direction facing{Direction::north};

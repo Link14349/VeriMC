@@ -2,6 +2,42 @@
 
 以下数字只代表给定工作负载，不能推出所有红石机器的速度，也没有与原版 Minecraft 作倍率比较。
 
+## 2026-09-07：查询、空回调与状态表布局
+
+同一 M1 开发机、Apple Clang 17、`-O3 -ffp-contract=off` Release。基线为 `f6446b0`，新旧可执行文件分别预热一次，交错五组测量；期间编辑器暂停，不同时构建或运行测试。原始数据、源码散列和二进制身份见 [checkedDispatchM1.json](../tests/benchmarks/checkedDispatchM1.json)。
+
+工作负载是 10,000 条受驱动的拉杆—粉线—中继器—粉线—灯链路，**110,000 方块、50,000 红石器件**，不是设计中“10,000 红石器件”的验收场景。40 次输入翻转、320 gt，每次处理 600,000 个计划事件、55,200,000 次邻居更新。计时包含输入、执行与增量收集；搭建耗时另外记录。
+
+| 构建 / 探针 | 中位耗时 | p95 耗时 | 中位吞吐 |
+| --- | --- | --- | --- |
+| 基线 / 0 | 2.285997 s | 2.308657 s | 139.98 gt/s |
+| 本轮 / 0 | 2.147283 s | 2.299036 s | 149.03 gt/s |
+| 本轮 / 64 | 2.184782 s | 2.205038 s | 146.47 gt/s |
+
+配对测量的中位耗时下降 **6.07%**。64 个探针分散在实际切换的输出线上，每个记录初始值及 40 次翻转，共 2,624 条边沿；相对无探针测量，吞吐下降 **1.72%**。探针样本见 [checkedDispatch64ProbesM1.json](../tests/benchmarks/checkedDispatch64ProbesM1.json)。这里测量原生采样，不包含浏览器绘图、WebSocket 传输或 VCD 导出。普通桌面仍有噪声；带探针组的较低 p95 不代表探针会提升性能。
+
+本轮保留的改动：
+
+- `World::set` 复用已有 8 项区块指针缓存。创建、删除和缓存空查询保持同步，清空、复制和移动重置缓存；不缓存电路信号。
+- 负坐标分块使用 C++20 明确定义的算术右移；支撑检查按器件实际需要查询邻居。
+- 空气、普通结构块、电源、拉杆和按钮收到邻居通知后，在已有空行为分支立即返回，避免进入较大的器件处理函数。形状更新独立执行，全部通知的顺序和计数保留。
+- 只读 `BlockState` 改为 64 字节对齐，让带越界检查的查表采用 2 的幂次步长。32,366 条状态的有效载荷从 1,294,640 增至 2,071,424 字节，增加约 0.74 MiB，不含容器预留容量；工程格式和网络格式不使用这个结构的内存布局。
+
+尝试的跨文件优化和入队函数拆分没有显示额外收益，已撤回。中间测量保存在 [lookupExperiments](../tests/benchmarks/lookupExperiments/)，它们不是最终交付版本的性能结果。
+
+一致性验证：21 组现有原版差分场景，加上跨正负区块、带 64 探针的 200 条链路，在原版场景每次输入后、链路每批输入后及游戏刻边界记录完整快照、事件队列、库存、随机状态、同刻边沿、增量和计数。新旧两版的 **9,830 条记录、388,534,566 字节完全一致**，摘要见 [performanceReplayM1.json](../tests/benchmarks/performanceReplayM1.json)。同刻事件的中间探针边沿包含在每份快照中。另有 83 项 Release 与 ASAN/UBSAN 测试通过，覆盖原版差分、更新预算、随机位模式、状态索引越界和整数坐标边界；协议、背压和浏览器单步验证通过。
+
+`tools/checkWorldReplay.cpp` 是独立的优化对照驱动。优化前后应使用同一驱动、数据和平台，分别链接各版本的核心；保留基线二进制后再修改核心。当前版本可通过 `cmake --build simulator/build --target checkWorldReplay` 构建，输出 JSON Lines。比较工具逐条检查并报告第一个不同的场景、记录及字段：
+
+```sh
+python3 simulator/tools/compareWorldReplay.py before.jsonl after.jsonl \
+  --before-commit f6446b0 --output simulator/testResults/replayComparison.json
+```
+
+输入也支持 `.jsonl.gz`。这个对照验证优化前后的一致性；与原版的正确性仍由独立差分样本验证。
+
+**尚未完成全部性能验收。** 149 gt/s 是这组活动链路的结果；混合比较器/活塞/漏斗、完整 100,000 方块验收场景、20,000 可见方块、暂停延迟及整体内存预算仍需继续。不能把本次 6.07% 推广到其他机器，也不能据此宣称达到所有目标或相对 Minecraft 的速度倍数。
+
 ## 2026-09-07：区块查询缓存
 
 环境：Apple M1、8 逻辑核心、16 GiB 内存、macOS 15.7.4，Apple Clang 17 的 arm64 Release 构建。浏览器保持暂停；测试不含三维渲染和探针。
@@ -26,10 +62,13 @@
 先完成 Release 构建，再在仓库根目录执行：
 
 ```sh
-python3 simulator/tools/runBenchmarks.py --circuits 10000 --runs 3 --output simulator/testResults/myBenchmark.json
+python3 simulator/tools/runBenchmarks.py --circuits 10000 --output simulator/testResults/myBenchmark.json
+python3 simulator/tools/runBenchmarks.py --circuits 10000 --probes 64 --output simulator/testResults/myProbes64.json
 ```
 
-脚本保存原始样本、中位数、平台、Git 状态和可执行文件 SHA-256。结果文件已存在时拒绝覆盖。测试前应暂停编辑器仿真，不要同时构建或运行其他负载。日常运行不需要原版 Minecraft。
+脚本默认预热一次、独立运行五次，保存原始样本、中位数、p95、平台、Git 状态、源码及可执行文件 SHA-256。p95 使用最近秩法，五次测量时就是最大样本，不能视为充分估计了长期尾部。结果文件已存在时拒绝覆盖。测试前应暂停编辑器仿真，不要同时构建或运行其他负载。日常运行不需要原版 Minecraft。
+
+`--baseline /path/to/earlierSimulatorCli` 会分别预热新旧二进制，然后交错五组前后测量，减少温度和后台活动随时间漂移的影响。它仍不能消除普通桌面的测量噪声。脚本核对游戏刻、事件和邻居更新数量，工作量不一致时拒绝给出比较结果。指定 64 探针时，CLI 另外确认每个探针实际记录 40 次翻转及初始值。
 
 仍需验收的项目包括混合器件工作负载、64 探针开销、20,000 可见方块的渲染、暂停延迟、通信背压和完整内存预算。当前数据不代表全部设计指标达成。
 # 调度修正后的复测

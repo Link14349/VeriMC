@@ -1,0 +1,78 @@
+{
+  "dateUtc": "2026-09-07T04:58:11.937672+00:00",
+  "platform": "macOS-15.7.4-arm64-arm-64bit",
+  "machine": "arm64",
+  "sourceCommit": "f6446b094c517bd45d2354355c959388d9ed4338",
+  "sourceDirty": false,
+  "binarySha256": "055cbffa03e57d721814c1a99136fa9b3aef151e5e503a24cf0083549560c54a",
+  "build": "Release (build/simulatorCli)",
+  "command": [
+    "simulatorCli",
+    "--benchmark",
+    "10000"
+  ],
+  "samples": [
+    {
+      "benchmark": "drivenRepeaterChains",
+      "blocks": 110000,
+      "chunkStorageBytes": 20485000,
+      "circuits": 10000,
+      "events": 600000,
+      "gameTicksPerSecond": 143.21341288239907,
+      "neighborUpdates": 55200000,
+      "seconds": 2.234427583,
+      "ticks": 320,
+      "version": "26.2"
+    },
+    {
+      "benchmark": "drivenRepeaterChains",
+      "blocks": 110000,
+      "chunkStorageBytes": 20485000,
+      "circuits": 10000,
+      "events": 600000,
+      "gameTicksPerSecond": 144.60873226608322,
+      "neighborUpdates": 55200000,
+      "seconds": 2.21286775,
+      "ticks": 320,
+      "version": "26.2"
+    },
+    {
+      "benchmark": "drivenRepeaterChains",
+      "blocks": 110000,
+      "chunkStorageBytes": 20485000,
+      "circuits": 10000,
+      "events": 600000,
+      "gameTicksPerSecond": 141.60609673862626,
+      "neighborUpdates": 55200000,
+      "seconds": 2.259789708,
+      "ticks": 320,
+      "version": "26.2"
+    },
+    {
+      "benchmark": "drivenRepeaterChains",
+      "blocks": 110000,
+      "chunkStorageBytes": 20485000,
+      "circuits": 10000,
+      "events": 600000,
+      "gameTicksPerSecond": 143.5339470680444,
+      "neighborUpdates": 55200000,
+      "seconds": 2.22943775,
+      "ticks": 320,
+      "version": "26.2"
+    },
+    {
+      "benchmark": "drivenRepeaterChains",
+      "blocks": 110000,
+      "chunkStorageBytes": 20485000,
+      "circuits": 10000,
+      "events": 600000,
+      "gameTicksPerSecond": 143.96895759332492,
+      "neighborUpdates": 55200000,
+      "seconds": 2.222701375,
+      "ticks": 320,
+      "version": "26.2"
+    }
+  ],
+  "notes": "Timed work includes 40 input transitions per circuit, execution and change collection; excludes construction. No browser rendering. No idle-only TPS claim.",
+  "medianSeconds": 2.22943775
+}

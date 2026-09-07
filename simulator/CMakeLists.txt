@@ -42,6 +42,9 @@ endif()
 
 include(CTest)
 if(BUILD_TESTING)
+  # Run before and after core optimizations, then compare the canonical stream.
+  add_executable(checkWorldReplay tools/checkWorldReplay.cpp)
+  target_link_libraries(checkWorldReplay PRIVATE simulatorCore)
   add_executable(simulatorTests tests/coreTests.cpp)
   target_link_libraries(simulatorTests PRIVATE simulatorCore)
   add_test(NAME simulatorCoreTests COMMAND simulatorTests)

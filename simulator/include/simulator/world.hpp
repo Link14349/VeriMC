@@ -33,12 +33,14 @@ private:
     // Pointers refer to individually owned chunks, so map rehashing is safe.
     // Each mutation updates this direct-mapped cache, including cached misses.
     // World has one owner thread; concurrent readers require separate snapshots.
-    struct CachedChunk { BlockPos pos{}; const Chunk* chunk{}; bool valid{}; };
+    struct CachedChunk { BlockPos pos{}; Chunk* chunk{}; bool valid{}; };
     static std::size_t cacheIndex(BlockPos key) {
         return (static_cast<unsigned>(key.x) + static_cast<unsigned>(key.y) * 3u + static_cast<unsigned>(key.z) * 5u) & 7u;
     }
     mutable std::array<CachedChunk, 8> chunkCache{};
-    static int floorChunk(int n) { return n >= 0 ? n / 16 : (n + 1) / 16 - 1; }
+    // C++20 defines signed right shift as division rounded toward -infinity,
+    // including INT_MIN; this matches Minecraft's negative chunk coordinates.
+    static int floorChunk(int n) { return n >> 4; }
     static BlockPos chunkPos(BlockPos p) { return {floorChunk(p.x), floorChunk(p.y), floorChunk(p.z)}; }
     static std::size_t offset(BlockPos p) { return (static_cast<unsigned>(p.x) & 15u) | ((static_cast<unsigned>(p.z) & 15u) << 4) | ((static_cast<unsigned>(p.y) & 15u) << 8); }
     std::unordered_map<BlockPos, std::unique_ptr<Chunk>, PosHash> chunks;

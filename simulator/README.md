@@ -89,6 +89,10 @@ node tests/webTests.mjs
 
 # 有实际驱动的中继器链基准
 ./build/simulatorCli --benchmark 1000
+
+# 预热后测量五次，并保存中位数、p95、原始样本和构建身份
+python3 tools/runBenchmarks.py --circuits 10000 --output testResults/baseline.json
+python3 tools/runBenchmarks.py --circuits 10000 --probes 64 --output testResults/probes64.json
 ```
 
 Release、ASan/UBSan、原版 GameTest 差分和浏览器实操分别验证。参考生成流程及边界见 [参考验证](docs/referenceValidation.md)。

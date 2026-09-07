@@ -1,0 +1,162 @@
+{
+  "baselineCommit": "f6446b094c517bd45d2354355c959388d9ed4338",
+  "identicalBytes": 388534566,
+  "sha256": "0e22a925c4a8da6c5d2ec66dfe3f7e18d4a930c7d495e362bb886c0bd4a182dd",
+  "scenarios": {
+    "java26_2Bells": {
+      "records": 323,
+      "finalTick": 122,
+      "events": 275,
+      "neighborUpdates": 4224,
+      "traceEdges": 98
+    },
+    "java26_2Bookshelves": {
+      "records": 88,
+      "finalTick": 56,
+      "events": 27,
+      "neighborUpdates": 734,
+      "traceEdges": 56
+    },
+    "java26_2Buttons": {
+      "records": 178,
+      "finalTick": 100,
+      "events": 59,
+      "neighborUpdates": 1956,
+      "traceEdges": 82
+    },
+    "java26_2Composters": {
+      "records": 181,
+      "finalTick": 110,
+      "events": 66,
+      "neighborUpdates": 1086,
+      "traceEdges": 94
+    },
+    "java26_2Containers": {
+      "records": 870,
+      "finalTick": 16,
+      "events": 15,
+      "neighborUpdates": 10475,
+      "traceEdges": 51
+    },
+    "java26_2CopperChests": {
+      "records": 608,
+      "finalTick": 24,
+      "events": 4,
+      "neighborUpdates": 6957,
+      "traceEdges": 396
+    },
+    "java26_2DeviceVibrations": {
+      "records": 245,
+      "finalTick": 154,
+      "events": 194,
+      "neighborUpdates": 4084,
+      "traceEdges": 146
+    },
+    "java26_2Devices": {
+      "records": 1359,
+      "finalTick": 28,
+      "events": 18,
+      "neighborUpdates": 16988,
+      "traceEdges": 94
+    },
+    "java26_2Droppers": {
+      "records": 107,
+      "finalTick": 30,
+      "events": 21,
+      "neighborUpdates": 1044,
+      "traceEdges": 50
+    },
+    "java26_2Hoppers": {
+      "records": 113,
+      "finalTick": 64,
+      "events": 127,
+      "neighborUpdates": 468,
+      "traceEdges": 161
+    },
+    "java26_2JukeboxHoppers": {
+      "records": 1491,
+      "finalTick": 1455,
+      "events": 5782,
+      "neighborUpdates": 294,
+      "traceEdges": 42
+    },
+    "java26_2Jukeboxes": {
+      "records": 396,
+      "finalTick": 150,
+      "events": 2949,
+      "neighborUpdates": 9182,
+      "traceEdges": 335
+    },
+    "java26_2Notes": {
+      "records": 337,
+      "finalTick": 99,
+      "events": 119,
+      "neighborUpdates": 3686,
+      "traceEdges": 48
+    },
+    "java26_2Pots": {
+      "records": 419,
+      "finalTick": 72,
+      "events": 138,
+      "neighborUpdates": 2076,
+      "traceEdges": 322
+    },
+    "java26_2Rails": {
+      "records": 1876,
+      "finalTick": 44,
+      "events": 11,
+      "neighborUpdates": 27955,
+      "traceEdges": 278
+    },
+    "java26_2Redstone": {
+      "records": 231,
+      "finalTick": 24,
+      "events": 69,
+      "neighborUpdates": 8349,
+      "traceEdges": 152
+    },
+    "java26_2Targets": {
+      "records": 126,
+      "finalTick": 52,
+      "events": 19,
+      "neighborUpdates": 11628,
+      "traceEdges": 274
+    },
+    "java26_2TickBatches": {
+      "records": 41,
+      "finalTick": 24,
+      "events": 68,
+      "neighborUpdates": 1008,
+      "traceEdges": 76
+    },
+    "java26_2Torches": {
+      "records": 237,
+      "finalTick": 194,
+      "events": 0,
+      "neighborUpdates": 690,
+      "traceEdges": 11
+    },
+    "java26_2Tripwire": {
+      "records": 225,
+      "finalTick": 69,
+      "events": 31,
+      "neighborUpdates": 7632,
+      "traceEdges": 169
+    },
+    "java26_2Vibrations": {
+      "records": 222,
+      "finalTick": 160,
+      "events": 153,
+      "neighborUpdates": 1967,
+      "traceEdges": 74
+    },
+    "negativeChains64Probes": {
+      "records": 157,
+      "finalTick": 144,
+      "events": 3600,
+      "neighborUpdates": 349200,
+      "traceEdges": 832
+    }
+  },
+  "notes": "Byte-identical full checkpoints, queues, RNG state, inventories, probe edges, display changes and counters after each fixture input and tick. Includes negative-coordinate chains with 64 switching probes. This compares the two core builds; original-game correctness is checked separately by simulatorTests."
+}

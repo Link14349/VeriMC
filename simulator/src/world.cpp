@@ -19,18 +19,21 @@ World& World::operator=(World&& other) noexcept {
 }
 StateId World::set(BlockPos pos, StateId state) {
     const auto key = chunkPos(pos);
-    auto found = chunks.find(key);
-    if (found == chunks.end()) {
-        if (state == 0) return 0;
-        found = chunks.emplace(key, std::make_unique<Chunk>()).first;
+    auto& cached = chunkCache[cacheIndex(key)];
+    if (!cached.valid || cached.pos != key) {
+        const auto found = chunks.find(key);
+        cached = {key, found == chunks.end() ? nullptr : found->second.get(), true};
     }
-    auto& chunk = *found->second;
+    if (!cached.chunk) {
+        if (state == 0) return 0;
+        cached.chunk = chunks.emplace(key, std::make_unique<Chunk>()).first->second.get();
+    }
+    auto& chunk = *cached.chunk;
     auto old = chunk.states[offset(pos)];
     chunk.states[offset(pos)] = state;
     if (old == 0 && state != 0) { ++chunk.count; ++blockCount; }
     if (old != 0 && state == 0) { --chunk.count; --blockCount; }
-    if (chunk.count == 0) { chunks.erase(found); chunkCache[cacheIndex(key)] = {key, nullptr, true}; }
-    else chunkCache[cacheIndex(key)] = {key, &chunk, true};
+    if (chunk.count == 0) { chunks.erase(key); cached.chunk = nullptr; }
     return old;
 }
 std::vector<Cell> World::cells() const {

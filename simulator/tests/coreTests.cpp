@@ -22,6 +22,11 @@ int main() {
     test("all 26.2 property combinations round-trip", [&] {
         std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/blockStates.json"); auto source = Json::parse(file);
         for (const auto& block : source["blocks"]) for (const auto& state : block["states"]) expect(r.state(block["name"], state["properties"]) == state["id"].get<StateId>(), "state mismatch: " + block["name"].get<std::string>());
+        for (StateId invalid : {static_cast<StateId>(r.stateCount()), UINT32_MAX}) {
+            bool rejected = false;
+            try { (void)r[invalid]; } catch (const std::out_of_range&) { rejected = true; }
+            expect(rejected, "aligned state lookup omitted its bounds check");
+        }
     });
     test("Java 26.2 random primitives match exact bits, rejection counts and restored state", [&] {
         std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/../tests/fixtures/java26_2Random.json");
@@ -477,6 +482,54 @@ int main() {
         moved.set(point, 8); moved.get(point); moved.clear(); expect(moved.get(point) == 0, "clear retained cache");
         moved = std::move(copy); expect(moved.get(point) == 7 && copy.get(point) == 0, "move assignment retained old cache");
         copy = moved; moved.set(point, 1); expect(copy.get(point) == 7, "copy assignment alias");
+    });
+    test("cached world writes agree with a coordinate map at integer limits and collisions", [&] {
+        World world;
+        std::map<BlockPos, StateId> expected;
+        std::vector<BlockPos> positions;
+        for (int n : {INT_MIN, INT_MIN + 15, INT_MIN + 16, -129, -128, -33, -32, -17, -16, -1, 0, 15, 16, 31, 32, 127, 128, INT_MAX - 16, INT_MAX - 15, INT_MAX}) {
+            positions.push_back({n, n, n});
+            positions.push_back({n, -17, 31});
+            positions.push_back({15, n, -16});
+            positions.push_back({-1, 16, n});
+        }
+        // Widely spaced x coordinates deliberately evict the same cache slot.
+        for (int n = -16; n < 16; ++n) positions.push_back({n * 128, 0, 0});
+        std::sort(positions.begin(), positions.end());
+        positions.erase(std::unique(positions.begin(), positions.end()), positions.end());
+        auto write = [&](BlockPos pos, StateId value) {
+            const auto found = expected.find(pos);
+            const auto old = found == expected.end() ? 0 : found->second;
+            expect(world.set(pos, value) == old, "cached write returned wrong previous state");
+            if (value) expected[pos] = value; else expected.erase(pos);
+            expect(world.get(pos) == value && world.size() == expected.size(), "cached write lost state/count");
+        };
+        auto verify = [&] {
+            const auto cells = world.cells();
+            expect(cells.size() == expected.size(), "world enumeration count");
+            auto item = expected.begin();
+            for (const auto& cell : cells) {
+                expect(cell.pos == item->first && cell.state == item->second, "world enumeration at integer boundary");
+                ++item;
+            }
+            for (const auto& pos : positions) {
+                const auto found = expected.find(pos);
+                expect(world.get(pos) == (found == expected.end() ? 0 : found->second), "evicted or negative cached read");
+            }
+        };
+        for (auto pos : positions) { expect(world.get(pos) == 0, "initial miss"); write(pos, 7); }
+        verify();
+        std::uint32_t random = 71237;
+        for (int i = 0; i < 10000; ++i) {
+            random = random * 1664525u + 1013904223u;
+            auto pos = positions[(random >> 8u) % positions.size()];
+            write(pos, i % 3 == 0 ? 0 : random % 31u + 1u);
+            if (i % 257 == 0) verify();
+        }
+        verify();
+        for (auto pos : positions) write(pos, 0);
+        expect(world.chunkCount() == 0, "empty cached chunks were retained");
+        verify();
     });
     test("wire attenuation and zero-delay settling", [&] { Simulator s(r); floor(s); for (int x = 1; x <= 17; ++x) s.place({x, 1, 0}, r.state("redstone_wire")); s.place({0, 1, 0}, r.state("redstone_block")); for (int x = 1; x <= 17; ++x) expect(s.at({x, 1, 0}).power == std::max(16 - x, 0), "wire at " + std::to_string(x)); expect(s.currentTick == 0, "wire introduced tick delay"); s.setBlock({0, 1, 0}, 0); for (int x = 1; x <= 17; ++x) expect(s.at({x, 1, 0}).power == 0, "wire failed to decay"); });
     test("strong power relays through a solid cube", [&] { Simulator s(r); floor(s); s.place({1, 1, 0}, r.state("stone")); s.place({2, 1, 0}, r.state("redstone_wire")); s.place({1, 2, 0}, r.state("lever", {{"face", "floor"}})); s.interact({1, 2, 0}); expect(s.at({2, 1, 0}).power == 15, "lever strong output"); s.interact({1, 2, 0}); expect(s.at({2, 1, 0}).power == 0, "strong output off"); });

@@ -178,6 +178,7 @@ private:
     bool beforeBlockEntities() const { return currentPhase < 2 || currentPhase == 3; }
     void enqueue(Update update);
     void executeNeighbor(BlockPos pos, StateId source = 0);
+    void executeReactiveNeighbor(BlockPos pos, StateId state, StateId source);
     void executeShape(const Update& update);
     void executeTick(const ScheduledEvent& event);
     void onPlace(BlockPos pos, StateId state, StateId oldState);
