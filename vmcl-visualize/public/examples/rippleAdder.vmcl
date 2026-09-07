@@ -1,0 +1,2001 @@
+{
+  "compilerVersion": "0.1.0",
+  "connections": [
+    {
+      "source": 62,
+      "sourceOffset": 0,
+      "sourceSpan": {
+        "column": 5,
+        "end": 491,
+        "file": "rippleAdder.vmc",
+        "line": 22,
+        "start": 461
+      },
+      "target": 4,
+      "targetOffset": 0,
+      "type": {
+        "kind": "bit",
+        "width": 1
+      },
+      "width": 1
+    },
+    {
+      "source": 26,
+      "sourceOffset": 0,
+      "sourceSpan": {
+        "column": 5,
+        "end": 195,
+        "file": "rippleAdder.vmc",
+        "line": 10,
+        "start": 165
+      },
+      "target": 8,
+      "targetOffset": 0,
+      "type": {
+        "kind": "bit",
+        "width": 1
+      },
+      "width": 1
+    },
+    {
+      "source": 30,
+      "sourceOffset": 0,
+      "sourceSpan": {
+        "column": 5,
+        "end": 249,
+        "file": "rippleAdder.vmc",
+        "line": 11,
+        "start": 200
+      },
+      "target": 9,
+      "targetOffset": 0,
+      "type": {
+        "kind": "bit",
+        "width": 1
+      },
+      "width": 1
+    },
+    {
+      "source": 31,
+      "sourceOffset": 0,
+      "sourceSpan": {
+        "column": 9,
+        "end": 591,
+        "file": "rippleAdder.vmc",
+        "line": 25,
+        "start": 569
+      },
+      "target": 5,
+      "targetOffset": 0,
+      "type": {
+        "kind": "bit",
+        "width": 1
+      },
+      "width": 1
+    },
+    {
+      "source": 32,
+      "sourceOffset": 0,
+      "sourceSpan": {
+        "column": 9,
+        "end": 622,
+        "file": "rippleAdder.vmc",
+        "line": 26,
+        "start": 600
+      },
+      "target": 6,
+      "targetOffset": 0,
+      "type": {
+        "kind": "bit",
+        "width": 1
+      },
+      "width": 1
+    },
+    {
+      "source": 33,
+      "sourceOffset": 0,
+      "sourceSpan": {
+        "column": 9,
+        "end": 668,
+        "file": "rippleAdder.vmc",
+        "line": 27,
+        "start": 631
+      },
+      "target": 7,
+      "targetOffset": 0,
+      "type": {
+        "kind": "bit",
+        "width": 1
+      },
+      "width": 1
+    },
+    {
+      "source": 8,
+      "sourceOffset": 0,
+      "sourceSpan": {
+        "column": 9,
+        "end": 703,
+        "file": "rippleAdder.vmc",
+        "line": 28,
+        "start": 677
+      },
+      "target": 2,
+      "targetOffset": 0,
+      "type": {
+        "kind": "bit",
+        "width": 1
+      },
+      "width": 1
+    },
+    {
+      "source": 9,
+      "sourceOffset": 0,
+      "sourceSpan": {
+        "column": 9,
+        "end": 754,
+        "file": "rippleAdder.vmc",
+        "line": 29,
+        "start": 712
+      },
+      "target": 4,
+      "targetOffset": 1,
+      "type": {
+        "kind": "bit",
+        "width": 1
+      },
+      "width": 1
+    },
+    {
+      "source": 35,
+      "sourceOffset": 0,
+      "sourceSpan": {
+        "column": 5,
+        "end": 195,
+        "file": "rippleAdder.vmc",
+        "line": 10,
+        "start": 165
+      },
+      "target": 13,
+      "targetOffset": 0,
+      "type": {
+        "kind": "bit",
+        "width": 1
+      },
+      "width": 1
+    },
+    {
+      "source": 39,
+      "sourceOffset": 0,
+      "sourceSpan": {
+        "column": 5,
+        "end": 249,
+        "file": "rippleAdder.vmc",
+        "line": 11,
+        "start": 200
+      },
+      "target": 14,
+      "targetOffset": 0,
+      "type": {
+        "kind": "bit",
+        "width": 1
+      },
+      "width": 1
+    },
+    {
+      "source": 40,
+      "sourceOffset": 0,
+      "sourceSpan": {
+        "column": 9,
+        "end": 591,
+        "file": "rippleAdder.vmc",
+        "line": 25,
+        "start": 569
+      },
+      "target": 10,
+      "targetOffset": 0,
+      "type": {
+        "kind": "bit",
+        "width": 1
+      },
+      "width": 1
+    },
+    {
+      "source": 41,
+      "sourceOffset": 0,
+      "sourceSpan": {
+        "column": 9,
+        "end": 622,
+        "file": "rippleAdder.vmc",
+        "line": 26,
+        "start": 600
+      },
+      "target": 11,
+      "targetOffset": 0,
+      "type": {
+        "kind": "bit",
+        "width": 1
+      },
+      "width": 1
+    },
+    {
+      "source": 42,
+      "sourceOffset": 0,
+      "sourceSpan": {
+        "column": 9,
+        "end": 668,
+        "file": "rippleAdder.vmc",
+        "line": 27,
+        "start": 631
+      },
+      "target": 12,
+      "targetOffset": 0,
+      "type": {
+        "kind": "bit",
+        "width": 1
+      },
+      "width": 1
+    },
+    {
+      "source": 13,
+      "sourceOffset": 0,
+      "sourceSpan": {
+        "column": 9,
+        "end": 703,
+        "file": "rippleAdder.vmc",
+        "line": 28,
+        "start": 677
+      },
+      "target": 2,
+      "targetOffset": 1,
+      "type": {
+        "kind": "bit",
+        "width": 1
+      },
+      "width": 1
+    },
+    {
+      "source": 14,
+      "sourceOffset": 0,
+      "sourceSpan": {
+        "column": 9,
+        "end": 754,
+        "file": "rippleAdder.vmc",
+        "line": 29,
+        "start": 712
+      },
+      "target": 4,
+      "targetOffset": 2,
+      "type": {
+        "kind": "bit",
+        "width": 1
+      },
+      "width": 1
+    },
+    {
+      "source": 44,
+      "sourceOffset": 0,
+      "sourceSpan": {
+        "column": 5,
+        "end": 195,
+        "file": "rippleAdder.vmc",
+        "line": 10,
+        "start": 165
+      },
+      "target": 18,
+      "targetOffset": 0,
+      "type": {
+        "kind": "bit",
+        "width": 1
+      },
+      "width": 1
+    },
+    {
+      "source": 48,
+      "sourceOffset": 0,
+      "sourceSpan": {
+        "column": 5,
+        "end": 249,
+        "file": "rippleAdder.vmc",
+        "line": 11,
+        "start": 200
+      },
+      "target": 19,
+      "targetOffset": 0,
+      "type": {
+        "kind": "bit",
+        "width": 1
+      },
+      "width": 1
+    },
+    {
+      "source": 49,
+      "sourceOffset": 0,
+      "sourceSpan": {
+        "column": 9,
+        "end": 591,
+        "file": "rippleAdder.vmc",
+        "line": 25,
+        "start": 569
+      },
+      "target": 15,
+      "targetOffset": 0,
+      "type": {
+        "kind": "bit",
+        "width": 1
+      },
+      "width": 1
+    },
+    {
+      "source": 50,
+      "sourceOffset": 0,
+      "sourceSpan": {
+        "column": 9,
+        "end": 622,
+        "file": "rippleAdder.vmc",
+        "line": 26,
+        "start": 600
+      },
+      "target": 16,
+      "targetOffset": 0,
+      "type": {
+        "kind": "bit",
+        "width": 1
+      },
+      "width": 1
+    },
+    {
+      "source": 51,
+      "sourceOffset": 0,
+      "sourceSpan": {
+        "column": 9,
+        "end": 668,
+        "file": "rippleAdder.vmc",
+        "line": 27,
+        "start": 631
+      },
+      "target": 17,
+      "targetOffset": 0,
+      "type": {
+        "kind": "bit",
+        "width": 1
+      },
+      "width": 1
+    },
+    {
+      "source": 18,
+      "sourceOffset": 0,
+      "sourceSpan": {
+        "column": 9,
+        "end": 703,
+        "file": "rippleAdder.vmc",
+        "line": 28,
+        "start": 677
+      },
+      "target": 2,
+      "targetOffset": 2,
+      "type": {
+        "kind": "bit",
+        "width": 1
+      },
+      "width": 1
+    },
+    {
+      "source": 19,
+      "sourceOffset": 0,
+      "sourceSpan": {
+        "column": 9,
+        "end": 754,
+        "file": "rippleAdder.vmc",
+        "line": 29,
+        "start": 712
+      },
+      "target": 4,
+      "targetOffset": 3,
+      "type": {
+        "kind": "bit",
+        "width": 1
+      },
+      "width": 1
+    },
+    {
+      "source": 53,
+      "sourceOffset": 0,
+      "sourceSpan": {
+        "column": 5,
+        "end": 195,
+        "file": "rippleAdder.vmc",
+        "line": 10,
+        "start": 165
+      },
+      "target": 23,
+      "targetOffset": 0,
+      "type": {
+        "kind": "bit",
+        "width": 1
+      },
+      "width": 1
+    },
+    {
+      "source": 57,
+      "sourceOffset": 0,
+      "sourceSpan": {
+        "column": 5,
+        "end": 249,
+        "file": "rippleAdder.vmc",
+        "line": 11,
+        "start": 200
+      },
+      "target": 24,
+      "targetOffset": 0,
+      "type": {
+        "kind": "bit",
+        "width": 1
+      },
+      "width": 1
+    },
+    {
+      "source": 58,
+      "sourceOffset": 0,
+      "sourceSpan": {
+        "column": 9,
+        "end": 591,
+        "file": "rippleAdder.vmc",
+        "line": 25,
+        "start": 569
+      },
+      "target": 20,
+      "targetOffset": 0,
+      "type": {
+        "kind": "bit",
+        "width": 1
+      },
+      "width": 1
+    },
+    {
+      "source": 59,
+      "sourceOffset": 0,
+      "sourceSpan": {
+        "column": 9,
+        "end": 622,
+        "file": "rippleAdder.vmc",
+        "line": 26,
+        "start": 600
+      },
+      "target": 21,
+      "targetOffset": 0,
+      "type": {
+        "kind": "bit",
+        "width": 1
+      },
+      "width": 1
+    },
+    {
+      "source": 60,
+      "sourceOffset": 0,
+      "sourceSpan": {
+        "column": 9,
+        "end": 668,
+        "file": "rippleAdder.vmc",
+        "line": 27,
+        "start": 631
+      },
+      "target": 22,
+      "targetOffset": 0,
+      "type": {
+        "kind": "bit",
+        "width": 1
+      },
+      "width": 1
+    },
+    {
+      "source": 23,
+      "sourceOffset": 0,
+      "sourceSpan": {
+        "column": 9,
+        "end": 703,
+        "file": "rippleAdder.vmc",
+        "line": 28,
+        "start": 677
+      },
+      "target": 2,
+      "targetOffset": 3,
+      "type": {
+        "kind": "bit",
+        "width": 1
+      },
+      "width": 1
+    },
+    {
+      "source": 24,
+      "sourceOffset": 0,
+      "sourceSpan": {
+        "column": 9,
+        "end": 754,
+        "file": "rippleAdder.vmc",
+        "line": 29,
+        "start": 712
+      },
+      "target": 4,
+      "targetOffset": 4,
+      "type": {
+        "kind": "bit",
+        "width": 1
+      },
+      "width": 1
+    },
+    {
+      "source": 61,
+      "sourceOffset": 0,
+      "sourceSpan": {
+        "column": 5,
+        "end": 799,
+        "file": "rippleAdder.vmc",
+        "line": 31,
+        "start": 765
+      },
+      "target": 3,
+      "targetOffset": 0,
+      "type": {
+        "kind": "bit",
+        "width": 1
+      },
+      "width": 1
+    }
+  ],
+  "format": "verimc.logic",
+  "formatVersion": 1,
+  "instances": [
+    {
+      "module": "examples::RippleAdder",
+      "parameters": {
+        "width": "4"
+      },
+      "path": "RippleAdder",
+      "source": {
+        "column": 1,
+        "end": 801,
+        "file": "rippleAdder.vmc",
+        "line": 14,
+        "start": 253
+      }
+    },
+    {
+      "module": "examples::FullAdder",
+      "parameters": {},
+      "path": "RippleAdder.lanes[0].unit",
+      "source": {
+        "column": 1,
+        "end": 251,
+        "file": "rippleAdder.vmc",
+        "line": 4,
+        "start": 35
+      }
+    },
+    {
+      "module": "examples::FullAdder",
+      "parameters": {},
+      "path": "RippleAdder.lanes[1].unit",
+      "source": {
+        "column": 1,
+        "end": 251,
+        "file": "rippleAdder.vmc",
+        "line": 4,
+        "start": 35
+      }
+    },
+    {
+      "module": "examples::FullAdder",
+      "parameters": {},
+      "path": "RippleAdder.lanes[2].unit",
+      "source": {
+        "column": 1,
+        "end": 251,
+        "file": "rippleAdder.vmc",
+        "line": 4,
+        "start": 35
+      }
+    },
+    {
+      "module": "examples::FullAdder",
+      "parameters": {},
+      "path": "RippleAdder.lanes[3].unit",
+      "source": {
+        "column": 1,
+        "end": 251,
+        "file": "rippleAdder.vmc",
+        "line": 4,
+        "start": 35
+      }
+    }
+  ],
+  "languageVersion": "0.1",
+  "limits": {
+    "maxArrayLength": 65536,
+    "maxBits": 1000000,
+    "maxDepth": 128,
+    "maxInstances": 10000,
+    "maxIntegerBits": 65536,
+    "maxNodes": 100000,
+    "maxSourceBytes": 4194304,
+    "maxSteps": 1000000,
+    "maxWidth": 4096
+  },
+  "nodes": [
+    {
+      "attributes": {
+        "name": "RippleAdder.a",
+        "role": "input"
+      },
+      "id": 0,
+      "inputs": [],
+      "instance": "RippleAdder",
+      "op": "input",
+      "source": {
+        "column": 5,
+        "end": 339,
+        "file": "rippleAdder.vmc",
+        "line": 16,
+        "start": 318
+      },
+      "type": {
+        "kind": "uint",
+        "width": 4
+      }
+    },
+    {
+      "attributes": {
+        "name": "RippleAdder.b",
+        "role": "input"
+      },
+      "id": 1,
+      "inputs": [],
+      "instance": "RippleAdder",
+      "op": "input",
+      "source": {
+        "column": 5,
+        "end": 365,
+        "file": "rippleAdder.vmc",
+        "line": 17,
+        "start": 344
+      },
+      "type": {
+        "kind": "uint",
+        "width": 4
+      }
+    },
+    {
+      "attributes": {
+        "name": "RippleAdder.sum",
+        "role": "output"
+      },
+      "id": 2,
+      "inputs": [],
+      "instance": "RippleAdder",
+      "op": "signal",
+      "source": {
+        "column": 5,
+        "end": 394,
+        "file": "rippleAdder.vmc",
+        "line": 18,
+        "start": 370
+      },
+      "type": {
+        "kind": "uint",
+        "width": 4
+      }
+    },
+    {
+      "attributes": {
+        "name": "RippleAdder.carry",
+        "role": "output"
+      },
+      "id": 3,
+      "inputs": [],
+      "instance": "RippleAdder",
+      "op": "signal",
+      "source": {
+        "column": 5,
+        "end": 417,
+        "file": "rippleAdder.vmc",
+        "line": 19,
+        "start": 399
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {
+        "name": "RippleAdder.carryChain",
+        "role": "wire"
+      },
+      "id": 4,
+      "inputs": [],
+      "instance": "RippleAdder",
+      "op": "signal",
+      "source": {
+        "column": 5,
+        "end": 456,
+        "file": "rippleAdder.vmc",
+        "line": 21,
+        "start": 423
+      },
+      "type": {
+        "kind": "bits",
+        "width": 5
+      }
+    },
+    {
+      "attributes": {
+        "name": "RippleAdder.lanes[0].unit.a",
+        "role": "input"
+      },
+      "id": 5,
+      "inputs": [],
+      "instance": "RippleAdder.lanes[0].unit",
+      "op": "signal",
+      "source": {
+        "column": 5,
+        "end": 71,
+        "file": "rippleAdder.vmc",
+        "line": 5,
+        "start": 58
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {
+        "name": "RippleAdder.lanes[0].unit.b",
+        "role": "input"
+      },
+      "id": 6,
+      "inputs": [],
+      "instance": "RippleAdder.lanes[0].unit",
+      "op": "signal",
+      "source": {
+        "column": 5,
+        "end": 89,
+        "file": "rippleAdder.vmc",
+        "line": 6,
+        "start": 76
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {
+        "name": "RippleAdder.lanes[0].unit.carryIn",
+        "role": "input"
+      },
+      "id": 7,
+      "inputs": [],
+      "instance": "RippleAdder.lanes[0].unit",
+      "op": "signal",
+      "source": {
+        "column": 5,
+        "end": 113,
+        "file": "rippleAdder.vmc",
+        "line": 7,
+        "start": 94
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {
+        "name": "RippleAdder.lanes[0].unit.sum",
+        "role": "output"
+      },
+      "id": 8,
+      "inputs": [],
+      "instance": "RippleAdder.lanes[0].unit",
+      "op": "signal",
+      "source": {
+        "column": 5,
+        "end": 134,
+        "file": "rippleAdder.vmc",
+        "line": 8,
+        "start": 118
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {
+        "name": "RippleAdder.lanes[0].unit.carryOut",
+        "role": "output"
+      },
+      "id": 9,
+      "inputs": [],
+      "instance": "RippleAdder.lanes[0].unit",
+      "op": "signal",
+      "source": {
+        "column": 5,
+        "end": 160,
+        "file": "rippleAdder.vmc",
+        "line": 9,
+        "start": 139
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {
+        "name": "RippleAdder.lanes[1].unit.a",
+        "role": "input"
+      },
+      "id": 10,
+      "inputs": [],
+      "instance": "RippleAdder.lanes[1].unit",
+      "op": "signal",
+      "source": {
+        "column": 5,
+        "end": 71,
+        "file": "rippleAdder.vmc",
+        "line": 5,
+        "start": 58
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {
+        "name": "RippleAdder.lanes[1].unit.b",
+        "role": "input"
+      },
+      "id": 11,
+      "inputs": [],
+      "instance": "RippleAdder.lanes[1].unit",
+      "op": "signal",
+      "source": {
+        "column": 5,
+        "end": 89,
+        "file": "rippleAdder.vmc",
+        "line": 6,
+        "start": 76
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {
+        "name": "RippleAdder.lanes[1].unit.carryIn",
+        "role": "input"
+      },
+      "id": 12,
+      "inputs": [],
+      "instance": "RippleAdder.lanes[1].unit",
+      "op": "signal",
+      "source": {
+        "column": 5,
+        "end": 113,
+        "file": "rippleAdder.vmc",
+        "line": 7,
+        "start": 94
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {
+        "name": "RippleAdder.lanes[1].unit.sum",
+        "role": "output"
+      },
+      "id": 13,
+      "inputs": [],
+      "instance": "RippleAdder.lanes[1].unit",
+      "op": "signal",
+      "source": {
+        "column": 5,
+        "end": 134,
+        "file": "rippleAdder.vmc",
+        "line": 8,
+        "start": 118
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {
+        "name": "RippleAdder.lanes[1].unit.carryOut",
+        "role": "output"
+      },
+      "id": 14,
+      "inputs": [],
+      "instance": "RippleAdder.lanes[1].unit",
+      "op": "signal",
+      "source": {
+        "column": 5,
+        "end": 160,
+        "file": "rippleAdder.vmc",
+        "line": 9,
+        "start": 139
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {
+        "name": "RippleAdder.lanes[2].unit.a",
+        "role": "input"
+      },
+      "id": 15,
+      "inputs": [],
+      "instance": "RippleAdder.lanes[2].unit",
+      "op": "signal",
+      "source": {
+        "column": 5,
+        "end": 71,
+        "file": "rippleAdder.vmc",
+        "line": 5,
+        "start": 58
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {
+        "name": "RippleAdder.lanes[2].unit.b",
+        "role": "input"
+      },
+      "id": 16,
+      "inputs": [],
+      "instance": "RippleAdder.lanes[2].unit",
+      "op": "signal",
+      "source": {
+        "column": 5,
+        "end": 89,
+        "file": "rippleAdder.vmc",
+        "line": 6,
+        "start": 76
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {
+        "name": "RippleAdder.lanes[2].unit.carryIn",
+        "role": "input"
+      },
+      "id": 17,
+      "inputs": [],
+      "instance": "RippleAdder.lanes[2].unit",
+      "op": "signal",
+      "source": {
+        "column": 5,
+        "end": 113,
+        "file": "rippleAdder.vmc",
+        "line": 7,
+        "start": 94
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {
+        "name": "RippleAdder.lanes[2].unit.sum",
+        "role": "output"
+      },
+      "id": 18,
+      "inputs": [],
+      "instance": "RippleAdder.lanes[2].unit",
+      "op": "signal",
+      "source": {
+        "column": 5,
+        "end": 134,
+        "file": "rippleAdder.vmc",
+        "line": 8,
+        "start": 118
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {
+        "name": "RippleAdder.lanes[2].unit.carryOut",
+        "role": "output"
+      },
+      "id": 19,
+      "inputs": [],
+      "instance": "RippleAdder.lanes[2].unit",
+      "op": "signal",
+      "source": {
+        "column": 5,
+        "end": 160,
+        "file": "rippleAdder.vmc",
+        "line": 9,
+        "start": 139
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {
+        "name": "RippleAdder.lanes[3].unit.a",
+        "role": "input"
+      },
+      "id": 20,
+      "inputs": [],
+      "instance": "RippleAdder.lanes[3].unit",
+      "op": "signal",
+      "source": {
+        "column": 5,
+        "end": 71,
+        "file": "rippleAdder.vmc",
+        "line": 5,
+        "start": 58
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {
+        "name": "RippleAdder.lanes[3].unit.b",
+        "role": "input"
+      },
+      "id": 21,
+      "inputs": [],
+      "instance": "RippleAdder.lanes[3].unit",
+      "op": "signal",
+      "source": {
+        "column": 5,
+        "end": 89,
+        "file": "rippleAdder.vmc",
+        "line": 6,
+        "start": 76
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {
+        "name": "RippleAdder.lanes[3].unit.carryIn",
+        "role": "input"
+      },
+      "id": 22,
+      "inputs": [],
+      "instance": "RippleAdder.lanes[3].unit",
+      "op": "signal",
+      "source": {
+        "column": 5,
+        "end": 113,
+        "file": "rippleAdder.vmc",
+        "line": 7,
+        "start": 94
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {
+        "name": "RippleAdder.lanes[3].unit.sum",
+        "role": "output"
+      },
+      "id": 23,
+      "inputs": [],
+      "instance": "RippleAdder.lanes[3].unit",
+      "op": "signal",
+      "source": {
+        "column": 5,
+        "end": 134,
+        "file": "rippleAdder.vmc",
+        "line": 8,
+        "start": 118
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {
+        "name": "RippleAdder.lanes[3].unit.carryOut",
+        "role": "output"
+      },
+      "id": 24,
+      "inputs": [],
+      "instance": "RippleAdder.lanes[3].unit",
+      "op": "signal",
+      "source": {
+        "column": 5,
+        "end": 160,
+        "file": "rippleAdder.vmc",
+        "line": 9,
+        "start": 139
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {},
+      "id": 25,
+      "inputs": [
+        5,
+        6
+      ],
+      "instance": "RippleAdder.lanes[0].unit",
+      "op": "xor",
+      "source": {
+        "column": 19,
+        "end": 194,
+        "file": "rippleAdder.vmc",
+        "line": 10,
+        "start": 179
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {},
+      "id": 26,
+      "inputs": [
+        25,
+        7
+      ],
+      "instance": "RippleAdder.lanes[0].unit",
+      "op": "xor",
+      "source": {
+        "column": 19,
+        "end": 194,
+        "file": "rippleAdder.vmc",
+        "line": 10,
+        "start": 179
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {},
+      "id": 27,
+      "inputs": [
+        5,
+        6
+      ],
+      "instance": "RippleAdder.lanes[0].unit",
+      "op": "and",
+      "source": {
+        "column": 25,
+        "end": 225,
+        "file": "rippleAdder.vmc",
+        "line": 11,
+        "start": 220
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {},
+      "id": 28,
+      "inputs": [
+        5,
+        6
+      ],
+      "instance": "RippleAdder.lanes[0].unit",
+      "op": "xor",
+      "source": {
+        "column": 36,
+        "end": 236,
+        "file": "rippleAdder.vmc",
+        "line": 11,
+        "start": 231
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {},
+      "id": 29,
+      "inputs": [
+        28,
+        7
+      ],
+      "instance": "RippleAdder.lanes[0].unit",
+      "op": "and",
+      "source": {
+        "column": 35,
+        "end": 247,
+        "file": "rippleAdder.vmc",
+        "line": 11,
+        "start": 230
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {},
+      "id": 30,
+      "inputs": [
+        27,
+        29
+      ],
+      "instance": "RippleAdder.lanes[0].unit",
+      "op": "or",
+      "source": {
+        "column": 24,
+        "end": 248,
+        "file": "rippleAdder.vmc",
+        "line": 11,
+        "start": 219
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {
+        "offset": 0
+      },
+      "id": 31,
+      "inputs": [
+        0
+      ],
+      "instance": "RippleAdder.lanes[0]",
+      "op": "slice",
+      "source": {
+        "column": 27,
+        "end": 590,
+        "file": "rippleAdder.vmc",
+        "line": 25,
+        "start": 587
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {
+        "offset": 0
+      },
+      "id": 32,
+      "inputs": [
+        1
+      ],
+      "instance": "RippleAdder.lanes[0]",
+      "op": "slice",
+      "source": {
+        "column": 27,
+        "end": 621,
+        "file": "rippleAdder.vmc",
+        "line": 26,
+        "start": 618
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {
+        "offset": 0
+      },
+      "id": 33,
+      "inputs": [
+        4
+      ],
+      "instance": "RippleAdder.lanes[0]",
+      "op": "slice",
+      "source": {
+        "column": 42,
+        "end": 667,
+        "file": "rippleAdder.vmc",
+        "line": 27,
+        "start": 664
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {},
+      "id": 34,
+      "inputs": [
+        10,
+        11
+      ],
+      "instance": "RippleAdder.lanes[1].unit",
+      "op": "xor",
+      "source": {
+        "column": 19,
+        "end": 194,
+        "file": "rippleAdder.vmc",
+        "line": 10,
+        "start": 179
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {},
+      "id": 35,
+      "inputs": [
+        34,
+        12
+      ],
+      "instance": "RippleAdder.lanes[1].unit",
+      "op": "xor",
+      "source": {
+        "column": 19,
+        "end": 194,
+        "file": "rippleAdder.vmc",
+        "line": 10,
+        "start": 179
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {},
+      "id": 36,
+      "inputs": [
+        10,
+        11
+      ],
+      "instance": "RippleAdder.lanes[1].unit",
+      "op": "and",
+      "source": {
+        "column": 25,
+        "end": 225,
+        "file": "rippleAdder.vmc",
+        "line": 11,
+        "start": 220
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {},
+      "id": 37,
+      "inputs": [
+        10,
+        11
+      ],
+      "instance": "RippleAdder.lanes[1].unit",
+      "op": "xor",
+      "source": {
+        "column": 36,
+        "end": 236,
+        "file": "rippleAdder.vmc",
+        "line": 11,
+        "start": 231
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {},
+      "id": 38,
+      "inputs": [
+        37,
+        12
+      ],
+      "instance": "RippleAdder.lanes[1].unit",
+      "op": "and",
+      "source": {
+        "column": 35,
+        "end": 247,
+        "file": "rippleAdder.vmc",
+        "line": 11,
+        "start": 230
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {},
+      "id": 39,
+      "inputs": [
+        36,
+        38
+      ],
+      "instance": "RippleAdder.lanes[1].unit",
+      "op": "or",
+      "source": {
+        "column": 24,
+        "end": 248,
+        "file": "rippleAdder.vmc",
+        "line": 11,
+        "start": 219
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {
+        "offset": 1
+      },
+      "id": 40,
+      "inputs": [
+        0
+      ],
+      "instance": "RippleAdder.lanes[1]",
+      "op": "slice",
+      "source": {
+        "column": 27,
+        "end": 590,
+        "file": "rippleAdder.vmc",
+        "line": 25,
+        "start": 587
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {
+        "offset": 1
+      },
+      "id": 41,
+      "inputs": [
+        1
+      ],
+      "instance": "RippleAdder.lanes[1]",
+      "op": "slice",
+      "source": {
+        "column": 27,
+        "end": 621,
+        "file": "rippleAdder.vmc",
+        "line": 26,
+        "start": 618
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {
+        "offset": 1
+      },
+      "id": 42,
+      "inputs": [
+        4
+      ],
+      "instance": "RippleAdder.lanes[1]",
+      "op": "slice",
+      "source": {
+        "column": 42,
+        "end": 667,
+        "file": "rippleAdder.vmc",
+        "line": 27,
+        "start": 664
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {},
+      "id": 43,
+      "inputs": [
+        15,
+        16
+      ],
+      "instance": "RippleAdder.lanes[2].unit",
+      "op": "xor",
+      "source": {
+        "column": 19,
+        "end": 194,
+        "file": "rippleAdder.vmc",
+        "line": 10,
+        "start": 179
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {},
+      "id": 44,
+      "inputs": [
+        43,
+        17
+      ],
+      "instance": "RippleAdder.lanes[2].unit",
+      "op": "xor",
+      "source": {
+        "column": 19,
+        "end": 194,
+        "file": "rippleAdder.vmc",
+        "line": 10,
+        "start": 179
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {},
+      "id": 45,
+      "inputs": [
+        15,
+        16
+      ],
+      "instance": "RippleAdder.lanes[2].unit",
+      "op": "and",
+      "source": {
+        "column": 25,
+        "end": 225,
+        "file": "rippleAdder.vmc",
+        "line": 11,
+        "start": 220
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {},
+      "id": 46,
+      "inputs": [
+        15,
+        16
+      ],
+      "instance": "RippleAdder.lanes[2].unit",
+      "op": "xor",
+      "source": {
+        "column": 36,
+        "end": 236,
+        "file": "rippleAdder.vmc",
+        "line": 11,
+        "start": 231
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {},
+      "id": 47,
+      "inputs": [
+        46,
+        17
+      ],
+      "instance": "RippleAdder.lanes[2].unit",
+      "op": "and",
+      "source": {
+        "column": 35,
+        "end": 247,
+        "file": "rippleAdder.vmc",
+        "line": 11,
+        "start": 230
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {},
+      "id": 48,
+      "inputs": [
+        45,
+        47
+      ],
+      "instance": "RippleAdder.lanes[2].unit",
+      "op": "or",
+      "source": {
+        "column": 24,
+        "end": 248,
+        "file": "rippleAdder.vmc",
+        "line": 11,
+        "start": 219
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {
+        "offset": 2
+      },
+      "id": 49,
+      "inputs": [
+        0
+      ],
+      "instance": "RippleAdder.lanes[2]",
+      "op": "slice",
+      "source": {
+        "column": 27,
+        "end": 590,
+        "file": "rippleAdder.vmc",
+        "line": 25,
+        "start": 587
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {
+        "offset": 2
+      },
+      "id": 50,
+      "inputs": [
+        1
+      ],
+      "instance": "RippleAdder.lanes[2]",
+      "op": "slice",
+      "source": {
+        "column": 27,
+        "end": 621,
+        "file": "rippleAdder.vmc",
+        "line": 26,
+        "start": 618
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {
+        "offset": 2
+      },
+      "id": 51,
+      "inputs": [
+        4
+      ],
+      "instance": "RippleAdder.lanes[2]",
+      "op": "slice",
+      "source": {
+        "column": 42,
+        "end": 667,
+        "file": "rippleAdder.vmc",
+        "line": 27,
+        "start": 664
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {},
+      "id": 52,
+      "inputs": [
+        20,
+        21
+      ],
+      "instance": "RippleAdder.lanes[3].unit",
+      "op": "xor",
+      "source": {
+        "column": 19,
+        "end": 194,
+        "file": "rippleAdder.vmc",
+        "line": 10,
+        "start": 179
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {},
+      "id": 53,
+      "inputs": [
+        52,
+        22
+      ],
+      "instance": "RippleAdder.lanes[3].unit",
+      "op": "xor",
+      "source": {
+        "column": 19,
+        "end": 194,
+        "file": "rippleAdder.vmc",
+        "line": 10,
+        "start": 179
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {},
+      "id": 54,
+      "inputs": [
+        20,
+        21
+      ],
+      "instance": "RippleAdder.lanes[3].unit",
+      "op": "and",
+      "source": {
+        "column": 25,
+        "end": 225,
+        "file": "rippleAdder.vmc",
+        "line": 11,
+        "start": 220
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {},
+      "id": 55,
+      "inputs": [
+        20,
+        21
+      ],
+      "instance": "RippleAdder.lanes[3].unit",
+      "op": "xor",
+      "source": {
+        "column": 36,
+        "end": 236,
+        "file": "rippleAdder.vmc",
+        "line": 11,
+        "start": 231
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {},
+      "id": 56,
+      "inputs": [
+        55,
+        22
+      ],
+      "instance": "RippleAdder.lanes[3].unit",
+      "op": "and",
+      "source": {
+        "column": 35,
+        "end": 247,
+        "file": "rippleAdder.vmc",
+        "line": 11,
+        "start": 230
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {},
+      "id": 57,
+      "inputs": [
+        54,
+        56
+      ],
+      "instance": "RippleAdder.lanes[3].unit",
+      "op": "or",
+      "source": {
+        "column": 24,
+        "end": 248,
+        "file": "rippleAdder.vmc",
+        "line": 11,
+        "start": 219
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {
+        "offset": 3
+      },
+      "id": 58,
+      "inputs": [
+        0
+      ],
+      "instance": "RippleAdder.lanes[3]",
+      "op": "slice",
+      "source": {
+        "column": 27,
+        "end": 590,
+        "file": "rippleAdder.vmc",
+        "line": 25,
+        "start": 587
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {
+        "offset": 3
+      },
+      "id": 59,
+      "inputs": [
+        1
+      ],
+      "instance": "RippleAdder.lanes[3]",
+      "op": "slice",
+      "source": {
+        "column": 27,
+        "end": 621,
+        "file": "rippleAdder.vmc",
+        "line": 26,
+        "start": 618
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {
+        "offset": 3
+      },
+      "id": 60,
+      "inputs": [
+        4
+      ],
+      "instance": "RippleAdder.lanes[3]",
+      "op": "slice",
+      "source": {
+        "column": 42,
+        "end": 667,
+        "file": "rippleAdder.vmc",
+        "line": 27,
+        "start": 664
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {
+        "offset": 4
+      },
+      "id": 61,
+      "inputs": [
+        4
+      ],
+      "instance": "RippleAdder",
+      "op": "slice",
+      "source": {
+        "column": 31,
+        "end": 798,
+        "file": "rippleAdder.vmc",
+        "line": 31,
+        "start": 791
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {
+        "value": "0"
+      },
+      "id": 62,
+      "inputs": [],
+      "instance": "RippleAdder",
+      "op": "constant",
+      "source": {
+        "column": 5,
+        "end": 491,
+        "file": "rippleAdder.vmc",
+        "line": 22,
+        "start": 461
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    }
+  ],
+  "ports": [
+    {
+      "direction": "input",
+      "name": "a",
+      "node": 0
+    },
+    {
+      "direction": "input",
+      "name": "b",
+      "node": 1
+    },
+    {
+      "direction": "output",
+      "name": "sum",
+      "node": 2
+    },
+    {
+      "direction": "output",
+      "name": "carry",
+      "node": 3
+    }
+  ],
+  "semantics": {
+    "clockEdge": "rising",
+    "initialRegisters": "invalid",
+    "reset": "synchronousHigh",
+    "stateUpdate": "simultaneous"
+  },
+  "sources": [
+    {
+      "byteLength": 802,
+      "path": "rippleAdder.vmc",
+      "sha256": "19847bd4fb36a548d2d43acfc6868dd37541d6dfcb9a2bc6b8fa25e3bb339a48"
+    }
+  ],
+  "top": "examples::RippleAdder",
+  "validation": {
+    "physicalVerified": false,
+    "sourceTestsExecuted": false,
+    "stage": "logicalGraph"
+  }
+}

@@ -1,0 +1,270 @@
+{
+  "compilerVersion": "0.1.0",
+  "connections": [
+    {
+      "source": 4,
+      "sourceOffset": 0,
+      "sourceSpan": {
+        "column": 5,
+        "end": 389,
+        "file": "counter.vmc",
+        "line": 19,
+        "start": 367
+      },
+      "target": 3,
+      "targetOffset": 0,
+      "type": {
+        "kind": "uint",
+        "width": 4
+      },
+      "width": 4
+    }
+  ],
+  "format": "verimc.logic",
+  "formatVersion": 1,
+  "instances": [
+    {
+      "module": "examples::Counter",
+      "parameters": {
+        "width": "4"
+      },
+      "path": "Counter",
+      "source": {
+        "column": 1,
+        "end": 391,
+        "file": "counter.vmc",
+        "line": 4,
+        "start": 35
+      }
+    }
+  ],
+  "languageVersion": "0.1",
+  "limits": {
+    "maxArrayLength": 65536,
+    "maxBits": 1000000,
+    "maxDepth": 128,
+    "maxInstances": 10000,
+    "maxIntegerBits": 65536,
+    "maxNodes": 100000,
+    "maxSourceBytes": 4194304,
+    "maxSteps": 1000000,
+    "maxWidth": 4096
+  },
+  "nodes": [
+    {
+      "attributes": {
+        "name": "Counter.clk",
+        "role": "input"
+      },
+      "id": 0,
+      "inputs": [],
+      "instance": "Counter",
+      "op": "input",
+      "source": {
+        "column": 5,
+        "end": 113,
+        "file": "counter.vmc",
+        "line": 6,
+        "start": 96
+      },
+      "type": {
+        "kind": "clock",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {
+        "name": "Counter.reset",
+        "role": "input"
+      },
+      "id": 1,
+      "inputs": [],
+      "instance": "Counter",
+      "op": "input",
+      "source": {
+        "column": 5,
+        "end": 135,
+        "file": "counter.vmc",
+        "line": 7,
+        "start": 118
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {
+        "name": "Counter.enable",
+        "role": "input"
+      },
+      "id": 2,
+      "inputs": [],
+      "instance": "Counter",
+      "op": "input",
+      "source": {
+        "column": 5,
+        "end": 158,
+        "file": "counter.vmc",
+        "line": 8,
+        "start": 140
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {
+        "name": "Counter.count",
+        "role": "output"
+      },
+      "id": 3,
+      "inputs": [],
+      "instance": "Counter",
+      "op": "signal",
+      "source": {
+        "column": 5,
+        "end": 189,
+        "file": "counter.vmc",
+        "line": 9,
+        "start": 163
+      },
+      "type": {
+        "kind": "uint",
+        "width": 4
+      }
+    },
+    {
+      "attributes": {
+        "initialState": "invalid",
+        "name": "Counter.value",
+        "resetValue": "0",
+        "role": "register"
+      },
+      "id": 4,
+      "inputs": [
+        7,
+        0,
+        1
+      ],
+      "instance": "Counter",
+      "op": "register",
+      "source": {
+        "column": 5,
+        "end": 236,
+        "file": "counter.vmc",
+        "line": 11,
+        "start": 195
+      },
+      "type": {
+        "kind": "uint",
+        "width": 4
+      }
+    },
+    {
+      "attributes": {
+        "value": "1"
+      },
+      "id": 5,
+      "inputs": [],
+      "instance": "Counter",
+      "op": "constant",
+      "source": {
+        "column": 26,
+        "end": 344,
+        "file": "counter.vmc",
+        "line": 15,
+        "start": 317
+      },
+      "type": {
+        "kind": "uint",
+        "width": 4
+      }
+    },
+    {
+      "attributes": {},
+      "id": 6,
+      "inputs": [
+        4,
+        5
+      ],
+      "instance": "Counter",
+      "op": "wrapAdd",
+      "source": {
+        "column": 26,
+        "end": 344,
+        "file": "counter.vmc",
+        "line": 15,
+        "start": 317
+      },
+      "type": {
+        "kind": "uint",
+        "width": 4
+      }
+    },
+    {
+      "attributes": {},
+      "id": 7,
+      "inputs": [
+        2,
+        6,
+        4
+      ],
+      "instance": "Counter",
+      "op": "mux",
+      "source": {
+        "column": 9,
+        "end": 355,
+        "file": "counter.vmc",
+        "line": 14,
+        "start": 280
+      },
+      "type": {
+        "kind": "uint",
+        "width": 4
+      }
+    }
+  ],
+  "ports": [
+    {
+      "direction": "input",
+      "name": "clk",
+      "node": 0
+    },
+    {
+      "direction": "input",
+      "name": "reset",
+      "node": 1
+    },
+    {
+      "direction": "input",
+      "name": "enable",
+      "node": 2
+    },
+    {
+      "direction": "output",
+      "name": "count",
+      "node": 3
+    }
+  ],
+  "semantics": {
+    "clockEdge": "rising",
+    "initialRegisters": "invalid",
+    "reset": "synchronousHigh",
+    "stateUpdate": "simultaneous"
+  },
+  "sources": [
+    {
+      "byteLength": 854,
+      "path": "counter.vmc",
+      "sha256": "092900590ebbddd9bf6ee83d26165adaeb90722927f3bc54de8c1a7a7afa406e"
+    }
+  ],
+  "top": "examples::Counter",
+  "validation": {
+    "physicalVerified": false,
+    "sourceTestsExecuted": false,
+    "stage": "logicalGraph"
+  }
+}

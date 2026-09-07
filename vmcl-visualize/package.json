@@ -1,0 +1,31 @@
+{
+  "name": "vmcl-visualize",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && node scripts/writeNotices.mjs && vite build",
+    "preview": "vite preview",
+    "check": "tsc --noEmit",
+    "test": "node --import tsx --test tests/*.test.ts",
+    "format": "prettier --write src tests scripts index.html vite.config.ts tsconfig.json package.json"
+  },
+  "dependencies": {
+    "@xyflow/react": "12.11.6",
+    "elkjs": "0.12.0",
+    "jsonc-parser": "3.3.1",
+    "lucide-react": "0.468.0",
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  },
+  "devDependencies": {
+    "@types/node": "22.19.15",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.7",
+    "prettier": "3.6.2",
+    "tsx": "4.23.13",
+    "typescript": "5.9.3",
+    "vite": "6.4.3"
+  }
+}

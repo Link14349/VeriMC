@@ -1,0 +1,5 @@
+node_modules/
+dist/
+.cache/
+testResults/
+playwright-report/

@@ -1,0 +1,322 @@
+{
+  "compilerVersion": "0.1.0",
+  "connections": [
+    {
+      "source": 5,
+      "sourceOffset": 0,
+      "sourceSpan": {
+        "column": 5,
+        "end": 254,
+        "file": "adder.vmc",
+        "line": 12,
+        "start": 232
+      },
+      "target": 4,
+      "targetOffset": 0,
+      "type": {
+        "kind": "uint",
+        "width": 5
+      },
+      "width": 5
+    },
+    {
+      "source": 7,
+      "sourceOffset": 0,
+      "sourceSpan": {
+        "column": 5,
+        "end": 296,
+        "file": "adder.vmc",
+        "line": 13,
+        "start": 259
+      },
+      "target": 2,
+      "targetOffset": 0,
+      "type": {
+        "kind": "uint",
+        "width": 4
+      },
+      "width": 4
+    },
+    {
+      "source": 8,
+      "sourceOffset": 0,
+      "sourceSpan": {
+        "column": 5,
+        "end": 330,
+        "file": "adder.vmc",
+        "line": 14,
+        "start": 301
+      },
+      "target": 3,
+      "targetOffset": 0,
+      "type": {
+        "kind": "bit",
+        "width": 1
+      },
+      "width": 1
+    }
+  ],
+  "format": "verimc.logic",
+  "formatVersion": 1,
+  "instances": [
+    {
+      "module": "examples::Adder",
+      "parameters": {
+        "width": "4"
+      },
+      "path": "Adder",
+      "source": {
+        "column": 1,
+        "end": 332,
+        "file": "adder.vmc",
+        "line": 4,
+        "start": 35
+      }
+    }
+  ],
+  "languageVersion": "0.1",
+  "limits": {
+    "maxArrayLength": 65536,
+    "maxBits": 1000000,
+    "maxDepth": 128,
+    "maxInstances": 10000,
+    "maxIntegerBits": 65536,
+    "maxNodes": 100000,
+    "maxSourceBytes": 4194304,
+    "maxSteps": 1000000,
+    "maxWidth": 4096
+  },
+  "nodes": [
+    {
+      "attributes": {
+        "name": "Adder.a",
+        "role": "input"
+      },
+      "id": 0,
+      "inputs": [],
+      "instance": "Adder",
+      "op": "input",
+      "source": {
+        "column": 5,
+        "end": 115,
+        "file": "adder.vmc",
+        "line": 6,
+        "start": 94
+      },
+      "type": {
+        "kind": "uint",
+        "width": 4
+      }
+    },
+    {
+      "attributes": {
+        "name": "Adder.b",
+        "role": "input"
+      },
+      "id": 1,
+      "inputs": [],
+      "instance": "Adder",
+      "op": "input",
+      "source": {
+        "column": 5,
+        "end": 141,
+        "file": "adder.vmc",
+        "line": 7,
+        "start": 120
+      },
+      "type": {
+        "kind": "uint",
+        "width": 4
+      }
+    },
+    {
+      "attributes": {
+        "name": "Adder.sum",
+        "role": "output"
+      },
+      "id": 2,
+      "inputs": [],
+      "instance": "Adder",
+      "op": "signal",
+      "source": {
+        "column": 5,
+        "end": 170,
+        "file": "adder.vmc",
+        "line": 8,
+        "start": 146
+      },
+      "type": {
+        "kind": "uint",
+        "width": 4
+      }
+    },
+    {
+      "attributes": {
+        "name": "Adder.carry",
+        "role": "output"
+      },
+      "id": 3,
+      "inputs": [],
+      "instance": "Adder",
+      "op": "signal",
+      "source": {
+        "column": 5,
+        "end": 193,
+        "file": "adder.vmc",
+        "line": 9,
+        "start": 175
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {
+        "name": "Adder.total",
+        "role": "wire"
+      },
+      "id": 4,
+      "inputs": [],
+      "instance": "Adder",
+      "op": "signal",
+      "source": {
+        "column": 5,
+        "end": 227,
+        "file": "adder.vmc",
+        "line": 11,
+        "start": 199
+      },
+      "type": {
+        "kind": "uint",
+        "width": 5
+      }
+    },
+    {
+      "attributes": {},
+      "id": 5,
+      "inputs": [
+        0,
+        1
+      ],
+      "instance": "Adder",
+      "op": "add",
+      "source": {
+        "column": 21,
+        "end": 253,
+        "file": "adder.vmc",
+        "line": 12,
+        "start": 248
+      },
+      "type": {
+        "kind": "uint",
+        "width": 5
+      }
+    },
+    {
+      "attributes": {
+        "offset": 0
+      },
+      "id": 6,
+      "inputs": [
+        4
+      ],
+      "instance": "Adder",
+      "op": "slice",
+      "source": {
+        "column": 31,
+        "end": 294,
+        "file": "adder.vmc",
+        "line": 13,
+        "start": 285
+      },
+      "type": {
+        "kind": "bits",
+        "width": 4
+      }
+    },
+    {
+      "attributes": {},
+      "id": 7,
+      "inputs": [
+        6
+      ],
+      "instance": "Adder",
+      "op": "reinterpret",
+      "source": {
+        "column": 19,
+        "end": 295,
+        "file": "adder.vmc",
+        "line": 13,
+        "start": 273
+      },
+      "type": {
+        "kind": "uint",
+        "width": 4
+      }
+    },
+    {
+      "attributes": {
+        "offset": 4
+      },
+      "id": 8,
+      "inputs": [
+        4
+      ],
+      "instance": "Adder",
+      "op": "slice",
+      "source": {
+        "column": 26,
+        "end": 329,
+        "file": "adder.vmc",
+        "line": 14,
+        "start": 322
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    }
+  ],
+  "ports": [
+    {
+      "direction": "input",
+      "name": "a",
+      "node": 0
+    },
+    {
+      "direction": "input",
+      "name": "b",
+      "node": 1
+    },
+    {
+      "direction": "output",
+      "name": "sum",
+      "node": 2
+    },
+    {
+      "direction": "output",
+      "name": "carry",
+      "node": 3
+    }
+  ],
+  "semantics": {
+    "clockEdge": "rising",
+    "initialRegisters": "invalid",
+    "reset": "synchronousHigh",
+    "stateUpdate": "simultaneous"
+  },
+  "sources": [
+    {
+      "byteLength": 729,
+      "path": "adder.vmc",
+      "sha256": "35b3e8ab449ffeee0249a9e200436fa7b3fd788b5079568e5033e2693ab50789"
+    }
+  ],
+  "top": "examples::Adder",
+  "validation": {
+    "physicalVerified": false,
+    "sourceTestsExecuted": false,
+    "stage": "logicalGraph"
+  }
+}

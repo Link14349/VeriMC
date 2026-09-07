@@ -1,0 +1,638 @@
+{
+  "compilerVersion": "0.1.0",
+  "connections": [
+    {
+      "source": 2,
+      "sourceOffset": 0,
+      "sourceSpan": {
+        "column": 5,
+        "end": 203,
+        "file": "valueOperations.vmc",
+        "line": 12,
+        "start": 189
+      },
+      "target": 3,
+      "targetOffset": 0,
+      "type": {
+        "kind": "bit",
+        "width": 1
+      },
+      "width": 1
+    },
+    {
+      "source": 10,
+      "sourceOffset": 0,
+      "sourceSpan": {
+        "column": 9,
+        "end": 602,
+        "file": "valueOperations.vmc",
+        "line": 32,
+        "start": 580
+      },
+      "target": 2,
+      "targetOffset": 0,
+      "type": {
+        "kind": "bit",
+        "width": 1
+      },
+      "width": 1
+    },
+    {
+      "source": 3,
+      "sourceOffset": 0,
+      "sourceSpan": {
+        "column": 9,
+        "end": 633,
+        "file": "valueOperations.vmc",
+        "line": 33,
+        "start": 611
+      },
+      "target": 1,
+      "targetOffset": 0,
+      "type": {
+        "kind": "bit",
+        "width": 1
+      },
+      "width": 1
+    },
+    {
+      "source": 4,
+      "sourceOffset": 0,
+      "sourceSpan": {
+        "column": 5,
+        "end": 203,
+        "file": "valueOperations.vmc",
+        "line": 12,
+        "start": 189
+      },
+      "target": 5,
+      "targetOffset": 0,
+      "type": {
+        "kind": "bit",
+        "width": 1
+      },
+      "width": 1
+    },
+    {
+      "source": 11,
+      "sourceOffset": 0,
+      "sourceSpan": {
+        "column": 9,
+        "end": 602,
+        "file": "valueOperations.vmc",
+        "line": 32,
+        "start": 580
+      },
+      "target": 4,
+      "targetOffset": 0,
+      "type": {
+        "kind": "bit",
+        "width": 1
+      },
+      "width": 1
+    },
+    {
+      "source": 5,
+      "sourceOffset": 0,
+      "sourceSpan": {
+        "column": 9,
+        "end": 633,
+        "file": "valueOperations.vmc",
+        "line": 33,
+        "start": 611
+      },
+      "target": 1,
+      "targetOffset": 1,
+      "type": {
+        "kind": "bit",
+        "width": 1
+      },
+      "width": 1
+    },
+    {
+      "source": 6,
+      "sourceOffset": 0,
+      "sourceSpan": {
+        "column": 5,
+        "end": 203,
+        "file": "valueOperations.vmc",
+        "line": 12,
+        "start": 189
+      },
+      "target": 7,
+      "targetOffset": 0,
+      "type": {
+        "kind": "bit",
+        "width": 1
+      },
+      "width": 1
+    },
+    {
+      "source": 12,
+      "sourceOffset": 0,
+      "sourceSpan": {
+        "column": 9,
+        "end": 602,
+        "file": "valueOperations.vmc",
+        "line": 32,
+        "start": 580
+      },
+      "target": 6,
+      "targetOffset": 0,
+      "type": {
+        "kind": "bit",
+        "width": 1
+      },
+      "width": 1
+    },
+    {
+      "source": 7,
+      "sourceOffset": 0,
+      "sourceSpan": {
+        "column": 9,
+        "end": 633,
+        "file": "valueOperations.vmc",
+        "line": 33,
+        "start": 611
+      },
+      "target": 1,
+      "targetOffset": 2,
+      "type": {
+        "kind": "bit",
+        "width": 1
+      },
+      "width": 1
+    },
+    {
+      "source": 8,
+      "sourceOffset": 0,
+      "sourceSpan": {
+        "column": 5,
+        "end": 203,
+        "file": "valueOperations.vmc",
+        "line": 12,
+        "start": 189
+      },
+      "target": 9,
+      "targetOffset": 0,
+      "type": {
+        "kind": "bit",
+        "width": 1
+      },
+      "width": 1
+    },
+    {
+      "source": 13,
+      "sourceOffset": 0,
+      "sourceSpan": {
+        "column": 9,
+        "end": 602,
+        "file": "valueOperations.vmc",
+        "line": 32,
+        "start": 580
+      },
+      "target": 8,
+      "targetOffset": 0,
+      "type": {
+        "kind": "bit",
+        "width": 1
+      },
+      "width": 1
+    },
+    {
+      "source": 9,
+      "sourceOffset": 0,
+      "sourceSpan": {
+        "column": 9,
+        "end": 633,
+        "file": "valueOperations.vmc",
+        "line": 33,
+        "start": 611
+      },
+      "target": 1,
+      "targetOffset": 3,
+      "type": {
+        "kind": "bit",
+        "width": 1
+      },
+      "width": 1
+    }
+  ],
+  "format": "verimc.logic",
+  "formatVersion": 1,
+  "instances": [
+    {
+      "module": "examples::SignalArray",
+      "parameters": {},
+      "path": "SignalArray",
+      "source": {
+        "column": 1,
+        "end": 641,
+        "file": "valueOperations.vmc",
+        "line": 27,
+        "start": 439
+      }
+    },
+    {
+      "module": "examples::BitBuffer",
+      "parameters": {},
+      "path": "SignalArray.lanes[0].unit",
+      "source": {
+        "column": 1,
+        "end": 205,
+        "file": "valueOperations.vmc",
+        "line": 9,
+        "start": 129
+      }
+    },
+    {
+      "module": "examples::BitBuffer",
+      "parameters": {},
+      "path": "SignalArray.lanes[1].unit",
+      "source": {
+        "column": 1,
+        "end": 205,
+        "file": "valueOperations.vmc",
+        "line": 9,
+        "start": 129
+      }
+    },
+    {
+      "module": "examples::BitBuffer",
+      "parameters": {},
+      "path": "SignalArray.lanes[2].unit",
+      "source": {
+        "column": 1,
+        "end": 205,
+        "file": "valueOperations.vmc",
+        "line": 9,
+        "start": 129
+      }
+    },
+    {
+      "module": "examples::BitBuffer",
+      "parameters": {},
+      "path": "SignalArray.lanes[3].unit",
+      "source": {
+        "column": 1,
+        "end": 205,
+        "file": "valueOperations.vmc",
+        "line": 9,
+        "start": 129
+      }
+    }
+  ],
+  "languageVersion": "0.1",
+  "limits": {
+    "maxArrayLength": 65536,
+    "maxBits": 1000000,
+    "maxDepth": 128,
+    "maxInstances": 10000,
+    "maxIntegerBits": 65536,
+    "maxNodes": 100000,
+    "maxSourceBytes": 4194304,
+    "maxSteps": 1000000,
+    "maxWidth": 4096
+  },
+  "nodes": [
+    {
+      "attributes": {
+        "name": "SignalArray.a",
+        "role": "input"
+      },
+      "id": 0,
+      "inputs": [],
+      "instance": "SignalArray",
+      "op": "input",
+      "source": {
+        "column": 5,
+        "end": 482,
+        "file": "valueOperations.vmc",
+        "line": 28,
+        "start": 464
+      },
+      "type": {
+        "element": {
+          "kind": "bit",
+          "width": 1
+        },
+        "kind": "array",
+        "length": 4,
+        "width": 0
+      }
+    },
+    {
+      "attributes": {
+        "name": "SignalArray.y",
+        "role": "output"
+      },
+      "id": 1,
+      "inputs": [],
+      "instance": "SignalArray",
+      "op": "signal",
+      "source": {
+        "column": 5,
+        "end": 506,
+        "file": "valueOperations.vmc",
+        "line": 29,
+        "start": 487
+      },
+      "type": {
+        "element": {
+          "kind": "bit",
+          "width": 1
+        },
+        "kind": "array",
+        "length": 4,
+        "width": 0
+      }
+    },
+    {
+      "attributes": {
+        "name": "SignalArray.lanes[0].unit.a",
+        "role": "input"
+      },
+      "id": 2,
+      "inputs": [],
+      "instance": "SignalArray.lanes[0].unit",
+      "op": "signal",
+      "source": {
+        "column": 5,
+        "end": 165,
+        "file": "valueOperations.vmc",
+        "line": 10,
+        "start": 152
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {
+        "name": "SignalArray.lanes[0].unit.y",
+        "role": "output"
+      },
+      "id": 3,
+      "inputs": [],
+      "instance": "SignalArray.lanes[0].unit",
+      "op": "signal",
+      "source": {
+        "column": 5,
+        "end": 184,
+        "file": "valueOperations.vmc",
+        "line": 11,
+        "start": 170
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {
+        "name": "SignalArray.lanes[1].unit.a",
+        "role": "input"
+      },
+      "id": 4,
+      "inputs": [],
+      "instance": "SignalArray.lanes[1].unit",
+      "op": "signal",
+      "source": {
+        "column": 5,
+        "end": 165,
+        "file": "valueOperations.vmc",
+        "line": 10,
+        "start": 152
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {
+        "name": "SignalArray.lanes[1].unit.y",
+        "role": "output"
+      },
+      "id": 5,
+      "inputs": [],
+      "instance": "SignalArray.lanes[1].unit",
+      "op": "signal",
+      "source": {
+        "column": 5,
+        "end": 184,
+        "file": "valueOperations.vmc",
+        "line": 11,
+        "start": 170
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {
+        "name": "SignalArray.lanes[2].unit.a",
+        "role": "input"
+      },
+      "id": 6,
+      "inputs": [],
+      "instance": "SignalArray.lanes[2].unit",
+      "op": "signal",
+      "source": {
+        "column": 5,
+        "end": 165,
+        "file": "valueOperations.vmc",
+        "line": 10,
+        "start": 152
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {
+        "name": "SignalArray.lanes[2].unit.y",
+        "role": "output"
+      },
+      "id": 7,
+      "inputs": [],
+      "instance": "SignalArray.lanes[2].unit",
+      "op": "signal",
+      "source": {
+        "column": 5,
+        "end": 184,
+        "file": "valueOperations.vmc",
+        "line": 11,
+        "start": 170
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {
+        "name": "SignalArray.lanes[3].unit.a",
+        "role": "input"
+      },
+      "id": 8,
+      "inputs": [],
+      "instance": "SignalArray.lanes[3].unit",
+      "op": "signal",
+      "source": {
+        "column": 5,
+        "end": 165,
+        "file": "valueOperations.vmc",
+        "line": 10,
+        "start": 152
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {
+        "name": "SignalArray.lanes[3].unit.y",
+        "role": "output"
+      },
+      "id": 9,
+      "inputs": [],
+      "instance": "SignalArray.lanes[3].unit",
+      "op": "signal",
+      "source": {
+        "column": 5,
+        "end": 184,
+        "file": "valueOperations.vmc",
+        "line": 11,
+        "start": 170
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {
+        "offset": 0
+      },
+      "id": 10,
+      "inputs": [
+        0
+      ],
+      "instance": "SignalArray.lanes[0]",
+      "op": "slice",
+      "source": {
+        "column": 27,
+        "end": 601,
+        "file": "valueOperations.vmc",
+        "line": 32,
+        "start": 598
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {
+        "offset": 1
+      },
+      "id": 11,
+      "inputs": [
+        0
+      ],
+      "instance": "SignalArray.lanes[1]",
+      "op": "slice",
+      "source": {
+        "column": 27,
+        "end": 601,
+        "file": "valueOperations.vmc",
+        "line": 32,
+        "start": 598
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {
+        "offset": 2
+      },
+      "id": 12,
+      "inputs": [
+        0
+      ],
+      "instance": "SignalArray.lanes[2]",
+      "op": "slice",
+      "source": {
+        "column": 27,
+        "end": 601,
+        "file": "valueOperations.vmc",
+        "line": 32,
+        "start": 598
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    },
+    {
+      "attributes": {
+        "offset": 3
+      },
+      "id": 13,
+      "inputs": [
+        0
+      ],
+      "instance": "SignalArray.lanes[3]",
+      "op": "slice",
+      "source": {
+        "column": 27,
+        "end": 601,
+        "file": "valueOperations.vmc",
+        "line": 32,
+        "start": 598
+      },
+      "type": {
+        "kind": "bit",
+        "width": 1
+      }
+    }
+  ],
+  "ports": [
+    {
+      "direction": "input",
+      "name": "a",
+      "node": 0
+    },
+    {
+      "direction": "output",
+      "name": "y",
+      "node": 1
+    }
+  ],
+  "semantics": {
+    "clockEdge": "rising",
+    "initialRegisters": "invalid",
+    "reset": "synchronousHigh",
+    "stateUpdate": "simultaneous"
+  },
+  "sources": [
+    {
+      "byteLength": 1023,
+      "path": "valueOperations.vmc",
+      "sha256": "90d7d103f88660f419bc4aabc8dfea72febbcba2896b82312097eae9dbd5c159"
+    }
+  ],
+  "top": "examples::SignalArray",
+  "validation": {
+    "physicalVerified": false,
+    "sourceTestsExecuted": false,
+    "stage": "logicalGraph"
+  }
+}
