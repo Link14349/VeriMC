@@ -56,7 +56,7 @@ enum class Device : std::uint8_t {
     piston, pistonHead, movingPiston, hopper, container, dropper, dispenser, crafter, furnace,
     door, trapdoor, fenceGate, noteBlock, rail, poweredRail, detectorRail, activatorRail,
     pressurePlate, weightedPlate, target, daylight, lightningRod, sculkSensor, calibratedSensor,
-    tripwire, tripwireHook, lectern, analog, unsupported, bell, jukebox
+    tripwire, tripwireHook, lectern, analog, unsupported, bell, jukebox, composter
 };
 constexpr bool isRail(Device device) { return device >= Device::rail && device <= Device::activatorRail; }
 constexpr bool isSensor(Device device) { return device == Device::sculkSensor || device == Device::calibratedSensor; }

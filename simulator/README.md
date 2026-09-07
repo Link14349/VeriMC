@@ -58,6 +58,8 @@ python3 simulator/runSimulator.py --no-build
 
 唱片机支持 22 张默认唱片、播放计时、比较器与库存传输；曲终保留唱片，浏览器可查看播放进度，详见 [唱片机说明](docs/jukeboxes.md)。
 
+堆肥桶支持 115 种材料、概率升层、20 gt 成熟及漏斗进出料，详见 [堆肥桶说明](docs/composters.md)。
+
 音符盒支持调音、材质/头颅乐器、遮挡和演奏振动，提供“音符实验”与演奏记录，详见 [音符盒说明](docs/notes.md)。
 
 ## 验证
@@ -82,6 +84,7 @@ python3 tests/vibrationTests.py
 python3 tests/noteTests.py
 python3 tests/bellTests.py
 python3 tests/jukeboxTests.py
+python3 tests/composterTests.py
 node tests/webTests.mjs
 
 # 有实际驱动的中继器链基准

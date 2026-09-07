@@ -11,6 +11,10 @@ void Simulator::dispenseDropper(BlockPos pos) {
     const auto source = slots[static_cast<std::size_t>(chosen)];
     auto stack = stackAt(source);
     const auto targetPos = pos.relative(at(pos).facing);
+    if(at(targetPos).device==Device::composter) {
+        if(insertCompost(pos,targetPos,stack))--stack.count;
+        writeStack(source,stack);return;
+    }
     const auto targets = containerSlots(targetPos);
     if (targets.empty()) {
         const auto direction = at(pos).facing;

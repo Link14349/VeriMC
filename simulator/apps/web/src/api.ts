@@ -12,7 +12,7 @@ export class SimulatorConnection extends EventTarget {
   cells = new Map<string, BlockCell>();
   states = new Map<number, BlockDef>();
   catalog: CatalogItem[] = [];
-  items: { name: string; maxStack: number; bookshelfBook?: boolean; jukeboxSong?: {name:string;lengthTicks:number;comparatorOutput:number} }[] = [];
+  items: { name: string; maxStack: number; bookshelfBook?: boolean; compostChance?:number; jukeboxSong?: {name:string;lengthTicks:number;comparatorOutput:number} }[] = [];
   gameEvents: { name: string; frequency: number; radius: number; listenable: boolean; ignoreSneaking: boolean }[] = [];
   trace = new TraceHistory();
   connected = false;

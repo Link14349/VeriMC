@@ -75,6 +75,10 @@ public class CaptureRedstone extends TestFunctionLoader {
                 return;
             }
             var input = command.getAsJsonObject("stimulus");
+            if(input.has("compostItem")) {
+                var item=BuiltInRegistries.ITEM.get(Identifier.parse(input.get("compostItem").getAsString())).orElseThrow().value();
+                ComposterBlock.insertItem(null,state,level,new ItemStack(item),pos);return;
+            }
             if (input.has("gameEvent")) {
                 var event=BuiltInRegistries.GAME_EVENT.get(Identifier.parse(input.get("gameEvent").getAsString())).orElseThrow();
                 var offset=input.has("offset")?input.getAsJsonArray("offset"):JsonParser.parseString("[0.5,0.5,0.5]").getAsJsonArray();

@@ -6,6 +6,7 @@ import { TargetControls } from './targetControls';
 import { createCoalescedRefresh } from './coalescedRefresh';
 import { VibrationControls } from './vibrationControls';
 import { NoteControls } from './noteControls';
+import { ComposterControls } from './composterControls';
 
 type Props = { pos: Pos; block: BlockDef; command: (cmd: string, body?: Record<string, unknown>) => Promise<Record<string, unknown> | undefined> };
 
@@ -21,8 +22,9 @@ export function EnvironmentControls({ pos, block, command }: Props) {
   const note=name==='note_block',head=name==='player_head'||name==='player_wall_head';
   const bell=name==='bell';const [bellFace,setBellFace]=useState('north'),[bellHeight,setBellHeight]=useState(.5);
   const jukebox=name==='jukebox';
+  const composter=name==='composter';
   const button = name.endsWith('_button'), stoneButton = name === 'stone_button' || name === 'polished_blackstone_button';
-  const supported = plate || daylight || lectern || rod || target || detector || tripwire || button || sensor || note || head || bell || jukebox;
+  const supported = plate || daylight || lectern || rod || target || detector || tripwire || button || sensor || note || head || bell || jukebox || composter;
   const key = posKey(pos);
   useEffect(() => {
     if (!supported) return;
@@ -47,6 +49,7 @@ export function EnvironmentControls({ pos, block, command }: Props) {
     <label className="propertyRow"><span>{label}</span><input aria-label={label} type="number" min={minimum} max={maximum} value={value} onChange={e => change(Number(e.target.value))}/></label>;
   return <div className="inspectorSection environmentControls"><label className="miniLabel"><Zap size={12}/>环境输入</label>
     {sensor&&<VibrationControls key={key} pos={pos} inspection={inspection} command={command}/>}
+    {composter&&<ComposterControls key={key} pos={pos} level={Number(inspection.analog??block.properties.level??0)} command={command}/>}
     {(note||head)&&<NoteControls key={key} pos={pos} head={head} inspection={inspection} command={command}/>}
     {jukebox&&<>
       <p className="subtleText">{song?.playing?`播放中 · ${song.song?.replace('minecraft:','')} · ${song.elapsed} / ${song.durationTicks} gt`:'未播放'}<br/>直接供电 {Number(inspection.value??0)} · 唱片读数 {Number(inspection.analog??0)}</p>

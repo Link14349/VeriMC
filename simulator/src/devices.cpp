@@ -188,6 +188,10 @@ bool Simulator::stimulateDevice(BlockPos pos, const Json& stimulus) {
         return true;
     }
     if (state.device == Device::detectorRail) { setCartInput(pos, stimulus); return true; }
+    if(state.device==Device::composter) {
+        if(stimulus.size()!=1 || !stimulus.contains("compostItem") || !stimulus.at("compostItem").is_string())throw std::invalid_argument("堆肥输入需要 compostItem 物品 ID");
+        addCompost(pos,registry.itemId(stimulus.at("compostItem")));return true;
+    }
     if (state.device == Device::tripwire) {
         if (stimulus.contains("shear")) {
             if (stimulus.size() != 1 || stimulus.at("shear") != true) throw std::invalid_argument("剪断输入必须为 shear: true");

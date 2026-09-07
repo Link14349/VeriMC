@@ -72,6 +72,7 @@ void Simulator::containerChanged(BlockPos pos) {
 }
 
 bool Simulator::transferItem(BlockPos from, BlockPos to, bool pulling) {
+    if(at(from).device==Device::composter || at(to).device==Device::composter)return transferComposter(from,to,pulling);
     auto sourceSlots = containerSlots(from), targetSlots = containerSlots(to);
     if (sourceSlots.empty() || targetSlots.empty() || (!pulling && inventoryFull(to))) return false;
     for (const auto& source : sourceSlots) {

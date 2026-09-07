@@ -180,7 +180,7 @@ int main() {
         try { restored.loadProject(invalid); } catch (...) { threw = true; }
         expect(threw && before == restored.saveProject("before", true), "invalid batch import changed world");
     });
-    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers", "java26_2Hoppers", "java26_2Torches", "java26_2Rails", "java26_2TickBatches", "java26_2Tripwire", "java26_2Buttons", "java26_2Droppers", "java26_2Targets", "java26_2CopperChests", "java26_2Bookshelves", "java26_2Pots", "java26_2Vibrations", "java26_2DeviceVibrations", "java26_2Notes", "java26_2Bells", "java26_2Jukeboxes", "java26_2JukeboxHoppers"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
+    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers", "java26_2Hoppers", "java26_2Torches", "java26_2Rails", "java26_2TickBatches", "java26_2Tripwire", "java26_2Buttons", "java26_2Droppers", "java26_2Targets", "java26_2CopperChests", "java26_2Bookshelves", "java26_2Pots", "java26_2Vibrations", "java26_2DeviceVibrations", "java26_2Notes", "java26_2Bells", "java26_2Jukeboxes", "java26_2JukeboxHoppers", "java26_2Composters"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
         std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/../tests/fixtures/" + fixtureName + ".json"); expect(static_cast<bool>(file), "missing vanilla reference fixture");
         auto fixture = Json::parse(file); auto origin = fixture["origin"].get<BlockPos>(); Simulator s(r);
         auto absolute = [&](const Json& p) { auto pos = p.get<BlockPos>(); return BlockPos{origin.x + pos.x, origin.y + pos.y, origin.z + pos.z}; };
@@ -205,6 +205,31 @@ int main() {
                 if (frame.contains("inventories")) expect(s.inventoryJson(p, false) == frame["inventories"][i], "inventory mismatch at " + std::to_string(tick) + " " + fixture["watch"][i].dump() + " expected " + frame["inventories"][i].dump() + " got " + s.inventoryJson(p, false).dump());
             }
         }
+    });
+    test("all original compost probabilities and random insertion samples", [&] {
+        std::ifstream file(std::string(SIMULATOR_DATA_DIR)+"/../tests/fixtures/java26_2Composting.json");auto fixture=Json::parse(file);
+        for(const auto& row:fixture.at("cases")) {
+            Simulator s(r);const BlockPos pos{0,0,0};const int before=row.at("before");const std::string item=row.at("item");
+            s.setBlock(pos,r.with(r.state("composter"),"level",before));s.setRandomSeed(std::stoull(row.at("seed").get<std::string>()));
+            s.stimulate(pos,{{"compostItem",item}});
+            expect(s.analogOutput(pos)==row.at("after").get<int>(),"compost result differs: "+row.dump());
+            expect(s.saveProject("random",true)["randomSource"]["state"]==row.at("randomState"),"compost random consumption differs: "+row.dump());
+            expect((r.item(r.itemId(item)).compostChance>=0 && before<7)==(row.at("count")==0),"compost input filter differs");
+        }
+    });
+    test("composter maturation checkpoints, idle sleep and failed extraction", [&] {
+        Simulator s(r);const BlockPos pos{0,1,0};s.place(pos,r.state("composter"));
+        for(int i=0;i<7;++i)s.stimulate(pos,{{"compostItem","pumpkin_pie"}});
+        expect(s.analogOutput(pos)==7 && s.pendingEvents()==1,"composter did not schedule one maturation");
+        s.advanceTo(19);auto checkpoint=s.saveProject("compost",true);Simulator copy(r);copy.loadProject(checkpoint);
+        s.advanceTo(20);copy.advanceTo(20);expect(s.saveProject("compost",true)==copy.saveProject("compost",true) && s.analogOutput(pos)==8,"maturation checkpoint diverged");
+        auto count=s.statistics.scheduledEvents;s.advanceTo(1000000);expect(s.statistics.scheduledEvents==count,"mature composter kept ticking");
+        s.place({0,0,0},r.state("hopper",{{"facing","east"}}));
+        Json inventory=Json::array();for(int i=0;i<5;++i)inventory.push_back({{"slot",i},{"item","stone"},{"count",63}});
+        s.stimulate({0,0,0},{{"inventory",inventory}});s.advanceTo(1000001);
+        expect(s.analogOutput(pos)==0 && s.inventoryJson({0,0,0}).size()==5,"failed output extraction did not preserve vanilla loss");
+        const auto before=s.saveProject("compost",true);bool threw=false;try{s.stimulate(pos,{{"compostItem","unknown_item"}});}catch(...){threw=true;}
+        expect(threw && s.saveProject("compost",true)==before,"invalid compost input was not atomic");
     });
     test("all original jukebox songs match full playback, end padding and random consumption", [&] {
         std::ifstream file(std::string(SIMULATOR_DATA_DIR)+"/../tests/fixtures/java26_2JukeboxPlayback.json");auto fixture=Json::parse(file);

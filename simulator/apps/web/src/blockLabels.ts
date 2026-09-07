@@ -23,3 +23,5 @@ Object.assign(labels,{clay:"黏土块",gold_block:"金块",packed_ice:"浮冰",b
 Object.assign(labels,{bell:"钟"});Object.assign(propertyLabels,{attachment:"支撑形式"});Object.assign(valueLabels,{single_wall:"单墙",double_wall:"双墙"});
 
 Object.assign(labels,{jukebox:"唱片机"});Object.assign(propertyLabels,{has_record:"装有唱片"});
+
+Object.assign(labels,{composter:"堆肥桶"});

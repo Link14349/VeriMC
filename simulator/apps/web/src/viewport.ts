@@ -190,6 +190,12 @@ export class CircuitViewport {
         part([.5,.24,.5],[.8,.16,.8],0x465155);
         for (const edge of [.14,.86]) { part([edge,.48,.5],[.12,.38,.84],0x9ba7a8); part([.5,.48,edge],[.6,.38,.12],0x9ba7a8); }
       }
+    } else if(name==='composter') {
+      part([.5,.06,.5],[1,.12,1],0x73523b);
+      for(const edge of [.06,.94]) {part([edge,.56,.5],[.12,.88,1],0x997049);part([.5,.56,edge],[.76,.88,.12],0x997049);}
+      const level=Number(p.level),height=Math.max(2,1+Math.min(level,7)*2)/16;
+      part([.5,height/2,.5],[.76,height,.76],level===8?0xa99b6d:0x624531);
+      if(level===8)for(const x of [.32,.65])part([x,height+.015,.48],[.12,.025,.2],0xe3d6a1);
     } else if(name==='jukebox') {
       part([.5,.5,.5],[1,1,1],0x6b503c);part([.5,1.005,.5],[.86,.02,.86],0xa78257);
       part([.5,1.019,.5],[.65,.015,.12],0x2c3030);

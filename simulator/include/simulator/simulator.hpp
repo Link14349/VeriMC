@@ -109,6 +109,10 @@ private:
     LegacyRandom worldRandom;
     std::uint64_t randomSeed{};
     void dispenseDropper(BlockPos pos);
+    bool addCompost(BlockPos pos, std::uint32_t item);
+    bool insertCompost(BlockPos from, BlockPos into, ItemStack stack);
+    void emptyComposter(BlockPos pos, StateId state);
+    bool transferComposter(BlockPos from, BlockPos into, bool pulling);
     StateId noteInstrument(BlockPos pos, StateId state) const;
     void playNote(BlockPos pos, StateId state);
     void noteEvent(BlockPos pos);

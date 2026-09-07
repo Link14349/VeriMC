@@ -7,7 +7,7 @@ namespace simulator {
 namespace {
 Device classify(const std::string& name, const std::string& c) {
     static const std::unordered_map<std::string, Device> classes{
-        {"JukeboxBlock", Device::jukebox}, {"BellBlock", Device::bell}, {"AirBlock", Device::air}, {"RedStoneWireBlock", Device::wire}, {"RedstoneBlock", Device::source},
+        {"ComposterBlock", Device::composter}, {"JukeboxBlock", Device::jukebox}, {"BellBlock", Device::bell}, {"AirBlock", Device::air}, {"RedStoneWireBlock", Device::wire}, {"RedstoneBlock", Device::source},
         {"LeverBlock", Device::lever}, {"ButtonBlock", Device::button}, {"RedstoneTorchBlock", Device::torch},
         {"RedstoneWallTorchBlock", Device::wallTorch}, {"RepeaterBlock", Device::repeater}, {"ComparatorBlock", Device::comparator},
         {"ObserverBlock", Device::observer}, {"RedstoneLampBlock", Device::lamp}, {"CopperBulbBlock", Device::bulb},
@@ -56,6 +56,11 @@ BlockRegistry::BlockRegistry(const std::string& path) {
     if(jukeboxData.at("version")!="26.2")throw std::runtime_error("Jukebox registry version mismatch");
     for(const auto& row:jukeboxData.at("songs"))songs.push_back({row.at("name"),row.at("sound"),row.at("lengthTicks"),row.at("comparatorOutput")});
     for(const auto& [name,songName]:jukeboxData.at("items").items())items.at(itemId(name)).jukeboxSong=songId(songName);
+    std::ifstream compostFile(std::filesystem::path(path).parent_path()/"compostingRules.json");
+    if(!compostFile)throw std::runtime_error("找不到堆肥规则 compostingRules.json");
+    const auto compostData=Json::parse(compostFile);
+    if(compostData.at("version")!="26.2")throw std::runtime_error("Composting registry version mismatch");
+    for(const auto& [name,chance]:compostData.at("items").items())items.at(itemId(name)).compostChance=chance;
     std::ifstream vibrationFile(std::filesystem::path(path).parent_path() / "vibrationRules.json");
     if(!vibrationFile) throw std::runtime_error("找不到振动规则 vibrationRules.json");
     const auto vibrationData=Json::parse(vibrationFile);
@@ -91,6 +96,7 @@ BlockRegistry::BlockRegistry(const std::string& path) {
         if (typeInfo.className == "CopperChestBlock" || typeInfo.className == "WeatheringCopperChestBlock") typeInfo.supportLevel = "implemented";
         if (typeInfo.device == Device::hopper) typeInfo.supportLevel = "implemented";
         if (typeInfo.device == Device::dropper) typeInfo.supportLevel = "partial";
+        if (typeInfo.device == Device::composter) typeInfo.supportLevel = "partial";
         if(typeInfo.device==Device::jukebox || typeInfo.device==Device::bell || typeInfo.device==Device::noteBlock || typeInfo.className.find("SkullBlock")!=std::string::npos || typeInfo.className=="PlayerHeadBlock" || typeInfo.className=="PlayerWallHeadBlock")typeInfo.supportLevel="partial";
         if (typeInfo.className == "ChiseledBookShelfBlock") typeInfo.supportLevel = "partial";
         if (typeInfo.className == "DecoratedPotBlock") typeInfo.supportLevel = "partial";
@@ -132,6 +138,7 @@ BlockRegistry::BlockRegistry(const std::string& path) {
             st.locked = val("locked", "false") == "true"; st.extended = val("extended", "false") == "true";
             st.subtract = val("mode", "compare") == "subtract"; st.sticky = typeInfo.name == "minecraft:sticky_piston";
             const auto& className = typeInfo.className;
+            if (className == "ComposterBlock") st.staticAnalog = static_cast<std::uint8_t>(std::stoi(val("level", "0")));
             if (className == "LayeredCauldronBlock") st.staticAnalog = static_cast<std::uint8_t>(std::stoi(val("level", "0")));
             if (className == "LavaCauldronBlock") st.staticAnalog = 3;
             if (className == "BeehiveBlock") st.staticAnalog = static_cast<std::uint8_t>(std::stoi(val("honey_level", "0")));
@@ -177,6 +184,7 @@ Json BlockRegistry::itemCatalog() const {
     for (const auto& info : items) {
         Json row{{"name", info.name}, {"maxStack", info.maxStack}};
         if(info.bookshelfBook) row["bookshelfBook"]=true;
+        if(info.compostChance>=0)row["compostChance"]=info.compostChance;
         if(info.jukeboxSong>=0)row["jukeboxSong"]={{"name",song(info.jukeboxSong).name},{"lengthTicks",song(info.jukeboxSong).lengthTicks},{"comparatorOutput",song(info.jukeboxSong).comparatorOutput}};
         result.push_back(std::move(row));
     }

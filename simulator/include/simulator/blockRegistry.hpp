@@ -6,7 +6,7 @@
 
 namespace simulator {
 struct PropertyInfo { std::vector<std::string> values; std::uint32_t stride{}; };
-struct ItemInfo { std::string name; std::uint16_t maxStack{}; bool bookshelfBook{}; int jukeboxSong{-1}; };
+struct ItemInfo { std::string name; std::uint16_t maxStack{}; bool bookshelfBook{}; int jukeboxSong{-1}; float compostChance{-1}; };
 struct SongInfo { std::string name, sound; std::uint32_t lengthTicks{}; std::uint8_t comparatorOutput{}; };
 struct GameEventInfo { std::string name; int radius{}, frequency{}; bool listenable{}, ignoreSneaking{}; };
 struct InstrumentInfo { std::string name, sound; bool tunable{}, above{}, custom{}; };

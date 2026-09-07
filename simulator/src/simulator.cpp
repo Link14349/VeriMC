@@ -47,7 +47,7 @@ int Simulator::analogOutput(BlockPos pos) const {
     if (isBookshelf(id)) return it==runtime.end()?0:it->second.values.value("lastInteractedSlot",-1)+1;
     if(state.device==Device::jukebox){auto stack=stackAt({pos,0});const int song=stack.count?registry.item(stack.item).jukeboxSong:-1;return song<0?0:registry.song(song).comparatorOutput;}
     if (inventorySize(id)) return containerAnalog(pos);
-    if (state.device == Device::analog) return state.staticAnalog;
+    if (state.device == Device::analog || state.device==Device::composter) return state.staticAnalog;
     if (state.device == Device::lectern) {
         if (registry.property(id, "has_book") != "true" || it == runtime.end()) return 0;
         int pages = it->second.values.value("pages", 0), page = it->second.values.value("page", 0);
@@ -61,7 +61,7 @@ int Simulator::displayValue(BlockPos pos) const {
     if(state.device==Device::jukebox)return jukeboxPlaying(pos)?15:0;
     if(isSensor(state.device)) return state.power;
     if (state.device == Device::wire || state.device == Device::target || state.device == Device::daylight || state.device == Device::weightedPlate) return state.power;
-    if (state.device == Device::comparator || state.device == Device::analog) return analogOutput(pos);
+    if (state.device == Device::comparator || state.device == Device::analog || state.device==Device::composter) return analogOutput(pos);
     if (state.device == Device::lamp || state.device == Device::bulb || state.device == Device::torch || state.device == Device::wallTorch) return state.lit ? 15 : 0;
     if (inventorySize(world.get(pos)) && registry.type(world.get(pos)).name != "minecraft:trapped_chest") return containerAnalog(pos);
     if (state.device == Device::piston) return state.extended ? 15 : 0;
@@ -206,6 +206,7 @@ void Simulator::place(BlockPos p, StateId id) {
 }
 void Simulator::onPlace(BlockPos p, StateId id, StateId old) {
     const auto& s = registry[id];
+    if(s.device==Device::composter && s.staticAnalog==7)schedule(p,20);
     if (isDiode(s.device)) { notifyFront(p, s.facing); return; }
     if (s.device == Device::torch || s.device == Device::wallTorch) { for (auto d : directions) updateNeighbors(p.relative(d)); return; }
     if (registry[old].type == s.type) return;
@@ -449,6 +450,7 @@ void Simulator::executeTick(const ScheduledEvent& event) {
         }
         break;
     case Device::comparator: refreshComparator(p); break;
+    case Device::composter: if(s.staticAnalog==7)setBlock(p,registry.with(id,"level",8));break;
     case Device::observer: setBlock(p, registry.withBool(id, "powered", !s.powered), 2); if (!s.powered) schedule(p, 2); notifyFront(p, s.facing); break;
     case Device::lamp: if (s.lit && bestSignal(p) == 0) setBlock(p, registry.withBool(id, "lit", false), 2); break;
     case Device::torch: case Device::wallTorch: {
