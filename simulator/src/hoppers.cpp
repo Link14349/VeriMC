@@ -55,6 +55,7 @@ void Simulator::writeStack(const InventorySlot& slot, ItemStack stack, bool noti
     auto& inventory = runtime[slot.pos].inventory;
     inventory.resize(inventorySize(id));
     inventory[slot.index] = stack.count ? stack : ItemStack{};
+    if(registry[id].device==Device::jukebox){updateJukeboxItem(slot.pos);return;}
     if(bookshelf) {
         if(occupied || stack.count) updateBookshelfSlot(slot);
         return;
@@ -124,7 +125,7 @@ void Simulator::tickHopper(const ScheduledEvent& event) {
         // Failed extraction from ordinary containers can still issue comparator
         // updates on remove/restore. Preserve those observable repeated calls.
         retryExtraction = !pulled && at(source).device != Device::hopper && !isDecoratedPot(world.get(source)) && !inventoryEmpty(source);
-        if(retryExtraction && isBookshelf(world.get(source))) {
+        if(retryExtraction && (isBookshelf(world.get(source)) || at(source).device==Device::jukebox)) {
             retryExtraction=false;
             for(const auto& slot:containerSlots(source)) if(stackAt(slot).count && canExtractStack(slot,event.pos)) {retryExtraction=true;break;}
         }

@@ -5,6 +5,13 @@
 
 namespace simulator {
 namespace {
+Json wakeTimeJson(Tick value) { return value==UINT64_MAX?Json(nullptr):Json(value); }
+Tick readWakeTime(const Json& value) {
+    if(value.is_null())return UINT64_MAX;
+    if(!value.is_number_integer() || (!value.is_number_unsigned() && value.get<std::int64_t>()<0))throw std::invalid_argument("无效唤醒时刻");
+    // Accept exact old native snapshots, but never a rounded JavaScript float.
+    return value.get<Tick>();
+}
 Json eventJson(const ScheduledEvent& e) {
     return {{"tick", e.tick}, {"priority", e.priority}, {"order", e.order}, {"pos", e.pos}, {"type", e.type}, {"phase", e.phase}, {"data", e.data}, {"entityOrder", e.entityOrder}};
 }
@@ -52,6 +59,7 @@ void Simulator::restore(const Simulator& snapshot) {
     blockTicks = snapshot.blockTicks;
     hoppers = snapshot.hoppers; entityOrders = snapshot.entityOrders; nextEntityOrder = snapshot.nextEntityOrder;
     sensors = snapshot.sensors; sensorSections = snapshot.sensorSections;
+    jukeboxes=snapshot.jukeboxes;
     recentTorchToggles = snapshot.recentTorchToggles; torchToggleCounts = snapshot.torchToggleCounts;
     probes = snapshot.probes; probeDependencies = snapshot.probeDependencies; trace = snapshot.trace;
     currentTick = snapshot.currentTick; nextOrder = snapshot.nextOrder; sequence = snapshot.sequence; nextProbeId = snapshot.nextProbeId;
@@ -67,6 +75,7 @@ Json Simulator::saveProject(const std::string& name, bool checkpoint) const {
     if(!checkpoint) for(const auto& event:scheduledKeys)
         if(event.phase==1 && event.type==registry[registry.state("note_block")].type)throw std::invalid_argument("音符盒等待演奏，请保存运行快照，或执行方块事件后导出电路");
     if(!checkpoint)for(const auto& [pos,data]:runtime)if(at(pos).device==Device::bell && data.values.value("ringing",false))throw std::invalid_argument("钟仍在摆动，请保存运行快照或等待停止");
+    if(!checkpoint)for(const auto& [pos,player]:jukeboxes){(void)player;if((stackAt({pos,0}).count>0)!=(registry.property(world.get(pos),"has_record")=="true"))throw std::invalid_argument("唱片标志与库存不一致，请保存运行快照");}
     Json data{{"format", "verimc.simulator"}, {"formatVersion", 1}, {"minecraftVersion", "26.2"}, {"edition", "java"}, {"kind", checkpoint ? "checkpoint" : "circuit"}, {"name", name}};
     data["profile"] = {{"experimentalRedstone", false}, {"naturalRandomTicks", false}, {"loadedRegionOnly", true}};
     data["randomSource"] = {{"algorithm", "javaLegacy48"}, {"seed", std::to_string(randomSeed)}};
@@ -106,16 +115,19 @@ Json Simulator::saveProject(const std::string& name, bool checkpoint) const {
         data["blockTickState"] = {{"earliestCollection", blockTicks.earliestTick()}, {"batch", Json::array()}};
         for (const auto& event : blockTicks.batchEvents()) data["blockTickState"]["batch"].push_back(eventJson(event));
         data["hoppers"] = Json::array();
-        for (const auto& [pos, h] : hoppers) data["hoppers"].push_back({{"pos", pos}, {"readyAt", h.readyAt}, {"firstTick", h.firstTick}, {"wakeAt", h.wakeAt}, {"generation", h.generation}});
+        for (const auto& [pos, h] : hoppers) data["hoppers"].push_back({{"pos", pos}, {"readyAt", h.readyAt}, {"firstTick", h.firstTick}, {"wakeAt", wakeTimeJson(h.wakeAt)}, {"generation", h.generation}});
         std::sort(data["hoppers"].begin(), data["hoppers"].end(), positionOrder);
         data["sensors"]=Json::array();
         for(const auto& [pos,sensor]:sensors) {
-            Json row{{"pos",pos},{"candidateTick",sensor.candidateTick},{"wakeAt",sensor.wakeAt},{"remaining",sensor.remaining},{"generation",sensor.generation}};
+            Json row{{"pos",pos},{"candidateTick",sensor.candidateTick},{"wakeAt",wakeTimeJson(sensor.wakeAt)},{"remaining",sensor.remaining},{"generation",sensor.generation}};
             if(sensor.candidate)row["candidate"]=vibrationJson(*sensor.candidate,registry);
             if(sensor.current)row["current"]=vibrationJson(*sensor.current,registry);
             data["sensors"].push_back(std::move(row));
         }
         std::sort(data["sensors"].begin(),data["sensors"].end(),positionOrder);
+        data["jukeboxes"]=Json::array();
+        for(const auto& [pos,player]:jukeboxes)data["jukeboxes"].push_back({{"pos",pos},{"song",player.song<0?Json(nullptr):Json(registry.song(player.song).name)},{"elapsed",player.elapsed},{"firstTick",player.firstTick},{"wakeAt",wakeTimeJson(player.wakeAt)},{"generation",player.generation}});
+        std::sort(data["jukeboxes"].begin(),data["jukeboxes"].end(),positionOrder);
         data["motions"] = Json::array();
         for (const auto& [p, m] : motions) data["motions"].push_back({{"pos", p}, {"movedState", m.movedState}, {"facing", static_cast<unsigned>(m.facing)}, {"extending", m.extending}, {"source", m.source}, {"progress", m.progress}, {"previousProgress", m.previousProgress}, {"lastTicked", m.lastTicked}, {"generation", m.generation}});
         std::sort(data["motions"].begin(), data["motions"].end(), positionOrder);
@@ -157,7 +169,7 @@ void Simulator::loadProject(const Json& data) {
     for (const auto& row : data.value("entityOrder", Json::array())) {
         auto pos = row.at("pos").get<BlockPos>(); auto rank = row.at("order").get<std::uint64_t>();
         auto device = candidate.at(pos).device;
-        if ((device != Device::hopper && device != Device::daylight && device != Device::movingPiston && device != Device::bell && !isSensor(device)) || rank >= candidate.nextEntityOrder || !usedRanks.insert(rank).second || !candidate.entityOrders.emplace(pos, rank).second) throw std::invalid_argument("无效方块实体执行顺序");
+        if ((device != Device::hopper && device != Device::daylight && device != Device::movingPiston && device != Device::bell && device!=Device::jukebox && !isSensor(device)) || rank >= candidate.nextEntityOrder || !usedRanks.insert(rank).second || !candidate.entityOrders.emplace(pos, rank).second) throw std::invalid_argument("无效方块实体执行顺序");
     }
     for (const auto& row : data.value("blockData", Json::array())) {
         auto p = row.at("pos").get<BlockPos>();
@@ -217,7 +229,7 @@ void Simulator::loadProject(const Json& data) {
         candidate.blockTicks.restoreBatch(earliest, batch);
         for (const auto& row : data.value("hoppers", Json::array())) {
             auto pos = row.at("pos").get<BlockPos>();
-            HopperState hopper{row.at("readyAt"), row.at("firstTick"), row.at("wakeAt"), row.at("generation")};
+            HopperState hopper{row.at("readyAt"), row.at("firstTick"), readWakeTime(row.at("wakeAt")), row.at("generation")};
             if (candidate.at(pos).device != Device::hopper || !candidate.entityOrders.contains(pos) || hopper.generation >= candidate.nextOrder || (hopper.wakeAt != UINT64_MAX && hopper.wakeAt < candidate.currentTick) || !candidate.hoppers.emplace(pos, hopper).second) throw std::invalid_argument("无效漏斗运行状态");
             if (hopper.wakeAt != UINT64_MAX && !candidate.scheduledKeys.contains({pos, candidate.at(pos).type, 2, hopper.generation})) throw std::invalid_argument("快照缺少漏斗唤醒事件");
         }
@@ -231,9 +243,9 @@ void Simulator::loadProject(const Json& data) {
         for(const auto& row:data.value("sensors",Json::array())) {
             auto pos=row.at("pos").get<BlockPos>();SensorState sensor;
             if(!isSensor(candidate.at(pos).device) || !candidate.entityOrders.contains(pos))throw std::invalid_argument("无效感测体运行位置或顺序");
-            for(const auto* field:{"candidateTick","wakeAt","remaining","generation"})if(!row.at(field).is_number_integer() || row.at(field)<0)throw std::invalid_argument("无效感测体运行字段");
-            if(row.at("remaining")>18)throw std::invalid_argument("振动传播剩余时间越界");
-            sensor.candidateTick=row.at("candidateTick");sensor.wakeAt=row.at("wakeAt");sensor.remaining=row.at("remaining");sensor.generation=row.at("generation");
+            for(const auto* field:{"candidateTick","remaining","generation"})if(!row.at(field).is_number_integer() || (!row.at(field).is_number_unsigned() && row.at(field).get<std::int64_t>()<0))throw std::invalid_argument("无效感测体运行字段");
+            if(row.at("remaining").get<std::uint64_t>()>18)throw std::invalid_argument("振动传播剩余时间越界");
+            sensor.candidateTick=row.at("candidateTick");sensor.wakeAt=readWakeTime(row.at("wakeAt"));sensor.remaining=row.at("remaining");sensor.generation=row.at("generation");
             if(row.contains("candidate"))sensor.candidate=readVibration(row.at("candidate"),registry,pos);
             if(row.contains("current"))sensor.current=readVibration(row.at("current"),registry,pos);
             for(const auto* pending:{&sensor.candidate,&sensor.current})if(*pending) {
@@ -257,6 +269,28 @@ void Simulator::loadProject(const Json& data) {
             if(found==candidate.sensors.end() || found->second.wakeAt!=event.tick || found->second.generation!=event.data)throw std::invalid_argument("感测体与运行事件不一致");
         }
         candidate.rebuildSensorIndex();
+        for(const auto& row:data.value("jukeboxes",Json::array())) {
+            auto pos=row.at("pos").get<BlockPos>();JukeboxState player;
+            const bool hasRecord=registry.property(candidate.world.get(pos),"has_record")=="true";
+            if(candidate.at(pos).device!=Device::jukebox || candidate.entityOrders.contains(pos)!=hasRecord)throw std::invalid_argument("无效唱片机位置或执行顺序");
+            for(const auto* field:{"elapsed","firstTick","generation"})if(!row.at(field).is_number_integer() || (!row.at(field).is_number_unsigned() && row.at(field).get<std::int64_t>()<0))throw std::invalid_argument("无效唱片机运行字段");
+            player.song=row.at("song").is_null()?-1:registry.songId(row.at("song"));
+            if(row.at("elapsed").get<std::uint64_t>()>(player.song<0?0:registry.song(player.song).lengthTicks+20))throw std::invalid_argument("唱片播放进度超出范围");
+            player.elapsed=row.at("elapsed");player.firstTick=row.at("firstTick");player.wakeAt=readWakeTime(row.at("wakeAt"));player.generation=row.at("generation");
+            if(player.firstTick>candidate.currentTick+1)throw std::invalid_argument("唱片机首次执行时刻越界");
+            const auto stack=candidate.stackAt({pos,0});
+            if(player.song>=0 && (!stack.count || registry.item(stack.item).jukeboxSong!=player.song))throw std::invalid_argument("播放曲目与唱片不一致");
+            const bool ticking=player.song>=0 && hasRecord;
+            if(ticking!=(player.wakeAt!=UINT64_MAX) || (ticking && (player.wakeAt<candidate.currentTick || player.wakeAt<player.firstTick || player.generation>=candidate.nextOrder || !candidate.scheduledKeys.contains({pos,candidate.at(pos).type,2,player.generation}))))throw std::invalid_argument("唱片机播放与队列不一致");
+            if(!candidate.jukeboxes.emplace(pos,player).second)throw std::invalid_argument("重复唱片机数据");
+        }
+        auto jukeboxQueue=candidate.scheduled;
+        while(!jukeboxQueue.empty()) {
+            const auto event=jukeboxQueue.top();jukeboxQueue.pop();if(event.phase!=2 || candidate.at(event.pos).device!=Device::jukebox)continue;
+            auto found=candidate.jukeboxes.find(event.pos);
+            if(found==candidate.jukeboxes.end() || found->second.wakeAt!=event.tick || found->second.generation!=event.data)throw std::invalid_argument("唱片机与排期不一致");
+        }
+        for(const auto& cell:candidate.world.cells())if(registry[cell.state].device==Device::jukebox && !candidate.jukeboxes.contains(cell.pos))throw std::invalid_argument("快照缺少唱片机数据");
         auto bellQueue=candidate.scheduled;std::unordered_set<BlockPos,PosHash> queuedBells,pendingBells;
         while(!bellQueue.empty()) {
             const auto event=bellQueue.top();bellQueue.pop();if(candidate.at(event.pos).device!=Device::bell || event.type!=candidate.at(event.pos).type)continue;
@@ -282,7 +316,9 @@ void Simulator::loadProject(const Json& data) {
         for (const auto& cell : candidate.world.cells()) if (registry[cell.state].device == Device::hopper && !candidate.hoppers.contains(cell.pos)) throw std::invalid_argument("运行快照缺少漏斗数据");
         for(const auto& cell:candidate.world.cells())if(isSensor(registry[cell.state].device) && !candidate.sensors.contains(cell.pos))throw std::invalid_argument("运行快照缺少感测体数据");
     } else {
+        for(const auto& cell:candidate.world.cells())if(registry[cell.state].device==Device::jukebox && ((candidate.stackAt({cell.pos,0}).count>0)!=(registry.property(cell.state,"has_record")=="true")))throw std::invalid_argument("电路中的唱片标志与库存不一致");
         for (const auto& cell : candidate.world.cells()) candidate.onPlace(cell.pos, cell.state, 0);
+        for(const auto& cell:candidate.world.cells())if(registry[cell.state].device==Device::jukebox && candidate.stackAt({cell.pos,0}).count)candidate.updateJukeboxItem(cell.pos);
         for (const auto& cell : candidate.world.cells()) candidate.neighborChanged(cell.pos);
     }
     for (const auto& row : data.at("probes")) {
@@ -302,6 +338,7 @@ void Simulator::loadProject(const Json& data) {
     swap(blockTicks, candidate.blockTicks);
     swap(hoppers, candidate.hoppers); swap(entityOrders, candidate.entityOrders); nextEntityOrder = candidate.nextEntityOrder;
     swap(sensors,candidate.sensors);swap(sensorSections,candidate.sensorSections);
+    swap(jukeboxes,candidate.jukeboxes);
     swap(recentTorchToggles, candidate.recentTorchToggles); swap(torchToggleCounts, candidate.torchToggleCounts);
     swap(probes, candidate.probes); swap(probeDependencies, candidate.probeDependencies); swap(trace, candidate.trace);
     currentTick = candidate.currentTick; nextOrder = candidate.nextOrder; sequence = candidate.sequence; nextProbeId = candidate.nextProbeId; traceDropped = candidate.traceDropped;

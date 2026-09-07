@@ -20,8 +20,9 @@ export function EnvironmentControls({ pos, block, command }: Props) {
   const sensor=name==='sculk_sensor'||name==='calibrated_sculk_sensor';
   const note=name==='note_block',head=name==='player_head'||name==='player_wall_head';
   const bell=name==='bell';const [bellFace,setBellFace]=useState('north'),[bellHeight,setBellHeight]=useState(.5);
+  const jukebox=name==='jukebox';
   const button = name.endsWith('_button'), stoneButton = name === 'stone_button' || name === 'polished_blackstone_button';
-  const supported = plate || daylight || lectern || rod || target || detector || tripwire || button || sensor || note || head || bell;
+  const supported = plate || daylight || lectern || rod || target || detector || tripwire || button || sensor || note || head || bell || jukebox;
   const key = posKey(pos);
   useEffect(() => {
     if (!supported) return;
@@ -32,18 +33,26 @@ export function EnvironmentControls({ pos, block, command }: Props) {
       const detail = (event as CustomEvent<{ full: boolean; changes: BlockCell[] }>).detail;
       if (detail.full || detail.changes.some(cell => posKey(cell.pos) === key)) refresh.request();
     };
-    connection.addEventListener('cells', onCells); refresh.request();
-    return () => { refresh.dispose(); connection.removeEventListener('cells', onCells); };
+    let lastTick=connection.status.tick;
+    const onStatus=()=>{if(jukebox && connection.status.tick!==lastTick){lastTick=connection.status.tick;refresh.request();}};
+    connection.addEventListener('cells', onCells);if(jukebox)connection.addEventListener('status',onStatus);refresh.request();
+    return () => { refresh.dispose(); connection.removeEventListener('cells', onCells);connection.removeEventListener('status',onStatus); };
   }, [key, block.name]);
   if (!supported) return null;
   const stimulus = (values: Record<string, unknown>) => command('stimulate', { pos, stimulus: values });
   const runtime = (inspection.runtime ?? {}) as Record<string, number>;
+  const song=inspection.jukebox as {playing:boolean;elapsed:number;song?:string;lengthTicks?:number;durationTicks?:number}|undefined;
   const carts = (inspection.runtime as {carts?: Array<{type: string}>})?.carts ?? [];
   const numberField = (label: string, value: number, change: (next: number) => void, maximum: number, minimum = 0) =>
     <label className="propertyRow"><span>{label}</span><input aria-label={label} type="number" min={minimum} max={maximum} value={value} onChange={e => change(Number(e.target.value))}/></label>;
   return <div className="inspectorSection environmentControls"><label className="miniLabel"><Zap size={12}/>环境输入</label>
     {sensor&&<VibrationControls key={key} pos={pos} inspection={inspection} command={command}/>}
     {(note||head)&&<NoteControls key={key} pos={pos} head={head} inspection={inspection} command={command}/>}
+    {jukebox&&<>
+      <p className="subtleText">{song?.playing?`播放中 · ${song.song?.replace('minecraft:','')} · ${song.elapsed} / ${song.durationTicks} gt`:'未播放'}<br/>直接供电 {Number(inspection.value??0)} · 唱片读数 {Number(inspection.analog??0)}</p>
+      <button className="wideButton" onClick={()=>command('probe',{pos,name:'唱片读数',mode:'analog'})}>添加唱片读数探针</button>
+      <p className="subtleText">在库存面板插入或取出唱片。曲目结束后继续保留唱片读数；持续播放事件不触发幽匿感测体。浏览器暂不播放音乐。</p>
+    </>}
     {bell&&<>
       <button className="wideButton accentOutline" onClick={()=>command('interact',{pos})}>敲钟</button>
       <label className="propertyRow"><span>敲击面</span><select aria-label="敲击面" value={bellFace} onChange={e=>setBellFace(e.target.value)}>{[['north','北'],['south','南'],['west','西'],['east','东'],['up','上'],['down','下']].map(([value,label])=><option key={value} value={value}>{label}</option>)}</select></label>

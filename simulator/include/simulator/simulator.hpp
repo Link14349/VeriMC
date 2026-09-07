@@ -28,6 +28,7 @@ struct SensorState {
     int remaining{};
     std::uint64_t generation{};
 };
+struct JukeboxState { int song{-1};std::uint32_t elapsed{};Tick firstTick{},wakeAt{UINT64_MAX};std::uint64_t generation{}; };
 struct Statistics { std::uint64_t updates{}, scheduledEvents{}, stateChanges{}; std::uint64_t simulationMicros{}; };
 class Simulator {
 public:
@@ -67,6 +68,7 @@ public:
     int displayValue(BlockPos pos) const;
     int viewerCount(BlockPos pos) const { auto found = runtime.find(pos); return found == runtime.end() ? 0 : found->second.values.value("viewers", 0); }
     bool bellRinging(BlockPos pos) const { auto found=runtime.find(pos);return found!=runtime.end() && found->second.values.value("ringing",false); }
+    bool jukeboxPlaying(BlockPos pos) const { auto found=jukeboxes.find(pos);return found!=jukeboxes.end() && found->second.song>=0; }
     std::size_t cartCount(BlockPos pos) const {
         auto found = runtime.find(pos);
         if (found == runtime.end()) return 0;
@@ -100,7 +102,7 @@ public:
     std::size_t estimatedBytes() const {
         auto bytes = world.storageBytes() + trace.size() * sizeof(TraceEdge) + runtime.size() * 512 + scheduled.size() * 128 + hoppers.size() * 96 + entityOrders.size() * 64 + blockTicks.estimatedBytes();
         for (const auto& [pos, data] : runtime) { (void)pos; bytes += data.inventory.capacity() * sizeof(ItemStack); }
-        return bytes + recentTorchToggles.size() * sizeof(TorchToggle) + torchToggleCounts.size() * 64 + environmentActions.size() * 2048 + sensors.size() * 384 + sensorSections.size() * 96;
+        return bytes + recentTorchToggles.size() * sizeof(TorchToggle) + torchToggleCounts.size() * 64 + environmentActions.size() * 2048 + sensors.size() * 384 + sensorSections.size() * 96 + jukeboxes.size() * 128;
     }
     const PistonMotion* motionAt(BlockPos pos) const { auto it = motions.find(pos); return it == motions.end() ? nullptr : &it->second; }
 private:
@@ -118,6 +120,12 @@ private:
     bool stimulateBell(BlockPos pos, const Json& input);
     void bellEvent(const ScheduledEvent& event);
     void finishBell(const ScheduledEvent& event);
+    void startJukebox(BlockPos pos);
+    void removeJukebox(BlockPos pos,std::uint16_t oldType);
+    void updateJukeboxItem(BlockPos pos);
+    void updateJukeboxTicker(BlockPos pos);
+    void tickJukebox(const ScheduledEvent& event);
+    std::unordered_map<BlockPos,JukeboxState,PosHash> jukeboxes;
     void startSensor(BlockPos pos);
     void removeSensor(BlockPos pos, std::uint16_t oldType);
     void rebuildSensorIndex();

@@ -1,0 +1,162 @@
+{
+  "version": "26.2",
+  "reference": "Fixed Java 26.2 song definitions and default item component report",
+  "songs": [
+    {
+      "name": "minecraft:11",
+      "sound": "minecraft:music_disc.11",
+      "lengthTicks": 1420,
+      "comparatorOutput": 11
+    },
+    {
+      "name": "minecraft:13",
+      "sound": "minecraft:music_disc.13",
+      "lengthTicks": 3560,
+      "comparatorOutput": 1
+    },
+    {
+      "name": "minecraft:5",
+      "sound": "minecraft:music_disc.5",
+      "lengthTicks": 3560,
+      "comparatorOutput": 15
+    },
+    {
+      "name": "minecraft:blocks",
+      "sound": "minecraft:music_disc.blocks",
+      "lengthTicks": 6900,
+      "comparatorOutput": 3
+    },
+    {
+      "name": "minecraft:bounce",
+      "sound": "minecraft:music_disc.bounce",
+      "lengthTicks": 4680,
+      "comparatorOutput": 8
+    },
+    {
+      "name": "minecraft:cat",
+      "sound": "minecraft:music_disc.cat",
+      "lengthTicks": 3700,
+      "comparatorOutput": 2
+    },
+    {
+      "name": "minecraft:chirp",
+      "sound": "minecraft:music_disc.chirp",
+      "lengthTicks": 3700,
+      "comparatorOutput": 4
+    },
+    {
+      "name": "minecraft:creator",
+      "sound": "minecraft:music_disc.creator",
+      "lengthTicks": 3520,
+      "comparatorOutput": 12
+    },
+    {
+      "name": "minecraft:creator_music_box",
+      "sound": "minecraft:music_disc.creator_music_box",
+      "lengthTicks": 1460,
+      "comparatorOutput": 11
+    },
+    {
+      "name": "minecraft:far",
+      "sound": "minecraft:music_disc.far",
+      "lengthTicks": 3480,
+      "comparatorOutput": 5
+    },
+    {
+      "name": "minecraft:lava_chicken",
+      "sound": "minecraft:music_disc.lava_chicken",
+      "lengthTicks": 2680,
+      "comparatorOutput": 9
+    },
+    {
+      "name": "minecraft:mall",
+      "sound": "minecraft:music_disc.mall",
+      "lengthTicks": 3940,
+      "comparatorOutput": 6
+    },
+    {
+      "name": "minecraft:mellohi",
+      "sound": "minecraft:music_disc.mellohi",
+      "lengthTicks": 1920,
+      "comparatorOutput": 7
+    },
+    {
+      "name": "minecraft:otherside",
+      "sound": "minecraft:music_disc.otherside",
+      "lengthTicks": 3900,
+      "comparatorOutput": 14
+    },
+    {
+      "name": "minecraft:pigstep",
+      "sound": "minecraft:music_disc.pigstep",
+      "lengthTicks": 2980,
+      "comparatorOutput": 13
+    },
+    {
+      "name": "minecraft:precipice",
+      "sound": "minecraft:music_disc.precipice",
+      "lengthTicks": 5980,
+      "comparatorOutput": 13
+    },
+    {
+      "name": "minecraft:relic",
+      "sound": "minecraft:music_disc.relic",
+      "lengthTicks": 4360,
+      "comparatorOutput": 14
+    },
+    {
+      "name": "minecraft:stal",
+      "sound": "minecraft:music_disc.stal",
+      "lengthTicks": 3000,
+      "comparatorOutput": 8
+    },
+    {
+      "name": "minecraft:strad",
+      "sound": "minecraft:music_disc.strad",
+      "lengthTicks": 3760,
+      "comparatorOutput": 9
+    },
+    {
+      "name": "minecraft:tears",
+      "sound": "minecraft:music_disc.tears",
+      "lengthTicks": 3500,
+      "comparatorOutput": 10
+    },
+    {
+      "name": "minecraft:wait",
+      "sound": "minecraft:music_disc.wait",
+      "lengthTicks": 4760,
+      "comparatorOutput": 12
+    },
+    {
+      "name": "minecraft:ward",
+      "sound": "minecraft:music_disc.ward",
+      "lengthTicks": 5020,
+      "comparatorOutput": 10
+    }
+  ],
+  "items": {
+    "minecraft:music_disc_11": "minecraft:11",
+    "minecraft:music_disc_13": "minecraft:13",
+    "minecraft:music_disc_5": "minecraft:5",
+    "minecraft:music_disc_blocks": "minecraft:blocks",
+    "minecraft:music_disc_bounce": "minecraft:bounce",
+    "minecraft:music_disc_cat": "minecraft:cat",
+    "minecraft:music_disc_chirp": "minecraft:chirp",
+    "minecraft:music_disc_creator": "minecraft:creator",
+    "minecraft:music_disc_creator_music_box": "minecraft:creator_music_box",
+    "minecraft:music_disc_far": "minecraft:far",
+    "minecraft:music_disc_lava_chicken": "minecraft:lava_chicken",
+    "minecraft:music_disc_mall": "minecraft:mall",
+    "minecraft:music_disc_mellohi": "minecraft:mellohi",
+    "minecraft:music_disc_otherside": "minecraft:otherside",
+    "minecraft:music_disc_pigstep": "minecraft:pigstep",
+    "minecraft:music_disc_precipice": "minecraft:precipice",
+    "minecraft:music_disc_relic": "minecraft:relic",
+    "minecraft:music_disc_stal": "minecraft:stal",
+    "minecraft:music_disc_strad": "minecraft:strad",
+    "minecraft:music_disc_tears": "minecraft:tears",
+    "minecraft:music_disc_wait": "minecraft:wait",
+    "minecraft:music_disc_ward": "minecraft:ward"
+  }
+}

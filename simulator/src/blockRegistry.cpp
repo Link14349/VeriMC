@@ -7,7 +7,7 @@ namespace simulator {
 namespace {
 Device classify(const std::string& name, const std::string& c) {
     static const std::unordered_map<std::string, Device> classes{
-        {"BellBlock", Device::bell}, {"AirBlock", Device::air}, {"RedStoneWireBlock", Device::wire}, {"RedstoneBlock", Device::source},
+        {"JukeboxBlock", Device::jukebox}, {"BellBlock", Device::bell}, {"AirBlock", Device::air}, {"RedStoneWireBlock", Device::wire}, {"RedstoneBlock", Device::source},
         {"LeverBlock", Device::lever}, {"ButtonBlock", Device::button}, {"RedstoneTorchBlock", Device::torch},
         {"RedstoneWallTorchBlock", Device::wallTorch}, {"RepeaterBlock", Device::repeater}, {"ComparatorBlock", Device::comparator},
         {"ObserverBlock", Device::observer}, {"RedstoneLampBlock", Device::lamp}, {"CopperBulbBlock", Device::bulb},
@@ -50,6 +50,12 @@ BlockRegistry::BlockRegistry(const std::string& path) {
         itemNames.emplace(row.at("name").get<std::string>(), static_cast<std::uint32_t>(items.size()));
         items.push_back({row.at("name"), row.at("maxStack"), row.value("bookshelfBook",false)});
     }
+    std::ifstream jukeboxFile(std::filesystem::path(path).parent_path()/"jukeboxRules.json");
+    if(!jukeboxFile)throw std::runtime_error("找不到唱片机规则 jukeboxRules.json");
+    const auto jukeboxData=Json::parse(jukeboxFile);
+    if(jukeboxData.at("version")!="26.2")throw std::runtime_error("Jukebox registry version mismatch");
+    for(const auto& row:jukeboxData.at("songs"))songs.push_back({row.at("name"),row.at("sound"),row.at("lengthTicks"),row.at("comparatorOutput")});
+    for(const auto& [name,songName]:jukeboxData.at("items").items())items.at(itemId(name)).jukeboxSong=songId(songName);
     std::ifstream vibrationFile(std::filesystem::path(path).parent_path() / "vibrationRules.json");
     if(!vibrationFile) throw std::runtime_error("找不到振动规则 vibrationRules.json");
     const auto vibrationData=Json::parse(vibrationFile);
@@ -85,7 +91,7 @@ BlockRegistry::BlockRegistry(const std::string& path) {
         if (typeInfo.className == "CopperChestBlock" || typeInfo.className == "WeatheringCopperChestBlock") typeInfo.supportLevel = "implemented";
         if (typeInfo.device == Device::hopper) typeInfo.supportLevel = "implemented";
         if (typeInfo.device == Device::dropper) typeInfo.supportLevel = "partial";
-        if(typeInfo.device==Device::bell || typeInfo.device==Device::noteBlock || typeInfo.className.find("SkullBlock")!=std::string::npos || typeInfo.className=="PlayerHeadBlock" || typeInfo.className=="PlayerWallHeadBlock")typeInfo.supportLevel="partial";
+        if(typeInfo.device==Device::jukebox || typeInfo.device==Device::bell || typeInfo.device==Device::noteBlock || typeInfo.className.find("SkullBlock")!=std::string::npos || typeInfo.className=="PlayerHeadBlock" || typeInfo.className=="PlayerWallHeadBlock")typeInfo.supportLevel="partial";
         if (typeInfo.className == "ChiseledBookShelfBlock") typeInfo.supportLevel = "partial";
         if (typeInfo.className == "DecoratedPotBlock") typeInfo.supportLevel = "partial";
         if (typeInfo.device == Device::sculkSensor || typeInfo.device == Device::calibratedSensor) typeInfo.supportLevel = "partial";
@@ -144,6 +150,11 @@ std::uint8_t BlockRegistry::instrumentId(const std::string& name) const {
     for(std::size_t i=0;i<instruments.size();++i)if(instruments[i].name==name)return static_cast<std::uint8_t>(i);
     throw std::invalid_argument("未知乐器："+name);
 }
+int BlockRegistry::songId(const std::string& name) const {
+    const auto key=name.find(':')==std::string::npos?"minecraft:"+name:name;
+    for(std::size_t i=0;i<songs.size();++i)if(songs[i].name==key)return static_cast<int>(i);
+    throw std::invalid_argument("未知唱片曲目："+name);
+}
 std::uint16_t BlockRegistry::gameEventId(const std::string& name) const {
     auto key=name.find(':')==std::string::npos?"minecraft:"+name:name;
     const auto found=gameEventNames.find(key);
@@ -166,6 +177,7 @@ Json BlockRegistry::itemCatalog() const {
     for (const auto& info : items) {
         Json row{{"name", info.name}, {"maxStack", info.maxStack}};
         if(info.bookshelfBook) row["bookshelfBook"]=true;
+        if(info.jukeboxSong>=0)row["jukeboxSong"]={{"name",song(info.jukeboxSong).name},{"lengthTicks",song(info.jukeboxSong).lengthTicks},{"comparatorOutput",song(info.jukeboxSong).comparatorOutput}};
         result.push_back(std::move(row));
     }
     return result;

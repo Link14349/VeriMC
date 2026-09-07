@@ -28,6 +28,7 @@ int Simulator::signal(BlockPos pos, Direction dir, bool includeWire) const {
     const auto& state = at(pos);
     int result = state.device == Device::wire || state.device == Device::comparator ? directSignal(pos, dir, includeWire) : state.weak[static_cast<unsigned>(dir)];
     if (state.device == Device::container && registry.type(world.get(pos)).name == "minecraft:trapped_chest") { auto it = runtime.find(pos); result = it == runtime.end() ? 0 : std::clamp(it->second.values.value("viewers", 0), 0, 15); }
+    if(state.device==Device::jukebox)result=jukeboxPlaying(pos)?15:0;
     if (state.conductor) for (auto d : directions) { result = std::max(result, directSignal(pos.relative(d), d, includeWire)); if (result == 15) break; }
     return result;
 }
@@ -44,6 +45,7 @@ int Simulator::analogOutput(BlockPos pos) const {
     if (state.device == Device::detectorRail) return state.powered ? cartAnalog(pos) : 0;
     if (isSensor(state.device)) return registry.property(id,"sculk_sensor_phase")=="active" && it!=runtime.end()?it->second.values.value("lastVibrationFrequency",0):0;
     if (isBookshelf(id)) return it==runtime.end()?0:it->second.values.value("lastInteractedSlot",-1)+1;
+    if(state.device==Device::jukebox){auto stack=stackAt({pos,0});const int song=stack.count?registry.item(stack.item).jukeboxSong:-1;return song<0?0:registry.song(song).comparatorOutput;}
     if (inventorySize(id)) return containerAnalog(pos);
     if (state.device == Device::analog) return state.staticAnalog;
     if (state.device == Device::lectern) {
@@ -56,6 +58,7 @@ int Simulator::analogOutput(BlockPos pos) const {
 }
 int Simulator::displayValue(BlockPos pos) const {
     const auto& state = at(pos);
+    if(state.device==Device::jukebox)return jukeboxPlaying(pos)?15:0;
     if(isSensor(state.device)) return state.power;
     if (state.device == Device::wire || state.device == Device::target || state.device == Device::daylight || state.device == Device::weightedPlate) return state.power;
     if (state.device == Device::comparator || state.device == Device::analog) return analogOutput(pos);
@@ -112,6 +115,7 @@ void Simulator::setBlock(BlockPos p, StateId id, unsigned flags, int depth) {
     sampleAffected(p);
     if (oldState.type != state.type) {
         if(oldState.device==Device::bell && runtime.contains(p) && runtime.at(p).values.contains("bellGeneration"))scheduledKeys.erase({p,oldState.type,2,runtime.at(p).values.at("bellGeneration")});
+        if(oldState.device==Device::jukebox)removeJukebox(p,oldState.type);
         if(isSensor(oldState.device)) removeSensor(p,oldState.type);
         if (!(oldState.device==Device::container && state.device==Device::container && isCopperChest(old) && isCopperChest(id))) runtime.erase(p);
         scheduledKeys.erase({p, oldState.type, 3, 0});
@@ -129,8 +133,10 @@ void Simulator::setBlock(BlockPos p, StateId id, unsigned flags, int depth) {
     if ((oldState.type != state.type || isRail(state.device)) && (flags & 1u) != 0 && (flags & 64u) == 0) onRemove(p, old);
     if(oldState.type!=state.type && isSensor(state.device))startSensor(p);
     if(oldState.type!=state.type && state.device==Device::bell)registerEntity(p);
+    if(oldState.type!=state.type && state.device==Device::jukebox)startJukebox(p);
     if ((flags & 512u) == 0) onPlace(p, id, old);
     if (world.get(p) != id) return;
+    if(state.device==Device::jukebox && oldState.type==state.type && registry.property(old,"has_record")!=registry.property(id,"has_record"))updateJukeboxTicker(p);
     if ((flags & 1u) != 0) { updateNeighbors(p, -1, old); if (state.analogSource) updateComparatorNeighbors(p); }
     if ((flags & 16u) == 0 && depth > 0) {
         const unsigned nextFlags = flags & ~33u;
@@ -204,6 +210,7 @@ void Simulator::onPlace(BlockPos p, StateId id, StateId old) {
     if (s.device == Device::torch || s.device == Device::wallTorch) { for (auto d : directions) updateNeighbors(p.relative(d)); return; }
     if (registry[old].type == s.type) return;
     switch (s.device) {
+    case Device::jukebox: startJukebox(p);break;
     case Device::bell: registerEntity(p);break;
     case Device::sculkSensor: case Device::calibratedSensor:
         startSensor(p);if(s.power && !hasScheduled(p))setBlock(p,registry.with(id,"power",0),18);break;
@@ -505,6 +512,7 @@ bool Simulator::stepEvent() {
                 else if (at(event.pos).device == Device::hopper) tickHopper(event);
                 else if (isSensor(at(event.pos).device)) tickVibration(event);
                 else if(at(event.pos).device==Device::bell)finishBell(event);
+                else if(at(event.pos).device==Device::jukebox)tickJukebox(event);
                 else tickMotion(event);
             } else executeTick(event);
             ++statistics.scheduledEvents;
@@ -578,7 +586,7 @@ void Simulator::clear() {
     setRandomSeed(0);
     environmentActions.clear(); pendingActionIds.clear(); nextActionId = 1; actionsDropped = 0;
     recentTorchToggles.clear(); torchToggleCounts.clear();
-    sensors.clear();sensorSections.clear();
+    sensors.clear();sensorSections.clear();jukeboxes.clear();
     world.clear(); runtime.clear(); motions.clear(); hoppers.clear(); entityOrders.clear(); nextEntityOrder = 0; scheduled = {}; scheduledKeys.clear(); blockTicks = {}; changes.clear(); currentTick = 0; nextOrder = 0; sequence = 0; currentPhase = 4;
     probes.clear(); probeDependencies.clear(); nextProbeId = 1; trace.clear(); traceDropped = 0; statistics = {}; breakRequested = false; faulted = false; pauseReason.clear(); ++revision;
     if (retainedTrace) retainedTrace = 0;
@@ -648,6 +656,10 @@ Json Simulator::inspect(BlockPos p) const {
         result["inventorySize"] = cart ? (cart->at("type") == "chest_minecart" ? 27 : 5) : 0;
     }
     auto it = runtime.find(p); result["runtime"] = it == runtime.end() ? Json::object() : it->second.values;
+    if(auto player=jukeboxes.find(p);player!=jukeboxes.end()) {
+        result["jukebox"]={{"playing",player->second.song>=0},{"elapsed",player->second.elapsed}};
+        if(player->second.song>=0) {const auto& song=registry.song(player->second.song);result["jukebox"]["song"]=song.name;result["jukebox"]["lengthTicks"]=song.lengthTicks;result["jukebox"]["durationTicks"]=song.lengthTicks+20;}
+    }
     if(auto sensor=sensors.find(p);sensor!=sensors.end()) {
         const auto& data=sensor->second;
         result["vibration"]={{"state",data.current?"travelling":data.candidate?"selecting":"idle"},{"remaining",data.remaining}};

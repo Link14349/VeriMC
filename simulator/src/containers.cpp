@@ -14,7 +14,7 @@ Direction turn(Direction direction, int steps) {
 
 std::size_t Simulator::inventorySize(StateId id) const {
     if(isBookshelf(id)) return 6;
-    if(isDecoratedPot(id)) return 1;
+    if(isDecoratedPot(id) || registry[id].device==Device::jukebox) return 1;
     switch (registry[id].device) {
     case Device::container: return 27;
     case Device::hopper: return 5;
@@ -30,10 +30,12 @@ bool Simulator::isDecoratedPot(StateId state) const {
     return registry[state].device==Device::analog && registry.type(state).className=="DecoratedPotBlock";
 }
 bool Simulator::canInsertStack(const InventorySlot& slot, ItemStack stack) const {
+    if(at(slot.pos).device==Device::jukebox)return registry.item(stack.item).jukeboxSong>=0 && !stackAt(slot).count;
     if(isBookshelf(world.get(slot.pos))) return registry.item(stack.item).bookshelfBook && !stackAt(slot).count;
     return true;
 }
 bool Simulator::canExtractStack(const InventorySlot& slot, BlockPos into) const {
+    if(at(slot.pos).device==Device::jukebox){for(const auto& target:containerSlots(into))if(!stackAt(target).count)return true;return false;}
     if(!isBookshelf(world.get(slot.pos))) return true;
     const auto source=stackAt(slot);
     for(const auto& target:containerSlots(into)) {
@@ -175,15 +177,16 @@ void Simulator::setInventory(BlockPos pos, const Json& values, bool combined, bo
     auto slots = combined ? containerSlots(pos) : std::vector<InventorySlot>{};
     if (!combined) for (std::size_t i = 0; i < inventorySize(world.get(pos)); ++i) slots.push_back({pos, i});
     if (slots.empty()) throw std::invalid_argument("这个器件没有库存槽位");
-    const bool bookshelf=isBookshelf(world.get(pos));
+    const bool bookshelf=isBookshelf(world.get(pos)),jukebox=at(pos).device==Device::jukebox;
     const auto edits=parseInventory(values,slots.size(),bookshelf);
     if(bookshelf) for(const auto& [index,stack]:edits) {
         (void)index;
         if(stack.count && (stack.count>1 || !registry.item(stack.item).bookshelfBook)) throw std::invalid_argument("雕纹书架每槽仅接受一本原版书籍");
     }
+    if(jukebox)for(const auto& [index,stack]:edits){(void)index;if(stack.count && (stack.count!=1 || registry.item(stack.item).jukeboxSong<0))throw std::invalid_argument("唱片机只接受一张可播放的默认唱片");}
     for (const auto& [index, stack] : edits) {
         const auto& slot = slots[index];
-        if(notify && bookshelf) {writeStack(slot,stack);continue;}
+        if(notify && (bookshelf || jukebox)) {writeStack(slot,stack);continue;}
         auto& inventory = runtime[slot.pos].inventory;
         inventory.resize(inventorySize(world.get(slot.pos)));
         inventory[slot.index] = stack;

@@ -266,13 +266,16 @@ public class CaptureRedstone extends TestFunctionLoader {
                     var bounds = net.minecraft.world.phys.AABB.encapsulatingFullBlocks(helper.absolutePos(new BlockPos(-4,-4,-4)), helper.absolutePos(new BlockPos(52,10,52)));
                     for (var drop : helper.getLevel().getEntitiesOfClass(ItemEntity.class, bounds)) drop.discard();
                 }
-                JsonObject frame = new JsonObject(); frame.addProperty("tick", tick); JsonArray states = new JsonArray(); JsonArray analogs = new JsonArray(); JsonArray inventories = new JsonArray();JsonArray bells=new JsonArray();
+                JsonObject frame = new JsonObject(); frame.addProperty("tick", tick); JsonArray states = new JsonArray(); JsonArray analogs = new JsonArray(); JsonArray inventories = new JsonArray();JsonArray bells=new JsonArray();JsonArray jukeboxes=new JsonArray();
                 for (var value : scenario.getAsJsonArray("watch")) {
                     var absolute = helper.absolutePos(pos(value.getAsJsonArray()));
                     states.add(Block.getId(helper.getLevel().getBlockState(absolute)));
                     var entity = helper.getLevel().getBlockEntity(absolute);
                     var state = helper.getLevel().getBlockState(absolute);
                     bells.add(entity instanceof net.minecraft.world.level.block.entity.BellBlockEntity bell && bell.shaking);
+                    if(entity instanceof net.minecraft.world.level.block.entity.JukeboxBlockEntity box) {
+                        var player=new JsonObject();player.addProperty("playing",box.getSongPlayer().isPlaying());player.addProperty("elapsed",box.getSongPlayer().getTicksSinceSongStarted());jukeboxes.add(player);
+                    }else jukeboxes.add(JsonNull.INSTANCE);
                     analogs.add(entity instanceof ComparatorBlockEntity comparator ? comparator.getOutputSignal() : state.hasAnalogOutputSignal() ? state.getAnalogOutputSignal(helper.getLevel(), absolute, Direction.NORTH) : -1);
                     JsonArray inventory = new JsonArray();
                     if (entity instanceof Container container) for (int slot = 0; slot < container.getContainerSize(); ++slot) {
@@ -283,6 +286,7 @@ public class CaptureRedstone extends TestFunctionLoader {
                 }
                 frame.add("states", states); frame.add("analogs", analogs); frame.add("inventories", inventories); frames.add(frame);
                 if(scenario.has("watchBells"))frame.add("bells",bells);
+                if(scenario.has("watchJukeboxes"))frame.add("jukeboxes",jukeboxes);
                 if (tick == end) {
                     try { Files.writeString(output, new GsonBuilder().setPrettyPrinting().create().toJson(result)); }
                     catch (Exception e) { throw new RuntimeException(e); }

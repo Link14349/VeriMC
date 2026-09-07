@@ -180,7 +180,7 @@ int main() {
         try { restored.loadProject(invalid); } catch (...) { threw = true; }
         expect(threw && before == restored.saveProject("before", true), "invalid batch import changed world");
     });
-    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers", "java26_2Hoppers", "java26_2Torches", "java26_2Rails", "java26_2TickBatches", "java26_2Tripwire", "java26_2Buttons", "java26_2Droppers", "java26_2Targets", "java26_2CopperChests", "java26_2Bookshelves", "java26_2Pots", "java26_2Vibrations", "java26_2DeviceVibrations", "java26_2Notes", "java26_2Bells"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
+    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers", "java26_2Hoppers", "java26_2Torches", "java26_2Rails", "java26_2TickBatches", "java26_2Tripwire", "java26_2Buttons", "java26_2Droppers", "java26_2Targets", "java26_2CopperChests", "java26_2Bookshelves", "java26_2Pots", "java26_2Vibrations", "java26_2DeviceVibrations", "java26_2Notes", "java26_2Bells", "java26_2Jukeboxes", "java26_2JukeboxHoppers"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
         std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/../tests/fixtures/" + fixtureName + ".json"); expect(static_cast<bool>(file), "missing vanilla reference fixture");
         auto fixture = Json::parse(file); auto origin = fixture["origin"].get<BlockPos>(); Simulator s(r);
         auto absolute = [&](const Json& p) { auto pos = p.get<BlockPos>(); return BlockPos{origin.x + pos.x, origin.y + pos.y, origin.z + pos.z}; };
@@ -198,9 +198,61 @@ int main() {
                 expect(s.world.get(p) == expected, "tick " + std::to_string(tick) + " position " + fixture["watch"][i].dump() + " expected " + r.describe(expected).dump() + " got " + r.describe(s.world.get(p)).dump());
                 if (frame["analogs"][i] != -1) expect(s.analogOutput(p) == frame["analogs"][i].get<int>(), "analog mismatch at " + std::to_string(tick) + " " + fixture["watch"][i].dump());
                 if(frame.contains("bells"))expect(s.inspect(p)["runtime"].value("ringing",false)==frame["bells"][i].get<bool>(),"bell shaking differs at "+std::to_string(tick)+" "+fixture["watch"][i].dump());
+                if(frame.contains("jukeboxes") && !frame["jukeboxes"][i].is_null()) {
+                    auto player=s.inspect(p)["jukebox"];const auto& expectedPlayer=frame["jukeboxes"][i];
+                    expect(player["playing"]==expectedPlayer["playing"] && player["elapsed"]==expectedPlayer["elapsed"],"jukebox playback differs at "+std::to_string(tick)+" "+fixture["watch"][i].dump()+" expected "+expectedPlayer.dump()+" got "+player.dump());
+                }
                 if (frame.contains("inventories")) expect(s.inventoryJson(p, false) == frame["inventories"][i], "inventory mismatch at " + std::to_string(tick) + " " + fixture["watch"][i].dump() + " expected " + frame["inventories"][i].dump() + " got " + s.inventoryJson(p, false).dump());
             }
         }
+    });
+    test("all original jukebox songs match full playback, end padding and random consumption", [&] {
+        std::ifstream file(std::string(SIMULATOR_DATA_DIR)+"/../tests/fixtures/java26_2JukeboxPlayback.json");auto fixture=Json::parse(file);
+        for(const auto& row:fixture.at("cases")) {
+            Simulator s(r);s.place({0,0,0},r.state("jukebox"));s.stimulate({0,0,0},{{"inventory",Json::array({{{"slot",0},{"item",row.at("item")},{"count",1}}})}});s.setRandomSeed(17);
+            const int song=r.item(r.itemId(row.at("item"))).jukeboxSong;
+            expect(r.song(song).lengthTicks==row.at("lengthTicks") && r.song(song).comparatorOutput==row.at("analog"),"song metadata differs");
+            for(const auto& sample:row.at("samples")) {
+                s.advanceTo(sample.at("ticks"));const auto info=s.inspect({0,0,0});
+                expect(s.jukeboxPlaying({0,0,0})==sample.at("playing").get<bool>() && info["jukebox"]["elapsed"]==sample.at("elapsed"),"song playback differs: "+row.at("item").get<std::string>()+" "+sample.dump());
+                expect(s.analogOutput({0,0,0})==row.at("analog") && s.signal({0,0,0},Direction::east)==(sample.at("playing").get<bool>()?15:0),"song power/analog differs");
+                expect(s.saveProject("song",true)["randomSource"]["state"]==sample.at("randomState"),"song particle RNG differs");
+            }
+            expect(s.inventoryJson({0,0,0}).size()==1 && s.pendingEvents()==0,"finished song lost disc or kept ticking");
+        }
+    });
+    test("jukebox checkpoint and ticker gate preserve playback and idle sentinels", [&] {
+        Simulator s(r);const BlockPos pos{0,0,0};s.place(pos,r.state("jukebox"));s.stimulate(pos,{{"inventory",Json::array({{{"slot",0},{"item","music_disc_bounce"},{"count",1}}})}});s.advanceTo(7);
+        auto before=s.saveProject("jukebox",true);Simulator restored(r);restored.loadProject(before);s.advanceTo(33);restored.advanceTo(33);expect(s.saveProject("jukebox",true)==restored.saveProject("jukebox",true),"playing checkpoint changed");
+        s.setBlock(pos,r.withBool(s.world.get(pos),"has_record",false));const auto elapsed=s.inspect(pos)["jukebox"]["elapsed"];s.advanceTo(100);
+        expect(s.jukeboxPlaying(pos) && s.signal(pos,Direction::up)==15 && s.inspect(pos)["jukebox"]["elapsed"]==elapsed && s.pendingEvents()==0,"ticker gate stopped or advanced song");
+        s.place({100,0,0},r.state("sculk_sensor"));
+        before=s.saveProject("jukebox",true);auto legacy=before;legacy["jukeboxes"][0]["wakeAt"]=UINT64_MAX;legacy["sensors"][0]["wakeAt"]=UINT64_MAX;
+        restored.loadProject(Json::parse(legacy.dump()));expect(restored.saveProject("jukebox",true)==before,"exact old idle sentinel did not round trip");
+        s.setBlock(pos,r.withBool(s.world.get(pos),"has_record",true));restored.setBlock(pos,r.withBool(restored.world.get(pos),"has_record",true));
+        s.advanceTo(123);restored.advanceTo(123);expect(s.saveProject("jukebox",true)==restored.saveProject("jukebox",true),"gated checkpoint changed");
+        auto invalid=s.saveProject("jukebox",true);invalid["jukeboxes"][0]["song"]="minecraft:11";before=s.saveProject("jukebox",true);bool threw=false;try{s.loadProject(invalid);}catch(...){threw=true;}expect(threw && before==s.saveProject("jukebox",true),"wrong song snapshot was not atomic");
+        threw=false;try{s.stimulate(pos,{{"inventory",Json::array({{{"slot",0},{"item","stone"},{"count",1}}})}});}catch(...){threw=true;}expect(threw && before==s.saveProject("jukebox",true),"non-disc inventory changed state");
+        Simulator design(r);design.loadProject(s.saveProject("design",false));expect(design.inspect(pos)["jukebox"]["elapsed"]==0 && design.jukeboxPlaying(pos),"design did not restart its disc");
+        s.stimulate(pos,{{"inventory",Json::array({{{"slot",0},{"count",0}}})}});const auto events=s.statistics.scheduledEvents;s.advanceTo(1000000);expect(!s.jukeboxPlaying(pos) && s.statistics.scheduledEvents==events,"empty jukebox kept ticking");
+    });
+    test("jukebox disc filtering covers dropper directions and nonempty hopper slots", [&] {
+        for(auto direction:directions) {
+            Simulator s(r);BlockPos source{0,0,0},target=source.relative(direction);s.place(source,r.state("dropper",{{"facing",directionNames[static_cast<unsigned>(direction)]}}));s.place(target,r.state("jukebox"));
+            s.stimulate(source,{{"inventory",Json::array({{{"slot",0},{"item","music_disc_13"},{"count",1}}})}});s.schedule(source,1);s.advanceTo(1);
+            expect(s.inventoryJson(target).size()==1 && s.jukeboxPlaying(target),"dropper failed disc insertion");
+            s.stimulate(source,{{"inventory",Json::array({{{"slot",0},{"item","music_disc_cat"},{"count",1}}})}});s.schedule(source,1);s.advanceTo(2);
+            expect(s.inventoryJson(source).size()==1 && s.inventoryJson(target)[0]["item"]=="minecraft:music_disc_13","dropper overwrote existing disc");
+        }
+        Simulator s(r);s.place({0,1,0},r.state("jukebox"));s.place({0,0,0},r.state("hopper",{{"facing","east"}}));
+        s.stimulate({0,0,0},{{"inventory",Json::array({{{"slot",0},{"item","stone"},{"count",63}},{{"slot",1},{"item","stone"},{"count",63}},{{"slot",2},{"item","stone"},{"count",63}},{{"slot",3},{"item","stone"},{"count",63}},{{"slot",4},{"item","stone"},{"count",63}}})}});
+        // A solid block prevents output. The recipient has spare capacity but no empty slot.
+        s.place({1,0,0},r.state("stone"));s.stimulate({0,1,0},{{"inventory",Json::array({{{"slot",0},{"item","music_disc_11"},{"count",1}}})}});s.advanceTo(30);
+        expect(s.inventoryJson({0,1,0}).size()==1 && s.inspect({0,1,0})["jukebox"]["elapsed"]==30,"failed extraction restarted playback");
+        s.stimulate({0,0,0},{{"inventory",Json::array({{{"slot",4},{"count",0}}})}});s.advanceTo(31);
+        expect(s.inventoryJson({0,1,0}).size()==1 && r.property(s.world.get({0,0,0}),"enabled")=="false","playing jukebox failed to lock hopper");
+        s.advanceTo(1441);expect(s.inventoryJson({0,1,0}).size()==1 && !s.jukeboxPlaying({0,1,0}),"song completion reordered its earlier hopper");
+        s.advanceTo(1442);expect(s.inventoryJson({0,1,0}).empty(),"song completion did not wake extraction");
     });
     test("bell hit faces and float boundary match original across attachments and world heights", [&] {
         std::ifstream file(std::string(SIMULATOR_DATA_DIR)+"/../tests/fixtures/java26_2BellHits.json");auto fixture=Json::parse(file);
