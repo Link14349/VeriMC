@@ -6,11 +6,11 @@ VeriMC 的 Minecraft 红石电路模拟子项目。C++20 原生执行，Three.js
 
 ## 启动
 
-当前验证平台：macOS / Apple Silicon，Apple Clang 17，Boost 1.90，nlohmann-json 3.12，Node 20.11。日常使用无需 Java 或 Minecraft。
+当前验证平台：macOS / Apple Silicon，Apple Clang 17，Boost 1.90，nlohmann-json 3.12，Zstandard 1.5.7，OpenSSL 3，Node 20.11。日常使用无需 Java 或 Minecraft。
 
 ```sh
 # 安装构建依赖（已安装则跳过）
-brew install cmake boost nlohmann-json node
+brew install cmake boost nlohmann-json zstd openssl@3 node
 
 # 在仓库根目录运行；构建后自动打开默认浏览器
 python3 simulator/runSimulator.py
@@ -31,10 +31,11 @@ python3 simulator/runSimulator.py --no-build
 - 属性面板检查坐标、方块状态和信号强度；中继器、比较器的朝向属性指向输入。
 - 波形支持缩放、跟随、双游标和触发暂停；探针菜单的 `↑` 或 `↓` 设置边沿断点。Shift 单击波形放置 B 游标。
 - 浏览器接收滞后、未确认采样满额时自动暂停并保留后续事件；接收完成后可继续运行。历史截断会显示数量，具体预算和极端中止条件见 [采样传输](docs/traceTransport.md)。
-- 工程菜单导出/导入 JSON 电路或运行快照。快照包含计划事件、器件内部状态与探针历史。VCD 一个游戏刻对应 50 ms，同刻边沿保留順序，不虚构物理子刻时间。
+- 工程菜单默认导出 `.vmcb` 电路或 `.snapshot.vmcb` 运行快照，导入同时接受 `.vmcb` 和旧 `.verimc.json` / `.json`。另有旧 JSON 电路和快照导出，方便继续使用原格式。快照包含计划事件、器件内部状态与探针历史；文件操作显示进度并可取消，失败保留当前工程，成功导入可以撤销。
+- VCD 一个游戏刻对应 50 ms，同刻边沿保留顺序，不虚构物理子刻时间。
 - Cmd/Ctrl+Z 撤销、Shift+Cmd/Ctrl+Z 重做，采用原生内存快照并控制历史预算。Cmd/Ctrl+C、Cmd/Ctrl+V 复制/粘贴当前器件。
 
-默认二进制工程格式已定名 **`.vmcb`**，[格式设计](docs/vmcbFormat.md)包含状态表复用、16³ 分区、位打包/稀疏/游程编码、独立压缩和快照规则。**目前只完成设计，读写与界面尚未接入；上面的 JSON 流程仍是当前可用方式。**
+**`.vmcb` 已接入 C++ 读写和浏览器工程菜单**。文件通过 HTTP 分块上传/下载，布局直接进入原生分区，浏览器不解析完整工程 JSON。格式使用状态表复用、16³ 分区、位打包/稀疏/游程编码、独立 Zstandard 压缩与 CRC；详见 [格式规范](docs/vmcbFormat.md) 和 [文件规模实测](docs/vmcbFiles.md)。当前默认读取预算为 200 万方块、8 GiB 文件及 2 GiB 候选内存预估；极端稀疏布局可能先触及内存预算。旧 JSON 使用原生解析器保留 64 位整数，但完整 DOM 的内存成本仍然存在。
 
 ## 当前覆盖
 
@@ -78,6 +79,8 @@ ctest --preset debug
 
 # 服务启动后，验证 HTTP / WebSocket 完整流程
 python3 tests/serverTests.py
+python3 tests/fileTransferTests.py
+python3 tests/vmcbReaderTests.py
 python3 tests/backpressureTests.py
 python3 tests/runControlTests.py
 python3 tests/dropperTests.py
@@ -91,6 +94,10 @@ node tests/webTests.mjs
 
 # 有实际驱动的中继器链基准
 ./build/simulatorCli --benchmark 1000
+
+# 原生工程文件基准；输出需放在忽略的 testResults 下
+mkdir -p testResults
+./build/vmcbBenchmark 1048576 dense testResults/million.vmcb
 
 # 预热后测量五次，并保存中位数、p95、原始样本和构建身份
 python3 tools/runBenchmarks.py --circuits 10000 --output testResults/baseline.json

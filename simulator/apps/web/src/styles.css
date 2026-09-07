@@ -60,3 +60,9 @@ body{overflow-x:auto}
 .vibrationCoordinates input { box-sizing:border-box;width:100%;min-width:0;padding:5px 2px; }
 .vibrationControls details { margin:12px 0;font-size:11px; }
 .vibrationControls summary { cursor:pointer; }
+
+.fileOverlay{position:fixed;inset:0;z-index:1000;background:#080d15aa;display:flex;align-items:center;justify-content:center}
+.fileDialog{width:340px;padding:24px;background:var(--panel,#151e2b);border:1px solid var(--border);border-radius:12px;box-shadow:0 16px 64px #0008}
+.fileDialog strong{font-size:17px}.fileDialog p{margin:20px 0;color:var(--muted)}
+.fileDialog progress{display:block;width:100%;margin:16px 0;accent-color:var(--accent,#5c9cff)}
+.fileDialog button{border:1px solid var(--border);border-radius:6px;padding:7px 22px}.fileDialog small{display:block;margin-top:16px;color:var(--muted);font-size:11px}

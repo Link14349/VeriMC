@@ -7,6 +7,7 @@ export type Probe = { id: number; pos: Pos; name: string; value: number; mode: s
 export type EnvironmentAction = { id: number; tick: number; sequence: number; kind: 'itemEjected'; source: Pos; item: string; count: number; position: Pos; velocity: Pos; resolved: boolean };
 export type Status = { tick: number; running: boolean; speed: number; eventsPerSecond: number; blocks: number; pending: number; updates: number; events: number; storageBytes: number; traceDropped: number; pauseReason: string; pendingActions: EnvironmentAction[]; actionsDropped: number; revision: number; probes: Probe[]; canUndo: boolean; canRedo: boolean; name: string };
 type Reply = Record<string, unknown>;
+export type FileProgress = { id: string; operation: 'import' | 'export'; state: 'working' | 'done' | 'failed' | 'cancelled'; stage: string; done: string; total: string; error: string };
 export const posKey = (p: Pos) => p.join(',');
 export class SimulatorConnection extends EventTarget {
   cells = new Map<string, BlockCell>();
@@ -22,10 +23,12 @@ export class SimulatorConnection extends EventTarget {
   private pending = new Map<number, { resolve: (value: Reply) => void; reject: (reason: Error) => void; timer: number }>();
   private stopped = false;
   private frame?: { id: number; full: boolean };
+  private sessionToken = '';
   async connect() {
     try {
       const boot = await fetch('/api/bootstrap').then(r => { if (!r.ok) throw new Error('本地服务无法连接'); return r.json(); });
       if (this.stopped) return;
+      this.sessionToken = boot.token;
       const socket = new WebSocket(`ws://${location.host}/socket?token=${encodeURIComponent(boot.token)}`); this.socket = socket; socket.binaryType = 'arraybuffer';
       socket.onopen = () => { this.connected = true; this.dispatchEvent(new Event('status')); };
       socket.onmessage = (event) => { try { this.receive(event.data); } catch (error) { this.error(String(error)); this.stop(); } };
@@ -40,6 +43,53 @@ export class SimulatorConnection extends EventTarget {
       const timer = window.setTimeout(() => { this.pending.delete(requestId); reject(new Error('内核响应超时，请检查连接')); }, 30000);
       this.pending.set(requestId, { resolve, reject, timer }); this.socket!.send(JSON.stringify({ ...body, cmd, requestId }));
     });
+  }
+  async projectFile(options: { file?: File; checkpoint?: boolean; format?: 'vmcb' | 'json'; signal: AbortSignal; progress: (value: FileProgress) => void }): Promise<void> {
+    if (options.signal.aborted) throw new Error('文件操作已取消');
+    const job = await this.request(options.file ? 'importFile' : 'exportFile', { checkpoint: options.checkpoint ?? false, format: options.format ?? 'vmcb' }) as FileProgress;
+    const id = job.id;
+    let upload: XMLHttpRequest | undefined;
+    const cancel = () => { void this.request('cancelFile', { id }).catch(() => {}); upload?.abort(); };
+    options.signal.addEventListener('abort', cancel);
+    options.progress(job);
+    try {
+      if (options.signal.aborted) cancel();
+      if (options.file && !options.signal.aborted) {
+        try {
+          await new Promise<void>((resolve, reject) => {
+            upload = new XMLHttpRequest();
+            upload.open('POST', `/api/files/${id}/upload`);
+            upload.setRequestHeader('X-Simulator-Token', this.sessionToken);
+            upload.setRequestHeader('Content-Type', 'application/octet-stream');
+            upload.upload.onprogress = event => options.progress({ ...job, stage: '上传文件', done: String(event.loaded), total: String(event.total) });
+            upload.onload = () => upload!.status === 202 ? resolve() : reject(new Error(upload!.responseText || '上传失败'));
+            upload.onerror = () => reject(new Error('上传连接中断'));
+            upload.onabort = () => reject(new Error('文件操作已取消'));
+            upload.send(options.file!);
+          });
+        } catch (error) {
+          cancel();
+          if (!options.signal.aborted) throw error;
+        }
+      }
+      // The server's terminal state resolves cancellation races: an import
+      // already committed remains a success even if Cancel was clicked late.
+      for (;;) {
+        const response = await fetch(`/api/files/${id}`, { headers: { 'X-Simulator-Token': this.sessionToken } });
+        if (!response.ok) throw new Error(await response.text());
+        const status = await response.json() as FileProgress; options.progress(status);
+        if (status.state === 'failed' || status.state === 'cancelled') throw new Error(status.error || '文件操作已取消');
+        if (status.state === 'done') {
+          if (!options.file) {
+            const link = document.createElement('a');
+            link.href = `/api/files/${id}/download?token=${encodeURIComponent(this.sessionToken)}`;
+            link.download = ''; link.click();
+          }
+          return;
+        }
+        await new Promise(resolve => window.setTimeout(resolve, 250));
+      }
+    } finally { options.signal.removeEventListener('abort', cancel); }
   }
   private receive(data: string | ArrayBuffer) {
     if (data instanceof ArrayBuffer) {

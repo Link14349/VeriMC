@@ -3,6 +3,8 @@
 #include <memory>
 #include <unordered_map>
 #include <vector>
+#include <functional>
+#include <span>
 
 namespace simulator {
 struct Cell { BlockPos pos; StateId state; };
@@ -24,6 +26,11 @@ public:
     }
     StateId set(BlockPos pos, StateId state);
     std::vector<Cell> cells() const;
+    std::vector<BlockPos> sectionPositions() const;
+    std::span<const StateId, 4096> sectionStates(BlockPos section) const;
+    // Read-only traversal; callbacks must not modify this World.
+    void forEachCell(const std::function<void(Cell)>& visit) const;
+    void forEachCellXyz(const std::function<void(Cell)>& visit) const;
     std::size_t size() const { return blockCount; }
     std::size_t chunkCount() const { return chunks.size(); }
     std::size_t storageBytes() const { return chunks.size() * sizeof(Chunk); }

@@ -1,4 +1,6 @@
 #include "server.hpp"
+#include "fileJobs.hpp"
+#include "simulator/vmcbEncoding.hpp"
 #include "simulator/simulator.hpp"
 #include <boost/asio.hpp>
 #include <boost/beast.hpp>
@@ -18,6 +20,7 @@ namespace ws = beast::websocket;
 using Tcp = asio::ip::tcp;
 using namespace simulator;
 using Clock = std::chrono::steady_clock;
+using simulatorServer::FileJob;
 class Client;
 struct Hub {
     asio::io_context& io;
@@ -25,7 +28,7 @@ struct Hub {
     Simulator sim{registry};
     asio::steady_timer timer;
     std::vector<std::weak_ptr<Client>> clients;
-    struct HistoryEntry { std::string name; std::unique_ptr<Simulator> state; };
+    struct HistoryEntry { std::string name; std::unique_ptr<Simulator> state; BlockPos origin{}; };
     std::deque<HistoryEntry> undo, redo;
     std::unique_ptr<Simulator> runStart;
     bool running{};
@@ -36,7 +39,17 @@ struct Hub {
     bool pendingFull{};
     std::string token, host;
     std::string projectName{"未命名电路"};
-    Clock::time_point lastPump{Clock::now()}, lastPublish{Clock::now()};
+    BlockPos projectOrigin{};
+    std::map<std::string, std::shared_ptr<FileJob>> fileJobs;
+    std::shared_ptr<FileJob> activeFileJob;
+    asio::thread_pool fileWorkers{1};
+    ~Hub() { for (auto& [id, job] : fileJobs) { (void)id; job->cancelled = true; } fileWorkers.join(); }
+    std::shared_ptr<FileJob> beginFileJob(const std::string& operation);
+    void exportFile(const std::shared_ptr<FileJob>& job, bool checkpoint, bool json);
+    void importFile(const std::shared_ptr<FileJob>& job);
+    void endFileJob(const std::shared_ptr<FileJob>& job, const std::string& error = {});
+    void trimHistory();
+    Clock::time_point lastPump{Clock::now()}, lastPublish{Clock::now()}, lastFileCleanup{Clock::now()};
     double eventsPerSecond{};
     std::uint64_t measuredEvents{};
     Clock::time_point measuredTime{Clock::now()};
@@ -47,7 +60,7 @@ struct Hub {
         Json probes = Json::array(); for (const auto& p : sim.getProbes()) probes.push_back({{"id", p.id}, {"pos", p.pos}, {"name", p.name}, {"mode", p.mode}, {"value", p.lastValue}, {"trigger", p.trigger}});
         return {{"type", "status"}, {"tick", sim.currentTick}, {"running", running}, {"speed", speed}, {"eventsPerSecond", running ? eventsPerSecond : 0}, {"blocks", sim.world.size()}, {"pending", sim.pendingEvents()}, {"updates", sim.statistics.updates}, {"events", sim.statistics.scheduledEvents}, {"storageBytes", sim.world.storageBytes()}, {"traceDropped", sim.traceDropped}, {"pauseReason", sim.pauseReason}, {"pendingActions", sim.pendingActionsJson()}, {"actionsDropped", sim.actionHistoryDropped()}, {"revision", sim.revision}, {"probes", probes}, {"canUndo", !undo.empty()}, {"canRedo", !redo.empty()}, {"name", projectName}};
     }
-    void remember() { undo.push_back({projectName, sim.clone()}); std::size_t bytes = 0; for (const auto& entry : undo) bytes += entry.state->estimatedBytes(); while (undo.size() > 1 && (undo.size() > 32 || bytes > 128u * 1024u * 1024u)) { bytes -= undo.front().state->estimatedBytes(); undo.pop_front(); } redo.clear(); runStart.reset(); }
+    void remember() { undo.push_back({projectName, sim.clone(), projectOrigin}); std::size_t bytes = 0; for (const auto& entry : undo) bytes += entry.state->estimatedBytes(); while (undo.size() > 1 && (undo.size() > 32 || bytes > 128u * 1024u * 1024u)) { bytes -= undo.front().state->estimatedBytes(); undo.pop_front(); } redo.clear(); runStart.reset(); }
     void demo(const std::string& kind = "basic");
     void start();
     void publish(bool full = false);
@@ -130,7 +143,7 @@ public:
     }
 };
 void Hub::demo(const std::string& kind) {
-    sim.clear(); projectName = "脉冲与记忆 · 入门电路";
+    sim.clear(); projectOrigin = {}; projectName = "脉冲与记忆 · 入门电路";
     if(kind=="notes") {
         projectName="音符实验 · 材质、演奏与振动";
         for(int x=-2;x<=8;++x)for(int z=-2;z<=3;++z)sim.world.set({x,0,z},registry.state("white_concrete"));
@@ -256,6 +269,15 @@ void Hub::start() {
     timer.async_wait([this](beast::error_code ec) {
         if (ec) return;
         auto now = Clock::now(); double elapsed = std::chrono::duration<double>(now - lastPump).count(); lastPump = now;
+        if (now - lastFileCleanup > std::chrono::seconds(1)) {
+            lastFileCleanup = now;
+            if (activeFileJob && now - activeFileJob->created > std::chrono::seconds(60) && activeFileJob->status().at("stage") == "等待上传") {
+                auto expired = activeFileJob; expired->cancelled = true; endFileJob(expired, "等待上传超时");
+            }
+            for (auto it = fileJobs.begin(); it != fileJobs.end();) {
+                if (it->second != activeFileJob && now - it->second->created > std::chrono::minutes(15)) it = fileJobs.erase(it); else ++it;
+            }
+        }
         bool stalled = false; bool connected = false;
         for (auto it = clients.begin(); it != clients.end();) {
             auto c = it->lock(); if (!c || !c->alive) { it = clients.erase(it); continue; }
@@ -313,6 +335,8 @@ void Hub::command(const std::shared_ptr<Client>& client, const Json& message) {
         }
         return;
     }
+    if (activeFileJob && cmd != "inspect" && cmd != "pause" && cmd != "fileStatus" && cmd != "cancelFile")
+        throw std::invalid_argument("工程文件正在读写，请等待完成或取消");
     protectTrace();
     if (sim.traceBlocked() && (cmd == "play" || cmd == "step" || cmd == "stepEvent" || cmd == "place" || cmd == "remove" || cmd == "edit" || cmd == "interact" || cmd == "stimulate" || cmd == "probe")) {
         running = false;
@@ -342,6 +366,20 @@ void Hub::command(const std::shared_ptr<Client>& client, const Json& message) {
         if (std::none_of(pending.begin(), pending.end(), [&](const auto& action) { return action.at("id") == id; })) throw std::invalid_argument("外部动作不存在或已确认");
         running = false; remember(); sim.resolveAction(id.get<std::uint64_t>());
     }
+    else if (cmd == "exportFile" || cmd == "importFile") {
+        const auto checkpoint = message.value("checkpoint", false);
+        const auto format = message.value("format", std::string("vmcb"));
+        if (format != "vmcb" && format != "json") throw std::invalid_argument("未知文件格式");
+        auto job = beginFileJob(cmd == "exportFile" ? "export" : "import"); result = job->status();
+        if (cmd == "exportFile") exportFile(job, checkpoint, format == "json");
+    }
+    else if (cmd == "fileStatus" || cmd == "cancelFile") {
+        auto found = fileJobs.find(message.at("id").get<std::string>());
+        if (found == fileJobs.end()) throw std::invalid_argument("文件任务不存在或已过期");
+        auto job = found->second;
+        if (cmd == "cancelFile" && activeFileJob == job) { job->cancelled = true; if (job->status().at("stage") == "等待上传") endFileJob(job, "文件操作已取消"); }
+        result = job->status();
+    }
     else if (cmd == "save") { result = sim.saveProject(projectName, message.value("checkpoint", false)); }
     else if (cmd == "vcd") { result = {{"text", sim.exportVcd()}}; }
     else if (cmd == "probe") { result["id"] = sim.addProbe(message.at("pos").get<BlockPos>(), message.value("name", std::string()), message.value("mode", std::string("output"))); }
@@ -350,7 +388,7 @@ void Hub::command(const std::shared_ptr<Client>& client, const Json& message) {
     else if (cmd == "clearTrace") { sim.clearTrace(); full = true; }
     else if (cmd == "undo" || cmd == "redo") {
         running = false; auto& from = cmd == "undo" ? undo : redo; auto& to = cmd == "undo" ? redo : undo;
-        if (!from.empty()) { to.push_back({projectName, sim.clone()}); auto saved = std::move(from.back()); from.pop_back(); sim.restore(*saved.state); projectName = saved.name; runStart.reset(); full = true; }
+        if (!from.empty()) { to.push_back({projectName, sim.clone(), projectOrigin}); auto saved = std::move(from.back()); from.pop_back(); sim.restore(*saved.state); projectName = saved.name; projectOrigin = saved.origin; runStart.reset(); full = true; }
     }
     else if (cmd == "reset") { running = false; if (runStart) { sim.restore(*runStart); full = true; } }
     else if (cmd == "rename") projectName = message.at("name").get<std::string>().substr(0, 200);
@@ -358,9 +396,9 @@ void Hub::command(const std::shared_ptr<Client>& client, const Json& message) {
         const bool resumeAfter = running && (cmd == "interact" || cmd == "stimulate");
         running = false; auto savedRunStart = resumeAfter ? std::move(runStart) : nullptr; remember();
         try {
-            if (cmd == "new") { sim.clear(); projectName = "未命名电路"; full = true; }
+            if (cmd == "new") { sim.clear(); projectOrigin = {}; projectName = "未命名电路"; full = true; }
             else if (cmd == "demo") { demo(message.value("kind", std::string("basic"))); full = true; }
-            else if (cmd == "load") { sim.loadProject(message.at("project")); projectName = message.at("project").value("name", std::string("导入电路")); full = true; }
+            else if (cmd == "load") { sim.loadProject(message.at("project")); projectOrigin = {}; projectName = message.at("project").value("name", std::string("导入电路")); full = true; }
             else if (cmd == "edit") {
                 if (message.at("blocks").size() > 100000) throw std::invalid_argument("一次编辑最多 10 万个方块");
                 for (const auto& row : message.at("blocks")) { auto p = row.at("pos").get<BlockPos>(); auto id = registry.state(row.at("name"), row.value("properties", Json::object())); if (id == 0) sim.setBlock(p, 0); else sim.place(p, id); }
@@ -377,23 +415,169 @@ void Hub::command(const std::shared_ptr<Client>& client, const Json& message) {
     result["type"] = "reply"; result["requestId"] = requestId; result["cmd"] = cmd; client->sendJson(result);
     if (full) publish(true); else { publish(); client->sendJson(status()); }
 }
-class HttpSession : public std::enable_shared_from_this<HttpSession> {
-    Tcp::socket socket; beast::flat_buffer buffer; http::request_parser<http::string_body> parser; Hub& hub;
-public:
-    HttpSession(Tcp::socket connection, Hub& owner) : socket(std::move(connection)), hub(owner) { parser.body_limit(1024); parser.header_limit(8192); }
-    void start() {
-        http::async_read(socket, buffer, parser, [self = shared_from_this()](beast::error_code ec, std::size_t) { if (!ec) self->respond(self->parser.release()); });
+void Hub::trimHistory() {
+    std::size_t bytes = 0; for (const auto& entry : undo) bytes += entry.state->estimatedBytes();
+    while (undo.size() > 1 && (undo.size() > 32 || bytes > 128u * 1024u * 1024u)) { bytes -= undo.front().state->estimatedBytes(); undo.pop_front(); }
+}
+std::shared_ptr<FileJob> Hub::beginFileJob(const std::string& operation) {
+    if (activeFileJob) throw std::invalid_argument("已有文件操作进行中");
+    for (auto it = fileJobs.begin(); it != fileJobs.end();) {
+        const auto state = it->second->status().at("state");
+        if (Clock::now() - it->second->created > std::chrono::minutes(15) || (state != "working" && (it->second->operation == "import" || state != "done"))) it = fileJobs.erase(it); else ++it;
     }
-    void respond(http::request<http::string_body> request) {
-        std::string host(request[http::field::host]); auto expectedLocalhost = "localhost" + hub.host.substr(hub.host.find(':'));
-        if (host != hub.host && host != expectedLocalhost) { reply(http::status::forbidden, "Invalid local host"); return; }
+    if (fileJobs.size() >= 8) throw std::invalid_argument("文件任务过多，请等待临时下载过期");
+    auto job = std::make_shared<FileJob>(operation); job->info = {projectName, projectOrigin}; job->revision = sim.revision;
+    if (operation == "import") job->stage = "等待上传";
+    running = false; activeFileJob = job; fileJobs.emplace(job->id, job); return job;
+}
+void Hub::endFileJob(const std::shared_ptr<FileJob>& job, const std::string& error) {
+    job->finish(error); if (activeFileJob == job) activeFileJob.reset();
+    for (const auto& weak : clients) if (auto client = weak.lock()) client->sendJson(status());
+}
+void Hub::exportFile(const std::shared_ptr<FileJob>& job, bool checkpoint, bool json) {
+    try {
+        // Clone on the owner thread at a completed event boundary. The worker
+        // owns this copy; the live World's mutable lookup cache is never shared.
+        auto snapshot = sim.clone();
+        asio::post(fileWorkers, [this, job, checkpoint, json, snapshot = std::move(snapshot)] {
+            std::string error;
+            try {
+                std::ofstream output(job->path, std::ios::binary | std::ios::trunc);
+                if (!output) throw std::runtime_error("无法写入临时工程文件");
+                if (json) {
+                    job->progress("编码旧 JSON", 0, 0);
+                    auto value = snapshot->saveProject(job->info.name, checkpoint, [job] { job->progress("编码旧 JSON", 0, 0); });
+                    output << value.dump(2);
+                    job->progress("文件已生成", static_cast<std::uint64_t>(output.tellp()), static_cast<std::uint64_t>(output.tellp()));
+                } else writeVmcb(output, *snapshot, job->info, checkpoint, job->options());
+                output.close();
+                if (!output) throw std::runtime_error("关闭工程文件失败");
+                job->info.name += checkpoint ? (json ? ".snapshot.verimc.json" : ".snapshot.vmcb") : (json ? ".verimc.json" : ".vmcb");
+            } catch (const std::exception& exception) { error = exception.what(); }
+            asio::post(io, [this, job, error] { endFileJob(job, error); });
+        });
+    } catch (const std::exception& error) { endFileJob(job, error.what()); }
+}
+void Hub::importFile(const std::shared_ptr<FileJob>& job) {
+    const auto capacity = sim.traceCapacity, reserve = sim.traceAtomicReserve, budget = sim.updateBudget;
+    asio::post(fileWorkers, [this, job, capacity, reserve, budget] {
+        std::unique_ptr<Simulator> candidate; ProjectInfo info; std::string error;
+        try {
+            candidate = std::make_unique<Simulator>(registry); candidate->traceCapacity = capacity; candidate->traceAtomicReserve = reserve; candidate->updateBudget = budget;
+            std::ifstream input(job->path, std::ios::binary); if (!input) throw std::runtime_error("无法读取上传工程");
+            info = readProjectFile(input, *candidate, job->options());
+        } catch (const std::exception& exception) { error = exception.what(); }
+        asio::post(io, [this, job, error, info, candidate = std::move(candidate)]() mutable {
+            if (job->cancelled && error.empty()) error = "文件操作已取消";
+            if (sim.revision != job->revision && error.empty()) error = "当前工程已变化，未替换工程";
+            if (error.empty()) {
+                // Allocate the undo entry before committing; the exchange is
+                // allocation-free and retains the old world without cloning it.
+                try { undo.push_back({projectName, std::move(candidate), projectOrigin}); }
+                catch (const std::exception& exception) { error = exception.what(); }
+                if (error.empty()) {
+                    sim.exchangeProject(*undo.back().state); projectName.swap(info.name); projectOrigin = info.origin;
+                    redo.clear(); runStart.reset(); trimHistory();
+                    // Publish on the regular pump after committing. A completed
+                    // import must not be reported as failed due to rendering.
+                    ++traceEpoch; pendingFull = true;
+                }
+            }
+            endFileJob(job, error);
+            std::error_code ignored; std::filesystem::remove(job->path, ignored);
+        });
+    });
+}
+class HttpSession : public std::enable_shared_from_this<HttpSession> {
+    Tcp::socket socket;
+    beast::flat_buffer buffer;
+    http::request_parser<http::buffer_body> parser;
+    Hub& hub;
+    std::shared_ptr<FileJob> uploadJob;
+    std::ofstream upload;
+    std::array<char, 65536> uploadBuffer{};
+    std::uint64_t uploaded{}, uploadTotal{};
+    asio::steady_timer deadline;
+    bool uploadFinished{};
+    void startDeadline(std::chrono::seconds timeout = std::chrono::seconds(60)) {
+        deadline.expires_after(timeout);
+        deadline.async_wait([weak = weak_from_this()](beast::error_code error) {
+            if (error) return;
+            if (auto self = weak.lock()) { beast::error_code ignored; self->socket.close(ignored); if (self->uploadJob && !self->uploadFinished) self->failUpload("文件上传超时"); }
+        });
+    }
+    void failUpload(const std::string& message) {
+        if (uploadFinished) return; uploadFinished = true; upload.close();
+        if (uploadJob) hub.endFileJob(uploadJob, message);
+    }
+    bool authenticated(const http::request<http::buffer_body>& request, const std::string& query = {}) {
+        const std::string origin(request[http::field::origin]); const auto localhost = "localhost" + hub.host.substr(hub.host.find(':'));
+        if (!origin.empty() && origin != "http://" + hub.host && origin != "http://" + localhost) return false;
+        return request["X-Simulator-Token"] == hub.token || query == "token=" + hub.token;
+    }
+    static std::string encodedFilename(std::string name) {
+        for (auto& ch : name) if (static_cast<unsigned char>(ch) < 32 || ch == '/' || ch == '\\') ch = '_';
+        std::string suffix;
+        for (const auto* extension : {".snapshot.verimc.json", ".verimc.json", ".snapshot.vmcb", ".vmcb"})
+            if (name.ends_with(extension)) { suffix = extension; name.resize(name.size() - suffix.size()); break; }
+        if (name.size() + suffix.size() > 200) { name.resize(200 - suffix.size()); while (!name.empty()) { try { simulator::vmcb::validUtf8(name); break; } catch (...) { name.pop_back(); } } }
+        name += suffix;
+        static constexpr char hex[] = "0123456789ABCDEF"; std::string encoded;
+        for (char character : name) { const auto ch = static_cast<unsigned char>(character); if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9') || ch == '.' || ch == '-' || ch == '_') encoded.push_back(static_cast<char>(ch)); else { encoded.push_back('%'); encoded.push_back(hex[ch >> 4]); encoded.push_back(hex[ch & 15]); } }
+        return encoded;
+    }
+    void download(const std::shared_ptr<FileJob>& job) {
+        if (job->operation != "export" || job->status().at("state") != "done") { reply(http::status::conflict, "文件尚未生成或操作失败"); return; }
+        auto response = std::make_shared<http::response<http::file_body>>(http::status::ok, 11); beast::error_code error;
+        response->body().open(job->path.c_str(), beast::file_mode::scan, error);
+        if (error) { reply(http::status::not_found, "下载文件已过期"); return; }
+        const auto fallback = job->info.name.ends_with(".json") ? "project.json" : "project.vmcb";
+        response->set(http::field::content_type, "application/octet-stream"); response->set(http::field::content_disposition, std::string("attachment; filename=") + fallback + "; filename*=UTF-8''" + encodedFilename(job->info.name)); response->set(http::field::cache_control, "no-store"); response->set("X-Content-Type-Options", "nosniff"); response->set("Referrer-Policy", "no-referrer"); response->content_length(response->body().size()); response->keep_alive(false);
+        hub.fileJobs.erase(job->id);
+        startDeadline(std::chrono::minutes(15)); http::async_write(socket, *response, [self = shared_from_this(), response, job](beast::error_code, std::size_t) { self->deadline.cancel(); beast::error_code ignored; self->socket.shutdown(Tcp::socket::shutdown_send, ignored); });
+    }
+    void readUpload() {
+        if (uploadFinished) return;
+        if (uploadJob->cancelled) { failUpload("文件操作已取消"); reply(http::status::conflict, "文件操作已取消"); return; }
+        parser.get().body().data = uploadBuffer.data(); parser.get().body().size = uploadBuffer.size(); startDeadline();
+        http::async_read_some(socket, buffer, parser, [self = shared_from_this()](beast::error_code error, std::size_t) {
+            if (self->uploadFinished) return;
+            self->deadline.cancel(); const auto count = self->uploadBuffer.size() - self->parser.get().body().size;
+            if (count) { self->upload.write(self->uploadBuffer.data(), static_cast<std::streamsize>(count)); self->uploaded += count; }
+            if (!self->upload) { self->failUpload("上传临时文件写入失败"); self->reply(http::status::internal_server_error, "上传临时文件写入失败"); return; }
+            if (error && error != http::error::need_buffer) { self->failUpload("上传中断或超过文件预算"); self->reply(http::status::bad_request, "上传中断或超过文件预算"); return; }
+            try { self->uploadJob->progress("上传文件", self->uploaded, self->uploadTotal); }
+            catch (...) { self->failUpload("文件操作已取消"); self->reply(http::status::conflict, "文件操作已取消"); return; }
+            if (!self->parser.is_done()) { self->readUpload(); return; }
+            self->upload.close(); if (!self->upload) { self->failUpload("上传关闭失败"); self->reply(http::status::internal_server_error, "上传关闭失败"); return; }
+            self->uploadFinished = true; self->hub.importFile(self->uploadJob); self->reply(http::status::accepted, self->uploadJob->status().dump(), "application/json");
+        });
+    }
+    void respond() {
+        const auto& request = parser.get(); std::string host(request[http::field::host]); auto localhost = "localhost" + hub.host.substr(hub.host.find(':'));
+        if (host != hub.host && host != localhost) { reply(http::status::forbidden, "Invalid local host"); return; }
         if (ws::is_upgrade(request)) {
             std::string origin(request[http::field::origin]);
-            if ((origin != "http://" + hub.host && origin != "http://" + expectedLocalhost) || request.target() != "/socket?token=" + hub.token) { reply(http::status::forbidden, "Invalid local session"); return; }
-            std::make_shared<Client>(std::move(socket), hub)->accept(std::move(request)); return;
+            if ((origin != "http://" + hub.host && origin != "http://" + localhost) || request.target() != "/socket?token=" + hub.token) { reply(http::status::forbidden, "Invalid local session"); return; }
+            http::request<http::string_body> upgrade; upgrade.base() = request.base(); std::make_shared<Client>(std::move(socket), hub)->accept(std::move(upgrade)); return;
+        }
+        std::string target(request.target()), query; if (auto pos = target.find('?'); pos != std::string::npos) { query = target.substr(pos + 1); target.resize(pos); }
+        if (target.starts_with("/api/files/")) {
+            const auto tail = target.substr(11); const auto slash = tail.find('/'); const auto id = tail.substr(0, slash); const auto action = slash == std::string::npos ? "" : tail.substr(slash + 1);
+            if (!authenticated(request, action == "download" ? query : "")) { reply(http::status::forbidden, "Invalid local session"); return; }
+            auto found = hub.fileJobs.find(id); if (found == hub.fileJobs.end()) { reply(http::status::not_found, "文件任务不存在或已过期"); return; } auto job = found->second;
+            if (request.method() == http::verb::get && action.empty()) { reply(http::status::ok, job->status().dump(), "application/json"); return; }
+            if (request.method() == http::verb::get && action == "download") { download(job); return; }
+            if (request.method() == http::verb::post && action == "upload") {
+                if (hub.activeFileJob != job || job->operation != "import" || job->status().at("stage") != "等待上传" || job->cancelled) { reply(http::status::conflict, "上传任务状态不匹配"); return; }
+                uploadTotal = parser.content_length().value_or(0); if (uploadTotal > 8ULL * 1024 * 1024 * 1024) { hub.endFileJob(job, "文件超过 8 GiB"); reply(http::status::payload_too_large, "文件超过 8 GiB"); return; }
+                parser.body_limit(8ULL * 1024 * 1024 * 1024);
+                uploadJob = job; upload.open(job->path, std::ios::binary | std::ios::trunc); if (!upload) { failUpload("无法创建上传文件"); reply(http::status::internal_server_error, "无法创建上传文件"); return; }
+                job->progress("上传文件", 0, uploadTotal); if (parser.is_done()) { failUpload("上传文件为空"); reply(http::status::bad_request, "上传文件为空"); return; } readUpload(); return;
+            }
+            reply(http::status::method_not_allowed, "Unsupported file operation"); return;
         }
         if (request.method() != http::verb::get) { reply(http::status::method_not_allowed, "GET only"); return; }
-        std::string target(request.target());
         if (target == "/api/bootstrap") { reply(http::status::ok, Json{{"token", hub.token}, {"version", "26.2"}}.dump(), "application/json"); return; }
         if (target == "/health") { reply(http::status::ok, "ok"); return; }
         if (target == "/") target = "/index.html";
@@ -404,15 +588,22 @@ public:
         auto ext = path.extension().string(); std::string mime = ext == ".html" ? "text/html; charset=utf-8" : ext == ".js" ? "text/javascript" : ext == ".css" ? "text/css" : ext == ".svg" ? "image/svg+xml" : "application/octet-stream";
         reply(http::status::ok, std::move(content), mime);
     }
-    void reply(http::status status, std::string body, const std::string& mime = "text/plain") {
+public:
+    HttpSession(Tcp::socket connection, Hub& owner) : socket(std::move(connection)), hub(owner), deadline(owner.io) { parser.body_limit(UINT64_MAX); parser.header_limit(8192); }
+    void start() {
+        startDeadline(); http::async_read_header(socket, buffer, parser, [self = shared_from_this()](beast::error_code error, std::size_t) {
+            self->deadline.cancel(); if (error) return;
+            try { self->respond(); } catch (const std::exception& exception) { if (self->uploadJob) self->failUpload(exception.what()); self->reply(http::status::bad_request, exception.what()); }
+        });
+    }
+    void reply(http::status status, std::string body, const std::string& mime = "text/plain; charset=utf-8") {
         auto response = std::make_shared<http::response<http::string_body>>(status, 11);
         response->set(http::field::content_type, mime); response->set(http::field::cache_control, "no-store");
         response->set("X-Content-Type-Options", "nosniff"); response->set("Content-Security-Policy", "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data:; frame-ancestors 'none'");
         response->body() = std::move(body); response->prepare_payload(); response->keep_alive(false);
         http::async_write(socket, *response, [self = shared_from_this(), response](beast::error_code, std::size_t) { beast::error_code ignored; self->socket.shutdown(Tcp::socket::shutdown_send, ignored); });
     }
-};
-}
+};}
 int runServer(unsigned short port) {
     asio::io_context io; Hub hub(io, port); hub.demo();
     Tcp::acceptor acceptor(io, {asio::ip::make_address("127.0.0.1"), port});

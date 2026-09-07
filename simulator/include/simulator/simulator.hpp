@@ -9,6 +9,8 @@
 #include <chrono>
 
 namespace simulator {
+class ProjectSource;
+class ProjectSink;
 struct TraceEdge { std::uint32_t probeId{}; Tick tick{}; std::uint64_t sequence{}; std::uint8_t value{}; };
 struct Probe { std::uint32_t id{}; BlockPos pos{}; std::string name; std::string mode{"output"}; Direction direction{Direction::up}; int lastValue{-1}; std::string trigger{"none"}; int triggerValue{15}; };
 struct ItemStack { std::uint32_t item{}; std::uint16_t count{}; bool operator==(const ItemStack&) const = default; };
@@ -94,11 +96,16 @@ public:
     std::vector<Cell> takeChanges();
     Json inspect(BlockPos pos) const;
     Json inventoryJson(BlockPos pos, bool combined = true) const;
-    Json saveProject(const std::string& name = "未命名电路", bool checkpoint = false) const;
-    void loadProject(const Json& data);
+    Json saveProject(const std::string& name = "未命名电路", bool checkpoint = false, const std::function<void()>& check = {}) const;
+    void loadProject(const Json& data, const std::function<void()>& check = {});
+    void loadProject(ProjectSource& source);
+    void writeProject(ProjectSink& sink, const std::string& name, bool checkpoint) const;
     std::string exportVcd() const;
     std::unique_ptr<Simulator> clone() const;
     void restore(const Simulator& snapshot);
+    // Both worlds must be quiescent and owned by the caller. Exchanges native
+    // storage so a successful file import can retain the previous world as undo.
+    void exchangeProject(Simulator& other);
     std::size_t estimatedBytes() const {
         auto bytes = world.storageBytes() + trace.size() * sizeof(TraceEdge) + runtime.size() * 512 + scheduled.size() * 128 + hoppers.size() * 96 + entityOrders.size() * 64 + blockTicks.estimatedBytes();
         for (const auto& [pos, data] : runtime) { (void)pos; bytes += data.inventory.capacity() * sizeof(ItemStack); }

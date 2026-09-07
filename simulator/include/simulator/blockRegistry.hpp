@@ -48,6 +48,8 @@ public:
     bool has(StateId id, const std::string& property) const { return type(id).properties.contains(property); }
     std::size_t stateCount() const { return states.size(); }
     std::size_t typeCount() const { return types.size(); }
+    const BlockType& blockType(std::uint16_t id) const { return types.at(id); }
+    const std::vector<std::uint8_t>& ruleFingerprint() const { return rulesHash; }
     std::uint32_t itemId(const std::string& name) const;
     const ItemInfo& item(std::uint32_t id) const { return items.at(id); }
     Json itemCatalog() const;
@@ -60,6 +62,7 @@ public:
     const SongInfo& song(int index) const { return songs.at(static_cast<std::size_t>(index)); }
     int songId(const std::string& name) const;
 private:
+    std::vector<std::uint8_t> rulesHash;
     std::vector<BlockState> states;
     std::vector<BlockType> types;
     std::unordered_map<std::string, std::uint16_t> names;

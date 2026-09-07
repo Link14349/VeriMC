@@ -1,4 +1,5 @@
 #include "simulator/blockRegistry.hpp"
+#include "simulator/vmcbEncoding.hpp"
 #include <fstream>
 #include <filesystem>
 #include <algorithm>
@@ -40,6 +41,7 @@ Device classify(const std::string& name, const std::string& c) {
 }
 }
 BlockRegistry::BlockRegistry(const std::string& path) {
+    rulesHash = vmcb::rulesDigest(path);
     std::ifstream file(path);
     if (!file) throw std::runtime_error("找不到方块注册表：" + path);
     std::ifstream itemFile(std::filesystem::path(path).parent_path() / "itemDefinitions.json");

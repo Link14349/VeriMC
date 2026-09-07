@@ -1,0 +1,81 @@
+{
+  "date": "2026-09-07",
+  "cpu": "Apple M1",
+  "memoryBytes": 17179869184,
+  "os": "macOS 15.7.4 (24G517)",
+  "compiler": "Apple Clang 17.0.0 (clang-1700.6.4.2)",
+  "buildType": "Release",
+  "coreBuildId": "443f9b9d4a3f1f7bd5520495426f5ab9832fb92d981fc41219c182627a090ff1",
+  "workloadSourceSha256": "c6f78df1e672e28796664321bb2e55d44160e301dcf8bab165fdf1317d751c8a",
+  "kind": "circuit",
+  "minecraftVersion": "26.2",
+  "randomSeed": 24680,
+  "zstdLevel": 3,
+  "samplesPerWorkload": 1,
+  "scope": "Native encode + disk write/close; disk read + validation + circuit initialization. No fsync, browser, service copy, waveforms, active devices, or dynamic snapshot measurements. Peak RSS is whole-process high-water before legacy JSON construction. JSON compression uses the entire text at level 3.",
+  "results": [
+    {
+      "blocks": 100000,
+      "bytes": 59459,
+      "kind": "dense",
+      "legacyCompactBytes": 6476817,
+      "legacyCompactZstdBytes": 418583,
+      "legacyPrettyBytes": 13276909,
+      "legacyPrettyZstdBytes": 489899,
+      "peakRssBytes": 101941248,
+      "readSeconds": 0.007959917,
+      "roundTripEqual": true,
+      "sections": 64,
+      "writeSeconds": 0.014333542,
+      "zstdVersion": "1.5.7"
+    },
+    {
+      "blocks": 1048576,
+      "bytes": 547647,
+      "kind": "dense",
+      "peakRssBytes": 102121472,
+      "readSeconds": 0.065259334,
+      "roundTripEqual": true,
+      "sections": 256,
+      "writeSeconds": 0.093329541,
+      "zstdVersion": "1.5.7"
+    },
+    {
+      "blocks": 2000000,
+      "bytes": 1068186,
+      "kind": "dense",
+      "peakRssBytes": 102203392,
+      "readSeconds": 0.124550833,
+      "roundTripEqual": true,
+      "sections": 512,
+      "writeSeconds": 0.180535917,
+      "zstdVersion": "1.5.7"
+    },
+    {
+      "blocks": 1048576,
+      "bytes": 1475265,
+      "kind": "sparse",
+      "peakRssBytes": 898416640,
+      "readSeconds": 0.696408542,
+      "roundTripEqual": true,
+      "sections": 16384,
+      "writeSeconds": 2.325308,
+      "zstdVersion": "1.5.7"
+    },
+    {
+      "blocks": 10000,
+      "bytes": 28216,
+      "kind": "containers",
+      "legacyCompactBytes": 2330583,
+      "legacyCompactZstdBytes": 24800,
+      "legacyPrettyBytes": 5110678,
+      "legacyPrettyZstdBytes": 32283,
+      "peakRssBytes": 106381312,
+      "readSeconds": 0.170416125,
+      "roundTripEqual": true,
+      "sections": 40,
+      "writeSeconds": 0.089850833,
+      "zstdVersion": "1.5.7"
+    }
+  ]
+}

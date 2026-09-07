@@ -45,4 +45,37 @@ std::vector<Cell> World::cells() const {
     std::sort(result.begin(), result.end(), [](const Cell& a, const Cell& b) { return a.pos < b.pos; });
     return result;
 }
+std::vector<BlockPos> World::sectionPositions() const {
+    std::vector<BlockPos> positions; positions.reserve(chunks.size());
+    for (const auto& [pos, chunk] : chunks) { (void)chunk; positions.push_back(pos); }
+    std::sort(positions.begin(), positions.end()); return positions;
+}
+std::span<const StateId, 4096> World::sectionStates(BlockPos section) const {
+    return chunks.at(section)->states;
+}
+void World::forEachCell(const std::function<void(Cell)>& visit) const {
+    for (const auto section : sectionPositions()) {
+        const auto states = sectionStates(section);
+        for (std::size_t i = 0; i < states.size(); ++i) if (states[i])
+            visit({{section.x * 16 + static_cast<int>(i & 15), section.y * 16 + static_cast<int>(i >> 8), section.z * 16 + static_cast<int>((i >> 4) & 15)}, states[i]});
+    }
+}
+void World::forEachCellXyz(const std::function<void(Cell)>& visit) const {
+    const auto positions = sectionPositions();
+    for (std::size_t xBegin = 0; xBegin < positions.size();) {
+        auto xEnd = xBegin + 1;
+        while (xEnd < positions.size() && positions[xEnd].x == positions[xBegin].x) ++xEnd;
+        for (int x = 0; x < 16; ++x) for (auto yBegin = xBegin; yBegin < xEnd;) {
+            auto yEnd = yBegin + 1;
+            while (yEnd < xEnd && positions[yEnd].y == positions[yBegin].y) ++yEnd;
+            for (int y = 0; y < 16; ++y) for (auto index = yBegin; index < yEnd; ++index) {
+                const auto pos = positions[index]; const auto states = sectionStates(pos);
+                for (int z = 0; z < 16; ++z) if (auto state = states[static_cast<std::size_t>(x | (z << 4) | (y << 8))])
+                    visit({{pos.x * 16 + x, pos.y * 16 + y, pos.z * 16 + z}, state});
+            }
+            yBegin = yEnd;
+        }
+        xBegin = xEnd;
+    }
+}
 }
