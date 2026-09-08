@@ -11,7 +11,7 @@
 - [x] [R6：[已修复] 日光传感器切换漏发振动事件](https://github.com/Zhen-WushuiLingchun/VeriMC/issues/1)
 - [x] [R7：[已修复] 相邻楼梯未更新连接形状](https://github.com/Zhen-WushuiLingchun/VeriMC/issues/2)
 - [x] [R10：[已修复] 活塞错误允许推动末地传送门框](https://github.com/Zhen-WushuiLingchun/VeriMC/issues/3)
-- [ ] [R1：[静态差异·待复现] 邻居通知来源方块与原版不一致](https://github.com/Zhen-WushuiLingchun/VeriMC/issues/4)
+- [x] [R1：[已复现并修复] 邻居通知来源方块与原版不一致](https://github.com/Zhen-WushuiLingchun/VeriMC/issues/4)
 - [ ] [R2：[静态差异·待复现] 活塞移动时全局跳过移除回调](https://github.com/Zhen-WushuiLingchun/VeriMC/issues/5)
 - [ ] [R3：[静态差异·待复现] 中继器和比较器断支撑处理阶段不同](https://github.com/Zhen-WushuiLingchun/VeriMC/issues/6)
 - [ ] [R4：[静态差异·待复现] 侦测器移除缺少计划刻状态判断](https://github.com/Zhen-WushuiLingchun/VeriMC/issues/7)

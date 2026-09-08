@@ -9,6 +9,51 @@
 GameTest 功能开关 `minecraft:vanilla` + `minecraft:trade_rebalance`，`randomTickSpeed=0`，
 实验红石关闭。仍然不能称为严格 vanilla-only 专用服务器验证。
 
+## R1 邻居通知的来源方块（issue #4）已复现并修复
+
+**根因**：原版 `Level.updateNeighborsAt(pos, sourceBlock)` 把“发起更新的那个方块”传给所有被通知者。
+C++ 的 `updateNeighbors(p)` 在不传 `source` 时取 `world.get(p)`，即“被通知位置自己的方块”。
+读取该参数的是 `RailBlock.updateState`（要求 `block.defaultBlockState().isSignalSource()` 且潜在连接数为 3）
+和 `DoorBlock.neighborChanged`（来源是同一种门时跳过）。
+
+**改动**（全部改为按原版显式传递来源）：
+
+| 位置 | 原版来源 |
+|---|---|
+| `onPlace` 红石火把 / `onRemove` 红石火把 | `RedstoneTorchBlock` 自身 |
+| `onPlace` 红石粉的上下通知 / `onRemove` 红石粉的六向通知 | `RedStoneWireBlock` |
+| `updateWire` 的七元素集合 | `DefaultRedstoneWireEvaluator` 的 `this.wireBlock` |
+| `wireCorners`（`checkCornerChangeAt`） | `RedStoneWireBlock` |
+| 红石粉点/十字右键（`updatesOnShapeChange`） | `newState.getBlock()` |
+| `movePistonBlocks` 的被破坏格、被推走格、活塞臂 | 各自移动前的方块状态、`Blocks.PISTON_HEAD` |
+| `finishMotion`（`PistonMovingBlockEntity.finalTick`） | 刚落地的方块 |
+
+**原版证据**：新增 `tests/fixtures/java26_2RailNotificationSource.json`
+（SHA-256 `dc495aeb22ec7c5a700a967e2aa483330449cd5101ed160c8ec7f553be6ca600`，
+原点 `[7265194, -58, -9435984]`，41 帧 × 29 点 = 1,189 次位置/帧观测），
+脚本 `tools/reference/captureRailNotificationSource.py`。把 watch 列表按组切片后逐组对照旧实现：
+
+| 组 | 布置 | 旧实现 |
+|---|---|---|
+| wireGap1 | 红石粉紧邻三向铁轨 | **一致**（被通知位置本身就是粉线，默认值恰好正确） |
+| wireGap2 | 红石粉隔一个导体 | **差异**：10 gt、`[11,2,16]`，原版 `east_west`，旧实现 `north_south` |
+| wireGap3 | 红石粉隔两个导体 | **一致**（七元素集合本来就够不到，原版也不更新） |
+| torch | 红石火把隔一个导体放置/移除 | **差异**：10 gt、`[31,2,6]` |
+| piston | 活塞把铁轨上方的红石块推走 | **差异**：11 gt、`[31,2,16]` |
+| door | 红石粉旁的双层门 | **一致**（见下） |
+
+修复后整份 fixture `match`；Release `ctest` 3/3，核心检查 89/89。
+并把 `tests/fixtures/` 下全部 26 个场景重新从原版捕获（各自新随机原点）逐帧对照，**全部 match**，
+确认这次改动没有回归红石粉、铁轨、火把、刻批次、活塞等既有场景。
+
+**明确排除的范围**：
+
+- **门这一路径没有找到可达反例**。原版七元素集合里几乎总还有另一个与目标门半扇相邻、
+  且在旧实现里来源不是门的位置（例如粉线正上方那格），所以上半扇仍会被正确更新。
+  代码已按原版传递来源，但这一条属于对齐，不是已复现故障；场景保留该组作为“两侧一致”的记录。
+- 只验证了 `RailBlock.updateState` 和门这两个读取方。其他潜在读取方（如未实现器件）没有覆盖。
+- `finishMotion` 的来源修正没有单独反例，它与活塞组同属一次改动。
+
 ## R7 楼梯连接形状（issue #2）已修复
 
 **根因**：`Simulator::executeShape` 与 `Simulator::place` 都没有楼梯分支，`shape` 永远是放置时写入的值。

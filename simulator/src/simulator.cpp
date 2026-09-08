@@ -211,7 +211,7 @@ void Simulator::onPlace(BlockPos p, StateId id, StateId old) {
     const auto& s = registry[id];
     if(s.device==Device::composter && s.staticAnalog==7)schedule(p,20);
     if (isDiode(s.device)) { notifyFront(p, s.facing); return; }
-    if (s.device == Device::torch || s.device == Device::wallTorch) { for (auto d : directions) updateNeighbors(p.relative(d)); return; }
+    if (s.device == Device::torch || s.device == Device::wallTorch) { for (auto d : directions) updateNeighbors(p.relative(d), -1, id); return; }
     if (registry[old].type == s.type) return;
     switch (s.device) {
     case Device::jukebox: startJukebox(p);break;
@@ -219,7 +219,7 @@ void Simulator::onPlace(BlockPos p, StateId id, StateId old) {
     case Device::sculkSensor: case Device::calibratedSensor:
         startSensor(p);if(s.power && !hasScheduled(p))setBlock(p,registry.with(id,"power",0),18);break;
     case Device::target: if (s.power && !hasScheduled(p)) setBlock(p, registry.with(id, "power", 0), 18); break;
-    case Device::wire: updateWire(p, id); updateNeighbors(p.relative(Direction::up)); updateNeighbors(p.relative(Direction::down)); wireCorners(p); break;
+    case Device::wire: updateWire(p, id); updateNeighbors(p.relative(Direction::up), -1, id); updateNeighbors(p.relative(Direction::down), -1, id); wireCorners(p); break;
     case Device::observer: if (s.powered && !hasScheduled(p)) { setBlock(p, registry.withBool(id, "powered", false), 18); notifyFront(p, s.facing); } break;
     case Device::bulb: executeNeighbor(p); break;
     case Device::daylight: schedulePhase(p, currentTick + 20 - currentTick % 20, 2, 0); break;
@@ -238,8 +238,8 @@ void Simulator::onRemove(BlockPos p, StateId old) {
     switch (s.device) {
     case Device::sculkSensor: case Device::calibratedSensor:
         if(registry.property(old,"sculk_sensor_phase")=="active") {updateNeighbors(p,-1,old);updateNeighbors(p.relative(Direction::down),-1,old);}break;
-    case Device::wire: for (auto d : directions) updateNeighbors(p.relative(d)); updateWire(p, old); wireCorners(p); break;
-    case Device::torch: case Device::wallTorch: for (auto d : directions) updateNeighbors(p.relative(d)); break;
+    case Device::wire: for (auto d : directions) updateNeighbors(p.relative(d), -1, old); updateWire(p, old); wireCorners(p); break;
+    case Device::torch: case Device::wallTorch: for (auto d : directions) updateNeighbors(p.relative(d), -1, old); break;
     case Device::lever: case Device::button: if (s.powered) notifyAttached(p, s.connectedDirection); break;
     case Device::repeater: case Device::comparator: notifyFront(p, s.facing); break;
     case Device::observer: if (s.powered) notifyFront(p, s.facing); break;
@@ -325,10 +325,11 @@ void Simulator::updateWire(BlockPos p, StateId id) {
     // Java 26.2's seven-entry HashSet iteration affects locational redstone.
     std::array<BlockPos, 7> affected{p}; for (std::size_t i = 0; i < 6; ++i) affected[i + 1] = p.relative(directions[i]);
     std::stable_sort(affected.begin(), affected.end(), [](BlockPos a, BlockPos b) { return javaPosBucket(a) < javaPosBucket(b); });
-    for (auto q : affected) updateNeighbors(q);
+    // 原版把红石粉方块本身作为 sourceBlock 传给集合里每个位置的通知。
+    for (auto q : affected) updateNeighbors(q, -1, id);
 }
 void Simulator::wireCorners(BlockPos p) {
-    auto check = [&](BlockPos q) { if (at(q).device == Device::wire) { updateNeighbors(q); for (auto d : directions) updateNeighbors(q.relative(d)); } };
+    auto check = [&](BlockPos q) { if (at(q).device == Device::wire) { const auto wire = world.get(q); updateNeighbors(q, -1, wire); for (auto d : directions) updateNeighbors(q.relative(d), -1, wire); } };
     for (auto d : horizontal) check(p.relative(d));
     for (auto d : horizontal) { auto q = p.relative(d); check(q.relative(at(q).conductor ? Direction::up : Direction::down)); }
 }
@@ -612,7 +613,7 @@ void Simulator::interact(BlockPos p) {
     case Device::wire: {
         bool dot = std::all_of(s.wireSides.begin(), s.wireSides.end(), [](auto x) { return x == 0; });
         bool cross = std::all_of(s.wireSides.begin(), s.wireSides.end(), [](auto x) { return x != 0; });
-        if (dot || cross) { auto next = id; for (auto d : horizontal) next = registry.with(next, directionNames[static_cast<unsigned>(d)], std::string(dot ? "side" : "none")); setBlock(p, wireConnections(p, next)); for (auto d : horizontal) if (at(p.relative(d)).conductor) updateNeighbors(p.relative(d), static_cast<int>(opposite(d))); }
+        if (dot || cross) { auto next = id; for (auto d : horizontal) next = registry.with(next, directionNames[static_cast<unsigned>(d)], std::string(dot ? "side" : "none")); setBlock(p, wireConnections(p, next)); for (auto d : horizontal) if (at(p.relative(d)).conductor) updateNeighbors(p.relative(d), static_cast<int>(opposite(d)), world.get(p)); }
         break;
     }
     default: if (!interactDevice(p)) throw std::invalid_argument("该器件没有直接点击操作；请编辑属性或使用环境刺激");

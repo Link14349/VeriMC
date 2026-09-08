@@ -129,9 +129,10 @@ bool Simulator::movePistonBlocks(BlockPos pos, Direction facing, bool extending)
         indirectShapes(cell.pos, cell.state, 2, 512);
         for (auto d : shapeOrder) enqueue({UpdateKind::shape, cell.pos.relative(d), opposite(d), 0});
     }
-    for (const auto& cell : removed) { onRemove(cell.pos, cell.state); indirectShapes(cell.pos, cell.state, 2, 512); updateNeighbors(cell.pos); }
-    for (auto it = originals.rbegin(); it != originals.rend(); ++it) updateNeighbors(it->pos);
-    if (extending) updateNeighbors(arm);
+    // 原版用被破坏/被推走方块的原状态和活塞头作为 sourceBlock，而不是清空后的方块。
+    for (const auto& cell : removed) { onRemove(cell.pos, cell.state); indirectShapes(cell.pos, cell.state, 2, 512); updateNeighbors(cell.pos, -1, cell.state); }
+    for (auto it = originals.rbegin(); it != originals.rend(); ++it) updateNeighbors(it->pos, -1, it->state);
+    if (extending) updateNeighbors(arm, -1, registry.state("piston_head"));
     return true;
 }
 void Simulator::pistonEvent(const ScheduledEvent& event) {
@@ -175,7 +176,8 @@ void Simulator::finishMotion(BlockPos pos, bool force) {
     if (registry[next].device == Device::wire) next = wireConnections(pos, next);
     if (next && registry.has(next, "waterlogged")) next = registry.withBool(next, "waterlogged", false);
     if (next == 0 && !force) { setBlock(pos, motion.movedState, 340); setBlock(pos, 0); }
-    else { setBlock(pos, next, force ? 3 : 67); neighborChanged(pos); }
+    // 原版 finalTick 用刚落地的方块作为 sourceBlock。
+    else { setBlock(pos, next, force ? 3 : 67); neighborChanged(pos, world.get(pos)); }
 }
 void Simulator::tickMotion(const ScheduledEvent& event) {
     auto found = motions.find(event.pos); if (found == motions.end() || found->second.generation != event.data) return;

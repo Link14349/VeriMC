@@ -64,6 +64,8 @@
 
 `ExportComposting` 在通常四路径参数之后，追加 `data/compostingRules.json` 的绝对输出路径，导出 115 种材料和 4,176 次隔离插入记录。`captureComposters.py` 增加第二十一组 GameTest，111 刻 / 26 点，验证临时输入/输出容器及失败抽取副作用，见 [堆肥桶说明](composters.md)。
 
+`captureRailNotificationSource.py` 增加邻居通知来源组：41 刻 / 29 点，用三向普通铁轨读取通知来源方块，覆盖红石粉隔 0/1/2 个导体、红石火把放置与移除、活塞推走铁轨上方红石块，另含一组红石粉旁双层门的对照。
+
 `captureStairShapes.py` 增加楼梯连接形状组：17 刻 / 153 点，覆盖四朝向 × 上下半 × 内外角、`canTakeShape` 阻断、原版玩家放置、拆除回到 `straight`，以及内角侧面变 sturdy 后红石墙火把的存活与消失。`ExportReference` 同时逐方块导出 `stairs`（`block instanceof StairBlock`）。`CaptureRedstone` 的 `playerPlace` 对楼梯按其 `getStateForPlacement` 语义设置玩家朝向与点击面；箱子路径不变。
 
 `captureDaylightVibration.py` 增加日光传感器振动组：81 刻 / 6 点，覆盖右键切换 `inverted` 发出的 `block_change`，包括两个切换方向、距离 3 与 5 格的行进刻数，以及背面滤波为 11（接受）和 9（拒绝）的校频感测体。场景不观察传感器自身 `power`，天空亮度仍是外部刺激。
