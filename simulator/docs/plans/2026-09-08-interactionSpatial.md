@@ -50,3 +50,5 @@
 ## 当前状态
 
 M1 已完成首批交互、默认属性与三维预览/三轴剖切集成，验证见 ../interactionSpatialStatus.md。M2/M3 尚未完成。第一批交付不声称自动生成可实装三维红石电路。
+
+2026-09-08 续：M2 首个固定组件与跨层连接实验已进入原生验证，范围、执行命令和结果见 `verimc/docs/physicalClosureStatus.md`。完整 HDL 物理映射和 M3 仍未实现。

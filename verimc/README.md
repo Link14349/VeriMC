@@ -4,6 +4,8 @@ VeriMC 的硬件描述语言与编译工具子项目，面向 Minecraft Java Edi
 
 **当前阶段：已有 C++20 编译前端，可将纯逻辑 VeriMC 源码编译为 `.vmcl` 逻辑网表。** 红石组件映射、已验证器件库和自动布局布线仍待实现。
 
+新增独立的[固定组件与跨层连接实验](docs/physicalClosureStatus.md)：从组件清单生成有限阶梯电路，链接 C++ 模拟器执行真实放置与输入输出比较。它尚未接入 HDL build，不等同于自动物理编译器。
+
 - [编译器设计方案](docs/compilerDesign.md)：分层、ANTLR4 选择、实现边界和后端路线。
 - [共享逻辑 IR](docs/logicIr.md)：独立于文件格式的内存模型与 C++ 接口。
 - [.vmcl 格式](docs/vmclFormat.md)：可独立读取的逻辑中间体。

@@ -1,0 +1,11 @@
+{
+  "profileId": "java26_2-experimental",
+  "conditions": [
+    "只有显式组件与受限阶梯线路，无其它世界方块"
+  ],
+  "caseIds": [],
+  "limitations": [
+    "尚无原版差分证据",
+    "无时序上界及位置支持域等价证明"
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "format": "verimc.fixedExperiment",
+  "formatVersion": 1,
+  "targetId": "java26_2-experimental",
+  "bounds": {
+    "min": [
+      -32,
+      -16,
+      -32
+    ],
+    "max": [
+      32,
+      32,
+      32
+    ]
+  },
+  "instances": [
+    {
+      "id": "lowBuffer",
+      "cell": "buffer.vmcell.json",
+      "origin": [
+        0,
+        1,
+        0
+      ],
+      "facing": "north"
+    },
+    {
+      "id": "highBuffer",
+      "cell": "buffer.vmcell.json",
+      "origin": [
+        6,
+        3,
+        0
+      ],
+      "facing": "north"
+    }
+  ],
+  "connection": {
+    "from": "lowBuffer",
+    "to": "highBuffer",
+    "checkerId": "straightAscendingDustV1"
+  },
+  "verification": {
+    "model": "identityBit",
+    "steps": [
+      {
+        "value": false,
+        "waitGt": 16
+      },
+      {
+        "value": true,
+        "waitGt": 16
+      },
+      {
+        "value": false,
+        "waitGt": 16
+      },
+      {
+        "value": true,
+        "waitGt": 16
+      },
+      {
+        "value": true,
+        "waitGt": 16
+      },
+      {
+        "value": false,
+        "waitGt": 16
+      }
+    ]
+  }
+}
