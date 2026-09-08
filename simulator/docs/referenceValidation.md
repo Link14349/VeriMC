@@ -64,6 +64,8 @@
 
 `ExportComposting` 在通常四路径参数之后，追加 `data/compostingRules.json` 的绝对输出路径，导出 115 种材料和 4,176 次隔离插入记录。`captureComposters.py` 增加第二十一组 GameTest，111 刻 / 26 点，验证临时输入/输出容器及失败抽取副作用，见 [堆肥桶说明](composters.md)。
 
+`captureDiodeSupportBreak.py` 增加二极管断支撑组：21 刻 / 34 点，中继器与比较器在供电与不供电两种状态下失去支撑，用二极管正南两格的三向普通铁轨读取原版移除时额外发出的六向通知。
+
 `capturePistonRemovalCallback.py` 增加活塞移除回调组：31 刻 / 14 点，把带电避雷针推走，用三向普通铁轨读取移除时刻的通知；含一组不供电的对照。
 
 `captureRailNotificationSource.py` 增加邻居通知来源组：41 刻 / 29 点，用三向普通铁轨读取通知来源方块，覆盖红石粉隔 0/1/2 个导体、红石火把放置与移除、活塞推走铁轨上方红石块，另含一组红石粉旁双层门的对照。

@@ -9,6 +9,38 @@
 GameTest 功能开关 `minecraft:vanilla` + `minecraft:trade_rebalance`，`randomTickSpeed=0`，
 实验红石关闭。仍然不能称为严格 vanilla-only 专用服务器验证。
 
+## R3 二极管断支撑的处理阶段（issue #6）已复现并修复
+
+**根因**：原版 `DiodeBlock.neighborChanged` 在 `canSurvive` 失败时**当场**掉落并移除二极管，
+然后对六个方向各发一次 `updateNeighborsAt(pos.relative(d), this)`（共 36 次通知，来源是二极管方块）。
+C++ 只做 `checkTickOnNeighbor`，移除推迟到形状更新阶段的 `!survives` 分支，那 36 次通知完全没有发生。
+
+**改动**：`Simulator::executeReactiveNeighbor` 在进入 device 分支前，
+对二极管补上 `!survives` → `setBlock(p, 0, 3)` + 六向 `updateNeighbors(p.relative(d), -1, 被移除的二极管状态)`。
+
+**原版证据**：新增 `tests/fixtures/java26_2DiodeSupportBreak.json`
+（SHA-256 `62c6911205acdb818a817462a0fc3d7dfdea2f73d552d45f4db5ba6009f3d5f7`，
+原点 `[2038544, -58, 459704]`，21 帧 × 34 点 = 714 次位置/帧观测），
+脚本 `tools/reference/captureDiodeSupportBreak.py`。读取方仍是三向普通铁轨，
+**放在二极管正南两格**——这个位置既不在移除 `setBlock` 的六邻居集合里，
+也不在 `updateNeighborsInFront` 的集合里，只有那 36 次通知能够到。
+
+六组：中继器/比较器 × {断支撑、不断支撑对照} × {不供电、供电并带下游粉线和红石灯}。
+断支撑组在 10 gt 原版把枢纽改成 `south_east`，旧实现停在 `north_south`；
+对照组两侧一致，说明差异来自断支撑那次通知本身。
+
+反向验证：只还原这一处改动 → 10 gt、相对坐标 `[8,2,10]`，`north_south` vs `south_east`。
+Release `ctest` 3/3，核心检查 91/91；`tests/fixtures/` 下全部 **28 个场景重新从原版捕获**后全部 `match`。
+
+**明确排除的范围**：
+
+- 本次证据是**通知集合**层面的：那 36 次通知只可能来自邻居通知阶段的移除，
+  所以它同时证明了阶段和后续通知，比“最终变成空气”强。但**刻内逐事件轨迹仍未实现**，
+  属于 quirkCompatibilityPlan 第 3 步与 issue #14 的范围；本次没有比较同刻内的事件序号与优先级。
+- 同刻内多个二极管同时断支撑、计划刻排序竞争的场景没有覆盖。
+- `DiodeBlock.updateShape` 在原版只对 DOWN 方向做 `canSurviveOn` 判断，C++ 的形状阶段
+  仍是通用的 `!survives`。这一处差别本次没有构造反例，也没有改动。
+
 ## R2 活塞移动跳过移除回调（issue #5）已复现并修复
 
 **根因**：原版 `LevelChunk.setBlockState` 的条件是

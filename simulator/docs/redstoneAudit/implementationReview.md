@@ -64,7 +64,7 @@
 
 ---
 
-### ★R3 二极管的 `neighborChanged` 缺少"无法存活→掉落并移除"分支
+### ★R3 二极管的 `neighborChanged` 缺少"无法存活→掉落并移除"分支（已复现并修复，见 [fixProgress.md](fixProgress.md)）
 
 | | 位置 |
 | --- | --- |

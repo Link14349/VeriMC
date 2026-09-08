@@ -431,6 +431,13 @@ void Simulator::executeNeighbor(BlockPos p, StateId source) {
 }
 void Simulator::executeReactiveNeighbor(BlockPos p, StateId id, StateId source) {
     const auto& s = registry[id];
+    if (isDiode(s.device) && !survives(p, id)) {
+        // 原版 DiodeBlock.neighborChanged 在邻居通知阶段就掉落并移除二极管，
+        // 随后对六个邻居各发一次 updateNeighborsAt(pos.relative(d), this)。
+        setBlock(p, 0, 3);
+        for (auto d : directions) updateNeighbors(p.relative(d), -1, id);
+        return;
+    }
     switch (s.device) {
     case Device::dropper: {
         bool powered = bestSignal(p) > 0 || bestSignal(p.relative(Direction::up)) > 0;
