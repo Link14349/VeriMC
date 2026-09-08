@@ -195,7 +195,13 @@ test('creative workbench supports fullscreen, nine slots and isolated E inventor
     connection.catalog=[...connection.states.values()].map(def => ({name:def.name,defaultState:def.stateId,defaultProperties:def.properties,device:2,supportLevel:'implemented',
       properties:Object.fromEntries(Object.entries(def.properties).map(([key,value]) => [key,key === 'facing' ? ['north','east','south','west'] : [value]]))}));
     connection.connected=true;connection.status={...connection.status,name:'创造搭建交互测试',blocks:1};
-    connection.request=async (cmd,body={}) => {commands.push({cmd,body});return {};};
+    connection.request=async (cmd,body={}) => {
+      commands.push({cmd,body});
+      if(cmd==='play')connection.status.running=true;
+      if(cmd==='pause')connection.status.running=false;
+      connection.dispatchEvent(new Event('status'));
+      return {};
+    };
     const cell={pos:[4,1,2],stateId:7,renderStateId:7,value:0,motion:0};
     connection.cells.set('4,1,2',cell);
     connection.dispatchEvent(new Event('catalog'));connection.dispatchEvent(new Event('status'));
@@ -207,10 +213,62 @@ test('creative workbench supports fullscreen, nine slots and isolated E inventor
       await page.waitForFunction(() => !!document.fullscreenElement);
       await page.getByTitle('退出全屏',{exact:true}).waitFor({state:'visible'});
       await page.waitForFunction(() => document.pointerLockElement === document.querySelector('.viewportCanvas canvas'));
+    });
+
+    await t.test('fullscreen Escape toggles the resume panel once per press and recaptures only on keyup', async () => {
+      await page.waitForTimeout(2200);
+      const resume=page.locator('.creativeResume');
+      await page.keyboard.down('Escape');
+      await page.waitForFunction(() => !document.pointerLockElement);
+      await resume.waitFor({state:'visible'});
+      await page.keyboard.down('Escape');
+      await page.keyboard.up('Escape');
+      assert.equal(await resume.isVisible(),true,'holding the first Escape must leave the resume panel open');
+      assert.equal(await page.evaluate(() => document.pointerLockElement),null);
+      await page.keyboard.down('Escape');
+      assert.equal(await resume.isVisible(),true,'recapture must wait until the resume Escape is released');
+      assert.equal(await page.evaluate(() => document.pointerLockElement),null);
+      await page.keyboard.down('Escape');
+      assert.equal(await page.evaluate(() => document.pointerLockElement),null,'repeated keydown must not recapture early');
+      await page.keyboard.up('Escape');
+      await page.waitForFunction(() => document.pointerLockElement === document.querySelector('.viewportCanvas canvas'));
+      await resume.waitFor({state:'hidden'});
+      assert.equal(await page.evaluate(() => !!document.fullscreenElement),true,'Escape toggling must preserve fullscreen');
+      assert.equal(await page.locator('dialog.creativeInventory').isVisible(),false);
+    });
+
+    await t.test('fullscreen Enter and NumpadEnter toggle simulation once per press and obey offline guards', async () => {
+      await page.evaluate(() => {commands.length=0;kernel.status.running=false;kernel.dispatchEvent(new Event('status'));});
+      await page.locator('.viewportCanvas canvas').focus();
+      await page.keyboard.down('Enter');
+      await page.keyboard.down('Enter');
+      await page.keyboard.up('Enter');
+      assert.deepEqual(await page.evaluate(() => commands.map(command=>command.cmd)),['play']);
+      assert.equal(await page.evaluate(() => kernel.status.running),true);
+      await page.keyboard.down('NumpadEnter');
+      await page.keyboard.down('NumpadEnter');
+      await page.keyboard.up('NumpadEnter');
+      assert.deepEqual(await page.evaluate(() => commands.map(command=>command.cmd)),['play','pause']);
+      assert.equal(await page.evaluate(() => kernel.status.running),false);
+      await page.evaluate(() => {kernel.connected=false;kernel.dispatchEvent(new Event('status'));});
+      await page.keyboard.press('Enter');
+      await page.keyboard.press('NumpadEnter');
+      assert.deepEqual(await page.evaluate(() => commands.map(command=>command.cmd)),['play','pause'],'offline shortcuts must not issue commands');
+      await page.evaluate(() => {kernel.connected=true;kernel.dispatchEvent(new Event('status'));});
+      assert.equal(await page.evaluate(() => document.pointerLockElement === document.querySelector('.viewportCanvas canvas')),true);
+      assert.equal(await page.evaluate(() => !!document.fullscreenElement),true);
+    });
+
+    await t.test('inventory Escape preserves fullscreen and the fullscreen button returns to windowed mode', async () => {
       await page.keyboard.press('e');
       const inventory = page.locator('dialog.creativeInventory');
       await inventory.waitFor({state:'visible'});
       await page.waitForFunction(() => !document.pointerLockElement);
+      const count=await page.evaluate(() => commands.length);
+      await inventory.evaluate(el => {el.tabIndex=-1;el.focus();});
+      await page.keyboard.press('Enter');
+      await page.keyboard.press('NumpadEnter');
+      assert.equal(await page.evaluate(() => commands.length),count,'fullscreen inventory must consume simulation shortcuts');
       await page.keyboard.press('Escape');
       await inventory.waitFor({state:'hidden'});
       await page.waitForFunction(() => document.pointerLockElement === document.querySelector('.viewportCanvas canvas'));
@@ -244,7 +302,7 @@ test('creative workbench supports fullscreen, nine slots and isolated E inventor
       assert.equal(await inventory.isVisible(), true);
       await search.fill('');
       await inventory.evaluate(el => {el.tabIndex=-1;el.focus();});
-      for (const key of ['Enter','f','Delete','1','Space','w']) await page.keyboard.press(key);
+      for (const key of ['Enter','NumpadEnter','f','Delete','1','Space','w']) await page.keyboard.press(key);
       assert.equal(await page.evaluate(() => commands.length), count);
       await mkdir(new URL('../testResults/',import.meta.url),{recursive:true});
       await page.screenshot({path:fileURLToPath(new URL('../testResults/creativeInventory.png',import.meta.url))});
