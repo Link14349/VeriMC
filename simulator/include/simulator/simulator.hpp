@@ -69,7 +69,7 @@ public:
     const BlockState& at(BlockPos p) const { return registry[world.get(p)]; }
     void setBlock(BlockPos pos, StateId state, unsigned flags = 3, int depth = 512);
     void place(BlockPos pos, StateId state);
-    void interact(BlockPos pos);
+    void interact(BlockPos pos, std::optional<Direction> playerFacing = std::nullopt);
     void stimulate(BlockPos pos, const Json& stimulus);
     int signal(BlockPos emitter, Direction direction, bool includeWire = true) const;
     int directSignal(BlockPos emitter, Direction direction, bool includeWire = true) const;
@@ -198,6 +198,7 @@ private:
     void executeNeighbor(BlockPos pos, StateId source = 0);
     void executeReactiveNeighbor(BlockPos pos, StateId state, StateId source);
     void executeShape(const Update& update);
+    bool supportChecked(StateId state, Direction direction) const;
     StateId shapeUpdated(BlockPos pos, StateId state, Direction direction, StateId neighborState);
     StateId updateFromNeighborShapes(BlockPos pos, StateId state);
     void executeTick(const ScheduledEvent& event);
@@ -247,7 +248,7 @@ private:
     void updateButton(BlockPos pos);
     void buttonContact(BlockPos pos);
     void updateDaylight(BlockPos pos);
-    bool interactDevice(BlockPos pos);
+    bool interactDevice(BlockPos pos, std::optional<Direction> playerFacing = std::nullopt);
     bool stimulateDevice(BlockPos pos, const Json& stimulus);
     void validateRuntime(BlockPos pos) const;
     struct InventorySlot { BlockPos pos; std::size_t index; };

@@ -64,6 +64,10 @@
 
 `ExportComposting` 在通常四路径参数之后，追加 `data/compostingRules.json` 的绝对输出路径，导出 115 种材料和 4,176 次隔离插入记录。`captureComposters.py` 增加第二十一组 GameTest，111 刻 / 26 点，验证临时输入/输出容器及失败抽取副作用，见 [堆肥桶说明](composters.md)。
 
+`fuzzRedstone.py --seed S --rounds N --output <新目录>` 生成随机小电路与随机输入历史，逐轮从原版捕获并对照；出现差异时先按格子隔离，再贪心删命令自动缩减到最小复现，报告保留坐标、种子与存活命令。`captureSupportDirection.py` 是它找到的前两个差异的固定回归：14 刻，覆盖各方块类各自检查支撑的方向，以及从背面开栅栏门时的朝向翻转（含一次不带 `playerFacing` 的交互）。`captureFenceGateInWall.py` 是第三个差异的回归：14 刻，覆盖 `IN_WALL` 只跟随垂直于朝向那条轴。墙本身仍未实现，只有栅栏门与普通方块进入 `watch`，该组因此不开刻内轨迹。
+
+`exportBlockTags.py` 从固定 JAR 的 `data/minecraft/tags/block/` 递归解析内置方块标签写入 `data/blockTags.json`：`Bootstrap.bootStrap()` 不加载数据包标签，`BlockTags.WALLS` 在注册表导出器里是空的，必须另走这条路径。
+
 `captureMachineMatrix.py` 增加准连接机器矩阵组：14 刻 / 88 点，同一台机器 22 份，覆盖四个 x 偏移 × 四个 z 偏移的位置相关桶序、活塞六个朝向与两种放置顺序，另逐条对照 31,740 条更新轨迹；实测捕获原点 x、z 均为负值。
 
 `captureUpdateTrace.py` 增加刻内更新轨迹组：14 刻 / 9 点，另逐条对照 3,327 条邻居/形状更新坐标。原版侧使用 `CollectingNeighborUpdater.setDebugListener` 这一公开钩子，不修改游戏代码；截断不判为通过。加 `--no-trace` 可用同一时间线复跑以验证跟踪不改变执行语义。详见 [刻内更新轨迹](redstoneAudit/updateTrace.md)。

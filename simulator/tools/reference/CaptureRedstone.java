@@ -94,13 +94,27 @@ public class CaptureRedstone extends TestFunctionLoader {
                     bell.attemptToRing(level,pos,direction);
                 }
                 else if (state.getBlock() instanceof ButtonBlock button) { if (!state.getValue(ButtonBlock.POWERED)) button.press(state, level, pos, null); }
-                else if (state.getBlock() instanceof NoteBlock || state.getBlock() instanceof DaylightDetectorBlock || state.getBlock() instanceof RedStoneWireBlock) {
+                else if (state.getBlock() instanceof NoteBlock || state.getBlock() instanceof DaylightDetectorBlock
+                    || state.getBlock() instanceof RedStoneWireBlock || state.getBlock() instanceof DiodeBlock
+                    || state.getBlock() instanceof TrapDoorBlock || state.getBlock() instanceof FenceGateBlock) {
                     var player=helper.makeMockPlayer(GameType.CREATIVE);
+                    // Fence gates flip their facing toward the player when opened from behind, so the
+                    // look direction has to be explicit. Without one, look along the gate's own facing,
+                    // which is exactly the case where vanilla does not flip.
+                    if (state.getBlock() instanceof FenceGateBlock) {
+                        var look = command.has("playerFacing") ? Direction.byName(command.get("playerFacing").getAsString())
+                            : state.getValue(FenceGateBlock.FACING);
+                        player.setYRot(look.toYRot());
+                    }
                     var hit=new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(pos),Direction.UP,pos,false);
                     var method=state.getBlock().getClass().getDeclaredMethod("useWithoutItem",BlockState.class,Level.class,BlockPos.class,Player.class,net.minecraft.world.phys.BlockHitResult.class);
                     method.setAccessible(true);method.invoke(state.getBlock(),state,level,pos,player,hit);
                 }
-                else throw new IllegalArgumentException("Unsupported reference interaction");
+                // Random generators cannot guarantee the target still exists; lenient mode makes
+                // that a no-op on both sides instead of aborting the capture. Any real behaviour
+                // difference still shows up as a state difference.
+                else if (!scenario.has("lenientInteract") || !scenario.get("lenientInteract").getAsBoolean())
+                    throw new IllegalArgumentException("Unsupported reference interaction");
                 return;
             }
             var input = command.getAsJsonObject("stimulus");

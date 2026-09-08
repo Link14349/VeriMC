@@ -3,6 +3,7 @@
 #include <fstream>
 #include <filesystem>
 #include <algorithm>
+#include <unordered_set>
 
 namespace simulator {
 namespace {
@@ -71,6 +72,12 @@ BlockRegistry::BlockRegistry(const std::string& path) {
         gameEventNames.emplace(row.at("name").get<std::string>(),static_cast<std::uint16_t>(gameEvents.size()));
         gameEvents.push_back({row.at("name"),row.at("radius"),row.at("frequency"),row.at("listenable"),row.at("ignoreSneaking")});
     }
+    std::ifstream tagFile(std::filesystem::path(path).parent_path() / "blockTags.json");
+    if (!tagFile) throw std::runtime_error("找不到方块标签 blockTags.json");
+    const auto tagData = Json::parse(tagFile);
+    if (tagData.at("version") != "26.2") throw std::runtime_error("Block tag registry version mismatch");
+    std::unordered_set<std::string> wallNames;
+    for (const auto& name : tagData.at("walls")) wallNames.insert(name.get<std::string>());
     const Json data = Json::parse(file);
     std::ifstream noteFile(std::filesystem::path(path).parent_path()/"noteRules.json");
     if(!noteFile)throw std::runtime_error("找不到音符盒规则 noteRules.json");
@@ -84,6 +91,7 @@ BlockRegistry::BlockRegistry(const std::string& path) {
         typeInfo.name = b.at("name"); typeInfo.className = b.at("className");
         typeInfo.defaultState = b.at("defaultState"); typeInfo.firstState = b.at("states")[0].at("id");
         typeInfo.stairs = b.at("stairs");
+        typeInfo.wall = wallNames.contains(typeInfo.name);
         typeInfo.device = classify(typeInfo.name, typeInfo.className);
         typeInfo.instrument=instrumentId(noteData.at("blocks").at(typeInfo.name));
         for(const auto& name:vibrationData.at("occludes_vibration_signals")) if(name==typeInfo.name) typeInfo.occludesVibrations=true;

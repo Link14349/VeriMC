@@ -192,7 +192,7 @@ int main() {
         try { restored.loadProject(invalid); } catch (...) { threw = true; }
         expect(threw && before == restored.saveProject("before", true), "invalid batch import changed world");
     });
-    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers", "java26_2Hoppers", "java26_2Torches", "java26_2Rails", "java26_2TickBatches", "java26_2Tripwire", "java26_2Buttons", "java26_2Droppers", "java26_2Targets", "java26_2CopperChests", "java26_2Bookshelves", "java26_2Pots", "java26_2Vibrations", "java26_2DeviceVibrations", "java26_2Notes", "java26_2Bells", "java26_2Jukeboxes", "java26_2JukeboxHoppers", "java26_2Composters", "java26_2WireGeometry", "java26_2PistonPushability", "java26_2DaylightVibration", "java26_2StairShapes", "java26_2RailNotificationSource", "java26_2PistonRemovalCallback", "java26_2DiodeSupportBreak", "java26_2ObserverRemoval", "java26_2PistonLandingShape", "java26_2WireShapeToggle", "java26_2RemovalNotifySource", "java26_2RepeaterLockRefresh", "java26_2ItemFrameComparator", "java26_2UpdateTrace", "java26_2MachineMatrix"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
+    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers", "java26_2Hoppers", "java26_2Torches", "java26_2Rails", "java26_2TickBatches", "java26_2Tripwire", "java26_2Buttons", "java26_2Droppers", "java26_2Targets", "java26_2CopperChests", "java26_2Bookshelves", "java26_2Pots", "java26_2Vibrations", "java26_2DeviceVibrations", "java26_2Notes", "java26_2Bells", "java26_2Jukeboxes", "java26_2JukeboxHoppers", "java26_2Composters", "java26_2WireGeometry", "java26_2PistonPushability", "java26_2DaylightVibration", "java26_2StairShapes", "java26_2RailNotificationSource", "java26_2PistonRemovalCallback", "java26_2DiodeSupportBreak", "java26_2ObserverRemoval", "java26_2PistonLandingShape", "java26_2WireShapeToggle", "java26_2RemovalNotifySource", "java26_2RepeaterLockRefresh", "java26_2ItemFrameComparator", "java26_2UpdateTrace", "java26_2MachineMatrix", "java26_2SupportDirection", "java26_2FenceGateInWall"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
         std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/../tests/fixtures/" + fixtureName + ".json"); expect(static_cast<bool>(file), "missing vanilla reference fixture");
         auto fixture = Json::parse(file); auto origin = fixture["origin"].get<BlockPos>(); Simulator s(r);
         const bool tracing = fixture.contains("updateTrace");
@@ -204,7 +204,12 @@ int main() {
                 auto p = absolute(command["pos"]);
                 if (command.contains("placedBy") || command.contains("playerPlace")) s.place(p, command["stateId"]);
                 else if (command.contains("stateId")) s.setBlock(p, command["stateId"]);
-                else if (command.contains("interact")) s.interact(p);
+                else if (command.contains("interact")) {
+                    std::optional<Direction> facing;
+                    if (command.contains("playerFacing")) facing = parseDirection(command["playerFacing"]);
+                    if (fixture.value("lenientInteract", false)) { try { s.interact(p, facing); } catch (const std::invalid_argument&) {} }
+                    else s.interact(p, facing);
+                }
                 else s.stimulate(p, command["stimulus"]);
             }
             for (std::size_t i = 0; i < fixture["watch"].size(); ++i) {
@@ -658,6 +663,25 @@ int main() {
     test("invalid project import leaves current world intact", [&] { Simulator s(r); s.place({0, 0, 0}, r.state("stone")); auto before = s.saveProject("test", true); auto bad = before; bad["blocks"][0]["name"] = "minecraft:not_a_block"; bool threw = false; try { s.loadProject(bad); } catch (...) { threw = true; } expect(threw && before == s.saveProject("test", true), "load not atomic"); });
     test("piston motion checkpoint continues across event phases", [&] { Simulator s(r); s.place({0,0,0},r.state("sticky_piston",{{"facing","east"}})); s.place({1,0,0},r.state("stone")); s.place({-1,0,0},r.state("redstone_block")); s.advanceTo(1); expect(s.at({2,0,0}).device == Device::movingPiston, "missing moving block"); auto snapshot=s.saveProject("moving",true); Simulator restored(r); restored.loadProject(snapshot); s.advanceTo(4); restored.advanceTo(4); expect(s.saveProject("moving",true)==restored.saveProject("moving",true),"motion checkpoint diverged"); expect(s.at({2,0,0}).device==Device::solid,"push failed"); s.setBlock({-1,0,0},0); s.advanceTo(8); expect(s.world.get({1,0,0})==r.state("stone") && s.world.get({2,0,0})==0,"sticky pull failed"); });
     test("update budget abort cannot resume after discarding updates", [&] { Simulator s(r); s.world.set({1,-1,0},r.state("stone")); s.place({1,0,0},r.state("redstone_wire")); auto before = s.clone(); s.updateBudget=1; bool threw=false; try { s.place({0,0,0},r.state("redstone_block")); } catch (...) { threw=true; } expect(threw&&s.faulted,"budget did not abort"); s.breakRequested=false; threw=false; try { s.advanceTo(1); } catch (...) { threw=true; } expect(threw,"faulted run resumed"); s.restore(*before); expect(!s.faulted&&s.world.size()==before->world.size(),"snapshot failed to recover"); });
+    test("fence gate IN_WALL follows the perpendicular axis only", [&] {
+        // 原版 FenceGateBlock.updateShape 只在 FACING.getClockWise() 那条轴上重算 IN_WALL；
+        // 放置时按同一条轴两侧是否是墙取值，朝向轴上的形状更新完全不动它。
+        Simulator s(r);
+        s.place({0, 0, 0}, r.state("oak_fence_gate", {{"facing", "north"}}));
+        expect(r.property(s.world.get({0, 0, 0}), "in_wall") == "false", "bare gate should not be in a wall");
+        s.setBlock({1, 0, 0}, r.state("cobblestone_wall"));
+        expect(r.property(s.world.get({0, 0, 0}), "in_wall") == "true", "perpendicular wall did not set IN_WALL");
+        s.setBlock({0, 0, -1}, r.state("white_wool"));
+        expect(r.property(s.world.get({0, 0, 0}), "in_wall") == "true", "facing-axis update must not clear IN_WALL");
+        s.setBlock({1, 0, 0}, 0);
+        expect(r.property(s.world.get({0, 0, 0}), "in_wall") == "false", "removing the wall did not clear IN_WALL");
+        s.place({0, 0, 4}, r.state("oak_fence_gate", {{"facing", "north"}}));
+        s.setBlock({0, 0, 5}, r.state("cobblestone_wall"));
+        expect(r.property(s.world.get({0, 0, 4}), "in_wall") == "false", "wall on the facing axis must be ignored");
+        s.world.set({1, 0, 8}, r.state("cobblestone_wall"));
+        s.place({0, 0, 8}, r.state("oak_fence_gate", {{"facing", "north"}}));
+        expect(r.property(s.world.get({0, 0, 8}), "in_wall") == "true", "placement did not read the perpendicular walls");
+    });
     test("26.2 redstone capability coverage gate", [&] {
         // Every block whose 26.2 class actually overrides a redstone-relevant callback, or that
         // emits a signal or analog output, must be either explicitly supported here or refused.

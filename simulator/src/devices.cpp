@@ -165,13 +165,18 @@ void Simulator::updateDaylight(BlockPos pos) {
     // A new stimulus invalidates this shortcut and schedules the next boundary.
 }
 
-bool Simulator::interactDevice(BlockPos pos) {
+bool Simulator::interactDevice(BlockPos pos, std::optional<Direction> playerFacing) {
     auto id = world.get(pos);
     const auto& state = registry[id];
     const auto& name = registry.type(id).name;
     if (state.device == Device::door || state.device == Device::trapdoor || state.device == Device::fenceGate) {
         if (name == "minecraft:iron_door" || name == "minecraft:iron_trapdoor") throw std::invalid_argument("铁门和铁活板门需要红石信号驱动");
-        setBlock(pos, registry.withBool(id, "open", registry.property(id, "open") != "true"), state.device == Device::trapdoor ? 2 : 10);
+        const bool opening = registry.property(id, "open") != "true";
+        auto next = registry.withBool(id, "open", opening);
+        // 原版 FenceGateBlock：从背面打开时会把朝向翻到玩家的朝向。没有给玩家朝向时不翻转。
+        if (opening && state.device == Device::fenceGate && playerFacing && state.facing == opposite(*playerFacing))
+            next = registry.withBool(registry.with(id, "facing", std::string(directionNames[static_cast<unsigned>(*playerFacing)])), "open", true);
+        setBlock(pos, next, state.device == Device::trapdoor ? 2 : 10);
         (void)worldRandom.nextFloat();emitGameEvent(registry.property(id,"open")=="true"?"block_close":"block_open",pos);
         return true;
     }

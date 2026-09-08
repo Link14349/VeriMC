@@ -229,6 +229,11 @@ void Simulator::place(BlockPos p, StateId id) {
     if ((registry[id].device == Device::trapdoor || registry[id].device == Device::fenceGate) && at(p).type != registry[id].type) {
         bool powered = bestSignal(p) > 0;
         id = registry.withBool(registry.withBool(id, "powered", powered), "open", powered);
+        // 原版 FenceGateBlock.getStateForPlacement 按垂直于朝向的两侧是否是墙决定 IN_WALL。
+        if (registry[id].device == Device::fenceGate) {
+            const auto side = clockWise(registry[id].facing);
+            id = registry.withBool(id, "in_wall", registry.type(world.get(p.relative(side))).wall || registry.type(world.get(p.relative(opposite(side)))).wall);
+        }
     }
     // 原版 StairBlock.getStateForPlacement 在放置时就算出连接形状。
     if (registry.type(id).stairs) id = stairsShape(p, id);
@@ -382,6 +387,27 @@ void Simulator::indirectShapes(BlockPos p, StateId id, unsigned flags, int depth
 }
 // 原版 BlockBehaviour.updateShape 的纯状态形式：只返回新状态，副作用限于原版同样会做的排刻。
 // 钟和箱子带方块实体、不可被活塞移动，仍由 executeShape 用各自的辅助函数处理。
+// 支撑丢失并不是所有方向的形状更新都检查：26.2 每个方块类在 updateShape 里
+// 各自写死了检查哪一个方向。地毯是唯一没有方向条件的（CarpetBlock 直接判 canSurvive）。
+bool Simulator::supportChecked(StateId id, Direction direction) const {
+    const auto& s = registry[id];
+    switch (s.device) {
+    case Device::wire: case Device::repeater: case Device::comparator: case Device::torch:
+    case Device::pressurePlate: case Device::weightedPlate:
+        return direction == Direction::down;
+    case Device::wallTorch: case Device::pistonHead: case Device::tripwireHook:
+        return direction == opposite(s.facing);
+    case Device::lever: case Device::button:
+        return direction == opposite(s.connectedDirection);
+    case Device::door:
+        return registry.property(id, "half") == "lower" && direction == Direction::down;
+    case Device::solid:
+        return registry.type(id).className == "WoolCarpetBlock";
+    default:
+        // 钟由 updateBellShape 单独处理；其余器件的 survives 恒为真。
+        return false;
+    }
+}
 StateId Simulator::shapeUpdated(BlockPos p, StateId id, Direction direction, StateId neighborState) {
     const auto& s = registry[id];
     if (s.device == Device::noteBlock) return axis(direction) == 0 ? noteInstrument(p, id) : id;
@@ -395,7 +421,10 @@ StateId Simulator::shapeUpdated(BlockPos p, StateId id, Direction direction, Sta
     }
     // 原版只在水平方向的形状更新里重算楼梯 SHAPE，竖直方向落到基类的空实现。
     if (registry.type(id).stairs) return axis(direction) != 0 ? stairsShape(p, id) : id;
-    if (!survives(p, id)) return 0;
+    // 原版 FenceGateBlock：垂直于朝向的那条轴上的形状更新会重算 IN_WALL。
+    if (s.device == Device::fenceGate && axis(direction) == axis(clockWise(s.facing)))
+        return registry.withBool(id, "in_wall", registry.type(neighborState).wall || registry.type(world.get(p.relative(opposite(direction)))).wall);
+    if (supportChecked(id, direction) && !survives(p, id)) return 0;
     if (s.device == Device::observer && direction == s.facing && !s.powered && !blockTicks.hasScheduled(p, s.type)) schedule(p, 2, 0, s.type);
     // 原版只比较轴：Y 轴与水平朝向轴必然不同，因此竖直形状更新同样刷新 LOCKED。
     if (s.device == Device::repeater && axis(direction) != axis(s.facing)) return registry.withBool(id, "locked", diodeSideInput(p) > 0);
@@ -654,7 +683,7 @@ std::size_t Simulator::advance(Tick target, std::size_t eventBudget, std::chrono
     statistics.simulationMicros += static_cast<std::uint64_t>(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - start).count());
     return count;
 }
-void Simulator::interact(BlockPos p) {
+void Simulator::interact(BlockPos p, std::optional<Direction> playerFacing) {
     if (faulted) throw std::runtime_error("当前执行已中止，请从有效快照恢复");
     auto id = world.get(p); const auto& s = registry[id];
     switch (s.device) {
@@ -683,7 +712,7 @@ void Simulator::interact(BlockPos p) {
         }
         break;
     }
-    default: if (!interactDevice(p)) throw std::invalid_argument("该器件没有直接点击操作；请编辑属性或使用环境刺激");
+    default: if (!interactDevice(p, playerFacing)) throw std::invalid_argument("该器件没有直接点击操作；请编辑属性或使用环境刺激");
     }
 }
 void Simulator::stimulate(BlockPos p, const Json& input) {

@@ -25,6 +25,7 @@ int main(int argc, char** argv) {
             const auto origin = fixture.at("origin").get<BlockPos>();
             Simulator simulation(registry);
             // 刻内更新轨迹：只有捕获里带轨迹时才开启，容量与原版侧一致。
+            const bool lenientInteract = fixture.value("lenientInteract", false);
             const bool tracing = fixture.contains("updateTrace");
             if (tracing) simulation.updateTraceLimit = fixture.at("updateTraceLimit").get<std::size_t>();
             auto absolute = [&](const Json& value) {
@@ -46,7 +47,13 @@ int main(int argc, char** argv) {
                     const auto pos = absolute(command.at("pos"));
                     if (command.contains("placedBy") || command.contains("playerPlace")) simulation.place(pos, command.at("stateId"));
                     else if (command.contains("stateId")) simulation.setBlock(pos, command.at("stateId"));
-                    else if (command.contains("interact")) simulation.interact(pos);
+                    else if (command.contains("interact")) {
+                        std::optional<Direction> facing;
+                        if (command.contains("playerFacing")) facing = parseDirection(command.at("playerFacing"));
+                        // 与捕获器的 lenientInteract 对应：目标已经不可交互时两侧都跳过。
+                        if (lenientInteract) { try { simulation.interact(pos, facing); } catch (const std::invalid_argument&) {} }
+                        else simulation.interact(pos, facing);
+                    }
                     else simulation.stimulate(pos, command.at("stimulus"));
                 }
                 for (std::size_t index = 0; index < fixture.at("watch").size(); ++index) {

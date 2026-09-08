@@ -9,6 +9,116 @@
 GameTest 功能开关 `minecraft:vanilla` + `minecraft:trade_rebalance`，`randomTickSpeed=0`，
 实验红石关闭。仍然不能称为严格 vanilla-only 专用服务器验证。
 
+## GameTest 功能开关与严格 vanilla-only 的差别（issue #14 第六条）
+
+**能证明的部分**：`GameTestServer.java:83-86` 的启用集合是
+`FeatureFlags.REGISTRY.allFlags().subtract(REDSTONE_EXPERIMENTS, MINECART_IMPROVEMENTS)`，
+所以与严格 vanilla-only 的差别只有 `trade_rebalance` 一个开关。
+对整棵反编译源码树检索 `FeatureFlags.TRADE_REBALANCE`，
+除 `FeatureFlags.java` 的定义外**只有一处**引用：`data/Main.java:156`，
+即数据生成器给内置数据包写描述用。它在世界、方块、实体、红石逻辑里**没有任何引用**。
+
+方块与物品受开关影响的唯一途径是 `isEnabled(enabledFeatures)` / `isItemEnabled(...)`
+所比较的 `requiredFeatures`；没有任何方块或物品把 `TRADE_REBALANCE` 列为必需特性
+（否则会出现第二处引用）。因此对方块与红石行为而言，
+当前 GameTest 环境与严格 vanilla-only **行为等价**。
+
+**仍然没有做的部分**：`GameTestServer.ENABLED_FEATURES` 是 `private static final`，
+无法在运行期改写；真正的“严格 vanilla-only 专用服务器复跑”需要另建一套不依赖 GameTest 的
+捕获链路（自建世界、自建数据包集合、自行驱动时间线）。本次**没有**做这件事，
+因此所有捕获仍然标注为 vanilla + trade_rebalance，不冒称严格 vanilla-only 专服验证。
+
+## 随机差分找到的新差异：支撑丢失的检查方向（issue #14 第三条）
+
+**发现方式**：新增的随机小电路差分器 `tools/reference/fuzzRedstone.py` 第一轮就报出差异，
+并把 1,162 条命令的一轮自动缩减到 **2 条命令**：
+
+```
+0 gt  (36,3,22)  lever[face=ceiling, facing=south]     ← 上方没有支撑
+0 gt  (36,3,23)  white_wool                            ← 南侧放一个方块
+```
+
+原版保留这盏拉杆；旧实现把它删掉了。第二轮又独立命中同一个根因（朝北的吸顶拉杆）。
+
+**根因**：`Simulator::shapeUpdated` 用一条通用的 `!survives(p, id) → 空气`，
+对**任何方向**的形状更新都检查支撑。原版把方向写死在每个方块类的 `updateShape` 里：
+
+| 方块类 | 检查的方向 |
+|---|---|
+| `FaceAttachedHorizontalDirectionalBlock`（拉杆、按钮） | `getConnectedDirection(state).getOpposite()` |
+| `BaseTorchBlock`、`DiodeBlock`、`BasePressurePlateBlock`、`RedStoneWireBlock`、`DoorBlock`（下半） | `DOWN` |
+| `WallTorchBlock`、`PistonHeadBlock`、`TripWireHookBlock` | `FACING.getOpposite()` |
+| `CarpetBlock` | **所有方向**（唯一没有方向条件的） |
+| `BaseRailBlock` | `updateShape` 不查，支撑由 `neighborChanged` 处理 |
+| 侦测器、讲台、标靶、阳光探测器、避雷针、音符盒、幽匿感测体 | `updateShape` 里没有支撑检查 |
+
+**改动**：新增 `Simulator::supportChecked(state, direction)` 按上表返回该方向是否检查支撑，
+`shapeUpdated` 改成 `supportChecked(...) && !survives(...)` 才移除。
+
+**原版证据**：新增 `tests/fixtures/java26_2SupportDirection.json`，脚本
+`tools/reference/captureSupportDirection.py`。12 组分别放一个**没有支撑**的方块，
+先从该类**不检查**的方向放一个方块再拿走（原版保留），
+最后从**检查**的方向先补支撑再撤掉（原版移除）。覆盖吸顶/落地/墙面拉杆、吸顶按钮、
+落地火把、中继器、压力板、红石粉、门下半、墙面火把、绊线钩，以及“所有方向都检查”的地毯。
+场景同时开启刻内更新轨迹（4,719 条）。fixture SHA-256
+`aee2bccd6f6d9876959f7ab74f3fe9a7a6442b7721eae954bf03d992a9474b2f`，
+原点 `[-6584818, -58, -11346017]`，15 帧 × 36 点。
+
+原版实测结果：吸顶/落地/墙面拉杆、吸顶按钮、落地火把、压力板、门下半、墙面火把、绊线钩
+在侧向放/拆方块时**全部保留**，直到第 11 gt 撤掉各自检查方向上的支撑才消失；
+地毯在侧向那一次就消失（它检查所有方向）；中继器在侧向那一次由
+`DiodeBlock.neighborChanged` 的断支撑分支移除（issue #6 已实现），两侧一致；
+红石粉在放置当刻就被自身的 `neighborChanged` 移除，两侧一致。
+
+反向验证：只还原 `supportChecked` 重新编译 → 2 gt、相对坐标 `[5,2,5]`，
+原版 `lever[face=ceiling]`（6790），旧实现空气。
+修复后两轮随机差分的完整场景（1,162 / 1,164 条命令，199 / 192 个观测点）也全部 `match`。
+`ctest` 3/3，核心检查 101/101；全量 **37 个场景重新从原版捕获**后全部 `match`。
+
+## 随机差分找到的第二个差异：栅栏门开门时的朝向翻转
+
+**发现方式**：随机差分器换一个种子后又报出差异：
+`oak_fence_gate` 在原版变成 `facing=south`，旧实现停在 `facing=north`。
+
+**根因**：原版 `FenceGateBlock.useWithoutItem` 在**打开**时，
+若 `state.getValue(FACING) == player.getDirection().getOpposite()`（玩家从背面开门），
+会把 `FACING` 翻到玩家的朝向再置 `OPEN=true`。C++ 的 `interactDevice` 只翻 `open`。
+
+**改动**：`Simulator::interact` / `interactDevice` 增加可选的 `playerFacing`；
+栅栏门在打开且给出玩家朝向、且自身朝向正好相反时按原版翻转。
+**不给玩家朝向时不翻转**——编辑器里没有玩家，这是明确的接口约定。
+捕获器对栅栏门相应地把模拟玩家的偏航角设为命令里的 `playerFacing`；
+命令没给时设为栅栏门自身的朝向，也就是原版恰好不翻转的那一档，两侧因此一致。
+
+**原版证据**：`captureSupportDirection.py` 增加四组栅栏门：
+背面开门（朝向翻转）、正面开门（不翻转）、两个不同轴的组合，
+以及一次**不带** `playerFacing` 的交互（两侧都不翻转）。
+
+## 随机差分找到的第三个差异：栅栏门的 `IN_WALL`
+
+**发现方式**：随机差分器第六轮在同一格上报出
+`oak_fence_gate` 原版 `in_wall=true`、旧实现 `in_wall=false`。
+
+**根因**：原版 `FenceGateBlock.updateShape` 在
+`directionToNeighbour.getAxis() == state.getValue(FACING).getClockWise().getAxis()` 时
+按该轴两侧是否属于 `BlockTags.WALLS` 重算 `IN_WALL`；
+`getStateForPlacement` 用同一条规则取初值。C++ 两处都缺，`IN_WALL` 只跟着写入的字面值走。
+
+**改动**：
+- `simulator/tools/reference/exportBlockTags.py`：`Bootstrap.bootStrap()` 不加载数据包标签，
+  `BlockTags.WALLS` 在注册表导出器里是空的，因此直接从固定 JAR 的
+  `data/minecraft/tags/block/walls.json` 递归解析，写进 `simulator/data/blockTags.json`（32 个墙）。
+- `BlockType::wall` 由该文件填充；`Simulator::place` 与 `shapeUpdated` 各加一条按垂直轴取值的分支。
+
+**原版证据**：新增 `java26_2FenceGateInWall`，两组栅栏门分别写入 `in_wall=true` / `false` 的陈旧值，
+在垂直轴上放墙再撤墙、在朝向轴上放普通方块。**回退验证**：注释掉 `shapeUpdated` 的分支后，
+该 fixture 在 `[14,2,6]` 报 `in_wall` 期望 `true` 实得 `false`。
+
+**边界**：墙本身仍是未实现器件，只有栅栏门与普通方块进入 `watch`，
+墙自己的 `west/east/...` 连接状态**不比对**；也因此该 fixture 不开刻内轨迹
+（原版会为墙自身的形状变化多发一批更新，那属于未实现范围而不是差异）。
+`captureSupportDirection` 保持开轨迹，两者分开捕获。
+
 ## 未实现器件的覆盖清单与占位门禁（issue #13）已建立
 
 **交付**：

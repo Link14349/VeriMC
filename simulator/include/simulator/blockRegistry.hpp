@@ -19,6 +19,8 @@ struct BlockType {
     bool occludesVibrations{}, dampensVibrations{}, vibrationResonator{};
     // 原版 StairBlock.isStairs 的判据：block instanceof StairBlock，由注册表导出。
     bool stairs{};
+    // 原版 BlockTags.WALLS，栅栏门的 IN_WALL 判据。
+    bool wall{};
     std::uint8_t instrument{};
 };
 // A power-of-two stride avoids division by 40 in each checked vector lookup.
