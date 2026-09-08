@@ -243,19 +243,23 @@ export class CircuitViewport {
     this.handles.set(key, this.drawBlock(cell, def, this.getChunk(cell.pos),collisions));
     this.collisionWorld.set(key,collisions);
   }
-  // World and placement preview share the exact same simplified block geometry.
+  // World and placement preview share both visible geometry and player collision shapes.
   private drawBlock(cell: BlockCell, def: BlockDef, chunk: Chunk, collisions?: THREE.Box3[]): Handle[] {
     const name = shortName(def.name), p = def.properties, handles: Handle[] = [];
     const collidable = collisions && blocksPlayer(def.name,p);
+    const collisionHeight = name === 'repeater' || name === 'comparator' ? 1/8 : name === 'daylight_detector' ? 3/8
+      : name === 'sculk_sensor' || name === 'calibrated_sculk_sensor' ? 1/2 : undefined;
     let x = cell.pos[0] - chunk.group.position.x, y = cell.pos[1] - chunk.group.position.y, z = cell.pos[2] - chunk.group.position.z;
     const moving = (cell.motion & 1) !== 0, extending = (cell.motion & 2) !== 0, source = (cell.motion & 4) !== 0, progress = ((cell.motion >> 6) & 3) / 2;
     const motionDir = directionVectors[['down','up','north','south','west','east'][(cell.motion >> 3) & 7]] ?? [0,0,0];
     if (moving && !(source && !extending)) { const offset = extending ? progress - 1 : 1 - progress; x += motionDir[0] * offset; y += motionDir[1] * offset; z += motionDir[2] * offset; }
+    // Low devices collide only with their base; torches, rods, antennae and crystals remain selectable decorations.
+    if(collidable && collisionHeight!==undefined)collisions.push(new THREE.Box3(new THREE.Vector3(x,y,z),new THREE.Vector3(x+1,y+collisionHeight,z+1)).translate(chunk.group.position));
     const transform = new THREE.Matrix4();
     const part = (center: [number,number,number], size: [number,number,number], tint: number, shape: 'box'|'cylinder' = 'box', rotation: number | THREE.Quaternion = 0) => {
       if (typeof rotation === 'number') quaternion.setFromAxisAngle(vector.set(0,1,0), rotation); else quaternion.copy(rotation);
       transform.compose(vector.set(x + center[0], y + center[1], z + center[2]), quaternion, scaleVector.fromArray(size)); handles.push(chunk[shape].add(cell.pos, transform, tint));
-      if(collidable)collisions.push(new THREE.Box3(new THREE.Vector3(-.5,-.5,-.5),new THREE.Vector3(.5,.5,.5)).applyMatrix4(transform).translate(chunk.group.position));
+      if(collidable && collisionHeight===undefined)collisions.push(new THREE.Box3(new THREE.Vector3(-.5,-.5,-.5),new THREE.Vector3(.5,.5,.5)).applyMatrix4(transform).translate(chunk.group.position));
     };
     const surface = (key: string, center: THREE.Vector3, size: [number,number], rotation: THREE.Quaternion) => {
       const surfaces = chunk.surfaces ??= new Map<string, InstancePool>();

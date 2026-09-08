@@ -6,6 +6,18 @@ import { createRequire } from 'node:module';
 
 const { chromium } = createRequire(import.meta.url)('playwright');
 const base = process.env.VERIMC_TEST_URL ?? 'http://127.0.0.1:5179';
+const lowDevices = [
+  {stateId:14,name:'repeater',properties:{facing:'north',delay:'1',powered:'false',locked:'false'},height:1/8},
+  {stateId:15,name:'repeater',properties:{facing:'east',delay:'4',powered:'true',locked:'true'},height:1/8},
+  {stateId:16,name:'comparator',properties:{facing:'south',mode:'compare',powered:'false'},height:1/8},
+  {stateId:17,name:'comparator',properties:{facing:'west',mode:'subtract',powered:'true'},height:1/8},
+  {stateId:18,name:'daylight_detector',properties:{inverted:'false',power:'0'},height:3/8},
+  {stateId:19,name:'daylight_detector',properties:{inverted:'true',power:'15'},height:3/8},
+  {stateId:20,name:'sculk_sensor',properties:{sculk_sensor_phase:'inactive',power:'0'},height:1/2},
+  {stateId:21,name:'sculk_sensor',properties:{sculk_sensor_phase:'active',power:'15'},height:1/2},
+  {stateId:22,name:'calibrated_sculk_sensor',properties:{facing:'north',sculk_sensor_phase:'cooldown',power:'0'},height:1/2},
+  {stateId:23,name:'calibrated_sculk_sensor',properties:{facing:'east',sculk_sensor_phase:'active',power:'15'},height:1/2},
+];
 let browser;
 before(async () => {
   browser = await chromium.launch({ channel: process.env.VERIMC_BROWSER ?? 'chrome', headless: true });
@@ -76,6 +88,7 @@ test('first-person player volume collides with blocks while flying and building'
         [12,'oak_fence_gate',{facing:'north',open:'true'}],
         [13,'oak_fence_gate',{facing:'north',open:'false'}],
       ])connection.states.set(stateId,{stateId,name:'minecraft:'+name,properties});
+      for(const {stateId,name,properties} of ${JSON.stringify(lowDevices)})connection.states.set(stateId,{stateId,name:'minecraft:'+name,properties});
       connection.catalog=[{name:'minecraft:stone',defaultState:1,defaultProperties:{},device:2,properties:{},supportLevel:'implemented'}];
       window.view=new CircuitViewport(document.querySelector('#scene'));
       window.calls=[];
@@ -215,6 +228,80 @@ test('first-person player volume collides with blocks while flying and building'
       }
     });
 
+    await t.test('low devices support the player at their base height across states and chunk coordinates', async () => {
+      for(const {stateId,name,height} of lowDevices) {
+        await scene([cell([-17,2,16],stateId)],[-16.5,5,16.5],[-16.5,5,15]);
+        near((await move(['ShiftLeft'],10))[1],2+height+1.62,`${name} state ${stateId} base top plus eye height`);
+        assert.equal(await page.evaluate(() => view.movement.flying),false,'landing on a low base must exit flight');
+        await scene([cell([0,0,0],stateId)],[.02,3,.02],[.02,3,-1]);
+        near((await move(['ShiftLeft'],10))[1],height+1.62,`${name} base supports the cell corner`);
+      }
+    });
+
+    await t.test('low device torches, lock rods, antennae and crystals do not obstruct flight above their bases', async () => {
+      for(const {stateId,name,height} of lowDevices) {
+        const eye=height+.02+1.62;
+        await scene([cell([0,0,0],stateId)],[.5,eye,3],[.5,eye,0]);
+        const position=await move(['KeyW'],12);
+        near(position[2],3-10.89*.05*12,`${name} decorations do not shorten the flight path`);
+        near(position[1],eye,`${name} flight preserves altitude above the base`);
+        assert.equal(await page.evaluate(() => view.movement.flying),true,'passing decorations must preserve flight');
+      }
+    });
+
+    await t.test('low device collision bases follow piston motion across chunk boundaries', async () => {
+      const halfway=1|2|(5<<3)|(1<<6),finished=1|2|(5<<3)|(2<<6);
+      for(const stateId of [14,23]) {
+        await scene([cell([16,2,0],999,stateId,halfway)],[14,3.65,.5],[18,3.65,.5]);
+        near((await move(['ControlLeft','KeyW'],10))[0],15.2,'translated low base west face plus player clearance');
+        await update([cell([16,2,0],999,stateId,finished)]);
+        near((await move(['ControlLeft','KeyW'],10))[0],15.7,'updated low base replaces its previous translated shape');
+      }
+    });
+
+    await t.test('walking crosses a repeater base without Space or an automatic jump arc', async () => {
+      const floor=Array.from({length:15},(_,index)=>[0,0,index-10]);
+      await scene([...floor,cell([0,1,0],14)],[.5,2.615,3],[.5,2.615,0]);
+      await walking();
+      const result=await page.evaluate(() => {
+        movementModeChanges.length=0;
+        const samples=[];
+        for(let step=0;step<30;step++)samples.push(moveSteps(['KeyW'],1));
+        return {samples,flying:view.movement.flying,changes:movementModeChanges};
+      });
+      const heights=result.samples.map(position=>position[1]);
+      near(Math.max(...heights),1+1/8+1.62,'repeater is crossed at its base height without jumping');
+      assert.ok(result.samples.at(-1)[2]<-2,'forward input must carry the player past the repeater');
+      near(result.samples.at(-1)[1],2.615,'walking returns to the supporting floor');
+      assert.equal(result.flying,false,'stepping over a repeater remains walking');
+      assert.deepEqual(result.changes,[],'automatic stepping must not change movement mode');
+    });
+
+    await t.test('walking automatically jumps onto a block while Shift and a low ceiling suppress the jump', async () => {
+      const floor=Array.from({length:15},(_,index)=>[0,0,index-10]);
+      const platform=Array.from({length:9},(_,index)=>[0,1,-index]);
+      await scene([...floor,...platform],[.5,2.615,3],[.5,2.615,0]);
+      await walking();
+      const result=await page.evaluate(() => {
+        const samples=[];
+        for(let step=0;step<36;step++)samples.push(moveSteps(['KeyW'],1));
+        return {samples,flying:view.movement.flying};
+      });
+      assert.ok(Math.max(...result.samples.map(position=>position[1]))>3.8,'the player must jump above a one-block obstacle without Space');
+      assert.ok(result.samples.at(-1)[2]<-2,'forward input continues across the raised platform');
+      near(result.samples.at(-1)[1],3.615,'automatic jump lands on the raised platform');
+      assert.equal(result.flying,false,'automatic jumping must preserve walking mode');
+      for(const ceiling of [false,true]) {
+        const overhead=ceiling?Array.from({length:7},(_,index)=>[0,3,index-2]):[];
+        await scene([...floor,...platform,...overhead],[.5,2.615,3],[.5,2.615,0]);
+        await walking();
+        const stopped=await move(ceiling?['KeyW']:['KeyW','ShiftLeft'],30);
+        near(stopped[2],1.295,ceiling?'low ceiling prevents automatic jumping':'Shift suppresses automatic jumping');
+        near(stopped[1],2.615,'suppressed automatic jump keeps the player on the floor');
+        assert.equal(await page.evaluate(() => view.movement.flying),false,'suppressed jump remains walking');
+      }
+    });
+
     await t.test('door and fence gate state changes replace their collision geometry', async () => {
       for(const [closed,opened] of [[4,5],[13,12]]) {
         await scene([cell([0,0,0],closed)]);
@@ -288,6 +375,20 @@ test('first-person player volume collides with blocks while flying and building'
       await scene([[0,0,0]],[.5,3.7,3],[.5,1,.5]);
       await page.evaluate(() => view.creativeAction(2,false));
       assert.deepEqual(await page.evaluate(() => calls.map(({pos,tool})=>({pos,tool}))),[{pos:[0,1,0],tool:'place'}]);
+      await page.evaluate(() => view.setPlacement('minecraft:stone',{}));
+    });
+
+    await t.test('placing low devices only rejects overlap with their base, including different states', async () => {
+      for(const {name,properties,height} of lowDevices) {
+        for(const [clearance,allowed] of [[.02,true],[-.02,false]]) {
+          await scene([[0,0,0]],[.5,1+height+clearance+1.62,.5],[.5,.995,.5]);
+          await page.evaluate(({name,properties}) => view.setPlacement('minecraft:'+name,properties),{name,properties});
+          assert.deepEqual(await page.evaluate(() => view.locate(view.centerPointer(),'place')?.pos),[0,1,0]);
+          await page.evaluate(() => view.creativeAction(2,false));
+          assert.deepEqual(await page.evaluate(() => calls.map(({pos,tool})=>({pos,tool}))),
+            allowed?[{pos:[0,1,0],tool:'place'}]:[],`${name} placement checks its base instead of decorative geometry`);
+        }
+      }
       await page.evaluate(() => view.setPlacement('minecraft:stone',{}));
     });
 

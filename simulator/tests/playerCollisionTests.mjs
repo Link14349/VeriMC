@@ -184,3 +184,66 @@ test('jumping hits a low ceiling and falling lands without tunneling at the term
   near(eye.y,2.62);world.set('ceiling',[]);
   eye.y=200;advance(movement,world,eye,200,1/30);near(eye.y,2.62);
 });
+
+test('walking steps smoothly onto low devices and slabs without jumping or entering flight',()=>{
+  for(const height of [.125,.375,.5,.6]) {
+    const world=floorWorld(), movement=new PlayerMovement();movement.setCollisionEnabled(true);
+    world.set('low step',[box([1,1,-2],[10,1+height,2])]);
+    const eye=vec(0,2.62,0);
+    for(let frame=0;frame<60;frame++) {
+      advance(movement,world,eye,1,1/60,vec(1,0,0));
+      assert.ok(eye.y<=2.62+height+1e-6,'low steps do not cause a full jump');
+      assert.equal(world.intersects(eye),false);
+    }
+    near(eye.x,4.3);near(eye.y,2.62+height);assert.equal(movement.flying,false);
+  }
+});
+
+test('walking automatically jumps onto one-block obstacles in all horizontal directions',()=>{
+  for(const axis of ['x','z'])for(const sign of [-1,1]) {
+    const world=floorWorld(), movement=new PlayerMovement();movement.setCollisionEnabled(true);
+    const obstacle=box([-2,1,-2],[2,2,2]);obstacle.min[axis]=sign>0?1:-10;obstacle.max[axis]=sign>0?10:-1;
+    world.set('step',[obstacle]);const eye=vec(0,2.62,0), input=vec(0,0,0);input[axis]=sign;
+    let highest=eye.y;
+    for(let frame=0;frame<90;frame++) {
+      advance(movement,world,eye,1,1/60,input);highest=Math.max(highest,eye.y);
+      assert.equal(world.intersects(eye),false,'the jump arc cannot enter the obstacle');
+    }
+    assert.ok(eye[axis]*sign>3,'walking continues onto the raised platform');
+    near(eye.y,3.62);assert.ok(highest>3.7,'a full block uses a real jump arc');
+    assert.equal(movement.flying,false,'automatic jumps never toggle flight');
+  }
+});
+
+test('tall walls, blocked headroom and Shift suppress automatic jumping',()=>{
+  for(const kind of ['wall','ceiling','shift']) {
+    const world=floorWorld(), movement=new PlayerMovement();movement.setCollisionEnabled(true);
+    world.set('obstacle',[box([1,1,-2],[5,kind==='wall'?3:2,2])]);
+    if(kind==='ceiling')world.set('ceiling',[box([-2,2.9,-2],[5,4,2])]);
+    const eye=vec(0,2.62,0);
+    advance(movement,world,eye,120,1/60,vec(1,kind==='shift'?-1:0,0));
+    near(eye.x,.7);near(eye.y,2.62);assert.equal(movement.flying,false);
+  }
+});
+
+test('low steps also respect headroom and unsupported players cannot step or auto-jump in midair',()=>{
+  const world=floorWorld(), movement=new PlayerMovement();movement.setCollisionEnabled(true);
+  world.set('low step',[box([1,1,-2],[5,1.125,2])]);
+  world.set('ceiling',[box([-2,2.9,-2],[5,4,2])]);
+  const eye=vec(0,2.62,0);advance(movement,world,eye,60,1/60,vec(1,0,0));
+  near(eye.x,.7);near(eye.y,2.62);
+  world.set('ceiling',[]);world.set('low step',[box([1,1,-2],[5,2,2])]);
+  eye.set(.7,2.82,0);advance(movement,world,eye,6,1/60,vec(1,0,0));
+  assert.ok(eye.y<2.82&&eye.y>2.62,'airborne movement continues falling instead of starting another jump');
+  near(eye.x,.7);
+});
+
+test('automatic jumping leaves collision flight and no-collision movement unchanged',()=>{
+  const world=floorWorld();world.set('step',[box([1,1,-2],[5,2,2])]);
+  const movement=new PlayerMovement();movement.setCollisionEnabled(true);movement.setFlying(true);
+  const eye=vec(0,3,0);advance(movement,world,eye,60,1/60,vec(1,0,0));
+  near(eye.x,.7);near(eye.y,3);assert.equal(movement.flying,true);
+  movement.setCollisionEnabled(false);eye.set(0,2.62,0);
+  advance(movement,world,eye,30,1/60,vec(1,0,0));
+  assert.ok(eye.x>5);near(eye.y,2.62);
+});
