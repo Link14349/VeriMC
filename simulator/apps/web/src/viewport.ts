@@ -4,7 +4,7 @@ import { connection, type BlockCell, type BlockDef, type Pos, posKey } from './a
 import { shortName } from './blockLabels';
 import { DeviceTextures } from './deviceTextures';
 
-type Tool = 'select' | 'place' | 'erase' | 'probe' | 'interact';
+import type { Tool, PickAction } from './interactionState';
 type Handle = { pool: InstancePool; index: number };
 const box = new THREE.BoxGeometry(1, 1, 1);
 const cylinder = new THREE.CylinderGeometry(.5, .5, 1, 8);
@@ -82,7 +82,7 @@ export class CircuitViewport {
   private moveDelta = new THREE.Vector3();
   private selected: Pos | null = null;
   private lastFps = performance.now(); private frameCount = 0;
-  onPick: (pos: Pos, tool: Tool, additive: boolean) => void = () => {};
+  onPick: (pos: Pos, tool: PickAction, additive: boolean) => void = () => {};
   onHover: (pos: Pos | null) => void = () => {};
   onFps: (value: number) => void = () => {};
   constructor(readonly container: HTMLDivElement) {
@@ -460,7 +460,7 @@ export class CircuitViewport {
   select(pos: Pos | null) { this.selected = pos; this.selection.visible = !!pos && this.positionVisible(pos); if (pos) { this.selection.box.min.fromArray(pos).addScalar(-.007); this.selection.box.max.fromArray(pos).addScalar(1.007); } }
   fit() { const bounds = new THREE.Box3(); for (const cell of connection.cells.values()) bounds.expandByPoint(new THREE.Vector3(...cell.pos)); if (bounds.isEmpty()) bounds.set(new THREE.Vector3(-4,0,-4),new THREE.Vector3(4,0,4)); const center = bounds.getCenter(new THREE.Vector3()), size = bounds.getSize(new THREE.Vector3()).length(); this.controls.target.copy(center); this.camera.position.copy(center).add(new THREE.Vector3(1,1.25,1.4).multiplyScalar(Math.max(size*.65,8))); }
   top() { this.camera.position.copy(this.controls.target).add(new THREE.Vector3(0,Math.max(this.camera.position.distanceTo(this.controls.target),15),.001)); }
-  private locate(event: { clientX: number; clientY: number }, tool: Tool = this.tool): Pos | null {
+  private locate(event: { clientX: number; clientY: number }, tool: PickAction = this.tool): Pos | null {
     const rect = this.renderer.domElement.getBoundingClientRect(); if (!rect.width || !rect.height) return null; this.camera.updateMatrixWorld(); this.scene.updateMatrixWorld(); this.pointer.set((event.clientX-rect.left)/rect.width*2-1,-(event.clientY-rect.top)/rect.height*2+1); this.raycaster.setFromCamera(this.pointer,this.camera);
     const meshes: THREE.Object3D[] = []; for (const chunk of this.chunks.values()) { meshes.push(chunk.box.mesh,chunk.cylinder.mesh); if (chunk.pick) meshes.push(chunk.pick.mesh); }
     for (const hit of this.raycaster.intersectObjects(meshes)) {

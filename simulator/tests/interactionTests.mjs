@@ -121,7 +121,7 @@ test('放置命令只发送合法的显式覆盖项', () => {
 
 test('R 只在放置工具生效，且不抢占 Ctrl/Alt 组合键', () => {
   assert.equal(resolveShortcut(key({ key: 'r', code: 'KeyR' }), context({ tool: 'select' })), null);
-  assert.equal(resolveShortcut(key({ key: 'r', code: 'KeyR' }), context({ tool: 'erase' })), null);
+  assert.equal(resolveShortcut(key({ key: 'r', code: 'KeyR' }), context({ tool: 'probe' })), null);
   assert.deepEqual(resolveShortcut(key({ key: 'r', code: 'KeyR' }), context({ tool: 'place' })), { result: { kind: 'rotate' }, preventDefault: true });
   assert.deepEqual(resolveShortcut(key({ key: 'R', code: 'KeyR', shiftKey: true }), context({ tool: 'place' })), { result: { kind: 'rotate' }, preventDefault: true });
   assert.equal(resolveShortcut(key({ key: 'r', code: 'KeyR', ctrlKey: true }), context({ tool: 'place' })), null, 'Ctrl+R 必须留给浏览器刷新');
@@ -178,7 +178,7 @@ test('斜杠聚焦搜索，输入控件内不再触发', () => {
 test('Esc 逐层退出：先关帮助，再关菜单，最后清理选择与提示', () => {
   const busy = reduce([
     { type: 'select', pos: [1, 2, 3], def: { stateId: 1, name: 'minecraft:lever', properties: {} } },
-    { type: 'setTool', tool: 'erase' },
+    { type: 'setTool', tool: 'probe' },
     { type: 'notify', kind: 'error', text: '内核响应超时' },
     { type: 'setSearch', value: '中继' },
     { type: 'setMenu', value: true },
@@ -251,7 +251,7 @@ test('断线时不能执行的命令被拒绝并给出原因', () => {
     assert.equal(decision.preventDefault, true);
   }
   // 纯本地操作断线时仍然可用。
-  assert.deepEqual(resolveShortcut(key({ key: '3' }), offline).result, { kind: 'setTool', tool: 'erase' });
+  assert.deepEqual(resolveShortcut(key({ key: '3' }), offline).result, { kind: 'setTool', tool: 'probe' });
   assert.deepEqual(resolveShortcut(key({ key: 'r', code: 'KeyR' }), context({ connected: false, tool: 'place' })).result, { kind: 'rotate' });
   assert.deepEqual(resolveShortcut(key({ key: 'c', ctrlKey: true }), offline).result, { kind: 'copy' });
   assert.deepEqual(resolveShortcut(key({ key: 'v', ctrlKey: true }), offline).result, { kind: 'paste' });
@@ -341,13 +341,13 @@ test('错误提示保留到显式关闭，普通提示可被替换', () => {
 });
 
 test('工具名称用中文显示，快捷键与工具一一对应', () => {
-  assert.deepEqual(interaction.toolOrder.map(t => t.key), ['1', '2', '3', '4', '5']);
-  assert.deepEqual(interaction.toolOrder.map(t => toolLabel(t.id)), ['选择', '放置', '移除', '探针', '操作']);
+  assert.deepEqual(interaction.toolOrder.map(t => t.key), ['1', '2', '3', '4']);
+  assert.deepEqual(interaction.toolOrder.map(t => toolLabel(t.id)), ['选择', '搭建', '探针', '操作']);
   for (const entry of interaction.toolOrder) {
     assert.deepEqual(resolveShortcut(key({ key: entry.key }), context()).result, { kind: 'setTool', tool: entry.id });
     assert.equal(reduce([{ type: 'setTool', tool: entry.id }]).tool, entry.id);
   }
-  assert.equal(toolLabel('place'), '放置');
+  assert.equal(toolLabel('place'), '搭建');
 });
 
 test('放置流程串联：选方块、改属性、旋转、发出的放置载荷', () => {
@@ -379,7 +379,7 @@ test('界面渲染：选中器件后从器件库选择另一个方块，检查�
   assert.match(shown, /放置属性/);
   assert.match(shown, /拉杆/);
   assert.doesNotMatch(shown, /器件检查/, '旧的选中器件必须清除');
-  assert.match(shown, /当前工具 · 放置 · 拉杆/, '当前工具需要有文字显示');
+  assert.match(shown, /当前工具 · 搭建 · 拉杆/, '当前工具需要有文字显示');
   // 附着面下拉必须选中 defaultState 的 wall，而不是枚举第一个值 ceiling。
   const face = switched.slice(switched.indexOf('附着面'), switched.indexOf('</select>', switched.indexOf('附着面')));
   assert.match(face, /<option value="wall" selected=""/, `附着面应选中 defaultState 的 wall：${face}`);
@@ -393,7 +393,7 @@ test('界面渲染：内核未提供 defaultState 时如实显示“默认”，
   assert.match(shape, /<option value="" selected="">默认（由内核决定）<\/option>/, `未知默认时应选中空值而不是第一个形状：${shape}`);
   assert.doesNotMatch(shape, /<option value="north_south" selected/);
   assert.match(textOf(html), /尚未收到器件默认属性/);
-  assert.match(textOf(html), /当前工具 · 放置 · 铁轨/);
+  assert.match(textOf(html), /当前工具 · 搭建 · 铁轨/);
 });
 
 test('界面渲染：器件库展示支持等级，空搜索结果给出明确提示', () => {
@@ -415,7 +415,7 @@ test('界面渲染：断线时命令按钮禁用，帮助弹窗使用原生 dial
   assert.match(html, /<fieldset class="offlineGuard[^"]*" disabled=""/, '子面板的表单控件在断线时应整体禁用');
   assert.match(html, /<dialog class="helpModal"/, '帮助弹窗使用原生 dialog 以获得焦点限制');
   assert.doesNotMatch(html, /open=""/, '帮助弹窗默认关闭');
-  assert.match(textOf(html), /当前工具 · 放置/);
+  assert.match(textOf(html), /当前工具 · 搭建/);
   assert.match(textOf(html), new RegExp(shortcutHint(isApplePlatform(typeof navigator === 'undefined' ? '' : navigator.platform, typeof navigator === 'undefined' ? '' : navigator.userAgent), 'S').replace(/\+/g, '\\+')));
 });
 

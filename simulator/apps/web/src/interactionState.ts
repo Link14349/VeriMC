@@ -2,13 +2,14 @@
 import type { BlockDef, CatalogItem, Pos } from './api';
 import { blockLabel, favorites, shortName } from './blockLabels';
 
-export type Tool = 'select' | 'place' | 'erase' | 'probe' | 'interact';
+export type Tool = 'select' | 'place' | 'probe' | 'interact';
+// 拆除是搭建工具的左键动作，不是单独的工具模式。
+export type PickAction = Tool | 'erase';
 export const toolOrder: { id: Tool; label: string; key: string }[] = [
   { id: 'select', label: '选择', key: '1' },
-  { id: 'place', label: '放置', key: '2' },
-  { id: 'erase', label: '移除', key: '3' },
-  { id: 'probe', label: '探针', key: '4' },
-  { id: 'interact', label: '操作', key: '5' },
+  { id: 'place', label: '搭建', key: '2' },
+  { id: 'probe', label: '探针', key: '3' },
+  { id: 'interact', label: '操作', key: '4' },
 ];
 export const toolLabel = (tool: Tool) => toolOrder.find(entry => entry.id === tool)?.label ?? tool;
 
@@ -279,7 +280,7 @@ export function resolveShortcut(event: ShortcutEvent, context: ShortcutContext):
   if (event.code === 'Enter' || event.code === 'NumpadEnter') return context.connected ? { result: { kind: 'command', command: context.running ? 'pause' : 'play' }, preventDefault: true } : unavailable();
   if (event.code === 'KeyF') return context.connected ? { result: { kind: 'command', command: 'step' }, preventDefault: true } : unavailable();
   if (event.key === '/') return { result: { kind: 'focusSearch' }, preventDefault: true };
-  // R 只在放置工具下调整待放置方块，不影响已选中的器件。
+  // R 只在搭建工具下调整待放置方块，不影响已选中的器件。
   if (event.key === 'r' || event.key === 'R') return context.tool === 'place' ? { result: { kind: 'rotate' }, preventDefault: true } : null;
   const picked = toolOrder.find(entry => entry.key === event.key);
   if (picked) return { result: { kind: 'setTool', tool: picked.id }, preventDefault: true };
@@ -291,7 +292,7 @@ export function resolveShortcut(event: ShortcutEvent, context: ShortcutContext):
 }
 
 // 视口拾取同样受连接状态约束：只有本地选中不需要内核。
-export function pickCommand(tool: Tool, connected: boolean): { command: string } | { blocked: string } | null {
+export function pickCommand(tool: PickAction, connected: boolean): { command: string } | { blocked: string } | null {
   if (tool === 'select') return null;
   if (!connected) return { blocked: offlineReason };
   if (tool === 'place') return { command: 'place' };
