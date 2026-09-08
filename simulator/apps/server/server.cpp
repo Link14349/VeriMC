@@ -37,6 +37,8 @@ struct Hub {
     std::uint32_t frameId{};
     std::uint64_t traceEpoch{};
     bool pendingFull{};
+    bool publishedRunning{};
+    std::string publishedPauseReason;
     std::string token, host;
     std::string projectName{"未命名电路"};
     BlockPos projectOrigin{};
@@ -108,7 +110,10 @@ public:
             if (ec) { self->alive = false; return; }
             int requestId = 0;
             try { auto message = Json::parse(beast::buffers_to_string(self->readBuffer.data())); requestId = message.value("requestId", 0); self->hub.command(self, message); }
-            catch (const std::exception& error) { self->hub.running = false; self->sendJson({{"type", "error"}, {"requestId", requestId}, {"message", error.what()}}); }
+            catch (const std::exception& error) {
+                self->hub.running = false; self->hub.sim.pauseReason = error.what();
+                self->sendJson({{"type", "error"}, {"requestId", requestId}, {"message", error.what()}});
+            }
             self->readBuffer.consume(self->readBuffer.size()); if (self->alive) self->read();
         });
     }
@@ -312,11 +317,22 @@ void Hub::publish(bool full) {
     std::vector<std::shared_ptr<Client>> active;
     for (const auto& weak : clients) if (auto c = weak.lock(); c && c->alive) active.push_back(c);
     protectTrace();
-    if (std::any_of(active.begin(), active.end(), [](const auto& c) { return c->awaitingAck; })) return;
+    if (std::any_of(active.begin(), active.end(), [](const auto& c) { return c->awaitingAck; })) {
+        // Control state must still reach healthy viewers when a scene/trace
+        // receiver stalls. Publish each transition once, without advancing
+        // frame cursors or repeatedly queuing status behind the slow receiver.
+        if (publishedRunning != running || publishedPauseReason != sim.pauseReason) {
+            const auto currentStatus = status();
+            for (auto& c : active) c->sendJson(currentStatus);
+            publishedRunning = running; publishedPauseReason = sim.pauseReason;
+        }
+        return;
+    }
     full = pendingFull; pendingFull = false;
     auto cells = full ? sim.world.cells() : sim.takeChanges();
     if (full) sim.takeChanges();
     for (auto& c : active) { c->frame(cells, full, ++frameId); c->sendJson(status()); }
+    publishedRunning = running; publishedPauseReason = sim.pauseReason;
     protectTrace();
 }
 void Hub::protectTrace() {
