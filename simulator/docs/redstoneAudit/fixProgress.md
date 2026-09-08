@@ -9,6 +9,41 @@
 GameTest 功能开关 `minecraft:vanilla` + `minecraft:trade_rebalance`，`randomTickSpeed=0`，
 实验红石关闭。仍然不能称为严格 vanilla-only 专用服务器验证。
 
+## 未实现器件的覆盖清单与占位门禁（issue #13）已建立
+
+**交付**：
+
+1. `tools/reference/ExportBlockCapabilities.java` 用反射记录固定版每个方块**实际重写**了哪些红石相关回调
+   （`neighborChanged`、`tick`、`triggerEvent`、`affectNeighborsAfterRemoval`、
+   `getSignal`/`getDirectSignal`/`ownSignal`、模拟量与信号源标志），
+   写入 `tests/fixtures/java26_2BlockCapabilities.json`。
+   纯形状/碰撞重写不计入，因为几乎所有连接类方块都有，且不带信号行为。
+   1,196 个方块里 **416 个**红石相关。
+2. `tools/exportSupportInventory.cpp`（CMake 目标 `exportSupportInventory`）从内核导出逐方块 `supportLevel`。
+3. `tools/buildSupportInventory.py` 把两者合成 [supportInventory.md](supportInventory.md)：
+   已开放的 62 组类 × 支持等级，以及 **243 个仍拒绝放置的红石相关方块**逐类逐名登记。
+4. **占位门禁**：`BlockRegistry` 现在在 `Device::dispenser` / `crafter` / `furnace`
+   的 `supportLevel` 不是 `unimplemented` 时直接抛出（R14 风险点）。
+5. **覆盖门禁测试** “26.2 redstone capability coverage gate”：
+   - 所有方块的 `supportLevel` 必须是四个已知值之一；
+   - 已开放的红石相关方块按「类=等级×数量」与显式期望表逐项相等，调色板一变就失败，
+     强制补实现与原版证据后再更新表；
+   - 243 个未实现的红石相关方块逐个调用 `place`，必须抛出且位置保持空气；
+   - 三个占位器件必须仍是 `unimplemented`。
+
+支持等级含义已写入清单：`implemented`（有实现且有原版差分）、`partial`（有实现但有明确缺口）、
+`externalStimulus`（需显式环境输入，不自动产生世界事件）、`unimplemented`（一律拒绝放置）。
+
+**明确排除的范围**：
+
+- 本单**没有**实现发射器分发表、合成器槽位禁用与时序、熔炉分面槽位、酿造台、潜影盒、Shelf、
+  幽匿尖啸体等；它们仍是拒绝放置，补支持要逐器件分单并带原版证据。
+- 蛋糕/插蜡烛蛋糕虽然被 `classify` 归入模拟量类，但 `supportLevel` 仍是 `unimplemented`，
+  清单里也在拒绝列表内，不能因为有分类就称已支持。
+- TNT 复制机、流体农场、矿车计算机、依赖完整生物 AI 的机器是用户已确定的排除项，单列不计入待实现。
+- “红石相关”的判据是回调重写与信号/模拟量标志，不代表这些方块在原版里都能被红石驱动；
+  清单是登记范围，不是行为断言。
+
 ## 比较器的物品展示框输入（issue #11）已实现
 
 **缺口**：`ComparatorBlock.getInputSignal` 在直接输入小于 15、第一格是导体时，会取

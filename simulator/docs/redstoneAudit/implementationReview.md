@@ -224,7 +224,7 @@ C++ 的 `executeNeighbor`（`src/simulator.cpp:385-395`）总是重新读 `world
 
 触发条件：从容器写入到比较器通知实际执行之间，比较器自身的状态被改写（例如同一批更新中比较器先被换朝向或被移除再放置）。这在常规电路中难以构造，需用原版差分确认是否可达。若可达，用户可见影响是比较器在极端同刻竞争下的排刻结果不同。
 
-### ☆R14 未实现器件在 `Device` 枚举与容量表中的占位耦合
+### ☆R14 未实现器件在 `Device` 枚举与容量表中的占位耦合（已加载入门禁与覆盖测试，见 [fixProgress.md](fixProgress.md) 与 [supportInventory.md](supportInventory.md)）
 `Device::dispenser` / `crafter` / `furnace` 已存在于枚举（`include/simulator/types.hpp:57`），`inventorySize` 已给出 9/9/3 槽（`src/containers.cpp:21-22`），`classify()` 也把 `DispenserBlock`/`CrafterBlock`/`AbstractFurnaceBlock` 映射过去（`src/blockRegistry.cpp:19-20`）。但 `supportLevel` 判据 `typeInfo.device <= Device::movingPiston`（`:92`）把它们留在 `unimplemented`，`Simulator::place`（`src/simulator.cpp:175`）会拒绝放置，因此当前安全。
 
 风险点：`stimulateDevice`（`src/devices.cpp:212`）对 `Device::dropper` 开放了库存输入，`transferItem`/`containerAnalog` 都会对这些 device 正常工作。一旦有人为了"能放置发射器"而把 supportLevel 改成 implemented，发射器的分发行为表、合成器的 `TRIGGERED`/`CRAFTING`/槽位禁用、熔炉的 `WorldlyContainer` 分面槽位都会静默按普通容器处理。建议：要么删掉占位容量，要么在 `place` 之外再加一道运行期断言。

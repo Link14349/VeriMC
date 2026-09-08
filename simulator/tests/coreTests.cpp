@@ -642,6 +642,57 @@ int main() {
     test("invalid project import leaves current world intact", [&] { Simulator s(r); s.place({0, 0, 0}, r.state("stone")); auto before = s.saveProject("test", true); auto bad = before; bad["blocks"][0]["name"] = "minecraft:not_a_block"; bool threw = false; try { s.loadProject(bad); } catch (...) { threw = true; } expect(threw && before == s.saveProject("test", true), "load not atomic"); });
     test("piston motion checkpoint continues across event phases", [&] { Simulator s(r); s.place({0,0,0},r.state("sticky_piston",{{"facing","east"}})); s.place({1,0,0},r.state("stone")); s.place({-1,0,0},r.state("redstone_block")); s.advanceTo(1); expect(s.at({2,0,0}).device == Device::movingPiston, "missing moving block"); auto snapshot=s.saveProject("moving",true); Simulator restored(r); restored.loadProject(snapshot); s.advanceTo(4); restored.advanceTo(4); expect(s.saveProject("moving",true)==restored.saveProject("moving",true),"motion checkpoint diverged"); expect(s.at({2,0,0}).device==Device::solid,"push failed"); s.setBlock({-1,0,0},0); s.advanceTo(8); expect(s.world.get({1,0,0})==r.state("stone") && s.world.get({2,0,0})==0,"sticky pull failed"); });
     test("update budget abort cannot resume after discarding updates", [&] { Simulator s(r); s.world.set({1,-1,0},r.state("stone")); s.place({1,0,0},r.state("redstone_wire")); auto before = s.clone(); s.updateBudget=1; bool threw=false; try { s.place({0,0,0},r.state("redstone_block")); } catch (...) { threw=true; } expect(threw&&s.faulted,"budget did not abort"); s.breakRequested=false; threw=false; try { s.advanceTo(1); } catch (...) { threw=true; } expect(threw,"faulted run resumed"); s.restore(*before); expect(!s.faulted&&s.world.size()==before->world.size(),"snapshot failed to recover"); });
+    test("26.2 redstone capability coverage gate", [&] {
+        // Every block whose 26.2 class actually overrides a redstone-relevant callback, or that
+        // emits a signal or analog output, must be either explicitly supported here or refused.
+        std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/../tests/fixtures/java26_2BlockCapabilities.json");
+        expect(static_cast<bool>(file), "missing vanilla block capability fixture");
+        auto fixture = Json::parse(file);
+        std::set<std::string> relevant;
+        for (const auto& row : fixture.at("blocks")) relevant.insert(row.at("name").get<std::string>());
+        expect(relevant.size() == fixture.at("blocks").size(), "duplicate capability rows");
+        std::map<std::string, int> placeable;
+        std::vector<std::string> refused;
+        for (std::size_t index = 0; index < r.typeCount(); ++index) {
+            const auto& type = r.blockType(static_cast<std::uint16_t>(index));
+            expect(type.supportLevel == "implemented" || type.supportLevel == "partial"
+                || type.supportLevel == "externalStimulus" || type.supportLevel == "unimplemented",
+                "unknown support level " + type.supportLevel + " for " + type.name);
+            if (type.device == Device::dispenser || type.device == Device::crafter || type.device == Device::furnace)
+                expect(type.supportLevel == "unimplemented", "placeholder device became placeable: " + type.name);
+            if (!relevant.contains(type.name)) continue;
+            if (type.supportLevel == "unimplemented") refused.push_back(type.name);
+            else ++placeable[type.className + "=" + type.supportLevel];
+        }
+        std::vector<std::string> actual;
+        for (const auto& [key, count] : placeable) actual.push_back(key + "x" + std::to_string(count));
+        const std::vector<std::string> expected{
+            "BarrelBlock=implementedx1", "BeehiveBlock=externalStimulusx2", "BellBlock=partialx1", "ButtonBlock=implementedx14",
+            "CalibratedSculkSensorBlock=partialx1", "CauldronBlock=externalStimulusx1", "ChestBlock=implementedx1", "ChiseledBookShelfBlock=partialx1",
+            "ComparatorBlock=implementedx1", "ComposterBlock=partialx1", "CopperBulbBlock=implementedx4", "CopperChestBlock=implementedx4",
+            "CopperGolemStatueBlock=externalStimulusx4", "DaylightDetectorBlock=externalStimulusx1", "DecoratedPotBlock=partialx1", "DetectorRailBlock=externalStimulusx1",
+            "DoorBlock=implementedx17", "DropperBlock=partialx1", "EndPortalFrameBlock=externalStimulusx1", "FenceGateBlock=implementedx12",
+            "HopperBlock=implementedx1", "JukeboxBlock=partialx1", "LavaCauldronBlock=externalStimulusx1", "LayeredCauldronBlock=externalStimulusx2",
+            "LecternBlock=externalStimulusx1", "LeverBlock=implementedx1", "LightningRodBlock=externalStimulusx4", "MovingPistonBlock=implementedx1",
+            "NoteBlock=partialx1", "ObserverBlock=implementedx1", "PiglinWallSkullBlock=partialx1", "PistonBaseBlock=implementedx2",
+            "PistonHeadBlock=implementedx1", "PlayerHeadBlock=partialx1", "PlayerWallHeadBlock=partialx1", "PoweredBlock=implementedx1",
+            "PoweredRailBlock=implementedx2", "PressurePlateBlock=externalStimulusx14", "RailBlock=implementedx1", "RedStoneWireBlock=implementedx1",
+            "RedstoneLampBlock=implementedx1", "RedstoneTorchBlock=implementedx1", "RedstoneWallTorchBlock=implementedx1", "RepeaterBlock=implementedx1",
+            "RespawnAnchorBlock=externalStimulusx1", "SculkSensorBlock=partialx1", "SkullBlock=partialx5", "TargetBlock=externalStimulusx1",
+            "TrapDoorBlock=implementedx17", "TrappedChestBlock=implementedx1", "TripWireBlock=externalStimulusx1", "TripWireHookBlock=implementedx1",
+            "WallSkullBlock=partialx4", "WeatheringCopperBulbBlock=implementedx4", "WeatheringCopperChestBlock=implementedx4", "WeatheringCopperDoorBlock=implementedx4",
+            "WeatheringCopperGolemStatueBlock=externalStimulusx4", "WeatheringCopperTrapDoorBlock=implementedx4", "WeatheringLightningRodBlock=externalStimulusx4", "WeightedPressurePlateBlock=externalStimulusx2",
+            "WitherSkullBlock=partialx1", "WitherWallSkullBlock=partialx1"};
+        expect(actual == expected, "redstone-relevant palette changed; update the inventory and add per-device evidence. actual="
+            + Json(actual).dump());
+        expect(refused.size() == 243, "refused redstone block count changed: " + std::to_string(refused.size()));
+        Simulator s(r); floor(s);
+        for (const auto& name : refused) {
+            bool threw = false;
+            try { s.place({0, 1, 0}, r.state(name)); } catch (...) { threw = true; }
+            expect(threw && s.world.get({0, 1, 0}) == 0, "unimplemented block was placed: " + name);
+        }
+    });
     test("item frame comparator input validation and checkpoint", [&] {
         Simulator s(r); floor(s);
         BlockPos comparator{0, 1, 0}, mount{1, 1, 0};

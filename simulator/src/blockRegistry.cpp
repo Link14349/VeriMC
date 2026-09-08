@@ -109,6 +109,11 @@ BlockRegistry::BlockRegistry(const std::string& path) {
         if (typeInfo.device == Device::detectorRail) typeInfo.supportLevel = "externalStimulus";
         if (typeInfo.device == Device::tripwire) typeInfo.supportLevel = "externalStimulus";
         if (typeInfo.device == Device::tripwireHook) typeInfo.supportLevel = "implemented";
+        // R14 门禁：发射器/合成器/熔炉只有占位枚举和容量，行为表尚未实现。
+        // 谁想放开 supportLevel，必须先实现分发表、槽位禁用和分面槽位，否则这里立刻失败。
+        if ((typeInfo.device == Device::dispenser || typeInfo.device == Device::crafter || typeInfo.device == Device::furnace)
+            && typeInfo.supportLevel != "unimplemented")
+            throw std::runtime_error("该器件的行为尚未实现，不能标记为可用：" + typeInfo.name);
         auto typeId = static_cast<std::uint16_t>(types.size());
         names.emplace(typeInfo.name, typeId);
         for (const auto& s : b.at("states")) for (const auto& [key, value] : s.at("properties").items()) {

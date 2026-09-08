@@ -20,7 +20,7 @@
 - [x] [hypotheses：[已结论] 核对锁定刷新、状态快照和日光数值边界](https://github.com/Zhen-WushuiLingchun/VeriMC/issues/10)
 - [x] [itemFrame：[已实现] 比较器缺少物品展示框输入](https://github.com/Zhen-WushuiLingchun/VeriMC/issues/11)
 - [ ] [entityIo：[未实现] 漏斗和投掷器缺少实体物品反馈链](https://github.com/Zhen-WushuiLingchun/VeriMC/issues/12)
-- [ ] [unsupported：[覆盖清单] 未实现器件与占位支持门禁](https://github.com/Zhen-WushuiLingchun/VeriMC/issues/13)
+- [x] [unsupported：[已建立清单与门禁] 未实现器件与占位支持门禁](https://github.com/Zhen-WushuiLingchun/VeriMC/issues/13)
 - [ ] [quirks：[特性保留] 刻内差分、零刻/BUD 与区块生命周期验证](https://github.com/Zhen-WushuiLingchun/VeriMC/issues/14)
 
 ## 特性保留要求

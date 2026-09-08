@@ -64,6 +64,8 @@
 
 `ExportComposting` 在通常四路径参数之后，追加 `data/compostingRules.json` 的绝对输出路径，导出 115 种材料和 4,176 次隔离插入记录。`captureComposters.py` 增加第二十一组 GameTest，111 刻 / 26 点，验证临时输入/输出容器及失败抽取副作用，见 [堆肥桶说明](composters.md)。
 
+`runReferenceTool.py ExportBlockCapabilities <绝对输出路径>` 用反射记录固定版每个方块实际重写的红石相关回调。构建 `exportSupportInventory` 目标导出内核逐方块支持等级，再运行 `python3 tools/buildSupportInventory.py <导出的 JSON>` 生成 [逐方块支持清单](redstoneAudit/supportInventory.md)。核心测试 “26.2 redstone capability coverage gate” 对已开放集合和 243 个仍拒绝放置的红石相关方块设门禁。
+
 `captureItemFrameComparator.py` 增加比较器展示框组：17 刻 / 12 点，覆盖旋转与物品开关、重复候选、朝向过滤、第一格导体要求、直接输入 15 短路，以及与第二格模拟量取较大者。捕获器直接生成真实 `ItemFrame` 实体；独立内核用受限实体输入表达，见 [环境输入](environmentInputs.md)。
 
 `runReferenceTool.py ExportSineTable <绝对输出路径>` 用反射导出原版 `Mth.SIN` 全部 65,536 项与 1,079 组日光临界角度；核心回归逐项比较 float 位模式，全部相同。`captureRepeaterLockRefresh.py` 增加中继器锁定刷新组：13 刻 / 7 点，覆盖竖直形状更新刷新 `LOCKED`、水平对照与真实锁定对照。
