@@ -9,6 +9,51 @@
 GameTest 功能开关 `minecraft:vanilla` + `minecraft:trade_rebalance`，`randomTickSpeed=0`，
 实验红石关闭。仍然不能称为严格 vanilla-only 专用服务器验证。
 
+## R2 活塞移动跳过移除回调（issue #5）已复现并修复
+
+**根因**：原版 `LevelChunk.setBlockState` 的条件是
+`(blockChanged || newBlock instanceof BaseRailBlock) && ((flags & 1) != 0 || movedByPiston)`，
+`movedByPiston` 只是**传给各方块自行决定**。C++ 用 `(flags & 64u) == 0` 把整条路径关掉。
+
+在 26.2 中，`affectNeighborsAfterRemoval` 里检查并跳过 `movedByPiston` 的只有：
+压力板、`BaseRailBlock`、按钮、`DiodeBlock`、拉杆、红石火把、红石粉、绊线、绊线钩。
+**侦测器、避雷针、讲台、容器、活塞头等不检查**，被活塞移动时照样发通知。
+
+**改动**：
+
+- `Simulator::onRemove` 增加 `movedByPiston` 参数，`setBlock` 改为原版条件并把 flag 64 传下去。
+- 上面那九类按原版加 `!movedByPiston` 守卫，其余不加。
+- **附带发现并修复**：`Simulator::onPlace` 缺少避雷针分支。原版
+  `LightningRodBlock.onPlace` 会给仍 `POWERED` 且没有计划刻的避雷针补排 8 gt 熄灭刻。
+  这个缺口是在构造本反例（把带电避雷针推走再落地）时由原版对照暴露出来的。
+
+**原版证据**：新增 `tests/fixtures/java26_2PistonRemovalCallback.json`
+（SHA-256 `77b17ea604a87dbda1b5377ebbff5c0f9cdcfd22eacbb061edca26fe0f446404`，
+原点 `[6032598, -58, 4825698]`，31 帧 × 14 点 = 434 次位置/帧观测），
+脚本 `tools/reference/capturePistonRemovalCallback.py`。两组对称布置：
+朝东的避雷针在 4 gt 被刺激供电，8 gt 被活塞向南推走；避雷针的
+`updateNeighbours` 通知的是它西侧一格的邻居集合，落在活塞自身通知集合之外，
+那里放了一个三向普通铁轨枢纽作为读取方。
+
+- 对照组：铁轨全程不供电，两次通知给出相同形状，两侧一致。
+- 实验组：6 gt 在铁轨上方放红石块（该放置的来源方块是空气，不触发 `updateState`），
+  于是只有 8 gt 移除时刻的那次通知能改变形状。原版 8 gt 得到 `north_west`，
+  旧实现停在 `south_west`。
+
+反向验证：只把 `setBlock` 的条件还原（保留避雷针 `onPlace`）→ 8 gt、`[6,2,20]` 报
+`south_west` vs `north_west`；只缺避雷针 `onPlace`（保留移除回调）→ 18 gt、`[8,2,9]` 报
+`powered=true` vs `powered=false`。两处改动各自都有独立反例。
+
+Release `ctest` 3/3，核心检查 90/90；`tests/fixtures/` 下全部 **27 个场景重新从原版捕获**后全部 `match`。
+
+**明确排除的范围**：
+
+- 只用避雷针复现。侦测器同样不检查 `movedByPiston`，但它的条件还牵涉
+  `hasScheduledTick`（R4 / issue #7），本次不动它的判定，也没有为侦测器建立反例。
+- 讲台、容器、活塞头等不检查 `movedByPiston` 的方块要么带方块实体不可推动，要么没有构造反例。
+- 九类加了守卫的方块没有逐个建立“加了守卫才正确”的反例；它们的守卫来自原版源码逐句核对，
+  并由全量 27 个场景的原版复跑保证没有回归。
+
 ## R1 邻居通知的来源方块（issue #4）已复现并修复
 
 **根因**：原版 `Level.updateNeighborsAt(pos, sourceBlock)` 把“发起更新的那个方块”传给所有被通知者。

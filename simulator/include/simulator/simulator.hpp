@@ -188,7 +188,7 @@ private:
     void executeShape(const Update& update);
     void executeTick(const ScheduledEvent& event);
     void onPlace(BlockPos pos, StateId state, StateId oldState);
-    void onRemove(BlockPos pos, StateId oldState);
+    void onRemove(BlockPos pos, StateId oldState, bool movedByPiston = false);
     bool survives(BlockPos pos, StateId state) const;
     void indirectShapes(BlockPos pos, StateId state, unsigned flags, int depth);
     void notifyFront(BlockPos pos, Direction facing);

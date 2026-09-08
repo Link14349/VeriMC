@@ -130,7 +130,8 @@ void Simulator::setBlock(BlockPos p, StateId id, unsigned flags, int depth) {
         }
         entityOrders.erase(p);
     }
-    if ((oldState.type != state.type || isRail(state.device)) && (flags & 1u) != 0 && (flags & 64u) == 0) onRemove(p, old);
+    // 原版在 movedByPiston 为真时仍然调用，由各方块自行决定是否跳过。
+    if ((oldState.type != state.type || isRail(state.device)) && ((flags & 1u) != 0 || (flags & 64u) != 0)) onRemove(p, old, (flags & 64u) != 0);
     if(oldState.type!=state.type && isSensor(state.device))startSensor(p);
     if(oldState.type!=state.type && state.device==Device::bell)registerEntity(p);
     if(oldState.type!=state.type && state.device==Device::jukebox)startJukebox(p);
@@ -221,6 +222,8 @@ void Simulator::onPlace(BlockPos p, StateId id, StateId old) {
     case Device::target: if (s.power && !hasScheduled(p)) setBlock(p, registry.with(id, "power", 0), 18); break;
     case Device::wire: updateWire(p, id); updateNeighbors(p.relative(Direction::up), -1, id); updateNeighbors(p.relative(Direction::down), -1, id); wireCorners(p); break;
     case Device::observer: if (s.powered && !hasScheduled(p)) { setBlock(p, registry.withBool(id, "powered", false), 18); notifyFront(p, s.facing); } break;
+    // 原版 LightningRodBlock.onPlace 会为仍处于供电状态的避雷针补排 8 gt 的熄灭刻。
+    case Device::lightningRod: if (s.powered && !hasScheduled(p)) schedule(p, 8); break;
     case Device::bulb: executeNeighbor(p); break;
     case Device::daylight: schedulePhase(p, currentTick + 20 - currentTick % 20, 2, 0); break;
     case Device::hopper: executeNeighbor(p); startHopper(p); break;
@@ -233,24 +236,26 @@ void Simulator::onPlace(BlockPos p, StateId id, StateId old) {
     default: break;
     }
 }
-void Simulator::onRemove(BlockPos p, StateId old) {
+void Simulator::onRemove(BlockPos p, StateId old, bool movedByPiston) {
     const auto& s = registry[old];
+    // 原版只有下列方块在 affectNeighborsAfterRemoval 里检查 movedByPiston 并跳过；
+    // 侦测器、避雷针、讲台、容器、活塞头等不检查，被活塞移动时同样发出通知。
     switch (s.device) {
     case Device::sculkSensor: case Device::calibratedSensor:
         if(registry.property(old,"sculk_sensor_phase")=="active") {updateNeighbors(p,-1,old);updateNeighbors(p.relative(Direction::down),-1,old);}break;
-    case Device::wire: for (auto d : directions) updateNeighbors(p.relative(d), -1, old); updateWire(p, old); wireCorners(p); break;
-    case Device::torch: case Device::wallTorch: for (auto d : directions) updateNeighbors(p.relative(d), -1, old); break;
-    case Device::lever: case Device::button: if (s.powered) notifyAttached(p, s.connectedDirection); break;
-    case Device::repeater: case Device::comparator: notifyFront(p, s.facing); break;
+    case Device::wire: if (movedByPiston) break; for (auto d : directions) updateNeighbors(p.relative(d), -1, old); updateWire(p, old); wireCorners(p); break;
+    case Device::torch: case Device::wallTorch: if (movedByPiston) break; for (auto d : directions) updateNeighbors(p.relative(d), -1, old); break;
+    case Device::lever: case Device::button: if (!movedByPiston && s.powered) notifyAttached(p, s.connectedDirection); break;
+    case Device::repeater: case Device::comparator: if (!movedByPiston) notifyFront(p, s.facing); break;
     case Device::observer: if (s.powered) notifyFront(p, s.facing); break;
-    case Device::pressurePlate: case Device::weightedPlate: if (s.powered || s.power > 0) { updateNeighbors(p, -1, old); updateNeighbors(p.relative(Direction::down), -1, old); } break;
+    case Device::pressurePlate: case Device::weightedPlate: if (!movedByPiston && (s.powered || s.power > 0)) { updateNeighbors(p, -1, old); updateNeighbors(p.relative(Direction::down), -1, old); } break;
     case Device::lightningRod: if (s.powered) updateNeighbors(p.relative(opposite(s.facing)), -1, old); break;
     case Device::lectern: if (s.powered) updateNeighbors(p.relative(Direction::down), -1, old); break;
     case Device::container: case Device::hopper: case Device::dropper: updateComparatorNeighbors(p); break;
     case Device::analog: if(isBookshelf(old) || isDecoratedPot(old)) updateComparatorNeighbors(p); break;
-    case Device::rail: case Device::poweredRail: case Device::activatorRail: case Device::detectorRail: removeRail(p, old); break;
-    case Device::tripwire: updateTripwireSource(p, registry.withBool(old, "powered", true)); break;
-    case Device::tripwireHook: removeTripwireHook(p, old); break;
+    case Device::rail: case Device::poweredRail: case Device::activatorRail: case Device::detectorRail: if (!movedByPiston) removeRail(p, old); break;
+    case Device::tripwire: if (!movedByPiston) updateTripwireSource(p, registry.withBool(old, "powered", true)); break;
+    case Device::tripwireHook: if (!movedByPiston) removeTripwireHook(p, old); break;
     case Device::pistonHead: { auto base = p.relative(opposite(s.facing)); if (at(base).device == Device::piston && at(base).extended && at(base).facing == s.facing) setBlock(base, 0); break; }
     default: break;
     }

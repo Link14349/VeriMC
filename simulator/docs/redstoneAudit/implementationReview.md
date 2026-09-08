@@ -39,7 +39,7 @@
 
 ---
 
-### ★R2 活塞移动路径完全跳过 `affectNeighborsAfterRemoval`
+### ★R2 活塞移动路径完全跳过 `affectNeighborsAfterRemoval`（已复现并修复，见 [fixProgress.md](fixProgress.md)）
 
 | | 位置 |
 | --- | --- |
