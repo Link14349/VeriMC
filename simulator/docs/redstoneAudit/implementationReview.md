@@ -81,7 +81,7 @@
 
 ---
 
-### ★R4 侦测器移除时缺少 `hasScheduledTick` 条件
+### ★R4 侦测器移除时缺少 `hasScheduledTick` 条件（已复现并修复，见 [fixProgress.md](fixProgress.md)）
 
 | | 位置 |
 | --- | --- |

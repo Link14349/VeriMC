@@ -9,6 +9,48 @@
 GameTest 功能开关 `minecraft:vanilla` + `minecraft:trade_rebalance`，`randomTickSpeed=0`，
 实验红石关闭。仍然不能称为严格 vanilla-only 专用服务器验证。
 
+## R4 侦测器移除缺少计划刻判断（issue #7）已复现并修复
+
+**根因**：原版 `ObserverBlock.affectNeighborsAfterRemoval` 的条件是
+`POWERED && level.getBlockTicks().hasScheduledTick(pos, this)`；C++ 只判断 `powered`。
+
+**改动**：`onRemove` 的侦测器分支改为
+`s.powered && blockTicks.hasScheduled(p, s.type)`。这里的 `s` 是**被移除的旧状态**，
+所以 `s.type` 是侦测器类型；`onRemove` 运行时世界上已经写入新方块，
+用 `Simulator::hasScheduled(p)`（按当前世界类型查询）是错的。
+
+**原版证据**：新增 `tests/fixtures/java26_2ObserverRemoval.json`
+（SHA-256 `fe86cd161a769c0165e45f9e58e7dd7c9bc1a33a90333bd0352ef3388b515d9b`，
+原点 `[7838934, -58, -398945]`，21 帧 × 11 点 = 231 次位置/帧观测），
+脚本 `tools/reference/captureObserverRemoval.py`。
+读取方是一个**准连接但从未被通知过的活塞**（对角位置放红石块，放置时不会通知活塞），
+它只有真的收到一次邻居通知才会伸出，因此可以直接检测“有没有发出这次通知”。
+
+| 组 | 布置 | 作用 |
+|---|---|---|
+| `stale` | 用同类型不同状态的 `setBlock` 把侦测器改成 `powered=true`（`onPlace` 因同方块提前返回，不会复位，也从没排过计划刻），再移除 | 原版**不**通知，活塞保持缩回；缺条件的实现会通知 |
+| `queued` | 正常触发的脉冲，探测器一开始就在 | 脉冲本身就会触发探测器，两侧一致 |
+| `lateDetector` | 正常触发的脉冲，探测器在脉冲**之后**才放置，随后在熄灭刻仍排队时移除 | 原版会通知，活塞伸出；按当前世界类型查询的实现不会通知 |
+| `replace` | 移除后立即在原位放一个新侦测器 | 排队中的计划刻按 (坐标, 方块类型) 保留，8 gt 时在新侦测器上触发一次完整脉冲 |
+
+反向验证（三种实现分别跑同一份原版捕获）：
+
+- 完全不判断计划刻 → 7 gt、`[8,2,8]`：`piston[extended=true]` vs `extended=false`。
+- 按当前世界类型查询（`hasScheduled(p)`）→ 8 gt、`[8,2,32]`：`extended=false` vs `extended=true`。
+- 按被移除的旧类型查询 → 全部 `match`。
+
+Release `ctest` 3/3，核心检查 92/92；`tests/fixtures/` 下全部 **29 个场景重新从原版捕获**后全部 `match`。
+
+**明确排除的范围**：
+
+- **“熄灭刻已收集进本刻批次但尚未执行”这一窗口没有复现**。要命中它，必须有东西在
+  方块计划刻阶段内、批次收集之后、侦测器自己的刻执行之前把侦测器移除。当前实现范围里
+  没有这种执行体：编辑器命令与活塞方块事件都在方块计划刻阶段之后，
+  红石更新也无法移除侦测器。因此本次用的是另一条同样满足
+  `POWERED && !hasScheduledTick` 的可达路径（同类型改状态造出的过时供电状态）。
+  该窗口的差异仍未证明可达，也未证伪。
+- 侦测器被活塞移动时同样会走这条分支（见 R2），但本次没有为“活塞移动 + 计划刻窗口”单独建反例。
+
 ## R3 二极管断支撑的处理阶段（issue #6）已复现并修复
 
 **根因**：原版 `DiodeBlock.neighborChanged` 在 `canSurvive` 失败时**当场**掉落并移除二极管，

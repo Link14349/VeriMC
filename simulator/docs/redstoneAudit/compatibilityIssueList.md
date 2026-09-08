@@ -14,7 +14,7 @@
 - [x] [R1：[已复现并修复] 邻居通知来源方块与原版不一致](https://github.com/Zhen-WushuiLingchun/VeriMC/issues/4)
 - [x] [R2：[已复现并修复] 活塞移动时全局跳过移除回调](https://github.com/Zhen-WushuiLingchun/VeriMC/issues/5)
 - [x] [R3：[已复现并修复] 中继器和比较器断支撑处理阶段不同](https://github.com/Zhen-WushuiLingchun/VeriMC/issues/6)
-- [ ] [R4：[静态差异·待复现] 侦测器移除缺少计划刻状态判断](https://github.com/Zhen-WushuiLingchun/VeriMC/issues/7)
+- [x] [R4：[已复现并修复] 侦测器移除缺少计划刻状态判断](https://github.com/Zhen-WushuiLingchun/VeriMC/issues/7)
 - [ ] [R8：[静态差异·待复现] 活塞落地未完整重算邻居形状](https://github.com/Zhen-WushuiLingchun/VeriMC/issues/8)
 - [ ] [R9：[静态差异·待复现] 粉线点/十字切换的额外邻居通知](https://github.com/Zhen-WushuiLingchun/VeriMC/issues/9)
 - [ ] [hypotheses：[验证任务] 核对锁定刷新、状态快照和日光数值边界](https://github.com/Zhen-WushuiLingchun/VeriMC/issues/10)

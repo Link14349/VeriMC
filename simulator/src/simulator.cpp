@@ -247,7 +247,8 @@ void Simulator::onRemove(BlockPos p, StateId old, bool movedByPiston) {
     case Device::torch: case Device::wallTorch: if (movedByPiston) break; for (auto d : directions) updateNeighbors(p.relative(d), -1, old); break;
     case Device::lever: case Device::button: if (!movedByPiston && s.powered) notifyAttached(p, s.connectedDirection); break;
     case Device::repeater: case Device::comparator: if (!movedByPiston) notifyFront(p, s.facing); break;
-    case Device::observer: if (s.powered) notifyFront(p, s.facing); break;
+    // 原版还要求 hasScheduledTick，且必须按被移除的旧类型查询：此时世界上已经是新方块。
+    case Device::observer: if (s.powered && blockTicks.hasScheduled(p, s.type)) notifyFront(p, s.facing); break;
     case Device::pressurePlate: case Device::weightedPlate: if (!movedByPiston && (s.powered || s.power > 0)) { updateNeighbors(p, -1, old); updateNeighbors(p.relative(Direction::down), -1, old); } break;
     case Device::lightningRod: if (s.powered) updateNeighbors(p.relative(opposite(s.facing)), -1, old); break;
     case Device::lectern: if (s.powered) updateNeighbors(p.relative(Direction::down), -1, old); break;
