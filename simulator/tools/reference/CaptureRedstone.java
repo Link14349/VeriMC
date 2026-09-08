@@ -65,11 +65,11 @@ public class CaptureRedstone extends TestFunctionLoader {
                     bell.attemptToRing(level,pos,direction);
                 }
                 else if (state.getBlock() instanceof ButtonBlock button) { if (!state.getValue(ButtonBlock.POWERED)) button.press(state, level, pos, null); }
-                else if (state.getBlock() instanceof NoteBlock note) {
+                else if (state.getBlock() instanceof NoteBlock || state.getBlock() instanceof DaylightDetectorBlock) {
                     var player=helper.makeMockPlayer(GameType.CREATIVE);
                     var hit=new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(pos),Direction.UP,pos,false);
-                    var method=NoteBlock.class.getDeclaredMethod("useWithoutItem",BlockState.class,Level.class,BlockPos.class,Player.class,net.minecraft.world.phys.BlockHitResult.class);
-                    method.setAccessible(true);method.invoke(note,state,level,pos,player,hit);
+                    var method=state.getBlock().getClass().getDeclaredMethod("useWithoutItem",BlockState.class,Level.class,BlockPos.class,Player.class,net.minecraft.world.phys.BlockHitResult.class);
+                    method.setAccessible(true);method.invoke(state.getBlock(),state,level,pos,player,hit);
                 }
                 else throw new IllegalArgumentException("Unsupported reference interaction");
                 return;
@@ -243,8 +243,21 @@ public class CaptureRedstone extends TestFunctionLoader {
         register.accept(ResourceKey.create(Registries.TEST_FUNCTION, Identifier.parse("simulator:capture")), CaptureRedstone::capture);
     }
     static void capture(GameTestHelper helper) {
+        // Match referenceVersion.json: natural random ticks are external to this
+        // loaded-region circuit model. Explicit randomTick stimuli still execute.
+        helper.getLevel().getGameRules().set(net.minecraft.world.level.gamerules.GameRules.RANDOM_TICK_SPEED, 0, helper.getLevel().getServer());
         JsonObject result = scenario.deepCopy();
         result.addProperty("reference", "Minecraft Java 26.2 GameTest, nonexperimental redstone");
+        // Record the actual harness environment, not just our intended profile.
+        // GameTest enables trade_rebalance even though redstone experiments are off.
+        JsonObject environment = new JsonObject();
+        environment.addProperty("javaVersion", System.getProperty("java.version"));
+        environment.addProperty("randomTickSpeed", helper.getLevel().getGameRules().get(net.minecraft.world.level.gamerules.GameRules.RANDOM_TICK_SPEED));
+        JsonArray featureFlags = new JsonArray();
+        net.minecraft.world.flag.FeatureFlags.REGISTRY.toNames(helper.getLevel().enabledFeatures()).stream()
+            .map(Object::toString).sorted().forEach(featureFlags::add);
+        environment.add("featureFlags", featureFlags);
+        result.add("referenceEnvironment", environment);
         result.add("origin", coordinates(helper.absolutePos(BlockPos.ZERO)));
         JsonArray frames = new JsonArray(); result.add("frames", frames);
         if(scenario.has("forceLoadedNeighborhood") && scenario.get("forceLoadedNeighborhood").getAsBoolean()) {

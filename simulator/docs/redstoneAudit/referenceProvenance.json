@@ -1,0 +1,118 @@
+{
+  "date": "2026-09-08",
+  "simulationCommit": "cc6b156723fb68fc0131def99013315f3ff3b455",
+  "referenceVersion": {
+    "edition": "java",
+    "version": "26.2",
+    "releaseTime": "2026-06-16T12:03:33+00:00",
+    "versionManifestUrl": "https://piston-meta.mojang.com/v1/packages/3592ebc61c6b6c33bb8228fe5a9e90221df0be68/26.2.json",
+    "versionManifestSha1": "3592ebc61c6b6c33bb8228fe5a9e90221df0be68",
+    "serverUrl": "https://piston-data.mojang.com/v1/objects/823e2250d24b3ddac457a60c92a6a941943fcd6a/server.jar",
+    "serverSha1": "823e2250d24b3ddac457a60c92a6a941943fcd6a",
+    "serverBytes": 60894273,
+    "requiredJavaMajor": 25,
+    "defaultProfile": {
+      "experimentalRedstone": false,
+      "naturalRandomTicks": false,
+      "loadedRegionOnly": true
+    }
+  },
+  "artifacts": {
+    "version.json": {
+      "bytes": 51781,
+      "sha256": "f5ad473862b4adf3793acdafbff2a4d14774343fb79008cb9b1098ef08c3f376"
+    },
+    "server.jar": {
+      "bytes": 60894273,
+      "sha256": "cdacdfb25898de5e4b4b0e5ddcc2722f77067e46605709c2d886c000ebb63ec5"
+    },
+    "game.jar": {
+      "bytes": 24952681,
+      "sha256": "183c0499c5f855570ee487dd38e141a53f0121f83a0b07a3bac2d8b6698823e8"
+    },
+    "vineflower-1.12.0.jar": {
+      "bytes": 1633863,
+      "sha256": "1dfcfe974395734fa467ce620661c7623d05ba83670de0529b1fbd63ff548b9d"
+    }
+  },
+  "decompiler": {
+    "name": "Vineflower",
+    "version": "1.12.0",
+    "url": "https://repo.maven.apache.org/maven2/org/vineflower/vineflower/1.12.0/vineflower-1.12.0.jar",
+    "runtime": "Temurin 24 Windows",
+    "options": [
+      "--folder",
+      "--thread-count=4",
+      "--skip-extra-files=true"
+    ],
+    "javaFiles": 4849,
+    "warnings": [
+      "CarvingMask.lambda$new$0 processed twice"
+    ],
+    "meaning": "Decompiled readable reference; not original Mojang Java source files"
+  },
+  "referenceRuntime": {
+    "release": "jdk-25.0.4.1+1",
+    "url": "https://github.com/adoptium/temurin25-binaries/releases/download/jdk-25.0.4.1%2B1/OpenJDK25U-jdk_x64_linux_hotspot_25.0.4.1_1.tar.gz",
+    "sha256": "dbb698396d478e7fa2b1e50f4103324b2a99b90569ee27c33f2261f9215cf41e"
+  },
+  "delegatedIndex": {
+    "tool": "Claude CLI 2.1.263",
+    "model": "claude-opus-5",
+    "scope": "Static region map and implementation review only; root agent executes differential tests"
+  },
+  "coreSourceSha256": {
+    "world/level/SignalGetter.java": "2582877d68b03e28c1fe1368ab48810ec84bb5ea983701596475a92334c4b9ed",
+    "world/level/redstone/DefaultRedstoneWireEvaluator.java": "1a5549eca4749d319644667f6412196ea1bf539166ab9dad1bd166e1c28936db",
+    "world/level/redstone/RedstoneWireEvaluator.java": "8f7a550f60daf1f51d3d0fbf2030153a7b26094a0b0911e005bc047432ddddee",
+    "world/level/redstone/CollectingNeighborUpdater.java": "67fada06d592305eac9c4ac188be922e2e4f44c6b64ba7a82c824c89b58d62eb",
+    "world/level/redstone/NeighborUpdater.java": "670d544e898b86c200f3cac91a6b1636d356771509fec140803ed8bbc51cc509",
+    "world/level/block/RedStoneWireBlock.java": "2c56087e76e3869cd4305b182b594d8636baec3ee7fa7e9a3dacbd058b72d0b4",
+    "world/level/block/DiodeBlock.java": "89530e339ba1df91a1b428ef3cd23ba32226a9e99913c51f7a75f7987e35fa8e",
+    "world/level/block/RepeaterBlock.java": "b0b75c00bb514fc305d0ac45770c9b7ace96ca2af53d4dc3de4c89090f426fce",
+    "world/level/block/ComparatorBlock.java": "d42af0ab0f8b2339a0863471bd9d6b716ae3e4aab0370fe1142fd679cbabc082",
+    "world/level/block/RedstoneTorchBlock.java": "ae863b4a22b5fb083fcc5436b3f5c113ef7ed9eeef3ab906a4951a7148c0f70f",
+    "world/level/block/ObserverBlock.java": "05404c695a6ba57982288dfba5b8ae63a4833ceaa2f7cd30ae1046c48c461f32",
+    "world/ticks/LevelTicks.java": "add9562544971e1bae3d3c83eb3fac3ed85cd74300736fa862dfa58f1488f690",
+    "world/ticks/LevelChunkTicks.java": "13225775710db803084da212174c889ea4a4dc2ad1988aa6c4833e615a5f95b2",
+    "world/ticks/ScheduledTick.java": "e4f21b7958287c9cf6ea736880014620dc6cbeeed63321d7a6529526a4e6265b",
+    "gametest/framework/GameTestServer.java": "7da93ed0be5073420729f8f12b221c5767b9c253eb12887dd1951d16cdec86ab"
+  },
+  "observedGameTestDefaults": {
+    "featureFlags": [
+      "minecraft:trade_rebalance",
+      "minecraft:vanilla"
+    ],
+    "randomTickSpeed": 3,
+    "evidence": "testResults/redstoneAudit/environmentValidation/java26_2Redstone/actual.json",
+    "limit": "This GameTest configuration is not identical to a dedicated server with vanilla-only feature flags."
+  },
+  "validatedCaptureProfile": {
+    "randomTickSpeed": 0,
+    "featureFlags": [
+      "minecraft:trade_rebalance",
+      "minecraft:vanilla"
+    ],
+    "evidence": "testResults/redstoneAudit/pinnedProfile/*/actual.json",
+    "scenarioCount": 21,
+    "additionalWireGeometryScenario": true
+  },
+  "innerGameIdentity": {
+    "id": "26.2",
+    "name": "26.2",
+    "world_version": 4903,
+    "series_id": "main",
+    "protocol_version": 776,
+    "pack_version": {
+      "resource_major": 88,
+      "resource_minor": 0,
+      "data_major": 107,
+      "data_minor": 1
+    },
+    "build_time": "2026-06-16T12:01:27+00:00",
+    "java_component": "java-runtime-epsilon",
+    "java_version": 25,
+    "stable": true,
+    "use_editor": false
+  }
+}

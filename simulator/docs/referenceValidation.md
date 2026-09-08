@@ -2,6 +2,8 @@
 
 参考版本固定为 Java Edition 26.2 正式版，非实验性红石。官方版本清单、服务端下载地址和 SHA-1 记录于 `data/referenceVersion.json`；原版 DataVersion 为 4903。
 
+2026-09-08 的源码区域索引、逐项核对、新鲜原版对照和环境限制见 [红石审计报告](redstoneAudit/auditReport.md)。新增 `auditReference.py --output <新目录> --checker <checkReference>` 可在不覆盖既有 fixture 的情况下复跑。参考捕获器现显式关闭自然随机刻，并记录实际功能开关；官方 GameTest 的 `trade_rebalance` 开关仍开启，不能称为严格 vanilla-only 专用服务器验证。
+
 ## 可重现流程
 
 1. 安装 Java 25 或更高版本。
