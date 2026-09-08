@@ -128,7 +128,10 @@ bool Simulator::interactDevice(BlockPos pos) {
         return true;
     }
     if (state.device == Device::daylight) {
-        setBlock(pos, registry.withBool(id, "inverted", registry.property(id, "inverted") != "true"), 2);
+        auto inverted = registry.withBool(id, "inverted", registry.property(id, "inverted") != "true");
+        setBlock(pos, inverted, 2);
+        // 原版在写入新状态后、刷新强度前发出 BLOCK_CHANGE，上下文携带新状态。
+        emitGameEvent("block_change", pos, {false, false, false, inverted});
         updateDaylight(pos);
         return true;
     }

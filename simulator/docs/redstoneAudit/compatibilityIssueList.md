@@ -8,7 +8,7 @@
 
 ## 任务
 
-- [ ] [R6：[已复现] 日光传感器切换漏发振动事件](https://github.com/Zhen-WushuiLingchun/VeriMC/issues/1)
+- [x] [R6：[已修复] 日光传感器切换漏发振动事件](https://github.com/Zhen-WushuiLingchun/VeriMC/issues/1)
 - [ ] [R7：[已复现] 相邻楼梯未更新连接形状](https://github.com/Zhen-WushuiLingchun/VeriMC/issues/2)
 - [x] [R10：[已修复] 活塞错误允许推动末地传送门框](https://github.com/Zhen-WushuiLingchun/VeriMC/issues/3)
 - [ ] [R1：[静态差异·待复现] 邻居通知来源方块与原版不一致](https://github.com/Zhen-WushuiLingchun/VeriMC/issues/4)

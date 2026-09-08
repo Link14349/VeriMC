@@ -9,6 +9,53 @@
 GameTest 功能开关 `minecraft:vanilla` + `minecraft:trade_rebalance`，`randomTickSpeed=0`，
 实验红石关闭。仍然不能称为严格 vanilla-only 专用服务器验证。
 
+## R6 日光传感器切换的振动事件（issue #1）已修复
+
+**根因**：`DaylightDetectorBlock.useWithoutItem` 在 `setBlock(pos, newState, 2)` 之后、
+`updateSignalStrength` 之前发出 `GameEvent.BLOCK_CHANGE`，上下文为 `Context.of(player, newState)`。
+`Simulator::interactDevice` 的日光分支只切换属性并刷新强度，完全没有这次事件。
+
+**改动**：`src/devices.cpp` 日光分支在写入新状态后、`updateDaylight` 之前调用
+`emitGameEvent("block_change", pos, {false, false, false, inverted})`，
+上下文的受影响方块状态取**切换后**的状态，与原版顺序一致。
+`block_change` 在 26.2 的频率表中是 11。
+
+**原版证据**：
+
+1. 原反例 `tests/scenarios/daylightVibration.json` 重跑通过。捕获 SHA-256
+   `1564e661c2a2db74dcff3804d85276eb15918b5dffc12bbe6d1717a986a4c691`，
+   原点 `[7217173, -58, -2219360]`，26 帧 × 2 点，`nativeComparison.status = match`。
+2. 新增常规回归 `tests/fixtures/java26_2DaylightVibration.json`
+   （SHA-256 `9eb5055ee13461a71024332c6c393f50e43b4171eb96437d64ab991f7635b5dd`，
+   原点 `[11940600, -58, -11279207]`，81 帧 × 6 点 = 486 次位置/帧观测），
+   脚本 `tools/reference/captureDaylightVibration.py`。四组互不干扰（间距超过 8 / 16 格监听半径）：
+
+   | 组 | 布置 | 原版结果 |
+   |---|---|---|
+   | A | 幽匿感测体距 3 格，第 10 gt 与第 60 gt 各切换一次 | 13 gt 与 63 gt 均 `active`、`power=10`、比较器读数 11，红石灯随之亮 |
+   | B | 校频感测体背面滤波强度 11 | 13 gt `active`、`power=13`、读数 11 |
+   | C | 校频感测体背面滤波强度 9 | 全程 `inactive`，事件被频率过滤拒绝 |
+   | D | 幽匿感测体距 5 格 | 15 gt 才 `active`、`power=6`，行进刻数与事件原点一致 |
+
+   A 组第二次切换是 `inverted=true → false` 方向，证明两个方向都发事件；
+   B/C 组一起证明事件频率确实是 11，不只是“有事件到达”。
+3. 反向验证：只删掉这一行 `emitGameEvent` 重新编译，该 fixture 在 13 gt、
+   相对坐标 `[6,2,3]` 报出 `inactive/power=0` vs `active/power=10`。
+4. 共用 `interact` 调用路径的既有回归重新从原版捕获后仍然一致：
+   `java26_2Notes`（100 帧 × 32 点）、`java26_2Vibrations`（161 × 13）、
+   `java26_2DeviceVibrations`（155 × 31）全部 `match`，各自使用新的随机原点。
+5. Release `ctest` 3/3 通过，核心检查 87/87。
+
+**明确排除的范围**：
+
+- **不观察日光传感器自身的 `power`**。它由 `getEffectiveSkyBrightness` 决定，而 C++ 把天空亮度
+  建模为显式外部刺激（默认 0）。该差别属于世界环境输入建模，不属于本 issue；场景刻意让
+  传感器与感测体相隔空气，使传感器的红石输出不进入被测链路。
+- 事件来源实体上下文只覆盖“非旁观、非潜行的创造模式玩家”这一种。GameTest 用
+  `helper.makeMockPlayer(GameType.CREATIVE)`，C++ 用默认上下文；旁观者与潜行过滤
+  由既有 `captureVibrations.py` 的显式刺激场景覆盖，本次没有为日光传感器单独重测。
+- 只修了 `interact` 这一条路径。其他玩家操作/放置产生的振动来源是否齐全，仍属 issue #14 的范围。
+
 ## R10 活塞推动判据（issue #3）已修复
 
 **根因**：`Simulator::pushable` 用方块名白名单代替原版

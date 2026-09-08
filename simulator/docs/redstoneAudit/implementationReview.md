@@ -111,7 +111,7 @@
 
 ---
 
-### ★R6 阳光探测器切换 `inverted` 时缺少 `BLOCK_CHANGE` 游戏事件
+### ★R6 阳光探测器切换 `inverted` 时缺少 `BLOCK_CHANGE` 游戏事件（已修复，见 [fixProgress.md](fixProgress.md)）
 
 | | 位置 |
 | --- | --- |
