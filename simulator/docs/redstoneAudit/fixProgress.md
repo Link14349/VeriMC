@@ -9,6 +9,46 @@
 GameTest 功能开关 `minecraft:vanilla` + `minecraft:trade_rebalance`，`randomTickSpeed=0`，
 实验红石关闭。仍然不能称为严格 vanilla-only 专用服务器验证。
 
+## 比较器的物品展示框输入（issue #11）已实现
+
+**缺口**：`ComparatorBlock.getInputSignal` 在直接输入小于 15、第一格是导体时，会取
+「第二格里朝向匹配且唯一的展示框读数」与「第二格自身模拟量」的较大者。C++ 完全没有这条路径。
+
+**边界设计**（详见 [环境输入](../environmentInputs.md) 的「物品展示框」一节）：
+展示框作为**受限实体输入**记录在它挂靠的方块上，
+`stimulate(挂靠方块, {"itemFrames": [{"facing", "rotation", "hasItem"}, …]})`。
+一条记录表示「格 `挂靠方块 + facing` 里朝向为 `facing` 的一个展示框」，与原版按格查询 + 朝向过滤一一对应。
+**这不是完整实体世界**：不建模掉落、挤掉、破坏、地图展示框读数与实体推动。
+
+**实现**：`Simulator::itemFrameSignal` 对应 `getItemFrame` + `ItemFrame.getAnalogOutput`
+（空框 0，否则 `rotation % 8 + 1`；候选不唯一时返回空）；
+`comparatorInput` 按原版顺序取两者较大值，都不存在时保留直接输入；
+`stimulateItemFrames` 整体替换集合并对每个受影响的格发一次 `updateComparatorNeighbors`。
+
+**原版证据**：新增 `tests/fixtures/java26_2ItemFrameComparator.json`
+（SHA-256 `cd1249976988d53a0694a3d3a9807314959d9f55d5eea69b1e48f731b47d719c`，
+原点 `[13225846, -58, 3248185]`，17 帧 × 12 点），
+捕获器直接生成真实 `ItemFrame` 实体。六组原版读数：
+
+| 组 | 规则 | 原版 |
+|---|---|---|
+| 1 | 旋转与物品开关、移除 | 空框 0；有物品 rot 0/3/7 → 1/4/8；移除后回落到直接输入 |
+| 2 | 重复候选 | 同格同朝向两个框 → 不采纳（0）；删掉一个后 rot 5 → 6 |
+| 3 | 朝向过滤 | 只有 north 框时不采纳；再加 east rot 7 → 8 |
+| 4 | 第一格必须是导体 | 玻璃 → 全程 0 |
+| 5 | 直接输入为 15 时短路 | 拉杆强充能导体 → 15，展示框被忽略 |
+| 6 | 与第二格模拟量取较大者 | 漏斗模拟量 3；rot 0 → 3，rot 7 → 8，空框 → 3 |
+
+另有核心单元测试覆盖：检查点往返保留展示框、非法旋转/未知字段/混用字段/空气挂点全部拒绝。
+Release `ctest` 3/3，核心检查 99/99；全部 **34 个场景重新从原版捕获**后 `match`。
+
+**明确排除的范围**：
+
+- 只实现比较器读取路径。展示框自身的物品增删、旋转右键交互、掉落与破坏没有器件层接口。
+- 不区分普通展示框与发光展示框（原版读数相同，`getEntitiesOfClass(ItemFrame.class, …)` 同样命中）。
+- 地图展示框在原版读数仍是 `rotation % 8 + 1`，本模型不记录物品种类，因此也不区分地图。
+- 展示框的生成/移除在原版不发比较器通知（BUD 行为），本模型统一在刺激里发出，属于接口约定。
+
 ## 四项假设的逐条结论（issue #10）
 
 ### R5 中继器 `locked` 的竖直形状刷新：已复现并修复

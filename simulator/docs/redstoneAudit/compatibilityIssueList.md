@@ -18,7 +18,7 @@
 - [x] [R8：[已复现并修复] 活塞落地未完整重算邻居形状](https://github.com/Zhen-WushuiLingchun/VeriMC/issues/8)
 - [x] [R9：[已复现并修复] 粉线点/十字切换的额外邻居通知](https://github.com/Zhen-WushuiLingchun/VeriMC/issues/9)
 - [x] [hypotheses：[已结论] 核对锁定刷新、状态快照和日光数值边界](https://github.com/Zhen-WushuiLingchun/VeriMC/issues/10)
-- [ ] [itemFrame：[未实现] 比较器缺少物品展示框输入](https://github.com/Zhen-WushuiLingchun/VeriMC/issues/11)
+- [x] [itemFrame：[已实现] 比较器缺少物品展示框输入](https://github.com/Zhen-WushuiLingchun/VeriMC/issues/11)
 - [ ] [entityIo：[未实现] 漏斗和投掷器缺少实体物品反馈链](https://github.com/Zhen-WushuiLingchun/VeriMC/issues/12)
 - [ ] [unsupported：[覆盖清单] 未实现器件与占位支持门禁](https://github.com/Zhen-WushuiLingchun/VeriMC/issues/13)
 - [ ] [quirks：[特性保留] 刻内差分、零刻/BUD 与区块生命周期验证](https://github.com/Zhen-WushuiLingchun/VeriMC/issues/14)

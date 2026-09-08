@@ -211,6 +211,9 @@ private:
     bool prioritizeDiode(BlockPos pos) const;
     bool torchInput(BlockPos pos) const;
     int comparatorInput(BlockPos pos) const;
+    // 受限的物品展示框输入：按“挂在哪一格的哪一面”记录，不是完整实体世界。
+    std::optional<int> itemFrameSignal(BlockPos mount, Direction facing) const;
+    void stimulateItemFrames(BlockPos pos, const Json& input);
     void refreshComparator(BlockPos pos);
     void sampleAffected(BlockPos pos);
     void sampleProbe(Probe& probe);

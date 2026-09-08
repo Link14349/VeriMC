@@ -192,7 +192,7 @@ int main() {
         try { restored.loadProject(invalid); } catch (...) { threw = true; }
         expect(threw && before == restored.saveProject("before", true), "invalid batch import changed world");
     });
-    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers", "java26_2Hoppers", "java26_2Torches", "java26_2Rails", "java26_2TickBatches", "java26_2Tripwire", "java26_2Buttons", "java26_2Droppers", "java26_2Targets", "java26_2CopperChests", "java26_2Bookshelves", "java26_2Pots", "java26_2Vibrations", "java26_2DeviceVibrations", "java26_2Notes", "java26_2Bells", "java26_2Jukeboxes", "java26_2JukeboxHoppers", "java26_2Composters", "java26_2WireGeometry", "java26_2PistonPushability", "java26_2DaylightVibration", "java26_2StairShapes", "java26_2RailNotificationSource", "java26_2PistonRemovalCallback", "java26_2DiodeSupportBreak", "java26_2ObserverRemoval", "java26_2PistonLandingShape", "java26_2WireShapeToggle", "java26_2RemovalNotifySource", "java26_2RepeaterLockRefresh"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
+    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers", "java26_2Hoppers", "java26_2Torches", "java26_2Rails", "java26_2TickBatches", "java26_2Tripwire", "java26_2Buttons", "java26_2Droppers", "java26_2Targets", "java26_2CopperChests", "java26_2Bookshelves", "java26_2Pots", "java26_2Vibrations", "java26_2DeviceVibrations", "java26_2Notes", "java26_2Bells", "java26_2Jukeboxes", "java26_2JukeboxHoppers", "java26_2Composters", "java26_2WireGeometry", "java26_2PistonPushability", "java26_2DaylightVibration", "java26_2StairShapes", "java26_2RailNotificationSource", "java26_2PistonRemovalCallback", "java26_2DiodeSupportBreak", "java26_2ObserverRemoval", "java26_2PistonLandingShape", "java26_2WireShapeToggle", "java26_2RemovalNotifySource", "java26_2RepeaterLockRefresh", "java26_2ItemFrameComparator"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
         std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/../tests/fixtures/" + fixtureName + ".json"); expect(static_cast<bool>(file), "missing vanilla reference fixture");
         auto fixture = Json::parse(file); auto origin = fixture["origin"].get<BlockPos>(); Simulator s(r);
         auto absolute = [&](const Json& p) { auto pos = p.get<BlockPos>(); return BlockPos{origin.x + pos.x, origin.y + pos.y, origin.z + pos.z}; };
@@ -642,6 +642,29 @@ int main() {
     test("invalid project import leaves current world intact", [&] { Simulator s(r); s.place({0, 0, 0}, r.state("stone")); auto before = s.saveProject("test", true); auto bad = before; bad["blocks"][0]["name"] = "minecraft:not_a_block"; bool threw = false; try { s.loadProject(bad); } catch (...) { threw = true; } expect(threw && before == s.saveProject("test", true), "load not atomic"); });
     test("piston motion checkpoint continues across event phases", [&] { Simulator s(r); s.place({0,0,0},r.state("sticky_piston",{{"facing","east"}})); s.place({1,0,0},r.state("stone")); s.place({-1,0,0},r.state("redstone_block")); s.advanceTo(1); expect(s.at({2,0,0}).device == Device::movingPiston, "missing moving block"); auto snapshot=s.saveProject("moving",true); Simulator restored(r); restored.loadProject(snapshot); s.advanceTo(4); restored.advanceTo(4); expect(s.saveProject("moving",true)==restored.saveProject("moving",true),"motion checkpoint diverged"); expect(s.at({2,0,0}).device==Device::solid,"push failed"); s.setBlock({-1,0,0},0); s.advanceTo(8); expect(s.world.get({1,0,0})==r.state("stone") && s.world.get({2,0,0})==0,"sticky pull failed"); });
     test("update budget abort cannot resume after discarding updates", [&] { Simulator s(r); s.world.set({1,-1,0},r.state("stone")); s.place({1,0,0},r.state("redstone_wire")); auto before = s.clone(); s.updateBudget=1; bool threw=false; try { s.place({0,0,0},r.state("redstone_block")); } catch (...) { threw=true; } expect(threw&&s.faulted,"budget did not abort"); s.breakRequested=false; threw=false; try { s.advanceTo(1); } catch (...) { threw=true; } expect(threw,"faulted run resumed"); s.restore(*before); expect(!s.faulted&&s.world.size()==before->world.size(),"snapshot failed to recover"); });
+    test("item frame comparator input validation and checkpoint", [&] {
+        Simulator s(r); floor(s);
+        BlockPos comparator{0, 1, 0}, mount{1, 1, 0};
+        s.place(comparator, r.state("comparator", {{"facing", "east"}}));
+        s.place(mount, r.state("stone"));
+        s.stimulate(mount, {{"itemFrames", Json::array({{{"facing", "east"}, {"rotation", 5}, {"hasItem", true}}})}});
+        s.advanceTo(2);
+        expect(s.analogOutput(comparator) == 6, "item frame rotation reading");
+        auto saved = s.saveProject("frames", true); Simulator restored(r); restored.loadProject(saved);
+        expect(restored.analogOutput(comparator) == 6, "item frame lost across checkpoint");
+        s.stimulate(mount, {{"itemFrames", Json::array()}});
+        s.advanceTo(4);
+        expect(s.analogOutput(comparator) == 0, "item frame removal not applied");
+        auto rejects = [&](const Json& input) {
+            bool threw = false; try { s.stimulate(mount, input); } catch (...) { threw = true; }
+            return threw;
+        };
+        expect(rejects({{"itemFrames", Json::array({{{"facing", "east"}, {"rotation", 8}, {"hasItem", true}}})}}), "rotation 8 accepted");
+        expect(rejects({{"itemFrames", Json::array({{{"facing", "east"}, {"rotation", 0}, {"hasItem", true}, {"item", "stone"}}})}}), "unknown frame field accepted");
+        expect(rejects({{"itemFrames", Json::array()}, {"viewers", 1}}), "mixed stimulus accepted");
+        bool threw = false; try { s.stimulate({5, 1, 0}, {{"itemFrames", Json::array({{{"facing", "east"}, {"rotation", 0}, {"hasItem", false}}})}}); } catch (...) { threw = true; }
+        expect(threw, "item frame accepted on an empty cell");
+    });
     test("full 26.2 sine table and daylight index boundaries", [&] {
         std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/../tests/fixtures/java26_2SineTable.json");
         expect(static_cast<bool>(file), "missing vanilla sine table fixture");

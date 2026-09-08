@@ -35,6 +35,51 @@ float daylightCos(float angle) {
 }
 }
 
+// 对应 ComparatorBlock.getItemFrame：只有恰好一个朝向匹配的展示框才被采纳，
+// 0 个或多个都返回空。读数为 ItemFrame.getAnalogOutput()：空框 0，否则 rotation % 8 + 1。
+std::optional<int> Simulator::itemFrameSignal(BlockPos mount, Direction facing) const {
+    auto found = runtime.find(mount);
+    if (found == runtime.end() || !found->second.values.contains("itemFrames")) return std::nullopt;
+    const auto& frames = found->second.values.at("itemFrames");
+    const char* name = directionNames[static_cast<unsigned>(facing)];
+    std::optional<int> result;
+    for (const auto& frame : frames) {
+        if (frame.at("facing") != name) continue;
+        if (result) return std::nullopt;
+        result = frame.value("hasItem", false) ? frame.at("rotation").get<int>() % 8 + 1 : 0;
+    }
+    return result;
+}
+void Simulator::stimulateItemFrames(BlockPos pos, const Json& input) {
+    if (input.size() != 1) throw std::invalid_argument("物品展示框输入不能与其他刺激字段混用");
+    const auto& frames = input.at("itemFrames");
+    if (!frames.is_array() || frames.size() > 12) throw std::invalid_argument("物品展示框列表最多 12 个");
+    if (world.get(pos) == 0) throw std::invalid_argument("物品展示框必须挂在一个方块上");
+    Json stored = Json::array();
+    std::vector<Direction> touched;
+    for (const auto& frame : frames) {
+        if (!frame.is_object()) throw std::invalid_argument("每个物品展示框必须是对象");
+        for (const auto& field : frame.items())
+            if (field.key() != "facing" && field.key() != "rotation" && field.key() != "hasItem")
+                throw std::invalid_argument("物品展示框只接受 facing、rotation 和 hasItem");
+        auto facing = parseDirection(frame.at("facing"));
+        int rotation = integerInRange(frame, "rotation", 0, 7);
+        if (frame.contains("hasItem") && !frame.at("hasItem").is_boolean()) throw std::invalid_argument("hasItem 必须为布尔值");
+        stored.push_back({{"facing", directionNames[static_cast<unsigned>(facing)]}, {"rotation", rotation}, {"hasItem", frame.value("hasItem", false)}});
+        if (std::find(touched.begin(), touched.end(), facing) == touched.end()) touched.push_back(facing);
+    }
+    auto& values = runtime[pos].values;
+    if (values.contains("itemFrames"))
+        for (const auto& frame : values.at("itemFrames")) {
+            auto facing = parseDirection(frame.at("facing"));
+            if (std::find(touched.begin(), touched.end(), facing) == touched.end()) touched.push_back(facing);
+        }
+    if (stored.empty()) values.erase("itemFrames"); else values["itemFrames"] = std::move(stored);
+    if (values.empty()) runtime.erase(pos); else runtimeChanged(pos, false);
+    // 原版 ItemFrame.setItem / setRotation 从展示框自身所在格发出 updateNeighbourForOutputSignal。
+    for (auto facing : touched) updateComparatorNeighbors(pos.relative(facing));
+}
+
 void Simulator::updateComparatorNeighbors(BlockPos pos) {
     for (auto direction : horizontal) {
         auto neighbor = pos.relative(direction);
@@ -312,6 +357,16 @@ void Simulator::validateRuntime(BlockPos pos) const {
     if (device == Device::lectern) {
         int pages = integerInRange(data.values, "pages", 0, 100);
         integerInRange(data.values, "page", 0, std::max(0, pages - 1));
+    }
+    if (data.values.contains("itemFrames")) {
+        const auto& frames = data.values.at("itemFrames");
+        if (!frames.is_array() || frames.empty() || frames.size() > 12) throw std::invalid_argument("无效物品展示框列表");
+        for (const auto& frame : frames) {
+            if (!frame.is_object() || frame.size() != 3) throw std::invalid_argument("无效物品展示框记录");
+            parseDirection(frame.at("facing"));
+            integerInRange(frame, "rotation", 0, 7);
+            if (!frame.at("hasItem").is_boolean()) throw std::invalid_argument("无效物品展示框物品标记");
+        }
     }
 }
 }

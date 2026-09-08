@@ -80,6 +80,31 @@ public class CaptureRedstone extends TestFunctionLoader {
                 return;
             }
             var input = command.getAsJsonObject("stimulus");
+            if (input.has("itemFrames")) {
+                // Rebuild the frame set hanging on this block. Notifications are issued once per
+                // affected cell afterwards, which is the same call ItemFrame.setItem/setRotation make.
+                var touched = new LinkedHashSet<Direction>();
+                for (var direction : Direction.values()) {
+                    var cell = pos.relative(direction);
+                    var box = new net.minecraft.world.phys.AABB(cell.getX(), cell.getY(), cell.getZ(), cell.getX() + 1, cell.getY() + 1, cell.getZ() + 1);
+                    for (var existing : level.getEntitiesOfClass(net.minecraft.world.entity.decoration.ItemFrame.class, box, f -> f.getDirection() == direction)) {
+                        existing.discard(); touched.add(direction);
+                    }
+                }
+                var rotationSetter = net.minecraft.world.entity.decoration.ItemFrame.class.getDeclaredMethod("setRotation", int.class, boolean.class);
+                rotationSetter.setAccessible(true);
+                for (var value : input.getAsJsonArray("itemFrames")) {
+                    var frame = value.getAsJsonObject();
+                    var direction = Direction.byName(frame.get("facing").getAsString());
+                    var entity = new net.minecraft.world.entity.decoration.ItemFrame(level, pos.relative(direction), direction);
+                    entity.setItem(frame.has("hasItem") && frame.get("hasItem").getAsBoolean() ? new ItemStack(Items.STONE) : ItemStack.EMPTY, false);
+                    rotationSetter.invoke(entity, frame.get("rotation").getAsInt(), false);
+                    level.addFreshEntity(entity);
+                    touched.add(direction);
+                }
+                for (var direction : touched) level.updateNeighbourForOutputSignal(pos.relative(direction), Blocks.AIR);
+                return;
+            }
             if(input.has("compostItem")) {
                 var item=BuiltInRegistries.ITEM.get(Identifier.parse(input.get("compostItem").getAsString())).orElseThrow().value();
                 ComposterBlock.insertItem(null,state,level,new ItemStack(item),pos);return;

@@ -18,7 +18,7 @@
 | 侦测器形状通知、2 gt 脉冲 | `world/level/block/ObserverBlock.java` | `executeShape`, `onPlace`, `onRemove`, `executeTick` | 观察面形状通知、已有计划刻不重复调度、2 gt 开/关、前方通知有对应。不能由方块状态变化测试推断所有容器/实体操作都发出正确观察事件。 |
 | 红石灯、铜灯泡 | `world/level/block/RedstoneLampBlock.java`, `CopperBulbBlock.java` | `executeNeighbor`, `executeTick` | 灯立即亮/4 gt 后检查熄灭；铜灯泡只在上升沿翻转，`powered` 与 `lit` 分开。两者不能统一为单一布尔输出。 |
 
-## 已确认缺口：比较器读取物品展示框
+## 已确认缺口：比较器读取物品展示框（已按受限实体输入实现，见 [fixProgress.md](fixProgress.md)）
 
 Java `ComparatorBlock.getInputSignal` 在直输入小于 15、第一格是导体时，会查第二格中朝向匹配且唯一的 `ItemFrame`，取展示框与该格方块模拟量的最大值。`getItemFrame` 还处理 0 个或多个展示框时不采纳的条件。
 

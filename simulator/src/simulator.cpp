@@ -416,7 +416,14 @@ bool Simulator::torchInput(BlockPos p) const { const auto& s = at(p); auto d = s
 int Simulator::comparatorInput(BlockPos p) const {
     auto d = at(p).facing; auto q = p.relative(d); int input = diodeInput(p);
     if (at(q).analogSource) return analogOutput(q);
-    if (input < 15 && at(q).conductor && at(q.relative(d)).analogSource) return analogOutput(q.relative(d));
+    if (input < 15 && at(q).conductor) {
+        // 原版取展示框读数与第二格模拟量的较大者；两者都不存在时保留直接输入。
+        const auto far = q.relative(d);
+        int best = std::numeric_limits<int>::min();
+        if (auto frame = itemFrameSignal(q, d)) best = *frame;
+        if (at(far).analogSource) best = std::max(best, analogOutput(far));
+        if (best != std::numeric_limits<int>::min()) return best;
+    }
     return input;
 }
 void Simulator::refreshComparator(BlockPos p) {
@@ -659,6 +666,7 @@ void Simulator::stimulate(BlockPos p, const Json& input) {
     if (faulted) throw std::runtime_error("当前执行已中止，请从有效快照恢复");
     if(input.contains("gameEvent")) {stimulateVibration(p,input);return;}
     if (!input.is_object())throw std::invalid_argument("环境输入必须是对象");
+    if (input.contains("itemFrames")) { stimulateItemFrames(p, input); return; }
     if(stimulateNote(p,input) || stimulateBell(p,input))return;
     if (stimulateDevice(p, input)) return;
     throw std::invalid_argument("该器件尚不支持这类环境刺激");
