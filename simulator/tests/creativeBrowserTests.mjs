@@ -121,15 +121,26 @@ test('first-person viewport dispatches trusted browser input only while captured
       assert.deepEqual(await page.evaluate(() => view.camera.position.toArray()), before);
     });
 
-    await t.test('only real blocks within five blocks are editable; no construction-plane fallback', async () => {
-      await scene([[0,1,-1]]);
-      await click();
-      assert.deepEqual(await page.evaluate(() => calls[0]?.pos), [0,1,-1]);
-      await scene([[0,1,-2]]);
+    await t.test('all block interactions reach twenty blocks; no construction-plane fallback', async () => {
+      // The aimed south faces are approximately 19.5 and 20.5 blocks from the eye.
+      await scene([[0,1,-16]]);
+      await page.evaluate(() => { consumeUse=false; });
+      for (const button of ['left','right','middle']) await click(button);
+      assert.deepEqual(await page.evaluate(() => calls), [
+        {kind:'pick',pos:[0,1,-16],tool:'erase',shift:false,face:null},
+        {kind:'use',pos:[0,1,-16],shift:false},
+        {kind:'pick',pos:[0,1,-15],tool:'place',shift:false,face:'south'},
+        {kind:'pickBlock',pos:[0,1,-16]},
+      ]);
+      await page.evaluate(() => { calls.length=0;consumeUse=true; });
+      await click('right');
+      assert.deepEqual(await page.evaluate(() => calls), [{kind:'use',pos:[0,1,-16],shift:false}]);
+      await scene([[0,1,-17]]);
+      await page.evaluate(() => { consumeUse=false; });
       for (const button of ['left','right','middle']) await click(button);
       assert.deepEqual(await page.evaluate(() => calls), []);
       await scene([], [.5,3,4], [.5,1,.5]);
-      await click('right');
+      for (const button of ['left','right','middle']) await click(button);
       assert.deepEqual(await page.evaluate(() => calls), []);
     });
 

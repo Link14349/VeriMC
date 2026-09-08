@@ -564,7 +564,8 @@ export class CircuitViewport {
   top() { this.camera.position.copy(this.controls.target).add(new THREE.Vector3(0,Math.max(this.camera.position.distanceTo(this.controls.target),15),.001)); }
   private locate(event: { clientX: number; clientY: number }, tool: PickAction = this.tool): PickTarget | null {
     const rect = this.renderer.domElement.getBoundingClientRect(); if (!rect.width || !rect.height) return null; this.camera.updateMatrixWorld(); this.scene.updateMatrixWorld(); this.pointer.set((event.clientX-rect.left)/rect.width*2-1,-(event.clientY-rect.top)/rect.height*2+1); this.raycaster.setFromCamera(this.pointer,this.camera);
-    this.raycaster.far = this.immersive ? 5 : Infinity;
+    // 第一人称搭建采用用户要求的加长交互距离，所有方块动作共用此射线。
+    this.raycaster.far = this.immersive ? 20 : Infinity;
     const meshes: THREE.Object3D[] = []; for (const chunk of this.chunks.values()) { meshes.push(chunk.box.mesh,chunk.cylinder.mesh); if (chunk.pick) meshes.push(chunk.pick.mesh); }
     for (const hit of this.raycaster.intersectObjects(meshes)) {
       const pool = hit.object.userData.pool as InstancePool; const pos = pool.positions[hit.instanceId!];

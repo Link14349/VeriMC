@@ -2,6 +2,8 @@
 
 2026-09-08：新增窗口内第一人称飞行搭建、原生浏览器全屏与 E 物品列表。浏览器处理相机和输入，C++ 仍是电路与库存的权威状态；本次没有修改仿真内核。
 
+按用户偏好，第一人称方块交互距离延长至 20 格。拆除、贴面放置、右键使用、中键取物和准星高亮共用同一射线范围；超距或无实际方块命中时不操作。
+
 ## 操作
 
 | 输入 | 第一人称搭建 |
@@ -40,7 +42,7 @@
 
 - `npm run build`：TypeScript 和生产构建。
 - `node --test simulator/tests/interactionTests.mjs simulator/tests/webTests.mjs`：39 项逻辑、渲染和协议回归，包含朝向/物品形式/右键分派。
-- `creativeBrowserTests.mjs`：真实 Chrome Pointer Lock / Fullscreen API、捕获前不编辑、5 格范围、左右中键、Shift、滚轮、清键、E/搜索隔离、九格快捷栏。
+- `creativeBrowserTests.mjs`：真实 Chrome Pointer Lock / Fullscreen API、捕获前不编辑、20 格范围、左右中键、Shift、滚轮、清键、E/搜索隔离、九格快捷栏。
 - `interactionBrowserTests.mjs`、`viewportTests.mjs`：原有工作台、预览、方块表面命中与键盘移动回归。
 
 浏览器测试使用 Vite `127.0.0.1:5179` 与受控内核夹具；可以用 `NODE_PATH` 指向环境的 Playwright。截图保存在忽略的 `simulator/testResults/`。
