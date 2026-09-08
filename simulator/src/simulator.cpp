@@ -373,7 +373,8 @@ StateId Simulator::shapeUpdated(BlockPos p, StateId id, Direction direction, Sta
     if (registry.type(id).stairs) return axis(direction) != 0 ? stairsShape(p, id) : id;
     if (!survives(p, id)) return 0;
     if (s.device == Device::observer && direction == s.facing && !s.powered && !blockTicks.hasScheduled(p, s.type)) schedule(p, 2, 0, s.type);
-    if (s.device == Device::repeater && axis(direction) != 0 && axis(direction) != axis(s.facing)) return registry.withBool(id, "locked", diodeSideInput(p) > 0);
+    // 原版只比较轴：Y 轴与水平朝向轴必然不同，因此竖直形状更新同样刷新 LOCKED。
+    if (s.device == Device::repeater && axis(direction) != axis(s.facing)) return registry.withBool(id, "locked", diodeSideInput(p) > 0);
     if (s.device == Device::wire && direction != Direction::down) {
         StateId next = id;
         if (direction == Direction::up) next = wireConnections(p, id);

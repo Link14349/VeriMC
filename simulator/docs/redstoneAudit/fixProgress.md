@@ -9,6 +9,77 @@
 GameTest 功能开关 `minecraft:vanilla` + `minecraft:trade_rebalance`，`randomTickSpeed=0`，
 实验红石关闭。仍然不能称为严格 vanilla-only 专用服务器验证。
 
+## 四项假设的逐条结论（issue #10）
+
+### R5 中继器 `locked` 的竖直形状刷新：已复现并修复
+
+原版 `RepeaterBlock.updateShape` 的条件只是
+`direction.getAxis() != state.getValue(FACING).getAxis()`；FACING 恒为水平，
+所以 **Y 轴也满足**，竖直形状更新同样刷新 `LOCKED`。C++ 额外排除了 Y 轴。
+
+旧的构造（靠 flag 2 跳过形状更新留下过时 `locked`）确实不成立：flag 2 仍会触发形状更新。
+本次改用**直接写入方块状态**造出过时值——这正是编辑器的常规操作，
+差分场景里也一直用原始 `stateId` 命令。新增
+`tests/fixtures/java26_2RepeaterLockRefresh.json`
+（SHA-256 `60ca2d59469f97fef1dfdd6980db7a6ca4bba35a9601116d431341022929b635`，
+原点 `[-14438248, -58, 5822622]`，13 帧 × 7 点）三组：
+
+| 组 | 布置 | 结果 |
+|---|---|---|
+| 竖直 | 写入 `repeater[locked=true]`（无侧向二极管），4 gt 在其上方放石头 | 原版 `locked=false`，旧实现仍 `locked=true`（**反例**） |
+| 水平 | 同上但在侧面放石头 | 两侧都刷新为 `locked=false`（对照） |
+| 真实锁定 | 侧向有真正供电的中继器，再从上方放石头 | 两侧都保持 `locked=true`（对照，证明刷新算的是正确值） |
+
+修复：`shapeUpdated` 的中继器分支去掉 `axis(direction) != 0`。
+**未排除的范围**：没有找到“只靠红石历史（不直接写状态）就能留下过时 `locked`”的路径——
+侧向二极管的 `powered` 变化用 flag 2 写入，形状更新照常发出；
+活塞销毁侧向二极管时活塞头会立刻落到同一格并补发水平形状更新。因此过时值的来源限于状态直写。
+
+### R15 正弦表：已按 65,536 项逐项排除
+
+新增 `tools/reference/ExportSineTable.java`，用反射读出原版 `Mth.SIN` 的全部 65,536 项，
+连同 1,079 组日光临界角度（0–359 度各取本身与相邻 float，去掉负值）与 16 档天空亮度下的最终整数强度，
+写入 `tests/fixtures/java26_2SineTable.json`
+（SHA-256 `a7c7c314c28036cbc1219a674093818f936cd06123c9c46fbb976c7c00904fa7`）。
+
+C++ 的表从 `daylightSineTable()` 暴露出来，新回归逐项比较 **float 位模式**：
+**65,536 项全部相同**。原版用 `(float)Math.sin(i / 10430.378350470453)`，
+C++ 用 `(float)std::sin(i * 2π / 65536)`；两者的 double 参数在 9,570 个索引上确实不同，
+但 float 结果没有任何一项不同。同一回归还逐项验证了 1,079 × 16 组日光整数强度。
+R15 到此为**已排除**，不是假设。
+
+**未排除的范围**：这条结论绑定本机的 glibc `sin` 与固定 JAR 的 `Math.sin`；
+换用不同 libm 的平台需要重跑该回归。表相同即索引算术相同（索引算术此前已核对），
+因此不需要再单独证明“表项不同是否影响整数强度”。
+
+### flag 128（`UPDATE_SKIP_SHAPE_UPDATE_ON_WIRE`）：已排除，非实验版不可达
+
+对整棵反编译源码树做完整检索，设置该位的地方**只有一处**：
+`ExperimentalRedstoneWireEvaluator.java:50` 的 `updateFlags |= 128`；
+读取处只有 `NeighborUpdater.java:46`。
+而 `RedStoneWireBlock.java:279` 只在 `level.enabledFeatures().contains(FeatureFlags.REDSTONE_EXPERIMENTS)`
+（同文件 `:359`）时才使用实验求值器，`GameTestServer.java:85` 更是显式把
+`REDSTONE_EXPERIMENTS` 从启用集合里减掉。
+目标固定为非实验红石，因此该分支在本兼容目标内**不可达**，缺少它不构成缺陷。
+
+### ☆R13 入队状态快照：未找到可达反例，保持假设
+
+带状态的 `neighborChanged(BlockState, …)` 在 26.2 的调用点只有：
+`Level.updateNeighbourForOutputSignal`（比较器）、`BaseRailBlock.onPlace`、
+`DetectorRailBlock.updatePowerToConnected`，以及仙人掌、霜冰、海绵（均未实现）。
+接收侧 `DiodeBlock.neighborChanged` 先用**当前世界状态**做 `is(this)` 守卫，
+再用快照做 `canSurvive` 与 `checkTickOnNeighbor`。
+
+要构造差异，必须在入队与出栈之间改写该比较器/铁轨自身的方块状态。
+在当前实现范围内，一次 `CollectingNeighborUpdater` 运行里能改写比较器方块状态的路径只有
+「断支撑后被移除」（R3 新增的分支）；而移除后两侧都会跳过——
+原版靠 `is(this)`，C++ 靠读到空气后落进 `Device::air` 分支。
+方块计划刻、玩家命令、活塞方块事件都在邻居更新运行之外，无法插进这个窗口。
+
+因此本次**没有取得可达反例**，也**没有证伪**。
+唯一还有理论差异的情形是「比较器在同一次运行内被换成另一种二极管」——
+当前实现范围里没有这样的路径。等将来有刻内事件跟踪（issue #14）后可以再查。
+
 ## R9 粉线点/十字切换的额外邻居通知（issue #9）已复现并修复
 
 **根因**：原版 `RedStoneWireBlock.useWithoutItem` 只有在 `newState != state` 时才写入并调用

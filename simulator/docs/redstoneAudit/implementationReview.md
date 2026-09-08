@@ -96,7 +96,7 @@
 
 ---
 
-### ★R5 中继器 `locked` 属性不在竖直形状更新中刷新
+### ★R5 中继器 `locked` 属性不在竖直形状更新中刷新（已复现并修复，见 [fixProgress.md](fixProgress.md)）
 
 | | 位置 |
 | --- | --- |
@@ -229,7 +229,7 @@ C++ 的 `executeNeighbor`（`src/simulator.cpp:385-395`）总是重新读 `world
 
 风险点：`stimulateDevice`（`src/devices.cpp:212`）对 `Device::dropper` 开放了库存输入，`transferItem`/`containerAnalog` 都会对这些 device 正常工作。一旦有人为了"能放置发射器"而把 supportLevel 改成 implemented，发射器的分发行为表、合成器的 `TRIGGERED`/`CRAFTING`/槽位禁用、熔炉的 `WorldlyContainer` 分面槽位都会静默按普通容器处理。建议：要么删掉占位容量，要么在 `place` 之外再加一道运行期断言。
 
-### ☆R15 `Mth.SIN` 表构造式与 C++ 不同
+### ☆R15 `Mth.SIN` 表构造式与 C++ 不同（已按 65,536 项逐项排除，见 [fixProgress.md](fixProgress.md)）
 原版 `Mth.java:35-39`：`sin[i] = (float)Math.sin(i / 10430.378350470453)`；C++ `src/devices.cpp:20-23`：`values[i] = (float)std::sin((double)i * π * 2.0 / 65536.0)`。两者数学上相等（`10430.378350470453 == 65536/(2π)`），但双精度求值路径不同，个别 `i` 上的 float 结果可能差 1 ULP。索引计算本身已正确复刻（`Mth.java:54-56` 的 `(int)((long)(i * 10430.378350470453 + 16384.0) & 65535L)` ↔ `src/devices.cpp:25-26`）。仓库已有 `java26_2Daylight.json` 的 11,536 个数值样本对照（`referenceValidation.md`），既有数值样本通过不等于穷尽 65536 个表项，不能因此排除本假设；仍需逐项比较整个表及临界输入。
 
 ---
@@ -247,7 +247,7 @@ C++ 的 `executeNeighbor`（`src/simulator.cpp:385-395`）总是重新读 `world
 | `SculkShriekerBlock` | 振动监听器，含 `requiresAdjacentChunksToBeTicking` | 不可放置 |
 | `TntBlock` / `CommandBlock` / `StructureBlock` / `JigsawBlock` / `BigDripleafBlock` / `CreakingHeartBlock` | 均有 `neighborChanged` 或比较器输出 | 不可放置 |
 | 实验性红石规则 | `ExperimentalRedstoneWireEvaluator`、`Orientation`、`ExperimentalRedstoneUtils` | C++ 完全不建模 `Orientation`；目标固定为非实验版 |
-| `Block.UPDATE_SKIP_SHAPE_UPDATE_ON_WIRE`（=128） | `Block.java:98`；`NeighborUpdater.java:46` | 本次未定位到传入该 flag 的实际主线调用；未通过完整字节码调用/复合常量分析证明不可达，因此不把缺失分支判为当前已复现故障 |
+| `Block.UPDATE_SKIP_SHAPE_UPDATE_ON_WIRE`（=128） | `Block.java:98`；`NeighborUpdater.java:46` | **已排除**：全树检索后唯一的设置点是 `ExperimentalRedstoneWireEvaluator.java:50`，而实验求值器只在 `REDSTONE_EXPERIMENTS` 开启时使用（`RedStoneWireBlock.java:279/:359`），GameTest 更是显式减掉该开关。非实验目标内不可达，见 [fixProgress.md](fixProgress.md) |
 
 ---
 

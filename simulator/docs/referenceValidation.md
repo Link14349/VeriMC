@@ -64,6 +64,8 @@
 
 `ExportComposting` 在通常四路径参数之后，追加 `data/compostingRules.json` 的绝对输出路径，导出 115 种材料和 4,176 次隔离插入记录。`captureComposters.py` 增加第二十一组 GameTest，111 刻 / 26 点，验证临时输入/输出容器及失败抽取副作用，见 [堆肥桶说明](composters.md)。
 
+`runReferenceTool.py ExportSineTable <绝对输出路径>` 用反射导出原版 `Mth.SIN` 全部 65,536 项与 1,079 组日光临界角度；核心回归逐项比较 float 位模式，全部相同。`captureRepeaterLockRefresh.py` 增加中继器锁定刷新组：13 刻 / 7 点，覆盖竖直形状更新刷新 `LOCKED`、水平对照与真实锁定对照。
+
 `captureRemovalNotifySource.py` 增加移除回调来源组：17 刻 / 20 点，拉杆、中继器、比较器被移除时的通知来源方块，用被通知位置再外一格的三向普通铁轨读取。
 
 `captureWireShapeToggle.py` 增加粉线点/十字切换组：21 刻 / 6 点，用准连接未通知的活塞检测右键切换发出的邻居通知；捕获器的 `interact` 相应支持红石粉。

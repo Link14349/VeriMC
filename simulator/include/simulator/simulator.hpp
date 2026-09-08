@@ -22,6 +22,8 @@ struct HopperState {
 };
 using Vec3 = std::array<double,3>;
 struct VibrationContext { bool spectator{}, sneaking{}, dampens{}; StateId affectedState{UINT32_MAX}; };
+// 26.2 Mth.SIN 的等价重建，导出用于与原版逐项对照。
+const std::array<float, 65536>& daylightSineTable();
 struct VibrationInfo { std::uint16_t event{}; Vec3 origin{}; float distance{}; VibrationContext context; };
 struct SensorState {
     std::optional<VibrationInfo> candidate, current;

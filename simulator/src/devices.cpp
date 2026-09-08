@@ -13,17 +13,25 @@ int integerInRange(const Json& values, const char* key, int fallback, int maximu
     return value.get<int>();
 }
 
-// 26.2 Mth.cos takes a double, indexes a 65536-entry float sine table, then
-// daylight arithmetic returns to float before Java's round-to-positive-infinity.
-float daylightCos(float angle) {
+}
+// 26.2 Mth.SIN。原版用 (float)Math.sin(i / 10430.378350470453) 构造，这里用等价的
+// i * 2π / 65536；两种写法的 double 参数在 9,570 个索引上不同，是否影响 float 结果由
+// java26_2SineTable.json 的逐项对照回归证明，不靠推断。
+const std::array<float, 65536>& daylightSineTable() {
     static const auto table = [] {
         std::array<float, 65536> values{};
         for (std::size_t i = 0; i < values.size(); ++i)
             values[i] = static_cast<float>(std::sin(static_cast<double>(i) * std::numbers::pi * 2.0 / 65536.0));
         return values;
     }();
+    return table;
+}
+namespace {
+// 26.2 Mth.cos takes a double, indexes a 65536-entry float sine table, then
+// daylight arithmetic returns to float before Java's round-to-positive-infinity.
+float daylightCos(float angle) {
     auto index = static_cast<std::int64_t>(static_cast<double>(angle) * 10430.378350470453 + 16384.0);
-    return table[static_cast<std::uint64_t>(index) & 65535u];
+    return daylightSineTable()[static_cast<std::uint64_t>(index) & 65535u];
 }
 }
 
