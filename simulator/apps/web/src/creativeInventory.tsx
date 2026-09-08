@@ -3,16 +3,12 @@ import type { CatalogItem } from './api';
 import { blockLabel, shortName } from './blockLabels';
 import { supportLevelInfo } from './interactionState';
 import './creativeInventory.css';
+import { BlockThumbnail } from './blockThumbnail';
 
 export type HotbarSlot = string | null;
 
-const iconFor = (name: string) => {
-  const n = shortName(name);
-  return n === 'redstone_wire' ? '╋' : n === 'repeater' ? '⇥' : n === 'comparator' ? '▷' : n.includes('torch') ? '♟' : n === 'lever' ? '╱' : n.includes('button') ? '▰' : n === 'observer' ? '◉' : n.includes('lamp') ? '▦' : n.includes('bulb') ? '▥' : n.includes('piston') ? '▣' : n === 'redstone_block' ? '◆' : n.includes('glass') ? '◇' : '▧';
-};
 function ItemGlyph({ name }: { name: string }) {
-  const n = shortName(name);
-  return <span aria-hidden="true" className={`creativeItemGlyph ${/redstone|repeater|comparator|torch/.test(n) ? 'isRedstone' : ''}`}>{iconFor(name)}</span>;
+  return <span aria-hidden="true" className="creativeItemGlyph"><BlockThumbnail name={name}/></span>;
 }
 const slotLabel = (name: HotbarSlot, index: number) => `快捷栏 ${index + 1}：${name ? blockLabel(name) : '空'}`;
 

@@ -1,0 +1,8 @@
+.blockThumbnail{display:block;width:100%;height:100%;object-fit:contain;image-rendering:pixelated;pointer-events:none;filter:drop-shadow(1px 2px 1px #07100d88)}
+.blockThumbnailPlaceholder{display:block;width:100%;height:100%;border:1px solid #77847733;border-radius:3px;background:#8793830a}
+.paletteItem .blockGlyph{width:38px;height:38px;border:0;background:none;text-shadow:none}
+.inspectorHero .largeGlyph{width:96px;height:96px;transform:none;text-shadow:none;margin:0}
+.creativeItemGlyph{width:40px;height:40px;text-shadow:none}
+.creativeItem>.creativeItemGlyph{width:56px;height:56px;margin:0 0 3px}
+.creativeSlot>.creativeItemGlyph{width:100%;height:100%;max-width:44px;max-height:44px}
+.creativeHeldItem .creativeItemGlyph{width:42px;height:42px}

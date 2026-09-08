@@ -61,6 +61,12 @@ export class DeviceTextures {
           rect(5,4,22,24,'#53605c'); arrow(true,on?'#ff6e4e':'#d3d9cb');
           rect(3,4,2,4,signal);rect(27,24,2,4,signal);
         }
+      } else if (kind === 'dispenserFront') {
+        stone('#acb4ae');
+        for(const x of [6,21]) {rect(x,7,5,4,'#35413f');rect(x,7,5,1,'#d3d9cc');}
+        rect(10,14,12,15,'#606c65');rect(7,17,18,9,'#606c65');
+        rect(12,16,8,11,'#26322f');rect(9,19,14,5,'#26322f');
+        rect(12,16,8,2,'#141e1c');
       } else if (kind === 'lamp') {
         rect(0,0,32,32,'#44382e');
         for(let y=2;y<32;y+=8)for(let x=2;x<32;x+=8) {

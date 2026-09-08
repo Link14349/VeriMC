@@ -4,6 +4,7 @@ import { Play, Pause, StepForward, SkipForward, RotateCcw, MousePointer2, Box, C
 import { connection, downloadFile, posKey, type Pos, type CatalogItem, type Status, type FileProgress } from './api';
 import { blockLabel, propertyLabels, shortName, valueLabels } from './blockLabels';
 import { CircuitViewport } from './viewport';
+import { BlockThumbnail } from './blockThumbnail';
 import { surfacePlacement } from './surfacePlacement';
 import { Waveform } from './waveform';
 import { EnvironmentControls } from './environmentControls';
@@ -19,7 +20,7 @@ import {
 import './styles.css';
 
 const toolIcons: Record<Tool, typeof Box> = { select: MousePointer2, place: Box, probe: Crosshair, interact: Hand };
-const blockIcon = (name: string) => { const n=shortName(name);return n==='redstone_wire'?'╋':n==='repeater'?'⇥':n==='comparator'?'▷':n.includes('torch')?'♟':n==='lever'?'╱':n.includes('button')?'▰':n==='observer'?'◉':n.includes('lamp')?'▦':n.includes('bulb')?'▥':n==='redstone_block'?'◆':n==='glass'?'◇':'▣'; };
+
 const apple = isApplePlatform(typeof navigator==='undefined'?'':navigator.platform, typeof navigator==='undefined'?'':navigator.userAgent);
 const demoKinds: { kind: string; label: string }[] = [
   { kind: 'basic', label: '打开入门样例' }, { kind: 'pistons', label: '打开活塞实验' }, { kind: 'environment', label: '打开环境实验' },
@@ -287,7 +288,7 @@ function App() {
       <div className="tickReadout"><span>SIM TIME</span><b>{status.tick.toLocaleString()}</b><span>gt</span></div></nav>
     <div className="workspace">
       <aside className="palette"><div className="panelHeading"><span>器件库</span><span className="muted">{catalog.length}</span></div><label className="search"><Search size={14}/><input ref={searchInput} placeholder="搜索器件或方块 ID" aria-label="搜索器件或方块 ID" value={state.search} onChange={e=>dispatch({type:'setSearch',value:e.target.value})}/><kbd>/</kbd></label><div className="tabs">{['常用','器件','结构'].map(c=><button className={state.category===c?'active':''} onClick={()=>dispatch({type:'setCategory',value:c})} key={c}>{c}</button>)}</div>
-        <div className="paletteList">{filtered.map(c=><button key={c.name} className={`paletteItem ${state.placement.name===c.name?'selected':''}`} onClick={()=>dispatch({type:'chooseBlock',name:c.name})} title={`${c.name} · ${supportLevelInfo(c.supportLevel).detail}`}><span className={`blockGlyph ${shortName(c.name).includes('redstone')?'red':''}`}>{blockIcon(c.name)}</span><span>{blockLabel(c.name)}<small>{shortName(c.name)}</small><SupportTag level={c.supportLevel}/></span>{state.placement.name===c.name&&<i/>}</button>)}
+        <div className="paletteList">{filtered.map(c=><button key={c.name} className={`paletteItem ${state.placement.name===c.name?'selected':''}`} onClick={()=>dispatch({type:'chooseBlock',name:c.name})} title={`${c.name} · ${supportLevelInfo(c.supportLevel).detail}`}><span className="blockGlyph"><BlockThumbnail name={c.name}/></span><span>{blockLabel(c.name)}<small>{shortName(c.name)}</small><SupportTag level={c.supportLevel}/></span>{state.placement.name===c.name&&<i/>}</button>)}
           {emptyReason&&<div className="paletteEmpty" role="status"><p>{emptyReason}</p>{state.search.trim()&&<button className="wideButton" onClick={()=>{dispatch({type:'setSearch',value:''});searchInput.current?.focus();}}>清除搜索</button>}</div>}</div>
         <div className="paletteNote"><Cpu size={16}/><span>原生 C++ 仿真<br/><small>标注区分已实现 / 部分实现 / 需环境输入，均未声称完整差分验证</small></span></div></aside>
       <section className="centerWorkspace"><div className="viewportArea"><div className="viewportCanvas" ref={viewportRef}/>
@@ -307,7 +308,7 @@ function App() {
         {status.pauseReason&&<div className="pauseBanner" role="alert">{status.pauseReason}</div>}
       </div><fieldset className="offlineGuard column" disabled={!connected}><Waveform status={status} command={command}/></fieldset></section>
       <aside className="inspector"><div className="panelHeading"><span>{state.selectedDef?'器件检查':'放置设置'}</span>{state.selection&&<button title="取消选择" onClick={()=>dispatch({type:'clearSelection'})}><X size={14}/></button>}</div>
-        <fieldset className="offlineGuard" disabled={!connected}><ActionControls status={status} command={command}/></fieldset><div className="inspectorHero"><div className="largeGlyph">{blockIcon(heroName)}</div><strong>{blockLabel(heroName)}</strong><code>{shortName(heroName)}</code><SupportTag level={heroItem?.supportLevel}/><small className="supportDetail">{supportLevelInfo(heroItem?.supportLevel).detail}</small></div>
+        <fieldset className="offlineGuard" disabled={!connected}><ActionControls status={status} command={command}/></fieldset><div className="inspectorHero"><div className="largeGlyph"><BlockThumbnail name={heroName} properties={state.selectedDef?.properties ?? (defaults ? {...defaults,...placementPayload(item,state.placement.properties)} : undefined)}/></div><strong>{blockLabel(heroName)}</strong><code>{shortName(heroName)}</code><SupportTag level={heroItem?.supportLevel}/><small className="supportDetail">{supportLevelInfo(heroItem?.supportLevel).detail}</small></div>
         {state.selection&&state.selectedDef?<><div className="inspectorSection"><label className="miniLabel">坐标</label><div className="positionFields">{state.selection.map((v,i)=><span key={i}><small>{['X','Y','Z'][i]}</small>{v}</span>)}</div><div className="signalMeter"><span>当前信号</span><strong>{connection.cells.get(posKey(state.selection))?.value??0}<small>/ 15</small></strong></div><div className="meter"><i style={{width:`${(connection.cells.get(posKey(state.selection))?.value??0)/15*100}%`}}/></div></div>
           <div className="inspectorSection"><label className="miniLabel">方块状态</label>{Object.entries(state.selectedDef.properties).map(([key,value])=><label className="propertyRow" key={key}><span>{propertyLabels[key]??key}</span><select value={value} disabled={!connected} onChange={e=>void command('place',{pos:stateRef.current.selection,name:stateRef.current.selectedDef!.name,properties:{...stateRef.current.selectedDef!.properties,[key]:e.target.value}})}>{(chosenItem?.properties[key]??[value]).map(v=><option key={v} value={v}>{valueLabels[v]??v}</option>)}</select></label>)}</div>
           {chosenItem?.supportLevel==='externalStimulus'&&<p className="subtleText" style={{padding:'0 15px'}}>此器件的环境状态由输入面板或方块属性提供。</p>}
