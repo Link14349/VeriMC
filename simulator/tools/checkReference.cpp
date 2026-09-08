@@ -8,10 +8,12 @@ using namespace simulator;
 // Compare externally captured vanilla observations at their actual coordinates.
 // Unlike checkWorldReplay, this checks vanilla values, not two C++ snapshots.
 int main(int argc, char** argv) {
-    if (argc < 2) { std::cerr << "Usage: checkReference fixture.json ...\n"; return 2; }
+    if (argc < 2) { std::cerr << "Usage: checkReference [--traceOut path] fixture.json ...\n"; return 2; }
     BlockRegistry registry;
     bool failed = false;
+    std::string traceOut;
     for (int arg = 1; arg < argc; ++arg) {
+        if (std::string(argv[arg]) == "--traceOut" && arg + 1 < argc) { traceOut = argv[++arg]; continue; }
         Json result{{"fixture", argv[arg]}, {"status", "match"}};
         try {
             std::ifstream file(argv[arg]);
@@ -106,6 +108,7 @@ int main(int argc, char** argv) {
                     differs = true;
                 }
                 result["traceEntries"] = actualTrace.size();
+                if (!traceOut.empty()) { std::ofstream dump(traceOut); dump << actualTrace.dump(); }
             }
             result["origin"] = fixture.at("origin");
             result["frames"] = fixture.at("frames").size();

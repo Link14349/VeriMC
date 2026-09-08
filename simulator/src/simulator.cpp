@@ -99,11 +99,15 @@ void Simulator::enqueue(Update update) {
             if (updateTraceLimit && !peeked) recordUpdateTrace(current);
             peeked = true;
             if (current.kind == UpdateKind::multi) {
-                while (current.index < 6 && static_cast<int>(updateOrder[static_cast<std::size_t>(current.index)]) == current.skip) ++current.index;
-                if (current.index >= 6) { updateStack.pop_back(); peeked = false; continue; }
-                auto d = updateOrder[static_cast<std::size_t>(current.index++)];
-                updateStack.back().index = current.index;
+                // 与原版 MultiNeighborUpdate.runNext 一致：先取当前方向，再跳过被排除的方向，
+                // 用推进后的下标判断是否还有剩余；耗尽时**当场**出栈，不多留一轮。
+                auto index = static_cast<std::size_t>(current.index);
+                auto d = updateOrder[index++];
+                if (index < 6 && static_cast<int>(updateOrder[index]) == current.skip) ++index;
+                updateStack.back().index = static_cast<int>(index);
+                const bool exhausted = index >= 6;
                 executeNeighbor(current.pos.relative(d), current.neighborState);
+                if (exhausted) { updateStack.pop_back(); peeked = false; }
             } else {
                 updateStack.pop_back(); peeked = false;
                 if (current.kind == UpdateKind::shape) executeShape(current); else executeNeighbor(current.pos, current.neighborState);
@@ -117,7 +121,12 @@ void Simulator::enqueue(Update update) {
         breakRequested = true; faulted = true; throw;
     }
 }
-void Simulator::updateNeighbors(BlockPos p, int skip, StateId source) { Update u{UpdateKind::multi, p}; u.skip = skip; u.neighborState = source == UINT32_MAX ? world.get(p) : source; enqueue(u); }
+void Simulator::updateNeighbors(BlockPos p, int skip, StateId source) {
+    Update u{UpdateKind::multi, p}; u.skip = skip; u.neighborState = source == UINT32_MAX ? world.get(p) : source;
+    // 原版构造 MultiNeighborUpdate 时就跳过首个被排除的方向。
+    if (static_cast<int>(updateOrder[0]) == skip) u.index = 1;
+    enqueue(u);
+}
 void Simulator::neighborChanged(BlockPos p, StateId source) { Update u{UpdateKind::neighbor, p}; u.neighborState = source; enqueue(u); }
 void Simulator::notifyFront(BlockPos p, Direction facing, StateId source) {
     auto out = p.relative(opposite(facing)); auto block = source == UINT32_MAX ? world.get(p) : source;
