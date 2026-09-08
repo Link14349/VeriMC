@@ -25,7 +25,7 @@
 
 ### Task 2：Codex 实现三维视口
 
-文件：simulator/apps/web/src/viewport.ts，可新增 placementGeometry.ts；测试放 simulator/tests/placementTests.mjs。
+文件：simulator/apps/web/src/viewport.ts；浏览器测试放 simulator/tests/viewportTests.mjs。
 
 1. 编辑网格跟随 Y 层，合法范围统一。
 2. 真实方块简化预览复用现有渲染语义，输入/输出方向可辨认；不得把前端预览当作合法性判定。
@@ -49,4 +49,4 @@
 
 ## 当前状态
 
-M1 开始实施；M2/M3 尚未完成。第一批交付不声称自动生成可实装三维红石电路。
+M1 已完成首批交互、默认属性与三维预览/三轴剖切集成，验证见 ../interactionSpatialStatus.md。M2/M3 尚未完成。第一批交付不声称自动生成可实装三维红石电路。

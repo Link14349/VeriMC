@@ -61,8 +61,39 @@ body{overflow-x:auto}
 .vibrationControls details { margin:12px 0;font-size:11px; }
 .vibrationControls summary { cursor:pointer; }
 
+/* 器件支持等级标注：已实现 / 部分实现 / 仅外部刺激；标注不代表已完成原版差分验证。 */
+.supportTag{display:inline-block;margin-top:5px;padding:1px 5px;border-radius:3px;border:1px solid #4d5a60;font-style:normal;font-size:8px;letter-spacing:.4px;color:#9fb0b6;background:#1b2529;white-space:nowrap}
+.supportTag.level-implemented{border-color:#5f7d5c;color:#a9c9a2;background:#1e2a22}
+.supportTag.level-partial{border-color:#8a7444;color:#e0c288;background:#2a261a}
+.supportTag.level-externalStimulus{border-color:#4f6b83;color:#a4c2d8;background:#1a242c}
+.supportTag.level-unknown{border-color:#6c5050;color:#d3a5a0;background:#2a1f1f}
+.inspectorHero .supportDetail{font-size:9px;line-height:1.7;color:#7e939b;text-align:center;max-width:190px;margin-top:2px}
+.paletteEmpty{padding:18px 12px;color:#8b9ea6;font-size:10px;line-height:1.8;text-align:center}
+.paletteEmpty p{margin:0 0 10px}
+.paletteEmpty .wideButton{margin:0}
+.toolReadout{color:#d6c19b}
+/* 断线时用原生 fieldset 禁用子面板里的全部表单控件，布局与启用时保持一致。 */
+.offlineGuard{display:block;border:0;margin:0;padding:0;min-inline-size:0;min-width:0}
+.offlineGuard.column{display:flex;flex-direction:column;flex:none}
+.offlineGuard:disabled{opacity:.55}
+.layerControl input{width:40px}
+.paletteItem{align-items:flex-start;padding-top:8px}
+.paletteItem>span:nth-child(2){padding-top:1px}
+.toast.error{background:#4a3630;border-color:#c1866a;color:#f4ded1}
+.toast.error::before{content:'错误';font:9px ui-monospace,monospace;letter-spacing:1px;color:#eab08c;border:1px solid #a67155;border-radius:3px;padding:2px 5px}
+
+/* 帮助弹窗使用原生 dialog：浏览器负责焦点限制与 Esc，关闭后由脚本还原焦点。 */
+dialog.helpModal{position:fixed;inset:0;margin:auto;width:670px;max-width:90vw;max-height:88vh;overflow-y:auto;border:1px solid #52646c;background:#222e35;color:#cbd3d5;border-radius:13px;padding:39px;box-shadow:0 20px 100px #0005}
+dialog.helpModal:not([open]){display:none}
+dialog.helpModal::backdrop{background:#0c1418bb;backdrop-filter:blur(8px)}
+.helpKeys{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px 18px;margin:24px 0 4px;font-size:10px;color:#9db1ba}
+.helpKeys .miniLabel{grid-column:1/-1;margin-bottom:0}
+.helpKeys kbd{margin-right:5px}
+
 .fileOverlay{position:fixed;inset:0;z-index:1000;background:#080d15aa;display:flex;align-items:center;justify-content:center}
 .fileDialog{width:340px;padding:24px;background:var(--panel,#151e2b);border:1px solid var(--border);border-radius:12px;box-shadow:0 16px 64px #0008}
 .fileDialog strong{font-size:17px}.fileDialog p{margin:20px 0;color:var(--muted)}
 .fileDialog progress{display:block;width:100%;margin:16px 0;accent-color:var(--accent,#5c9cff)}
 .fileDialog button{border:1px solid var(--border);border-radius:6px;padding:7px 22px}.fileDialog small{display:block;margin-top:16px;color:var(--muted);font-size:11px}
+
+.sectionControl{position:absolute;right:15px;top:104px;display:flex;align-items:center;gap:8px;background:#222b30ee;border:1px solid #48575d77;border-radius:5px;padding:4px 7px;font-size:11px}.sectionControl label{display:flex;align-items:center;gap:5px}.sectionControl input{width:65px}.sectionControl>span{font-size:10px;color:var(--muted)}
