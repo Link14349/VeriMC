@@ -2,11 +2,13 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { connection, type BlockCell, type BlockDef, type Pos, posKey } from './api';
 import { shortName } from './blockLabels';
+import { DeviceTextures } from './deviceTextures';
 
 type Tool = 'select' | 'place' | 'erase' | 'probe' | 'interact';
 type Handle = { pool: InstancePool; index: number };
 const box = new THREE.BoxGeometry(1, 1, 1);
 const cylinder = new THREE.CylinderGeometry(.5, .5, 1, 8);
+const face = new THREE.PlaneGeometry(1, 1);
 const color = new THREE.Color();
 const matrix = new THREE.Matrix4();
 const quaternion = new THREE.Quaternion();
@@ -40,7 +42,7 @@ class InstancePool {
   private dirty() { this.mesh.instanceMatrix.needsUpdate = true; if (this.mesh.instanceColor) this.mesh.instanceColor.needsUpdate = true; }
   dispose() { this.group.remove(this.mesh); this.mesh.dispose(); }
 }
-type Chunk = { group: THREE.Group; box: InstancePool; cylinder: InstancePool; pick?: InstancePool };
+type Chunk = { group: THREE.Group; box: InstancePool; cylinder: InstancePool; pick?: InstancePool; surfaces?: Map<string, InstancePool> };
 export class CircuitViewport {
   renderer: THREE.WebGLRenderer;
   scene = new THREE.Scene();
@@ -68,6 +70,7 @@ export class CircuitViewport {
   private lastPointer: { clientX: number; clientY: number } | null = null;
   private clipPlane = new THREE.Plane(new THREE.Vector3(0,-1,0), 2000000);
   private sectionPlane = new THREE.Plane(new THREE.Vector3(0,0,0), 0);
+  private deviceTextures = new DeviceTextures([this.clipPlane, this.sectionPlane]);
   private section: { axis: 'x'|'y'|'z'; maximum: number } | null = null;
   private resizeObserver: ResizeObserver;
   private frameId = 0;
@@ -129,40 +132,82 @@ export class CircuitViewport {
     const part = (center: [number,number,number], size: [number,number,number], tint: number, shape: 'box'|'cylinder' = 'box', rotation = 0) => {
       quaternion.setFromAxisAngle(vector.set(0,1,0), rotation); transform.compose(vector.set(x + center[0], y + center[1], z + center[2]), quaternion, scaleVector.fromArray(size)); handles.push(chunk[shape].add(cell.pos, transform, tint));
     };
+    const surface = (key: string, center: THREE.Vector3, size: [number,number], rotation: THREE.Quaternion) => {
+      const surfaces = chunk.surfaces ??= new Map<string, InstancePool>();
+      let pool = surfaces.get(key);
+      if (!pool) { pool = new InstancePool(chunk.group, face, true, this.deviceTextures.get(key, chunk === this.previewChunk)); surfaces.set(key,pool); }
+      transform.compose(vector.set(x+center.x,y+center.y,z+center.z),rotation,scaleVector.set(size[0],size[1],1));
+      handles.push(pool.add(cell.pos,transform,0xffffff));
+    };
+    // Each face is instanced by texture and chunk; state updates replace only
+    // this cell's handles. The same surfaces are used by the placement preview.
+    const topSurface = (key: string, height: number, width: number, rotation = 0) => surface(key,new THREE.Vector3(.5,height,.5),[width,width],new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),rotation).multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1,0,0),-Math.PI/2)));
+    const cubeSurfaces = (keys: string[], orientation = new THREE.Quaternion(), width = .982, height = .982, depth = .982, center = new THREE.Vector3(.5,.5,.5)) => {
+      const normals = [[0,0,-1],[0,0,1],[-1,0,0],[1,0,0],[0,1,0],[0,-1,0]];
+      normals.forEach((n,i) => {
+        if (!keys[i]) return;
+        const normal = new THREE.Vector3(...n);
+        const offset = normal.clone().multiply(new THREE.Vector3(width,height,depth)).multiplyScalar(.5).applyQuaternion(orientation).add(center);
+        const rotation = orientation.clone().multiply(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0,0,1),normal));
+        const turn = i===2?Math.PI/2:i===3?-Math.PI/2:i===5?Math.PI:0;
+        rotation.multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,0,1),turn));
+        surface(keys[i],offset,n[0]?[height,depth]:[width,n[1]?depth:height],rotation);
+      });
+    };
     const on = p.lit === 'true' || cell.value > 0, red = on ? new THREE.Color().setRGB(.28 + cell.value / 22,.035 + cell.value / 110,.025).getHex() : 0x4d2728;
     const facing = p.facing ?? 'north', dir = directionVectors[facing], angle = Math.atan2(dir[0], dir[2]);
-    const torch = (cx: number, cz: number, lit: boolean, height = .5) => { part([cx,height / 2,cz],[.11,height,.11],0x9c7651,'cylinder'); part([cx,height,cz],[.2,.14,.2],lit ? 0xff5541 : 0x713637); };
+    const torch = (cx: number, cz: number, lit: boolean, height = .5, base = 0) => {
+      part([cx,(base+height)/2,cz],[.125,height-base,.125],0x9c7651);
+      part([cx,height-.0625,cz],[.126,.125,.126],lit ? 0xff5541 : 0x713637);
+      cubeSurfaces(Array(6).fill(`torch:${Number(lit)}`),undefined,.128,.127,.128,new THREE.Vector3(cx,height-.0625,cz));
+    };
     if (name === 'redstone_wire') {
       part([.5,.024,.5],[.22,.042,.22],red);
       for (const d of ['north','east','south','west']) if (p[d] !== 'none') { const v = directionVectors[d]; part([.5 + v[0] * .27,.023,.5 + v[2] * .27], v[0] ? [.54,.04,.095] : [.095,.04,.54],red); if (p[d] === 'up') part([.5 + v[0] * .49,.5,.5 + v[2] * .49],v[0] ? [.045,1,.095] : [.095,1,.045],red); }
+      topSurface(`wire:${Math.max(0,Math.min(15,Number(p.power ?? cell.value)))}`,.048,.38);
     } else if (name === 'repeater' || name === 'comparator') {
-      part([.5,.065,.5],[.94,.13,.94],0xb2b7ac); part([.5,.14,.5],[.12,.025,.65],red,'box',angle);
-      const v = directionVectors[facing]; torch(.5 - v[0]*.29,.5 - v[2]*.29,on,.31);
-      if (name === 'repeater') torch(.5 + v[0]*(.3 - (Number(p.delay)-1)*.11),.5 + v[2]*(.3 - (Number(p.delay)-1)*.11),on,.31);
-      else { torch(.5+v[0]*.27+v[2]*.21,.5+v[2]*.27-v[0]*.21,on,.31); torch(.5+v[0]*.27-v[2]*.21,.5+v[2]*.27+v[0]*.21,on,.31); }
-      if (p.locked === 'true') part([.5,.28,.5],[.8,.12,.14],0x343b40,'box',angle);
+      const powered = p.powered === 'true', delay = Math.max(1,Math.min(4,Number(p.delay) || 1)), subtract = p.mode === 'subtract';
+      part([.5,.0625,.5],[1,.125,1],0xa8ada5);
+      topSurface(`${name}:${Number(powered)}:${name==='repeater'?delay:Number(subtract)}`,.126,1,angle);
+      const v = directionVectors[facing];
+      if (name === 'repeater') {
+        // State facing points toward the input. The fixed output torch is
+        // -5/16; the movable input torch advances from -1/16 to +5/16.
+        torch(.5-v[0]*5/16,.5-v[2]*5/16,powered,7/16,2/16);
+        const offset = (2*delay-3)/16;
+        if (p.locked === 'true') part([.5+v[0]*offset,3/16,.5+v[2]*offset],[12/16,2/16,2/16],0x343b40,'box',angle);
+        else torch(.5+v[0]*offset,.5+v[2]*offset,powered,7/16,2/16);
+      } else {
+        torch(.5-v[0]*5/16,.5-v[2]*5/16,subtract,subtract?5/16:4/16,2/16);
+        for(const sign of [-1,1])torch(.5+v[0]*4/16+v[2]*sign*3/16,.5+v[2]*4/16-v[0]*sign*3/16,powered,7/16,2/16);
+      }
     } else if (name.includes('redstone_torch')) torch(.5,.5,on,.62);
     else if (name === 'lever') { part([.5,.09,.5],[.46,.18,.46],0x747d7d); part([on ? .65 : .35,.36,.5],[.12,.5,.12],0xc4ad80); part([on ? .65 : .35,.6,.5],[.18,.09,.18],on ? 0xee6550 : 0x80776b); }
     else if (name.endsWith('_button')) part([.5,on ? .035 : .08,.5],[.35,on ? .07 : .16,.5],name.includes('stone') ? 0x9b9f95 : 0xba8c58);
     else if (name === 'redstone_lamp') {
       part([.5,.5,.5],[.98,.98,.98],on ? 0xffcf82 : 0x5c4938);
-      for (const v of [.08,.5,.92]) { part([v,.5,.999],[.045,1,.02],0x564536); part([.5,v,.999],[1,.045,.02],0x564536); part([.999,.5,v],[.02,1,.045],0x564536); part([.999,v,.5],[.02,.045,1],0x564536); part([v,.999,.5],[.045,.02,1],0x564536); part([.5,.999,v],[1,.02,.045],0x564536); }
+      cubeSurfaces(Array(6).fill(`lamp:${Number(p.lit==='true')}`));
     } else if (name.endsWith('copper_bulb')) {
       const oxidized = name.includes('oxidized') || name.includes('weathered'); part([.5,.5,.5],[.98,.98,.98],oxidized ? 0x527b65 : 0xac7151);
       for (const v of [.25,.5,.75]) { part([v,.996,.5],[.11,.014,.66],on ? 0xffda8c : 0x3f4944); part([.996,.5,v],[.014,.66,.11],on ? 0xffda8c : 0x3f4944); part([v,.5,.996],[.11,.66,.014],on ? 0xffda8c : 0x3f4944); }
     } else if (name === 'observer') {
-      part([.5,.5,.5],[.98,.98,.98],0x818b8c); part([.5,.998,.5],[.58,.016,.65],0x515d60); part([.5,.998,.5],[.12,.025,.55],0x9aadaa,'box',angle);
-      const v = directionVectors[facing]; for (const sign of [-1,1]) part([.5+v[0]*.5+v[2]*.2,.6,.5+v[2]*.5-v[0]*.2*sign],[v[0] ? .018 : .14,.12,v[0] ? .14 : .018],0x20292c);
-      part([.5-v[0]*.5,.48,.5-v[2]*.5],[v[0] ? .025 : .22,.22,v[0] ? .22 : .025],red);
+      part([.5,.5,.5],[.98,.98,.98],0x818b8c);
+      const state = Number(p.powered==='true'), orientation = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0,0,-1),new THREE.Vector3(...dir));
+      cubeSurfaces([`observerFront:${state}`,`observerBack:${state}`,...Array(4).fill(`observerSide:${state}`)],orientation);
     } else if (name === 'piston' || name === 'sticky_piston' || name === 'piston_head') {
       const v = directionVectors[facing], sticky = name === 'sticky_piston' || p.type === 'sticky';
       const pistonPart = (offset: number, length: number, width: number, tint: number) => part([.5+v[0]*offset,.5+v[1]*offset,.5+v[2]*offset],[v[0]?length:width,v[1]?length:width,v[2]?length:width],tint);
+      const orientation = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0,0,-1),new THREE.Vector3(...v));
+      const headSurface = (offset: number) => surface(`pistonHead:${Number(sticky)}`,new THREE.Vector3(.5+v[0]*offset,.5+v[1]*offset,.5+v[2]*offset),[.99,.99],orientation.clone().multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),Math.PI)));
       if (name === 'piston_head') { pistonPart(.37,.25,.99,sticky?0x8da96a:0xbb9f70); pistonPart(-.12,.75,.22,0xa8a38c); }
       else {
         const open = p.extended === 'true' || (moving && source); pistonPart(open?-.125:0,open?.75:.99,.99,0x727d7a);
         if (!open || (moving && source && !extending)) { const headOffset = moving ? 1-progress : 0; pistonPart(.37+headOffset,.25,.99,sticky?0x8da96a:0xbb9f70); if(moving)pistonPart(headOffset*.5,.8,.22,0xaaa58e); }
-        for (const offset of [-.25,0,.25]) part([.5,.995,.5+offset],[.77,.01,.045],0x48534f);
+        const center = new THREE.Vector3(.5,.5,.5).addScaledVector(new THREE.Vector3(...v),open?-.125:0);
+        cubeSurfaces(['','',...Array(4).fill(`pistonSide:${Number(sticky)}`)],orientation,.992,.992,open?.752:.992,center);
+        if(!open || (moving && source && !extending))headSurface(.497+(moving?1-progress:0));
       }
+      if(name==='piston_head')headSurface(.497);
     } else if (name === 'tripwire') {
       const attached = p.attached === 'true';
       // Original wire selection volume covers the cell, not only its thin
@@ -369,7 +414,7 @@ export class CircuitViewport {
     return handles;
   }
   private applyChanges = (event: Event) => { const { full, changes } = (event as CustomEvent<{ full: boolean; changes: BlockCell[] }>).detail; if (full) this.rebuild(); else for (const cell of changes) this.drawCell(cell); this.refreshHover(); };
-  private rebuild() { for (const chunk of this.chunks.values()) { chunk.box.dispose(); chunk.cylinder.dispose(); chunk.pick?.dispose(); this.scene.remove(chunk.group); } this.chunks.clear(); this.handles.clear(); for (const cell of connection.cells.values()) this.drawCell(cell); }
+  private rebuild() { for (const chunk of this.chunks.values()) { chunk.box.dispose(); chunk.cylinder.dispose(); chunk.pick?.dispose(); for(const pool of chunk.surfaces?.values() ?? [])pool.dispose(); this.scene.remove(chunk.group); } this.chunks.clear(); this.handles.clear(); for (const cell of connection.cells.values()) this.drawCell(cell); }
   setLayer(layer: number, cutaway: boolean) {
     this.layer = Number.isFinite(layer) ? Math.max(-64, Math.min(319, Math.trunc(layer))) : this.layer;
     this.cutaway = cutaway; this.plane.constant = -this.layer;
@@ -477,5 +522,5 @@ export class CircuitViewport {
   private pointerMove = (event: PointerEvent) => { if (this.down && Math.hypot(event.clientX-this.down.x,event.clientY-this.down.y) >= 5) this.down.dragged = true; this.lastPointer = { clientX:event.clientX, clientY:event.clientY }; this.refreshHover(); };
   private pointerLeave = () => { this.lastPointer = null; this.down = null; this.refreshHover(); };
   private animate = () => { this.frameId = requestAnimationFrame(this.animate); const now = performance.now(); this.moveCamera(Math.min((now-this.lastFrame)/1000,.05)); this.lastFrame = now; this.controls.update(); this.renderer.render(this.scene,this.camera); this.frameCount++; if (now-this.lastFps > 1000) { this.onFps(Math.round(this.frameCount*1000/(now-this.lastFps))); this.lastFps=now; this.frameCount=0; } };
-  dispose() { cancelAnimationFrame(this.frameId); window.removeEventListener('blur', this.clearInput); document.removeEventListener('visibilitychange', this.clearInput); this.resizeObserver.disconnect(); connection.removeEventListener('cells',this.applyChanges); this.controls.removeEventListener('change', this.refreshHover); this.controls.dispose(); this.previewChunk.box.dispose(); this.previewChunk.cylinder.dispose(); this.previewChunk.pick?.dispose(); this.previewMaterial.dispose(); this.previewArrow.dispose(); this.grid.dispose(); this.selection.dispose(); for (const c of this.chunks.values()) { c.box.dispose(); c.cylinder.dispose(); c.pick?.dispose(); } this.renderer.dispose(); this.renderer.domElement.remove(); }
+  dispose() { cancelAnimationFrame(this.frameId); window.removeEventListener('blur', this.clearInput); document.removeEventListener('visibilitychange', this.clearInput); this.resizeObserver.disconnect(); connection.removeEventListener('cells',this.applyChanges); this.controls.removeEventListener('change', this.refreshHover); this.controls.dispose(); this.previewChunk.box.dispose(); this.previewChunk.cylinder.dispose(); this.previewChunk.pick?.dispose(); for(const pool of this.previewChunk.surfaces?.values() ?? [])pool.dispose(); this.previewMaterial.dispose(); this.previewArrow.dispose(); this.grid.dispose(); this.selection.dispose(); for (const c of this.chunks.values()) { c.box.dispose(); c.cylinder.dispose(); c.pick?.dispose(); for(const pool of c.surfaces?.values() ?? [])pool.dispose(); } this.deviceTextures.dispose(); this.renderer.dispose(); this.renderer.domElement.remove(); }
 }

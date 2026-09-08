@@ -11,6 +11,7 @@ let browser, page;
 before(async () => {
   browser = await chromium.launch({ channel: process.env.VERIMC_BROWSER ?? 'chrome', headless: true });
   page = await browser.newPage({ viewport: { width: 1100, height: 800 } });
+  page.on('pageerror', error => console.error(error));
   await page.route('**/viewport-harness', route => route.fulfill({ contentType: 'text/html', body: `
     <style>body{margin:0}#scene{width:1100px;height:800px}</style><div id="scene"></div>
     <script type="module">
@@ -166,4 +167,84 @@ test('render placement preview for visual review', async () => {
   await page.evaluate(() => new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
   await mkdir(new URL('../testResults/',import.meta.url),{recursive:true});
   await page.screenshot({path:fileURLToPath(new URL('../testResults/placementPreview.png',import.meta.url))});
+});
+
+test('repeater spacing increases across all four delays and facings; lock replaces the movable torch', async () => {
+  const cases=await page.evaluate(() => {
+    const results=[];
+    for(const [facing,v] of Object.entries({north:[0,0,-1],south:[0,0,1],east:[1,0,0],west:[-1,0,0]}))for(let delay=1;delay<=4;delay++)for(const locked of [false,true])for(const powered of [false,true]) {
+      view.setPlacement('minecraft:repeater',{facing,delay:String(delay),locked:String(locked),powered:String(powered)});
+      const parts=view.previewHandles.filter(h=>h.pool===view.previewChunk.box).map(h=>{
+        const m=new THREE.Matrix4(),position=new THREE.Vector3(),size=new THREE.Vector3();h.pool.mesh.getMatrixAt(h.index,m);m.decompose(position,new THREE.Quaternion(),size);
+        return {along:(position.x-.5)*v[0]+(position.z-.5)*v[2],height:size.y,width:size.x};
+      });
+      const stems=parts.filter(p=>Math.abs(p.height-5/16)<1e-6).map(p=>p.along).sort((a,b)=>a-b);
+      const bar=parts.find(p=>Math.abs(p.width-12/16)<1e-6);
+      const texture=view.previewHandles.find(h=>h.pool.geometry.type==='PlaneGeometry').pool.poolMaterial;
+      results.push({delay,locked,powered,stems,bar:bar?.along,textureMatches:texture===view.deviceTextures.get(`repeater:${Number(powered)}:${delay}`,true)});
+    }
+    return results;
+  });
+  assert.equal(cases.length,64);
+  for(const c of cases) {
+    assert.equal(c.textureMatches,true);
+    assert.equal(c.stems.length,c.locked?1:2);
+    assert.ok(Math.abs(c.stems[0]+5/16)<1e-6,'fixed output torch');
+    const movable=c.locked?c.bar:c.stems[1];
+    assert.ok(Math.abs(movable-(-1/16+(c.delay-1)/8))<1e-6,'movable torch / lock position');
+    assert.ok(Math.abs(movable-c.stems[0]-(c.delay+1)/8)<1e-6,'1–4 delays have 4, 6, 8, 10 pixel spacing');
+  }
+});
+
+test('comparator mode indicator is independent of output, and observer faces rotate in six directions',async()=>{
+  const result=await page.evaluate(()=>{
+    const comparators=[];
+    for(const mode of ['compare','subtract'])for(const powered of ['false','true']) {
+      view.setPlacement('minecraft:comparator',{facing:'south',mode,powered});
+      const front=view.previewHandles.filter(h=>h.pool===view.previewChunk.box).map(h=>{const m=new THREE.Matrix4();h.pool.mesh.getMatrixAt(h.index,m);return m.elements;}).filter(m=>Math.abs(m[14]-3/16)<1e-6);
+      const head=front.find(m=>Math.abs(m[5]-.125)<1e-6);
+      comparators.push({mode,powered,top:head[13]+head[5]/2,lit:view.previewHandles.filter(h=>h.pool.poolMaterial===view.deviceTextures.get('torch:1',true)).length});
+    }
+    const observers=[],pistons=[];
+    for(const [facing,v] of Object.entries({north:[0,0,-1],south:[0,0,1],east:[1,0,0],west:[-1,0,0],up:[0,1,0],down:[0,-1,0]})) {
+      view.setPlacement('minecraft:observer',{facing,powered:'true'});
+      const center=key=>{const h=view.previewHandles.find(h=>h.pool.poolMaterial===view.deviceTextures.get(key,true));const m=new THREE.Matrix4();h.pool.mesh.getMatrixAt(h.index,m);return m.elements.slice(12,15).map((n,i)=>(n-.5)*v[i]);};
+      const arrows=view.previewHandles.filter(h=>h.pool.poolMaterial===view.deviceTextures.get('observerSide:1',true)).map(h=>{const m=new THREE.Matrix4();h.pool.mesh.getMatrixAt(h.index,m);return new THREE.Vector3(0,-1,0).transformDirection(m).dot(new THREE.Vector3(...v));});
+      observers.push({front:center('observerFront:1').reduce((a,b)=>a+b,0),back:center('observerBack:1').reduce((a,b)=>a+b,0),arrows});
+      view.setPlacement('minecraft:piston',{facing,extended:'true'});
+      const corners=view.previewHandles.filter(h=>h.pool.geometry.type==='PlaneGeometry').flatMap(h=>{
+        const m=new THREE.Matrix4();h.pool.mesh.getMatrixAt(h.index,m);
+        return [-.5,.5].flatMap(x=>[-.5,.5].map(y=>new THREE.Vector3(x,y,0).applyMatrix4(m).addScalar(-.5).dot(new THREE.Vector3(...v))));
+      });
+      pistons.push({min:Math.min(...corners),max:Math.max(...corners)});
+    }
+    return {comparators,observers,pistons};
+  });
+  for(const c of result.comparators){assert.ok(Math.abs(c.top-(c.mode==='subtract'?5/16:4/16))<1e-6);assert.equal(c.lit,(c.mode==='subtract'?6:0)+(c.powered==='true'?12:0));}
+  for(const o of result.observers){assert.ok(Math.abs(o.front-.491)<1e-6);assert.ok(Math.abs(o.back+.491)<1e-6);for(const arrow of o.arrows)assert.ok(Math.abs(arrow+1)<1e-6);}
+  for(const p of result.pistons){assert.ok(Math.abs(p.min+.501)<1e-6);assert.ok(Math.abs(p.max-.251)<1e-6,'extended piston textures must stop at the shortened body');}
+});
+
+test('render device material gallery for visual review',async()=>{
+  await page.evaluate(()=>{
+    connection.cells.clear();connection.states.clear();view.setSection('none');view.setLayer(0,false);view.tool='select';view.select(null);
+    let id=1;
+    const add=(name,properties,pos)=>{const stateId=id++;connection.states.set(stateId,{name:`minecraft:${name}`,stateId,properties});connection.cells.set(pos.join(','),{pos,stateId,renderStateId:stateId,motion:0,value:0});};
+    for(let delay=1;delay<=4;delay++)for(let row=0;row<3;row++)add('repeater',{facing:'south',delay:String(delay),powered:String(row===1),locked:String(row===2)},[(delay-1)*2,0,row*2]);
+    for(let i=0;i<4;i++)add('comparator',{facing:'south',powered:String(i%2===1),mode:i<2?'compare':'subtract'},[i*2,0,6]);
+    for(let i=0;i<4;i++)add('observer',{facing:['south','east','up','north'][i],powered:String(i%2===1)},[i*2,0,8]);
+    for(let i=0;i<4;i++)add(i<2?'piston':'sticky_piston',{facing:['south','up','east','up'][i],extended:'false'},[i*2,0,10]);
+    for(let i=0;i<4;i++)add('redstone_wire',{power:String(i*5),north:'side',south:'side',east:'side',west:'side'},[i*2,0,12]);
+    add('redstone_lamp',{lit:'false'},[8,0,8]);add('redstone_lamp',{lit:'true'},[8,0,10]);
+    connection.dispatchEvent(new CustomEvent('cells',{detail:{full:true,changes:[]}}));
+    view.camera.position.set(9,20,21);view.controls.target.set(4,0,6);view.controls.update();
+  });
+  await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+  await page.screenshot({path:fileURLToPath(new URL('../testResults/deviceMaterials.png',import.meta.url))});
+  await page.evaluate(()=>{view.camera.position.set(11,8,16);view.controls.target.set(5,0,9);view.controls.update();});
+  await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+  await page.screenshot({path:fileURLToPath(new URL('../testResults/deviceFaces.png',import.meta.url))});
+  await page.evaluate(()=>{view.camera.position.set(3.5,11,3.6);view.controls.target.set(3.5,0,3.5);view.controls.update();});
+  await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+  await page.screenshot({path:fileURLToPath(new URL('../testResults/repeaterDelays.png',import.meta.url))});
 });
