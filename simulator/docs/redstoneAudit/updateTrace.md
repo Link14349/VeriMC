@@ -53,6 +53,7 @@
   比较器读桶、以及一个准连接活塞，14 刻 / 9 点，轨迹 **3,327 条**，逐条相同。
 - **跟踪不改变执行语义**：同一时间线用 `python3 captureUpdateTrace.py --no-trace` 再捕获一次，
   两次的 `frames` 与 `commands` 完全相同（原点不同，是 GameTest 的随机原点）。
+  这只证明上述两次具体采样一致；尚需固定相同坐标及环境做开关对照，不能据此证明跟踪普遍无扰动。
 - **负对照**：把轨迹里第 100 条改成 `[99,99,99]`，`checkReference` 报
   `firstTraceDifference` 并给出前后各若干条上下文；把 `updateTraceTruncated` 改成 true，
   直接报错而不是 match。

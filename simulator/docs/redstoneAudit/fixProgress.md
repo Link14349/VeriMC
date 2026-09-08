@@ -19,13 +19,13 @@ GameTest 功能开关 `minecraft:vanilla` + `minecraft:trade_rebalance`，`rando
 即数据生成器给内置数据包写描述用。它在世界、方块、实体、红石逻辑里**没有任何引用**。
 
 方块与物品受开关影响的唯一途径是 `isEnabled(enabledFeatures)` / `isItemEnabled(...)`
-所比较的 `requiredFeatures`；没有任何方块或物品把 `TRADE_REBALANCE` 列为必需特性
-（否则会出现第二处引用）。因此对方块与红石行为而言，
-当前 GameTest 环境与严格 vanilla-only **行为等价**。
+所比较的 `requiredFeatures`；上述源码检索未找到方块或物品硬编码该开关的路径。
+但单一 Java 字段引用检索并未穷尽数据包、按名称查询及资源加载路径，
+因此只能作为当前电路不受该开关影响的静态支持证据，**不能证明整个环境行为等价**。
 
 **仍然没有做的部分**：`GameTestServer.ENABLED_FEATURES` 是 `private static final`，
-无法在运行期改写；真正的“严格 vanilla-only 专用服务器复跑”需要另建一套不依赖 GameTest 的
-捕获链路（自建世界、自建数据包集合、自行驱动时间线）。本次**没有**做这件事，
+本次没有改写该字段，也没有建立严格 vanilla-only 专用服务器捕获链路。
+静态字段修饰符本身并不证明其他测试接入方式都不可行。本次**没有**完成严格专服复跑，
 因此所有捕获仍然标注为 vanilla + trade_rebalance，不冒称严格 vanilla-only 专服验证。
 
 ## 随机差分找到的新差异：支撑丢失的检查方向（issue #14 第三条）

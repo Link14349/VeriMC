@@ -31,6 +31,6 @@ R11 更新预算耗尽暂停是当前明确约定的差别；R12 空闲振动优
 
 [详细策略与新增测试范围](https://github.com/Zhen-WushuiLingchun/VeriMC/blob/9c6f535/simulator/docs/redstoneAudit/quirkCompatibilityPlan.md) · [新增捕获哈希和环境](https://github.com/Zhen-WushuiLingchun/VeriMC/blob/9c6f535/simulator/docs/redstoneAudit/quirkDifferentialResults.json)
 
-建议先修复三个真实反例，再核对更新执行主干，建设刻内差分和典型机器回归。区块/实体模型先明确设计和边界；本次建立任务不表示这些功能已经实现。
+截至 2026-09-09，已关闭 #1–#11、#13，共 12 项；其中 #10 是有边界的调查结论，#13 是清单与门禁，不代表全部器件都已实现。#12、#14 及汇总 #15 仍打开。随机差分收尾及可恢复会话说明见 [closureHandoff.md](closureHandoff.md)。
 
 汇总入口：[issue #15](https://github.com/Zhen-WushuiLingchun/VeriMC/issues/15)。

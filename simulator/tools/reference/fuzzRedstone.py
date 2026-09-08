@@ -4,14 +4,17 @@
 Many independent circuits are packed into one GameTest capture so a run costs one server
 start. On a difference the first differing position identifies the offending cell, and the
 scenario is shrunk automatically: first to that cell alone, then by greedily dropping
-commands and then blocks while the difference survives.
+commands while the difference survives. This is budgeted reduction, not a minimality proof.
 
 Every step re-captures from the pinned reference; nothing is inferred. Coordinates, seed
 and the surviving command history are written to the report so a failure is reproducible.
+GameTest chooses a new origin for each capture: a reduced witness is confirmed at its own
+recorded origin, not proved equivalent to the initial failure at the initial coordinates.
 
     python3 tools/reference/fuzzRedstone.py --seed 1 --rounds 3 --output <new directory>
 """
 import argparse
+import hashlib
 import json
 import random
 import subprocess
@@ -121,18 +124,34 @@ def capture(commands, watch, endTick, path):
 
 def check(checker, path):
     finished = subprocess.run([str(checker), str(path)], capture_output=True, text=True, timeout=300)
-    return json.loads(finished.stdout)
+    report = json.loads(finished.stdout)
+    status = report.get('status')
+    if status not in ('match', 'difference', 'error'):
+        raise RuntimeError(f'Unknown checker status: {status}')
+    expectedCode = 0 if status == 'match' else 1
+    if finished.returncode != expectedCode:
+        raise RuntimeError(f'Checker status {status} contradicts exit code {finished.returncode}')
+    return report
 
 
 def differenceKey(report):
     difference = report.get('firstDifference')
     if difference:
-        return ('state', tuple(difference['relativePos']), difference['tick'], difference['field'])
+        return ('state', tuple(difference['relativePos']), difference['tick'], difference['field'],
+                json.dumps(difference.get('expected'), sort_keys=True),
+                json.dumps(difference.get('actual'), sort_keys=True))
     return None
 
 
+def captureEvidence(path):
+    content = path.read_bytes()
+    capture = json.loads(content)
+    return {'captureSha256': hashlib.sha256(content).hexdigest(),
+            'origin': capture.get('origin'), 'referenceEnvironment': capture.get('referenceEnvironment')}
+
+
 def shrink(checker, commands, watch, endTick, key, workDir, budget):
-    """Greedily drop commands, then blocks, keeping only changes that preserve the difference."""
+    """Budgeted command reduction; each accepted witness has its own captured origin."""
     step = 0
     changed = True
     while changed and step < budget:
@@ -150,7 +169,7 @@ def shrink(checker, commands, watch, endTick, key, workDir, budget):
             if differenceKey(check(checker, path)) == key:
                 commands = candidate
                 changed = True
-    return commands, step
+    return commands, step, step >= budget
 
 
 def main():
@@ -162,8 +181,12 @@ def main():
     parser.add_argument('--output', required=True, type=Path)
     parser.add_argument('--shrinkBudget', type=int, default=60)
     args = parser.parse_args()
+    if args.rounds < 1 or args.ticks < 4 or args.shrinkBudget < 0:
+        parser.error('rounds must be positive, ticks >= 4, and shrinkBudget >= 0')
     args.output.mkdir(parents=True, exist_ok=False)
-    report = {'seed': args.seed, 'rounds': args.rounds, 'ticks': args.ticks, 'results': []}
+    report = {'seed': args.seed, 'rounds': args.rounds, 'ticks': args.ticks,
+              'reductionScope': 'budgeted; recaptures use new origins; no minimality or fixed-origin guarantee',
+              'results': []}
     failures = 0
     for round_ in range(args.rounds):
         rng = random.Random((args.seed << 16) + round_)
@@ -180,6 +203,7 @@ def main():
         result = check(args.checker, path)
         row = {'round': round_, 'cells': GRID * GRID, 'commands': len(commands), 'watch': len(watch),
                'status': result['status'], 'origin': result.get('origin')}
+        row.update(captureEvidence(path))
         key = differenceKey(result)
         if key:
             failures += 1
@@ -191,12 +215,19 @@ def main():
             capture(cellCommands, cellWatch, args.ticks, reduced)
             cellKey = differenceKey(check(args.checker, reduced))
             if cellKey == key:
-                shrunk, steps = shrink(args.checker, cellCommands, cellWatch, args.ticks, key, args.output, args.shrinkBudget)
-                minimal = args.output / f'round{round_}Minimal.json'
-                capture(shrunk, cellWatch, args.ticks, minimal)
-                row['minimalCommands'] = len(shrunk)
+                reducedDir = args.output / f'round{round_}Reduction'
+                reducedDir.mkdir()
+                shrunk, steps, budgetReached = shrink(args.checker, cellCommands, cellWatch, args.ticks, key, reducedDir, args.shrinkBudget)
+                candidate = args.output / f'round{round_}Reduced.json'
+                capture(shrunk, cellWatch, args.ticks, candidate)
+                confirmation = check(args.checker, candidate)
+                row['reducedCommands'] = len(shrunk)
                 row['shrinkSteps'] = steps
-                row['minimalScenario'] = str(minimal)
+                row['shrinkBudgetReached'] = budgetReached
+                row['reducedScenario'] = str(candidate)
+                row['reducedEvidence'] = captureEvidence(candidate)
+                row['reducedComparison'] = confirmation
+                row['reducedWitnessConfirmed'] = differenceKey(confirmation) == key
             else:
                 row['note'] = 'difference does not survive isolation to a single cell'
         elif result['status'] != 'match':
