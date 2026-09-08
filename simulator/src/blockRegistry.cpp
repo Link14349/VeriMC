@@ -83,6 +83,7 @@ BlockRegistry::BlockRegistry(const std::string& path) {
         BlockType typeInfo;
         typeInfo.name = b.at("name"); typeInfo.className = b.at("className");
         typeInfo.defaultState = b.at("defaultState"); typeInfo.firstState = b.at("states")[0].at("id");
+        typeInfo.stairs = b.at("stairs");
         typeInfo.device = classify(typeInfo.name, typeInfo.className);
         typeInfo.instrument=instrumentId(noteData.at("blocks").at(typeInfo.name));
         for(const auto& name:vibrationData.at("occludes_vibration_signals")) if(name==typeInfo.name) typeInfo.occludesVibrations=true;

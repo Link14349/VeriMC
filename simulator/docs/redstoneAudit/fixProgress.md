@@ -9,6 +9,65 @@
 GameTest 功能开关 `minecraft:vanilla` + `minecraft:trade_rebalance`，`randomTickSpeed=0`，
 实验红石关闭。仍然不能称为严格 vanilla-only 专用服务器验证。
 
+## R7 楼梯连接形状（issue #2）已修复
+
+**根因**：`Simulator::executeShape` 与 `Simulator::place` 都没有楼梯分支，`shape` 永远是放置时写入的值。
+`shape` 决定 `supportMask`/`rigidMask`/`centerMask`，所以这不是外观差异：内角楼梯的侧面在原版是 sturdy，
+可以挂红石墙火把，仿真里永远不能。
+
+**改动**：
+
+- `tools/reference/ExportReference.java` 增加逐方块导出 `stairs`（即原版 `StairBlock.isStairs` 的
+  `block instanceof StairBlock`），`BlockType` 新增同名字段。这样 `WeatheringCopperStairBlock`
+  等子类自动包含在内，不靠名字后缀猜测。重新生成 `data/blockStates.json`。
+- 新增 `Simulator::stairsShape`，逐句对应 `StairBlock.getStairsShape`：先看朝向前方
+  （`pos.relative(facing)`）的楼梯给出 `outer_left`/`outer_right`，再看背后
+  （`pos.relative(facing.getOpposite())`）的楼梯给出 `inner_left`/`inner_right`，
+  两者都要求同 `half`、轴不同，并通过 `canTakeShape`（对侧不是同朝向同 half 的楼梯）。
+  `types.hpp` 增加 `clockWise` / `counterClockWise`。
+- `executeShape` 对楼梯只在水平方向的形状更新中重算 `shape`（竖直方向落到原版基类的空实现），
+  `place` 按 `getStateForPlacement` 在放置时算出 `shape`。
+- `tools/reference/CaptureRedstone.java` 的 `playerPlace` 增加楼梯分支：楼梯的
+  `getStateForPlacement` 直接使用玩家水平朝向（箱子用其反向），`half` 来自点击面，
+  因此对楼梯把偏航角设为目标 `facing`，并按目标 `half` 点击目标格自身的上/下面。
+  箱子路径逐字不变，`java26_2CopperChests` 重新捕获后仍然一致。
+
+**原版证据**：
+
+1. 原反例 `tests/scenarios/stairShape.json` 重跑通过。捕获 SHA-256
+   `fb849305efdd7723c0e0035627e26f4991d1eb1f54ec7d2f5876db8acf75c787`，
+   原点 `[10884563, -58, 13377240]`，5 帧 × 2 点。
+2. 新增常规回归 `tests/fixtures/java26_2StairShapes.json`
+   （SHA-256 `946d8b9330009112b11f0ec4a6d9057ac547d53d7dc960bc2bfbdf6e49c2ddbc`，
+   原点 `[4903637, -58, 8864154]`，17 帧 × 153 点 = 2,601 次位置/帧观测），
+   脚本 `tools/reference/captureStairShapes.py`。67 个互不相邻的 5×5 格子：
+
+   - 32 组：4 朝向 × 上下半 × `outer_left`/`outer_right`/`inner_left`/`inner_right`，
+     先放主楼梯，再放搭档触发形状更新，第 10 gt 拆除搭档后回到 `straight`。
+   - 16 组：同样布置但在 `canTakeShape` 探测位放一段同朝向同 half 的楼梯，原版保持 `straight`。
+   - 16 组：搭档先放，主楼梯用原版 `getStateForPlacement` 放置，放置当刻即得内/外角；
+     捕获确认原版给出的 `facing`/`half` 与请求一致。
+   - 3 组：内角把侧面变 sturdy，第 4 gt 在该面挂红石墙火把；第 10 gt 拆除搭档后楼梯回到
+     `straight`，火把随形状更新一起消失。这是 `shape → supportMask → survives` 的实际链路证据。
+
+   第 5 gt 的形状分布为 bottom/top 各含 `outer_left` 4、`outer_right` 8、`inner_left` 5、
+   `inner_right` 8/9，第 15 gt 全部回到 `straight`，三个火把位置变回空气。
+3. 反向验证（两条路径分别验证）：
+   - 去掉 `executeShape` 的楼梯分支 → 第 2 gt、相对坐标 `[4,2,4]` 报 `straight` vs `outer_left`。
+   - 只去掉 `place` 的楼梯分支 → 第 2 gt、相对坐标 `[19,2,29]`（第一个玩家放置格）报
+     `straight` vs `outer_right`。
+4. Release `ctest` 3/3 通过，核心检查 88/88。
+
+**明确排除的范围**：
+
+- **活塞推动后的楼梯仍保持旧 `shape`**。`Simulator::finishMotion` 用 `survives()` 近似原版的
+  `Block.updateFromNeighbourShapes`，这是 R8（issue #8）的范围，本次没有修，也没有为它建证据。
+- 只覆盖 `oak_stairs` 一种材质。`stairs` 标志来自注册表 `instanceof StairBlock`，
+  64 种楼梯方块全部命中，但差分场景没有逐材质重复。
+- 楼梯的 `waterlogged` 与流体计划刻不在实现范围内，场景中全部为 `false`。
+- 没有覆盖“外角楼梯失去正面 sturdy”对应的挂接实体：外角搭档必然占据该面所在的格子，
+  在这套只放方块的场景里无法同时放置见证方块。内角的获得/失去已经双向验证。
+
 ## R6 日光传感器切换的振动事件（issue #1）已修复
 
 **根因**：`DaylightDetectorBlock.useWithoutItem` 在 `setBlock(pos, newState, 2)` 之后、
@@ -68,7 +127,9 @@ C++ 却在其后又执行了一次 `!hasBlockEntity()`。
 
 - `tools/reference/ExportReference.java` 增加导出每个方块状态的 `destroySpeed`
   （`BlockBehaviour.BlockStateBase.getDestroySpeed` 返回的是与位置无关的常量字段，逐状态导出即精确）。
-- 重新生成 `data/blockStates.json`（SHA-256 `a7f075994561df20f9be27071933ced23164f34612327ecc8bbec5c41bf19a16`）。
+- 重新生成 `data/blockStates.json`（提交 `9f401bb` 时 SHA-256
+  `a7f075994561df20f9be27071933ced23164f34612327ecc8bbec5c41bf19a16`；R7 又新增 `stairs` 列后变为
+  `9a44e583bbe9bfd08827fe364a51fee356b20cbd5b0122a99bf36578e30e81c2`）。
   状态 ID 与既有字段未变，只新增一列；该文件参与 `rulesDigest`，旧 `.vmcb` 需要显式迁移。
 - `BlockState` 新增 `indestructible`（`destroySpeed == -1.0f`），`pushable()` 按原版顺序判断，
   并删除硬编码的 `minecraft:bedrock`；黑曜石四件套仍按原版的显式 `state.is(...)` 名字分支保留。

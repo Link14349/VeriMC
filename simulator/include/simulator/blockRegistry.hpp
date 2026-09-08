@@ -17,6 +17,8 @@ struct BlockType {
     std::map<std::string, PropertyInfo> properties;
     std::string supportLevel{"unimplemented"};
     bool occludesVibrations{}, dampensVibrations{}, vibrationResonator{};
+    // 原版 StairBlock.isStairs 的判据：block instanceof StairBlock，由注册表导出。
+    bool stairs{};
     std::uint8_t instrument{};
 };
 // A power-of-two stride avoids division by 40 in each checked vector lookup.

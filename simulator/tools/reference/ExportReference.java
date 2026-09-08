@@ -10,6 +10,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.Bootstrap;
 import net.minecraft.world.level.EmptyBlockGetter;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.SupportType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
@@ -30,6 +31,7 @@ public class ExportReference {
             blockInfo.addProperty("name", BuiltInRegistries.BLOCK.getKey(block).toString());
             blockInfo.addProperty("className", block.getClass().getSimpleName());
             blockInfo.addProperty("defaultState", Block.getId(block.defaultBlockState()));
+            blockInfo.addProperty("stairs", block instanceof StairBlock);
             JsonArray states = new JsonArray();
             for (var state : block.getStateDefinition().getPossibleStates()) {
                 JsonObject stateInfo = new JsonObject();

@@ -195,6 +195,7 @@ private:
     void notifyAttached(BlockPos pos, Direction connected);
     void updateWire(BlockPos pos, StateId state);
     StateId wireConnections(BlockPos pos, StateId state) const;
+    StateId stairsShape(BlockPos pos, StateId state) const;
     std::array<std::uint8_t, 4> connectionSides(BlockPos pos, StateId state) const;
     std::uint8_t wireSide(BlockPos pos, Direction direction) const;
     bool connectsWire(StateId state, int direction) const;

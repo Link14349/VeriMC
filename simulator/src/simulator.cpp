@@ -199,6 +199,8 @@ void Simulator::place(BlockPos p, StateId id) {
         bool powered = bestSignal(p) > 0;
         id = registry.withBool(registry.withBool(id, "powered", powered), "open", powered);
     }
+    // 原版 StairBlock.getStateForPlacement 在放置时就算出连接形状。
+    if (registry.type(id).stairs) id = stairsShape(p, id);
     if (registry[id].device == Device::container && at(p).type != registry[id].type) id = placedChest(p, id);
     if (registry[id].device == Device::lamp) id = registry.withBool(id, "lit", bestSignal(p) != 0);
     setBlock(p, id);
@@ -284,6 +286,29 @@ StateId Simulator::wireConnections(BlockPos p, StateId id) const {
     for (std::size_t i = 0; i < 4; ++i) id = registry.with(id, directionNames[static_cast<unsigned>(horizontal[i])], std::string(sides[i] == 2 ? "up" : sides[i] == 1 ? "side" : "none"));
     return id;
 }
+// 对应原版 StairBlock.getStairsShape：先看朝向前方的楼梯给出外角，再看背后的楼梯给出内角。
+StateId Simulator::stairsShape(BlockPos p, StateId id) const {
+    const auto facing = registry[id].facing;
+    const auto half = registry.property(id, "half");
+    auto isStairs = [&](StateId other) { return registry.type(other).stairs; };
+    auto canTakeShape = [&](Direction neighbor) {
+        const auto other = world.get(p.relative(neighbor));
+        return !isStairs(other) || registry[other].facing != facing || registry.property(other, "half") != half;
+    };
+    const auto behind = world.get(p.relative(facing));
+    if (isStairs(behind) && registry.property(behind, "half") == half) {
+        const auto behindFacing = registry[behind].facing;
+        if (axis(behindFacing) != axis(facing) && canTakeShape(opposite(behindFacing)))
+            return registry.with(id, "shape", std::string(behindFacing == counterClockWise(facing) ? "outer_left" : "outer_right"));
+    }
+    const auto front = world.get(p.relative(opposite(facing)));
+    if (isStairs(front) && registry.property(front, "half") == half) {
+        const auto frontFacing = registry[front].facing;
+        if (axis(frontFacing) != axis(facing) && canTakeShape(frontFacing))
+            return registry.with(id, "shape", std::string(frontFacing == counterClockWise(facing) ? "inner_left" : "inner_right"));
+    }
+    return registry.with(id, "shape", std::string("straight"));
+}
 void Simulator::updateWire(BlockPos p, StateId id) {
     int power = bestSignal(p, false), neighborPower = 0;
     if (power < 15) for (auto d : horizontal) {
@@ -338,6 +363,11 @@ void Simulator::executeShape(const Update& u) {
         return;
     }
     if (s.device == Device::container && registry.has(id, "type")) { updateChestShape(u); return; }
+    if (registry.type(id).stairs) {
+        // 原版只在水平方向的形状更新里重算 SHAPE，竖直方向落到基类的空实现。
+        if (axis(u.direction) != 0) setBlock(u.pos, stairsShape(u.pos, id), u.flags, u.depth);
+        return;
+    }
     if (!survives(u.pos, id)) { setBlock(u.pos, 0, 3, u.depth); return; }
     if (s.device == Device::observer && u.direction == s.facing && !s.powered && !hasScheduled(u.pos)) schedule(u.pos, 2);
     if (s.device == Device::repeater && axis(u.direction) != 0 && axis(u.direction) != axis(s.facing)) setBlock(u.pos, registry.withBool(id, "locked", diodeSideInput(u.pos) > 0), u.flags, u.depth);

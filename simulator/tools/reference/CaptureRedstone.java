@@ -44,8 +44,13 @@ public class CaptureRedstone extends TestFunctionLoader {
             var placed = Block.stateById(command.get("stateId").getAsInt());
             if (command.has("playerPlace")) {
                 var player=helper.makeMockPlayer(GameType.CREATIVE);
-                player.setYRot(placed.getValue(ChestBlock.FACING).getOpposite().toYRot());
-                var hit=new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(pos.below()),Direction.UP,pos.below(),false);
+                // Stairs read the player's horizontal direction directly and take HALF from the clicked face;
+                // chests use the opposite direction and always keep the original click below the target.
+                boolean stairs=placed.getBlock() instanceof StairBlock;
+                player.setYRot(stairs?placed.getValue(StairBlock.FACING).toYRot():placed.getValue(ChestBlock.FACING).getOpposite().toYRot());
+                var hit=stairs
+                    ?new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(pos),placed.getValue(StairBlock.HALF)==net.minecraft.world.level.block.state.properties.Half.TOP?Direction.DOWN:Direction.UP,pos,false)
+                    :new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(pos.below()),Direction.UP,pos.below(),false);
                 var context=new net.minecraft.world.item.context.BlockPlaceContext(player,net.minecraft.world.InteractionHand.MAIN_HAND,new ItemStack(placed.getBlock().asItem()),hit);
                 placed=placed.getBlock().getStateForPlacement(context);
                 if(placed==null) throw new IllegalStateException("Reference placement failed");

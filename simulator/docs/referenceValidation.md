@@ -64,6 +64,8 @@
 
 `ExportComposting` 在通常四路径参数之后，追加 `data/compostingRules.json` 的绝对输出路径，导出 115 种材料和 4,176 次隔离插入记录。`captureComposters.py` 增加第二十一组 GameTest，111 刻 / 26 点，验证临时输入/输出容器及失败抽取副作用，见 [堆肥桶说明](composters.md)。
 
+`captureStairShapes.py` 增加楼梯连接形状组：17 刻 / 153 点，覆盖四朝向 × 上下半 × 内外角、`canTakeShape` 阻断、原版玩家放置、拆除回到 `straight`，以及内角侧面变 sturdy 后红石墙火把的存活与消失。`ExportReference` 同时逐方块导出 `stairs`（`block instanceof StairBlock`）。`CaptureRedstone` 的 `playerPlace` 对楼梯按其 `getStateForPlacement` 语义设置玩家朝向与点击面；箱子路径不变。
+
 `captureDaylightVibration.py` 增加日光传感器振动组：81 刻 / 6 点，覆盖右键切换 `inverted` 发出的 `block_change`，包括两个切换方向、距离 3 与 5 格的行进刻数，以及背面滤波为 11（接受）和 9（拒绝）的校频感测体。场景不观察传感器自身 `power`，天空亮度仍是外部刺激。
 
 `capturePistonPushability.py` 增加活塞可推性组：25 刻 / 36 点，覆盖普通方块、按原版 `getDestroySpeed()==-1` 拒绝的基岩与末地传送门框，以及釉面陶瓦 `PUSH_ONLY` 的推出、不可拉回和侧向分支留置。`ExportReference` 同时导出每个方块状态的 `destroySpeed`，注册表数据指纹随之变化，旧 `.vmcb` 需要显式迁移。详见 [修复进度](redstoneAudit/fixProgress.md)。
