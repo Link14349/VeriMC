@@ -295,7 +295,6 @@ void Hub::start() {
             try {
                 if (speed == 0) {
                     sim.advanceActive(8192, std::chrono::milliseconds(5));
-                    if (sim.pendingEvents() == 0 && !sim.breakRequested) { running = false; sim.pauseReason = "电路已稳定，没有待执行事件"; }
                 } else {
                     fractionalTicks += std::min(elapsed, 0.1) * speed;
                     auto ticks = static_cast<Tick>(fractionalTicks); fractionalTicks -= static_cast<double>(ticks);
@@ -403,13 +402,15 @@ void Hub::command(const std::shared_ptr<Client>& client, const Json& message) {
     else if (cmd == "configureProbe") sim.configureProbe(message.at("id"), message);
     else if (cmd == "clearTrace") { sim.clearTrace(); full = true; }
     else if (cmd == "undo" || cmd == "redo") {
+        const bool resumeAfter = running;
         running = false; auto& from = cmd == "undo" ? undo : redo; auto& to = cmd == "undo" ? redo : undo;
-        if (!from.empty()) { to.push_back({projectName, sim.clone(), projectOrigin}); auto saved = std::move(from.back()); from.pop_back(); sim.restore(*saved.state); projectName = saved.name; projectOrigin = saved.origin; runStart.reset(); full = true; }
+        if (!from.empty()) { to.push_back({projectName, sim.clone(), projectOrigin}); auto saved = std::move(from.back()); from.pop_back(); sim.restore(*saved.state); projectName = saved.name; projectOrigin = saved.origin; if (!resumeAfter) runStart.reset(); full = true; }
+        running = resumeAfter && !sim.breakRequested && !sim.faulted && !sim.hasPendingActions();
     }
     else if (cmd == "reset") { running = false; if (runStart) { sim.restore(*runStart); full = true; } }
     else if (cmd == "rename") projectName = message.at("name").get<std::string>().substr(0, 200);
     else if (cmd == "place" || cmd == "remove" || cmd == "interact" || cmd == "stimulate" || cmd == "edit" || cmd == "load" || cmd == "new" || cmd == "demo") {
-        const bool resumeAfter = running && (cmd == "interact" || cmd == "stimulate");
+        const bool resumeAfter = running && (cmd == "place" || cmd == "remove" || cmd == "edit" || cmd == "interact" || cmd == "stimulate");
         running = false; auto savedRunStart = resumeAfter ? std::move(runStart) : nullptr; remember();
         try {
             if (cmd == "new") { sim.clear(); projectOrigin = {}; projectName = "未命名电路"; full = true; }
@@ -425,8 +426,12 @@ void Hub::command(const std::shared_ptr<Client>& client, const Json& message) {
                 else if (cmd == "interact") sim.interact(p);
                 else sim.stimulate(p, message.at("stimulus"));
             }
-        } catch (...) { sim.restore(*undo.back().state); undo.pop_back(); throw; }
-        if (resumeAfter) { runStart = std::move(savedRunStart); running = !sim.breakRequested; }
+        } catch (...) {
+            sim.restore(*undo.back().state); undo.pop_back();
+            if (resumeAfter) runStart = std::move(savedRunStart);
+            throw;
+        }
+        if (resumeAfter) { runStart = std::move(savedRunStart); running = !sim.breakRequested && !sim.faulted && !sim.hasPendingActions(); }
     } else throw std::invalid_argument("未知命令：" + cmd);
     result["type"] = "reply"; result["requestId"] = requestId; result["cmd"] = cmd; client->sendJson(result);
     if (full) publish(true); else { publish(); client->sendJson(status()); }
