@@ -28,6 +28,8 @@ struct alignas(64) BlockState {
     std::uint8_t power{}, delay{1}, supportMask{}, rigidMask{}, centerMask{}, staticAnalog{};
     bool conductor{}, fullCube{}, analogSource{}, blockEntity{}, replaceable{}, signalSource{};
     bool powered{}, lit{}, locked{}, extended{}, subtract{}, sticky{};
+    // 原版 getDestroySpeed() == -1.0F 的不可破坏方块，活塞据此拒绝推动。
+    bool indestructible{};
     std::uint8_t pushReaction{};
     std::array<std::uint8_t, 6> weak{}, strong{};
     std::array<std::uint8_t, 4> wireSides{};

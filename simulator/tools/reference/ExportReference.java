@@ -46,6 +46,7 @@ public class ExportReference {
                 stateInfo.addProperty("replaceable", state.canBeReplaced());
                 stateInfo.addProperty("signalSource", state.isSignalSource());
                 stateInfo.addProperty("pushReaction", state.getPistonPushReaction().name());
+                stateInfo.addProperty("destroySpeed", state.getDestroySpeed(EmptyBlockGetter.INSTANCE, BlockPos.ZERO));
                 int supportMask = 0;
                 int rigidMask = 0;
                 int centerMask = 0;

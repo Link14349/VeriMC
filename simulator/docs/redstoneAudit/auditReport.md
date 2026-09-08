@@ -48,7 +48,7 @@ GameTest 默认 `randomTickSpeed=3`，与项目 `naturalRandomTicks=false` 的�
 | R7：两段楼梯形成内角 | 0 gt：原版 `inner_right`，C++ `straight` | 连接形状没有计算；导出的支撑掩码依赖该形状，影响三维器件搭建的正确性 |
 | R10：活塞前放末地传送门框 | 2 gt：原版活塞保持缩回，C++ 伸出 | 当前调色板已支持传送门框，不能当成未来扩容风险；C++ 未按原版不可破坏属性拒绝推动 |
 
-三个原创命令场景保留在 `tests/scenarios/`，捕获哈希与首差异保留在 [confirmedCounterexamples.json](confirmedCounterexamples.json)。这三个场景尚未修复，不纳入“通过的 CTest”来冒充一致性；可用下方工具分别复跑，当前预期退出 1。
+三个原创命令场景保留在 `tests/scenarios/`，捕获哈希与首差异保留在 [confirmedCounterexamples.json](confirmedCounterexamples.json)。上表是 2026-09-08 审计当时的状态；后续修复进度与新的原版证据记录在 [fixProgress.md](fixProgress.md)，实际状态以该文件为准。仍未修复的场景不纳入“通过的 CTest”来冒充一致性；可用下方工具分别复跑，未修复时预期退出 1。
 
 Opus 索引整理了 35 组机制条目（其中明确标有仅定位项），主代理复核了关键差异并修正不成立的反例假设。例如，flag 2 **仍会**触发形状更新，不能据此构造 R5 的过时锁定状态；R4 若修复要查被移除方块的旧类型；R10 已被真实反例证明在当前范围可达。其余静态发现应先补原版定向证据，不能视为全部已经复现。
 

@@ -63,3 +63,5 @@
 `exportJukebox.py` 导出 22 张默认唱片定义。`captureJukeboxes.py` 顺序生成第十九、二十组 GameTest，151 刻 / 68 点与 1,456 刻 / 11 点，逐刻比较播放进度、输出及库存，覆盖首次注册、重新注册、曲终解锁和漏斗空槽条件。`ExportJukeboxPlayback` 使用与 `ExportDropperMotion` 相同的四路径参数，22 张唱片完整播放共 4,265 个隔离样本，详见[唱片机说明](jukeboxes.md)。
 
 `ExportComposting` 在通常四路径参数之后，追加 `data/compostingRules.json` 的绝对输出路径，导出 115 种材料和 4,176 次隔离插入记录。`captureComposters.py` 增加第二十一组 GameTest，111 刻 / 26 点，验证临时输入/输出容器及失败抽取副作用，见 [堆肥桶说明](composters.md)。
+
+`capturePistonPushability.py` 增加活塞可推性组：25 刻 / 36 点，覆盖普通方块、按原版 `getDestroySpeed()==-1` 拒绝的基岩与末地传送门框，以及釉面陶瓦 `PUSH_ONLY` 的推出、不可拉回和侧向分支留置。`ExportReference` 同时导出每个方块状态的 `destroySpeed`，注册表数据指纹随之变化，旧 `.vmcb` 需要显式迁移。详见 [修复进度](redstoneAudit/fixProgress.md)。

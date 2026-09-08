@@ -16,13 +16,16 @@ bool Simulator::pushable(BlockPos pos, Direction movement, bool allowDestroy, Di
     auto id = world.get(pos); const auto& state = registry[id];
     if (id == 0) return true;
     const auto& name = registry.type(id).name;
-    if (name == "minecraft:bedrock" || name == "minecraft:obsidian" || name == "minecraft:crying_obsidian" || name == "minecraft:respawn_anchor" || name == "minecraft:reinforced_deepslate") return false;
+    if (name == "minecraft:obsidian" || name == "minecraft:crying_obsidian" || name == "minecraft:respawn_anchor" || name == "minecraft:reinforced_deepslate") return false;
     if ((movement == Direction::down && pos.y == -64) || (movement == Direction::up && pos.y == 319)) return false;
     if (state.device == Device::piston) { if (state.extended) return false; }
     else {
+        // 原版按 getDestroySpeed()==-1 拒绝，基岩、末地传送门框等由注册表属性决定，不再列举名字。
+        if (state.indestructible) return false;
         if (state.pushReaction == 2) return false;
         if (state.pushReaction == 1) return allowDestroy;
-        if (state.pushReaction == 3 && movement != connection) return false;
+        // PUSH_ONLY 在原版直接返回，不再判断方块实体。
+        if (state.pushReaction == 3) return movement == connection;
     }
     return !state.blockEntity;
 }

@@ -4,11 +4,13 @@
 
 3 个已复现缺陷、6 个静态差异验证任务、1 个剩余假设任务、3 个未实现功能/覆盖任务、1 个原版特性验证任务。
 
+已修复项的原版证据和排除范围见 [fixProgress.md](fixProgress.md)；下方复选框反映当前状态。
+
 ## 任务
 
 - [ ] [R6：[已复现] 日光传感器切换漏发振动事件](https://github.com/Zhen-WushuiLingchun/VeriMC/issues/1)
 - [ ] [R7：[已复现] 相邻楼梯未更新连接形状](https://github.com/Zhen-WushuiLingchun/VeriMC/issues/2)
-- [ ] [R10：[已复现] 活塞错误允许推动末地传送门框](https://github.com/Zhen-WushuiLingchun/VeriMC/issues/3)
+- [x] [R10：[已修复] 活塞错误允许推动末地传送门框](https://github.com/Zhen-WushuiLingchun/VeriMC/issues/3)
 - [ ] [R1：[静态差异·待复现] 邻居通知来源方块与原版不一致](https://github.com/Zhen-WushuiLingchun/VeriMC/issues/4)
 - [ ] [R2：[静态差异·待复现] 活塞移动时全局跳过移除回调](https://github.com/Zhen-WushuiLingchun/VeriMC/issues/5)
 - [ ] [R3：[静态差异·待复现] 中继器和比较器断支撑处理阶段不同](https://github.com/Zhen-WushuiLingchun/VeriMC/issues/6)

@@ -190,7 +190,7 @@
 
 ---
 
-### ★R10 `pushable()` 用方块名白名单代替 `getDestroySpeed()==-1`，且 `PUSH_ONLY` 分支多一次方块实体判定
+### ★R10 `pushable()` 用方块名白名单代替 `getDestroySpeed()==-1`，且 `PUSH_ONLY` 分支多一次方块实体判定（已修复，见 [fixProgress.md](fixProgress.md)）
 
 | | 位置 |
 | --- | --- |

@@ -132,6 +132,7 @@ BlockRegistry::BlockRegistry(const std::string& path) {
             st.weak = s.at("weakSignal").get<decltype(st.weak)>(); st.strong = s.at("strongSignal").get<decltype(st.strong)>();
             auto reaction = s.at("pushReaction").get<std::string>();
             st.pushReaction = reaction == "NORMAL" ? 0 : reaction == "DESTROY" ? 1 : reaction == "BLOCK" ? 2 : reaction == "PUSH_ONLY" ? 3 : 4;
+            st.indestructible = s.at("destroySpeed").get<float>() == -1.0f;
             const auto& p = s.at("properties");
             auto val = [&](const char* key, const char* fallback) { return p.value(key, std::string(fallback)); };
             st.facing = parseDirection(val("facing", "north"));
