@@ -20,9 +20,9 @@ class InstancePool {
   private free: number[] = [];
   private count = 0;
   private capacity = 32;
-  constructor(readonly group: THREE.Group, readonly geometry: THREE.BufferGeometry, readonly visible = true) { this.mesh = this.create(); }
+  constructor(readonly group: THREE.Group, readonly geometry: THREE.BufferGeometry, readonly visible = true, readonly poolMaterial: THREE.Material = material) { this.mesh = this.create(); }
   private create() {
-    const mesh = new THREE.InstancedMesh(this.geometry, material, this.capacity); mesh.count = this.count;
+    const mesh = new THREE.InstancedMesh(this.geometry, this.poolMaterial, this.capacity); mesh.count = this.count;
     mesh.visible = this.visible;
     mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage); mesh.castShadow = false; mesh.receiveShadow = true;
     mesh.boundingSphere = new THREE.Sphere(new THREE.Vector3(8,8,8), 15); mesh.userData.pool = this; this.group.add(mesh); return mesh;
@@ -46,7 +46,9 @@ export class CircuitViewport {
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera(42, 1, .1, 3000);
   controls: OrbitControls;
-  tool: Tool = 'select';
+  private activeTool: Tool = 'select';
+  get tool(): Tool { return this.activeTool; }
+  set tool(value: Tool) { this.activeTool = value; this.refreshHover(); }
   layer = 1;
   cutaway = false;
   hover: Pos | null = null;
@@ -57,8 +59,16 @@ export class CircuitViewport {
   private plane = new THREE.Plane(new THREE.Vector3(0,1,0), -1);
   private grid: THREE.GridHelper;
   private selection = new THREE.Box3Helper(new THREE.Box3(new THREE.Vector3(), new THREE.Vector3(1,1,1)), 0xf0c88a);
-  private ghost = new THREE.Mesh(new THREE.BoxGeometry(1.005,1.005,1.005), new THREE.MeshBasicMaterial({ color: 0xf0c88a, transparent: true, opacity: .16, depthWrite: false }));
+  private ghost = new THREE.Group();
+  private previewMaterial = new THREE.MeshStandardMaterial({ roughness: .84, transparent: true, opacity: .6, depthWrite: false });
+  private previewChunk: Chunk;
+  private previewHandles: Handle[] = [];
+  private previewArrow: THREE.ArrowHelper;
+  private placementKey = '';
+  private lastPointer: { clientX: number; clientY: number } | null = null;
   private clipPlane = new THREE.Plane(new THREE.Vector3(0,-1,0), 2000000);
+  private sectionPlane = new THREE.Plane(new THREE.Vector3(0,0,0), 0);
+  private section: { axis: 'x'|'y'|'z'; maximum: number } | null = null;
   private resizeObserver: ResizeObserver;
   private frameId = 0;
   private down: [number,number] | null = null;
@@ -70,7 +80,7 @@ export class CircuitViewport {
   constructor(readonly container: HTMLDivElement) {
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
     this.renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); this.renderer.setClearColor(0x20272b); this.renderer.outputColorSpace = THREE.SRGBColorSpace; this.renderer.localClippingEnabled = true;
-    material.clippingPlanes = [this.clipPlane];
+    material.clippingPlanes = [this.clipPlane, this.sectionPlane];
     this.renderer.domElement.tabIndex = 0;
     this.renderer.domElement.setAttribute('aria-label', '三维工作台，WASD 平移视角');
     container.appendChild(this.renderer.domElement);
@@ -82,11 +92,14 @@ export class CircuitViewport {
     // Ctrl/Cmd+S 等组合键保留给应用快捷键，不触发键盘旋转。
     this.controls.keyRotateSpeed = 0;
     this.controls.listenToKeyEvents(this.renderer.domElement);
-    this.grid = new THREE.GridHelper(128,128,0x5c6668,0x343e42); this.grid.position.y = -.008; this.scene.add(this.grid);
+    this.grid = new THREE.GridHelper(128,128,0x5c6668,0x343e42); this.grid.position.y = this.layer + .002; this.scene.add(this.grid);
     const axes = new THREE.AxesHelper(2.2); axes.position.set(-.5,.025,-.5); this.scene.add(axes);
+    this.previewChunk = { group: this.ghost, box: new InstancePool(this.ghost, box, true, this.previewMaterial), cylinder: new InstancePool(this.ghost, cylinder, true, this.previewMaterial) };
+    this.previewArrow = new THREE.ArrowHelper(new THREE.Vector3(0,0,1), new THREE.Vector3(.5,1.15,.5), .9, 0xf0c88a, .22, .13);
+    this.previewArrow.visible = false; this.ghost.add(this.previewArrow);
     this.selection.visible = false; this.ghost.visible = false; this.scene.add(this.selection, this.ghost);
     this.resizeObserver = new ResizeObserver(() => this.resize()); this.resizeObserver.observe(container);
-    this.renderer.domElement.addEventListener('pointerdown', this.pointerDown); this.renderer.domElement.addEventListener('pointerup', this.pointerUp); this.renderer.domElement.addEventListener('pointermove', this.pointerMove); this.renderer.domElement.addEventListener('contextmenu', event => event.preventDefault());
+    this.renderer.domElement.addEventListener('pointerdown', this.pointerDown); this.renderer.domElement.addEventListener('pointerup', this.pointerUp); this.renderer.domElement.addEventListener('pointermove', this.pointerMove); this.renderer.domElement.addEventListener('pointerleave', this.pointerLeave); this.controls.addEventListener('change', this.refreshHover); this.renderer.domElement.addEventListener('contextmenu', event => event.preventDefault());
     connection.addEventListener('cells', this.applyChanges); this.rebuild(); this.animate();
   }
   private resize() { const { clientWidth: w, clientHeight: h } = this.container; this.renderer.setSize(w, h); this.camera.aspect = w / Math.max(h,1); this.camera.updateProjectionMatrix(); }
@@ -98,7 +111,11 @@ export class CircuitViewport {
     const key = posKey(cell.pos); for (const handle of this.handles.get(key) ?? []) handle.pool.remove(handle.index); this.handles.delete(key);
     if (cell.stateId === 0) return;
     const def = connection.states.get(cell.renderStateId); if (!def) return;
-    const name = shortName(def.name), p = def.properties, chunk = this.getChunk(cell.pos), handles: Handle[] = [];
+    this.handles.set(key, this.drawBlock(cell, def, this.getChunk(cell.pos)));
+  }
+  // World and placement preview share the exact same simplified block geometry.
+  private drawBlock(cell: BlockCell, def: BlockDef, chunk: Chunk): Handle[] {
+    const name = shortName(def.name), p = def.properties, handles: Handle[] = [];
     let x = cell.pos[0] - chunk.group.position.x, y = cell.pos[1] - chunk.group.position.y, z = cell.pos[2] - chunk.group.position.z;
     const moving = (cell.motion & 1) !== 0, extending = (cell.motion & 2) !== 0, source = (cell.motion & 4) !== 0, progress = ((cell.motion >> 6) & 3) / 2;
     const motionDir = directionVectors[['down','up','north','south','west','east'][(cell.motion >> 3) & 7]] ?? [0,0,0];
@@ -344,24 +361,72 @@ export class CircuitViewport {
       const colors: Record<string, number> = { stone:0x747c80,smooth_stone:0xa3aaa8,white_concrete:0xc5c8bb,light_gray_concrete:0x93978c,red_concrete:0x975347,blue_concrete:0x516f96,white_wool:0xd2cfc0,redstone_block:0xb2372a,glass:0x719d9e,slime_block:0x84b85f,honey_block:0xb99b42,obsidian:0x353041,bedrock:0x474b50,glowstone:0xb8a673,sea_lantern:0xb6cebe };
       const height = name.endsWith('_slab') && p.type !== 'double' ? .5 : 1; part([.5,(p.type === 'top' ? .5 : 0)+height / 2,.5],[.99,height*.99,.99],colors[name] ?? 0x9b9c89);
     }
-    this.handles.set(key, handles);
+    return handles;
   }
   private applyChanges = (event: Event) => { const { full, changes } = (event as CustomEvent<{ full: boolean; changes: BlockCell[] }>).detail; if (full) this.rebuild(); else for (const cell of changes) this.drawCell(cell); };
   private rebuild() { for (const chunk of this.chunks.values()) { chunk.box.dispose(); chunk.cylinder.dispose(); chunk.pick?.dispose(); this.scene.remove(chunk.group); } this.chunks.clear(); this.handles.clear(); for (const cell of connection.cells.values()) this.drawCell(cell); }
-  setLayer(layer: number, cutaway: boolean) { this.layer = layer; this.cutaway = cutaway; this.plane.constant = -layer; this.clipPlane.constant = cutaway ? layer + 1.01 : 2000000; }
-  select(pos: Pos | null) { this.selected = pos; this.selection.visible = !!pos; if (pos) { this.selection.box.min.fromArray(pos).addScalar(-.007); this.selection.box.max.fromArray(pos).addScalar(1.007); } }
+  setLayer(layer: number, cutaway: boolean) {
+    this.layer = Number.isFinite(layer) ? Math.max(-64, Math.min(319, Math.trunc(layer))) : this.layer;
+    this.cutaway = cutaway; this.plane.constant = -this.layer;
+    this.grid.position.y = this.layer + .002;
+    this.clipPlane.constant = cutaway ? this.layer + 1.01 : 2000000;
+    this.selection.visible = !!this.selected && this.positionVisible(this.selected);
+    this.refreshHover();
+  }
+  setSection(axis: 'x'|'y'|'z'|'none', maximum = 0) {
+    if (axis !== 'none' && !Number.isFinite(maximum)) return;
+    this.section = axis === 'none' ? null : { axis, maximum: Math.trunc(maximum) };
+    const normal: Pos = axis === 'y' ? [0,-1,0] : axis === 'z' ? [0,0,-1] : [-1,0,0];
+    this.sectionPlane.normal.fromArray(normal);
+    this.sectionPlane.constant = this.section ? this.section.maximum + 1.01 : 0;
+    this.sectionPlane.normal.multiplyScalar(this.section ? 1 : 0);
+    this.selection.visible = !!this.selected && this.positionVisible(this.selected);
+    this.refreshHover();
+  }
+  private positionVisible(pos: Pos) {
+    if (this.cutaway && pos[1] > this.layer) return false;
+    return !this.section || pos[{x:0,y:1,z:2}[this.section.axis]] <= this.section.maximum;
+  }
+  setPlacement(name: string, properties: Record<string,string> | null) {
+    // Older kernels may not have sent an unused block's default state yet.
+    // Hide the model instead of inventing a facing or generating NaN geometry.
+    if (!properties) { this.placementKey = ''; this.refreshHover(); return; }
+    const key = JSON.stringify([name, Object.entries(properties).sort(([a],[b]) => a.localeCompare(b))]);
+    if (key === this.placementKey) return;
+    this.placementKey = key;
+    for (const handle of this.previewHandles) handle.pool.remove(handle.index);
+    const position = this.ghost.position.clone(); this.ghost.position.set(0,0,0);
+    this.previewHandles = this.drawBlock({ pos:[0,0,0], stateId:1, renderStateId:1, motion:0, value:0 }, { name, stateId:1, properties }, this.previewChunk);
+    this.ghost.position.copy(position);
+    const direction = directionVectors[properties.facing];
+    this.previewArrow.visible = !!direction;
+    if (direction) {
+      const output = name === 'minecraft:repeater' || name === 'minecraft:comparator';
+      this.previewArrow.setDirection(new THREE.Vector3(...direction).multiplyScalar(output ? -1 : 1));
+      this.previewArrow.setColor(name === 'minecraft:observer' ? 0x80bec4 : 0xf0c88a);
+    }
+    this.refreshHover();
+  }
+  select(pos: Pos | null) { this.selected = pos; this.selection.visible = !!pos && this.positionVisible(pos); if (pos) { this.selection.box.min.fromArray(pos).addScalar(-.007); this.selection.box.max.fromArray(pos).addScalar(1.007); } }
   fit() { const bounds = new THREE.Box3(); for (const cell of connection.cells.values()) bounds.expandByPoint(new THREE.Vector3(...cell.pos)); if (bounds.isEmpty()) bounds.set(new THREE.Vector3(-4,0,-4),new THREE.Vector3(4,0,4)); const center = bounds.getCenter(new THREE.Vector3()), size = bounds.getSize(new THREE.Vector3()).length(); this.controls.target.copy(center); this.camera.position.copy(center).add(new THREE.Vector3(1,1.25,1.4).multiplyScalar(Math.max(size*.65,8))); }
   top() { this.camera.position.copy(this.controls.target).add(new THREE.Vector3(0,Math.max(this.camera.position.distanceTo(this.controls.target),15),.001)); }
-  private locate(event: PointerEvent): Pos | null {
-    const rect = this.renderer.domElement.getBoundingClientRect(); this.pointer.set((event.clientX-rect.left)/rect.width*2-1,-(event.clientY-rect.top)/rect.height*2+1); this.raycaster.setFromCamera(this.pointer,this.camera);
-    if (this.tool === 'place') { const hit = this.raycaster.ray.intersectPlane(this.plane, new THREE.Vector3()); return hit ? [Math.floor(hit.x),this.layer,Math.floor(hit.z)] : null; }
+  private locate(event: { clientX: number; clientY: number }): Pos | null {
+    const rect = this.renderer.domElement.getBoundingClientRect(); if (!rect.width || !rect.height) return null; this.camera.updateMatrixWorld(); this.pointer.set((event.clientX-rect.left)/rect.width*2-1,-(event.clientY-rect.top)/rect.height*2+1); this.raycaster.setFromCamera(this.pointer,this.camera);
+    if (this.tool === 'place') { const hit = this.raycaster.ray.intersectPlane(this.plane, new THREE.Vector3()); const pos: Pos | null = hit ? [Math.floor(hit.x),this.layer,Math.floor(hit.z)] : null; return pos && this.positionVisible(pos) ? pos : null; }
     const meshes: THREE.Object3D[] = []; for (const chunk of this.chunks.values()) { meshes.push(chunk.box.mesh,chunk.cylinder.mesh); if (chunk.pick) meshes.push(chunk.pick.mesh); }
-    for (const hit of this.raycaster.intersectObjects(meshes)) { const pool = hit.object.userData.pool as InstancePool; const pos = pool.positions[hit.instanceId!]; if (pos && (!this.cutaway || pos[1] <= this.layer)) return pos; }
+    for (const hit of this.raycaster.intersectObjects(meshes)) { const pool = hit.object.userData.pool as InstancePool; const pos = pool.positions[hit.instanceId!]; if (pos && this.positionVisible(pos)) return pos; }
     return null;
   }
   private pointerDown = (event: PointerEvent) => { this.renderer.domElement.focus({ preventScroll: true }); if (event.button === 0) this.down = [event.clientX,event.clientY]; };
   private pointerUp = (event: PointerEvent) => { if (event.button === 0 && this.down && Math.hypot(event.clientX-this.down[0],event.clientY-this.down[1]) < 5) { const pos = this.locate(event); if (pos) this.onPick(pos,this.tool,event.shiftKey); } this.down = null; };
-  private pointerMove = (event: PointerEvent) => { const pos = this.locate(event); if (posKey(pos ?? [0,0,0]) !== posKey(this.hover ?? [0,0,0])) this.onHover(pos); this.hover = pos; this.ghost.visible = this.tool === 'place' && !!pos; if (pos) this.ghost.position.set(pos[0]+.5,pos[1]+.5,pos[2]+.5); };
+  private refreshHover = () => {
+    const pos = this.lastPointer ? this.locate(this.lastPointer) : null;
+    if ((pos ? posKey(pos) : null) !== (this.hover ? posKey(this.hover) : null)) this.onHover(pos);
+    this.hover = pos; this.ghost.visible = this.tool === 'place' && !!pos && !!this.placementKey;
+    if (pos) this.ghost.position.fromArray(pos);
+  };
+  private pointerMove = (event: PointerEvent) => { this.lastPointer = { clientX:event.clientX, clientY:event.clientY }; this.refreshHover(); };
+  private pointerLeave = () => { this.lastPointer = null; this.down = null; this.refreshHover(); };
   private animate = () => { this.frameId = requestAnimationFrame(this.animate); this.controls.update(); this.renderer.render(this.scene,this.camera); this.frameCount++; const now = performance.now(); if (now-this.lastFps > 1000) { this.onFps(Math.round(this.frameCount*1000/(now-this.lastFps))); this.lastFps=now; this.frameCount=0; } };
-  dispose() { cancelAnimationFrame(this.frameId); this.resizeObserver.disconnect(); connection.removeEventListener('cells',this.applyChanges); this.controls.dispose(); for (const c of this.chunks.values()) { c.box.dispose(); c.cylinder.dispose(); c.pick?.dispose(); } this.renderer.dispose(); this.renderer.domElement.remove(); }
+  dispose() { cancelAnimationFrame(this.frameId); this.resizeObserver.disconnect(); connection.removeEventListener('cells',this.applyChanges); this.controls.removeEventListener('change', this.refreshHover); this.controls.dispose(); this.previewChunk.box.dispose(); this.previewChunk.cylinder.dispose(); this.previewChunk.pick?.dispose(); this.previewMaterial.dispose(); this.previewArrow.dispose(); this.grid.dispose(); this.selection.dispose(); for (const c of this.chunks.values()) { c.box.dispose(); c.cylinder.dispose(); c.pick?.dispose(); } this.renderer.dispose(); this.renderer.domElement.remove(); }
 }

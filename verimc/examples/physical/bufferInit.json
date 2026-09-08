@@ -1,0 +1,24 @@
+{
+  "format": "verimc.initPlan",
+  "formatVersion": 1,
+  "strategy": "orderedPlacement",
+  "steps": [
+    {
+      "op": "place",
+      "pos": [
+        0,
+        -1,
+        0
+      ]
+    },
+    {
+      "op": "place",
+      "pos": [
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "externalRequirements": []
+}

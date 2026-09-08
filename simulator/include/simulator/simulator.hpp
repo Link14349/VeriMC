@@ -3,14 +3,13 @@
 #include "world.hpp"
 #include "blockTicks.hpp"
 #include "legacyRandom.hpp"
+#include "projectIo.hpp"
 #include <deque>
 #include <queue>
 #include <unordered_set>
 #include <chrono>
 
 namespace simulator {
-class ProjectSource;
-class ProjectSink;
 struct TraceEdge { std::uint32_t probeId{}; Tick tick{}; std::uint64_t sequence{}; std::uint8_t value{}; };
 struct Probe { std::uint32_t id{}; BlockPos pos{}; std::string name; std::string mode{"output"}; Direction direction{Direction::up}; int lastValue{-1}; std::string trigger{"none"}; int triggerValue{15}; };
 struct ItemStack { std::uint32_t item{}; std::uint16_t count{}; bool operator==(const ItemStack&) const = default; };

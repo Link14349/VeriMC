@@ -1,0 +1,25 @@
+[
+  {
+    "pos": [
+      0,
+      -1,
+      0
+    ],
+    "name": "minecraft:stone",
+    "properties": {}
+  },
+  {
+    "pos": [
+      0,
+      0,
+      0
+    ],
+    "name": "minecraft:repeater",
+    "properties": {
+      "delay": "1",
+      "facing": "west",
+      "locked": "false",
+      "powered": "false"
+    }
+  }
+]

@@ -2,7 +2,7 @@ import { TraceHistory } from './traceHistory';
 export type Pos = [number, number, number];
 export type BlockDef = { stateId: number; name: string; properties: Record<string, string> };
 export type BlockCell = { pos: Pos; stateId: number; value: number; renderStateId: number; motion: number };
-export type CatalogItem = { name: string; defaultState: number; device: number; properties: Record<string, string[]>; supportLevel: string };
+export type CatalogItem = { name: string; defaultState: number; defaultProperties?: Record<string,string>; device: number; properties: Record<string, string[]>; supportLevel: string };
 export type Probe = { id: number; pos: Pos; name: string; value: number; mode: string; trigger: string };
 export type EnvironmentAction = { id: number; tick: number; sequence: number; kind: 'itemEjected'; source: Pos; item: string; count: number; position: Pos; velocity: Pos; resolved: boolean };
 export type Status = { tick: number; running: boolean; speed: number; eventsPerSecond: number; blocks: number; pending: number; updates: number; events: number; storageBytes: number; traceDropped: number; pauseReason: string; pendingActions: EnvironmentAction[]; actionsDropped: number; revision: number; probes: Probe[]; canUndo: boolean; canRedo: boolean; name: string };
