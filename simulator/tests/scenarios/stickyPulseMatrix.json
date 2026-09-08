@@ -1,0 +1,1474 @@
+{
+  "endTick": 14,
+  "commands": [
+    {
+      "tick": 0,
+      "pos": [
+        5,
+        3,
+        5
+      ],
+      "stateId": 2242
+    },
+    {
+      "tick": 0,
+      "pos": [
+        6,
+        3,
+        5
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 2,
+      "pos": [
+        4,
+        3,
+        5
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 2,
+      "pos": [
+        4,
+        3,
+        5
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 0,
+      "pos": [
+        12,
+        3,
+        5
+      ],
+      "stateId": 2244
+    },
+    {
+      "tick": 0,
+      "pos": [
+        11,
+        3,
+        5
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 2,
+      "pos": [
+        13,
+        3,
+        5
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 2,
+      "pos": [
+        13,
+        3,
+        5
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 0,
+      "pos": [
+        19,
+        3,
+        5
+      ],
+      "stateId": 2241
+    },
+    {
+      "tick": 0,
+      "pos": [
+        19,
+        3,
+        4
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 2,
+      "pos": [
+        19,
+        3,
+        6
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 2,
+      "pos": [
+        19,
+        3,
+        6
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 0,
+      "pos": [
+        26,
+        3,
+        5
+      ],
+      "stateId": 2243
+    },
+    {
+      "tick": 0,
+      "pos": [
+        26,
+        3,
+        6
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 2,
+      "pos": [
+        26,
+        3,
+        4
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 2,
+      "pos": [
+        26,
+        3,
+        4
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 0,
+      "pos": [
+        33,
+        3,
+        5
+      ],
+      "stateId": 2245
+    },
+    {
+      "tick": 0,
+      "pos": [
+        33,
+        4,
+        5
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 2,
+      "pos": [
+        33,
+        2,
+        5
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 2,
+      "pos": [
+        33,
+        2,
+        5
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 0,
+      "pos": [
+        40,
+        3,
+        5
+      ],
+      "stateId": 2246
+    },
+    {
+      "tick": 0,
+      "pos": [
+        40,
+        2,
+        5
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 2,
+      "pos": [
+        40,
+        4,
+        5
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 2,
+      "pos": [
+        40,
+        4,
+        5
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 0,
+      "pos": [
+        5,
+        3,
+        15
+      ],
+      "stateId": 2242
+    },
+    {
+      "tick": 0,
+      "pos": [
+        6,
+        3,
+        15
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 2,
+      "pos": [
+        4,
+        3,
+        15
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 3,
+      "pos": [
+        4,
+        3,
+        15
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 0,
+      "pos": [
+        12,
+        3,
+        15
+      ],
+      "stateId": 2244
+    },
+    {
+      "tick": 0,
+      "pos": [
+        11,
+        3,
+        15
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 2,
+      "pos": [
+        13,
+        3,
+        15
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 3,
+      "pos": [
+        13,
+        3,
+        15
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 0,
+      "pos": [
+        19,
+        3,
+        15
+      ],
+      "stateId": 2241
+    },
+    {
+      "tick": 0,
+      "pos": [
+        19,
+        3,
+        14
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 2,
+      "pos": [
+        19,
+        3,
+        16
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 3,
+      "pos": [
+        19,
+        3,
+        16
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 0,
+      "pos": [
+        26,
+        3,
+        15
+      ],
+      "stateId": 2243
+    },
+    {
+      "tick": 0,
+      "pos": [
+        26,
+        3,
+        16
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 2,
+      "pos": [
+        26,
+        3,
+        14
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 3,
+      "pos": [
+        26,
+        3,
+        14
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 0,
+      "pos": [
+        33,
+        3,
+        15
+      ],
+      "stateId": 2245
+    },
+    {
+      "tick": 0,
+      "pos": [
+        33,
+        4,
+        15
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 2,
+      "pos": [
+        33,
+        2,
+        15
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 3,
+      "pos": [
+        33,
+        2,
+        15
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 0,
+      "pos": [
+        40,
+        3,
+        15
+      ],
+      "stateId": 2246
+    },
+    {
+      "tick": 0,
+      "pos": [
+        40,
+        2,
+        15
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 2,
+      "pos": [
+        40,
+        4,
+        15
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 3,
+      "pos": [
+        40,
+        4,
+        15
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 0,
+      "pos": [
+        5,
+        3,
+        25
+      ],
+      "stateId": 2242
+    },
+    {
+      "tick": 0,
+      "pos": [
+        6,
+        3,
+        25
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 2,
+      "pos": [
+        4,
+        3,
+        25
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 4,
+      "pos": [
+        4,
+        3,
+        25
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 0,
+      "pos": [
+        12,
+        3,
+        25
+      ],
+      "stateId": 2244
+    },
+    {
+      "tick": 0,
+      "pos": [
+        11,
+        3,
+        25
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 2,
+      "pos": [
+        13,
+        3,
+        25
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 4,
+      "pos": [
+        13,
+        3,
+        25
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 0,
+      "pos": [
+        19,
+        3,
+        25
+      ],
+      "stateId": 2241
+    },
+    {
+      "tick": 0,
+      "pos": [
+        19,
+        3,
+        24
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 2,
+      "pos": [
+        19,
+        3,
+        26
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 4,
+      "pos": [
+        19,
+        3,
+        26
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 0,
+      "pos": [
+        26,
+        3,
+        25
+      ],
+      "stateId": 2243
+    },
+    {
+      "tick": 0,
+      "pos": [
+        26,
+        3,
+        26
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 2,
+      "pos": [
+        26,
+        3,
+        24
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 4,
+      "pos": [
+        26,
+        3,
+        24
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 0,
+      "pos": [
+        33,
+        3,
+        25
+      ],
+      "stateId": 2245
+    },
+    {
+      "tick": 0,
+      "pos": [
+        33,
+        4,
+        25
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 2,
+      "pos": [
+        33,
+        2,
+        25
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 4,
+      "pos": [
+        33,
+        2,
+        25
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 0,
+      "pos": [
+        40,
+        3,
+        25
+      ],
+      "stateId": 2246
+    },
+    {
+      "tick": 0,
+      "pos": [
+        40,
+        2,
+        25
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 2,
+      "pos": [
+        40,
+        4,
+        25
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 4,
+      "pos": [
+        40,
+        4,
+        25
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 0,
+      "pos": [
+        5,
+        3,
+        35
+      ],
+      "stateId": 2242
+    },
+    {
+      "tick": 0,
+      "pos": [
+        6,
+        3,
+        35
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 2,
+      "pos": [
+        4,
+        3,
+        35
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 6,
+      "pos": [
+        4,
+        3,
+        35
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 0,
+      "pos": [
+        12,
+        3,
+        35
+      ],
+      "stateId": 2244
+    },
+    {
+      "tick": 0,
+      "pos": [
+        11,
+        3,
+        35
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 2,
+      "pos": [
+        13,
+        3,
+        35
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 6,
+      "pos": [
+        13,
+        3,
+        35
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 0,
+      "pos": [
+        19,
+        3,
+        35
+      ],
+      "stateId": 2241
+    },
+    {
+      "tick": 0,
+      "pos": [
+        19,
+        3,
+        34
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 2,
+      "pos": [
+        19,
+        3,
+        36
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 6,
+      "pos": [
+        19,
+        3,
+        36
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 0,
+      "pos": [
+        26,
+        3,
+        35
+      ],
+      "stateId": 2243
+    },
+    {
+      "tick": 0,
+      "pos": [
+        26,
+        3,
+        36
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 2,
+      "pos": [
+        26,
+        3,
+        34
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 6,
+      "pos": [
+        26,
+        3,
+        34
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 0,
+      "pos": [
+        33,
+        3,
+        35
+      ],
+      "stateId": 2245
+    },
+    {
+      "tick": 0,
+      "pos": [
+        33,
+        4,
+        35
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 2,
+      "pos": [
+        33,
+        2,
+        35
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 6,
+      "pos": [
+        33,
+        2,
+        35
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 0,
+      "pos": [
+        40,
+        3,
+        35
+      ],
+      "stateId": 2246
+    },
+    {
+      "tick": 0,
+      "pos": [
+        40,
+        2,
+        35
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 2,
+      "pos": [
+        40,
+        4,
+        35
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 6,
+      "pos": [
+        40,
+        4,
+        35
+      ],
+      "stateId": 0
+    }
+  ],
+  "watch": [
+    [
+      5,
+      3,
+      5
+    ],
+    [
+      6,
+      3,
+      5
+    ],
+    [
+      7,
+      3,
+      5
+    ],
+    [
+      12,
+      3,
+      5
+    ],
+    [
+      11,
+      3,
+      5
+    ],
+    [
+      10,
+      3,
+      5
+    ],
+    [
+      19,
+      3,
+      5
+    ],
+    [
+      19,
+      3,
+      4
+    ],
+    [
+      19,
+      3,
+      3
+    ],
+    [
+      26,
+      3,
+      5
+    ],
+    [
+      26,
+      3,
+      6
+    ],
+    [
+      26,
+      3,
+      7
+    ],
+    [
+      33,
+      3,
+      5
+    ],
+    [
+      33,
+      4,
+      5
+    ],
+    [
+      33,
+      5,
+      5
+    ],
+    [
+      40,
+      3,
+      5
+    ],
+    [
+      40,
+      2,
+      5
+    ],
+    [
+      40,
+      1,
+      5
+    ],
+    [
+      5,
+      3,
+      15
+    ],
+    [
+      6,
+      3,
+      15
+    ],
+    [
+      7,
+      3,
+      15
+    ],
+    [
+      12,
+      3,
+      15
+    ],
+    [
+      11,
+      3,
+      15
+    ],
+    [
+      10,
+      3,
+      15
+    ],
+    [
+      19,
+      3,
+      15
+    ],
+    [
+      19,
+      3,
+      14
+    ],
+    [
+      19,
+      3,
+      13
+    ],
+    [
+      26,
+      3,
+      15
+    ],
+    [
+      26,
+      3,
+      16
+    ],
+    [
+      26,
+      3,
+      17
+    ],
+    [
+      33,
+      3,
+      15
+    ],
+    [
+      33,
+      4,
+      15
+    ],
+    [
+      33,
+      5,
+      15
+    ],
+    [
+      40,
+      3,
+      15
+    ],
+    [
+      40,
+      2,
+      15
+    ],
+    [
+      40,
+      1,
+      15
+    ],
+    [
+      5,
+      3,
+      25
+    ],
+    [
+      6,
+      3,
+      25
+    ],
+    [
+      7,
+      3,
+      25
+    ],
+    [
+      12,
+      3,
+      25
+    ],
+    [
+      11,
+      3,
+      25
+    ],
+    [
+      10,
+      3,
+      25
+    ],
+    [
+      19,
+      3,
+      25
+    ],
+    [
+      19,
+      3,
+      24
+    ],
+    [
+      19,
+      3,
+      23
+    ],
+    [
+      26,
+      3,
+      25
+    ],
+    [
+      26,
+      3,
+      26
+    ],
+    [
+      26,
+      3,
+      27
+    ],
+    [
+      33,
+      3,
+      25
+    ],
+    [
+      33,
+      4,
+      25
+    ],
+    [
+      33,
+      5,
+      25
+    ],
+    [
+      40,
+      3,
+      25
+    ],
+    [
+      40,
+      2,
+      25
+    ],
+    [
+      40,
+      1,
+      25
+    ],
+    [
+      5,
+      3,
+      35
+    ],
+    [
+      6,
+      3,
+      35
+    ],
+    [
+      7,
+      3,
+      35
+    ],
+    [
+      12,
+      3,
+      35
+    ],
+    [
+      11,
+      3,
+      35
+    ],
+    [
+      10,
+      3,
+      35
+    ],
+    [
+      19,
+      3,
+      35
+    ],
+    [
+      19,
+      3,
+      34
+    ],
+    [
+      19,
+      3,
+      33
+    ],
+    [
+      26,
+      3,
+      35
+    ],
+    [
+      26,
+      3,
+      36
+    ],
+    [
+      26,
+      3,
+      37
+    ],
+    [
+      33,
+      3,
+      35
+    ],
+    [
+      33,
+      4,
+      35
+    ],
+    [
+      33,
+      5,
+      35
+    ],
+    [
+      40,
+      3,
+      35
+    ],
+    [
+      40,
+      2,
+      35
+    ],
+    [
+      40,
+      1,
+      35
+    ]
+  ],
+  "frames": [],
+  "caseLabels": [
+    {
+      "facing": "east",
+      "pulseGameTicks": 0,
+      "piston": [
+        5,
+        3,
+        5
+      ],
+      "note": "pulse 0 removes power within one command callback; not a proof of all zero-tick circuits"
+    },
+    {
+      "facing": "west",
+      "pulseGameTicks": 0,
+      "piston": [
+        12,
+        3,
+        5
+      ],
+      "note": "pulse 0 removes power within one command callback; not a proof of all zero-tick circuits"
+    },
+    {
+      "facing": "north",
+      "pulseGameTicks": 0,
+      "piston": [
+        19,
+        3,
+        5
+      ],
+      "note": "pulse 0 removes power within one command callback; not a proof of all zero-tick circuits"
+    },
+    {
+      "facing": "south",
+      "pulseGameTicks": 0,
+      "piston": [
+        26,
+        3,
+        5
+      ],
+      "note": "pulse 0 removes power within one command callback; not a proof of all zero-tick circuits"
+    },
+    {
+      "facing": "up",
+      "pulseGameTicks": 0,
+      "piston": [
+        33,
+        3,
+        5
+      ],
+      "note": "pulse 0 removes power within one command callback; not a proof of all zero-tick circuits"
+    },
+    {
+      "facing": "down",
+      "pulseGameTicks": 0,
+      "piston": [
+        40,
+        3,
+        5
+      ],
+      "note": "pulse 0 removes power within one command callback; not a proof of all zero-tick circuits"
+    },
+    {
+      "facing": "east",
+      "pulseGameTicks": 1,
+      "piston": [
+        5,
+        3,
+        15
+      ],
+      "note": "pulse 0 removes power within one command callback; not a proof of all zero-tick circuits"
+    },
+    {
+      "facing": "west",
+      "pulseGameTicks": 1,
+      "piston": [
+        12,
+        3,
+        15
+      ],
+      "note": "pulse 0 removes power within one command callback; not a proof of all zero-tick circuits"
+    },
+    {
+      "facing": "north",
+      "pulseGameTicks": 1,
+      "piston": [
+        19,
+        3,
+        15
+      ],
+      "note": "pulse 0 removes power within one command callback; not a proof of all zero-tick circuits"
+    },
+    {
+      "facing": "south",
+      "pulseGameTicks": 1,
+      "piston": [
+        26,
+        3,
+        15
+      ],
+      "note": "pulse 0 removes power within one command callback; not a proof of all zero-tick circuits"
+    },
+    {
+      "facing": "up",
+      "pulseGameTicks": 1,
+      "piston": [
+        33,
+        3,
+        15
+      ],
+      "note": "pulse 0 removes power within one command callback; not a proof of all zero-tick circuits"
+    },
+    {
+      "facing": "down",
+      "pulseGameTicks": 1,
+      "piston": [
+        40,
+        3,
+        15
+      ],
+      "note": "pulse 0 removes power within one command callback; not a proof of all zero-tick circuits"
+    },
+    {
+      "facing": "east",
+      "pulseGameTicks": 2,
+      "piston": [
+        5,
+        3,
+        25
+      ],
+      "note": "pulse 0 removes power within one command callback; not a proof of all zero-tick circuits"
+    },
+    {
+      "facing": "west",
+      "pulseGameTicks": 2,
+      "piston": [
+        12,
+        3,
+        25
+      ],
+      "note": "pulse 0 removes power within one command callback; not a proof of all zero-tick circuits"
+    },
+    {
+      "facing": "north",
+      "pulseGameTicks": 2,
+      "piston": [
+        19,
+        3,
+        25
+      ],
+      "note": "pulse 0 removes power within one command callback; not a proof of all zero-tick circuits"
+    },
+    {
+      "facing": "south",
+      "pulseGameTicks": 2,
+      "piston": [
+        26,
+        3,
+        25
+      ],
+      "note": "pulse 0 removes power within one command callback; not a proof of all zero-tick circuits"
+    },
+    {
+      "facing": "up",
+      "pulseGameTicks": 2,
+      "piston": [
+        33,
+        3,
+        25
+      ],
+      "note": "pulse 0 removes power within one command callback; not a proof of all zero-tick circuits"
+    },
+    {
+      "facing": "down",
+      "pulseGameTicks": 2,
+      "piston": [
+        40,
+        3,
+        25
+      ],
+      "note": "pulse 0 removes power within one command callback; not a proof of all zero-tick circuits"
+    },
+    {
+      "facing": "east",
+      "pulseGameTicks": 4,
+      "piston": [
+        5,
+        3,
+        35
+      ],
+      "note": "pulse 0 removes power within one command callback; not a proof of all zero-tick circuits"
+    },
+    {
+      "facing": "west",
+      "pulseGameTicks": 4,
+      "piston": [
+        12,
+        3,
+        35
+      ],
+      "note": "pulse 0 removes power within one command callback; not a proof of all zero-tick circuits"
+    },
+    {
+      "facing": "north",
+      "pulseGameTicks": 4,
+      "piston": [
+        19,
+        3,
+        35
+      ],
+      "note": "pulse 0 removes power within one command callback; not a proof of all zero-tick circuits"
+    },
+    {
+      "facing": "south",
+      "pulseGameTicks": 4,
+      "piston": [
+        26,
+        3,
+        35
+      ],
+      "note": "pulse 0 removes power within one command callback; not a proof of all zero-tick circuits"
+    },
+    {
+      "facing": "up",
+      "pulseGameTicks": 4,
+      "piston": [
+        33,
+        3,
+        35
+      ],
+      "note": "pulse 0 removes power within one command callback; not a proof of all zero-tick circuits"
+    },
+    {
+      "facing": "down",
+      "pulseGameTicks": 4,
+      "piston": [
+        40,
+        3,
+        35
+      ],
+      "note": "pulse 0 removes power within one command callback; not a proof of all zero-tick circuits"
+    }
+  ]
+}

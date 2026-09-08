@@ -1,0 +1,412 @@
+{
+  "endTick": 16,
+  "commands": [
+    {
+      "tick": 0,
+      "pos": [
+        5,
+        2,
+        10
+      ],
+      "stateId": 2264
+    },
+    {
+      "tick": 1,
+      "pos": [
+        5,
+        4,
+        10
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 3,
+      "pos": [
+        5,
+        2,
+        11
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 7,
+      "pos": [
+        5,
+        4,
+        10
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 9,
+      "pos": [
+        5,
+        2,
+        11
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 0,
+      "pos": [
+        12,
+        2,
+        10
+      ],
+      "stateId": 2266
+    },
+    {
+      "tick": 1,
+      "pos": [
+        12,
+        4,
+        10
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 3,
+      "pos": [
+        12,
+        2,
+        11
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 7,
+      "pos": [
+        12,
+        4,
+        10
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 9,
+      "pos": [
+        12,
+        2,
+        11
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 0,
+      "pos": [
+        19,
+        2,
+        10
+      ],
+      "stateId": 2263
+    },
+    {
+      "tick": 1,
+      "pos": [
+        19,
+        4,
+        10
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 3,
+      "pos": [
+        20,
+        2,
+        10
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 7,
+      "pos": [
+        19,
+        4,
+        10
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 9,
+      "pos": [
+        20,
+        2,
+        10
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 0,
+      "pos": [
+        26,
+        2,
+        10
+      ],
+      "stateId": 2265
+    },
+    {
+      "tick": 1,
+      "pos": [
+        26,
+        4,
+        10
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 3,
+      "pos": [
+        27,
+        2,
+        10
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 7,
+      "pos": [
+        26,
+        4,
+        10
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 9,
+      "pos": [
+        27,
+        2,
+        10
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 0,
+      "pos": [
+        33,
+        2,
+        10
+      ],
+      "stateId": 2267
+    },
+    {
+      "tick": 1,
+      "pos": [
+        33,
+        4,
+        10
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 3,
+      "pos": [
+        33,
+        2,
+        11
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 7,
+      "pos": [
+        33,
+        4,
+        10
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 9,
+      "pos": [
+        33,
+        2,
+        11
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 0,
+      "pos": [
+        40,
+        2,
+        10
+      ],
+      "stateId": 2268
+    },
+    {
+      "tick": 1,
+      "pos": [
+        40,
+        4,
+        10
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 3,
+      "pos": [
+        40,
+        2,
+        11
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 7,
+      "pos": [
+        40,
+        4,
+        10
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 9,
+      "pos": [
+        40,
+        2,
+        11
+      ],
+      "stateId": 0
+    }
+  ],
+  "watch": [
+    [
+      5,
+      2,
+      10
+    ],
+    [
+      6,
+      2,
+      10
+    ],
+    [
+      12,
+      2,
+      10
+    ],
+    [
+      11,
+      2,
+      10
+    ],
+    [
+      19,
+      2,
+      10
+    ],
+    [
+      19,
+      2,
+      9
+    ],
+    [
+      26,
+      2,
+      10
+    ],
+    [
+      26,
+      2,
+      11
+    ],
+    [
+      33,
+      2,
+      10
+    ],
+    [
+      33,
+      3,
+      10
+    ],
+    [
+      40,
+      2,
+      10
+    ],
+    [
+      40,
+      1,
+      10
+    ]
+  ],
+  "frames": [],
+  "caseLabels": [
+    {
+      "facing": "east",
+      "piston": [
+        5,
+        2,
+        10
+      ],
+      "powerAdded": 1,
+      "neighborNotification": 3,
+      "powerRemoved": 7,
+      "secondNotification": 9
+    },
+    {
+      "facing": "west",
+      "piston": [
+        12,
+        2,
+        10
+      ],
+      "powerAdded": 1,
+      "neighborNotification": 3,
+      "powerRemoved": 7,
+      "secondNotification": 9
+    },
+    {
+      "facing": "north",
+      "piston": [
+        19,
+        2,
+        10
+      ],
+      "powerAdded": 1,
+      "neighborNotification": 3,
+      "powerRemoved": 7,
+      "secondNotification": 9
+    },
+    {
+      "facing": "south",
+      "piston": [
+        26,
+        2,
+        10
+      ],
+      "powerAdded": 1,
+      "neighborNotification": 3,
+      "powerRemoved": 7,
+      "secondNotification": 9
+    },
+    {
+      "facing": "up",
+      "piston": [
+        33,
+        2,
+        10
+      ],
+      "powerAdded": 1,
+      "neighborNotification": 3,
+      "powerRemoved": 7,
+      "secondNotification": 9
+    },
+    {
+      "facing": "down",
+      "piston": [
+        40,
+        2,
+        10
+      ],
+      "powerAdded": 1,
+      "neighborNotification": 3,
+      "powerRemoved": 7,
+      "secondNotification": 9
+    }
+  ]
+}
