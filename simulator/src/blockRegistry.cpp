@@ -229,7 +229,7 @@ Json BlockRegistry::catalog() const {
     for (const auto& t : types) {
         if (t.supportLevel == "unimplemented" || t.device == Device::air || t.device == Device::movingPiston || t.device == Device::pistonHead) continue;
         Json props = Json::object(); for (const auto& [key, p] : t.properties) props[key] = p.values;
-        result.push_back({{"name", t.name}, {"defaultState", t.defaultState}, {"device", static_cast<unsigned>(t.device)}, {"properties", props}, {"supportLevel", t.supportLevel}});
+        result.push_back({{"name", t.name}, {"defaultState", t.defaultState}, {"defaultProperties", describe(t.defaultState).at("properties")}, {"device", static_cast<unsigned>(t.device)}, {"properties", props}, {"supportLevel", t.supportLevel}});
     }
     return result;
 }

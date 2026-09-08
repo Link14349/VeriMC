@@ -19,6 +19,13 @@ void tripwireLine(Simulator& s) {
 int main() {
     BlockRegistry r; int passed = 0, failed = 0;
     auto test = [&](const std::string& name, const std::function<void()>& run) { try { run(); ++passed; std::cout << "PASS " << name << '\n'; } catch (const std::exception& e) { ++failed; std::cerr << "FAIL " << name << ": " << e.what() << '\n'; } };
+    test("palette defaults reproduce native placement before any world state is sent", [&] {
+        for (const auto& item : r.catalog()) {
+            const auto id = item.at("defaultState").get<StateId>();
+            expect(r.state(item.at("name"), item.at("defaultProperties")) == id, "palette defaults changed placement state");
+            expect(item.at("defaultProperties") == r.describe(id).at("properties"), "palette defaults disagree with state registry");
+        }
+    });
     test("all 26.2 property combinations round-trip", [&] {
         std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/blockStates.json"); auto source = Json::parse(file);
         for (const auto& block : source["blocks"]) for (const auto& state : block["states"]) expect(r.state(block["name"], state["properties"]) == state["id"].get<StateId>(), "state mismatch: " + block["name"].get<std::string>());
