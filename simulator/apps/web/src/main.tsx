@@ -36,6 +36,7 @@ function App() {
   const [fileProgress,setFileProgress]=useState<FileProgress|null>(null);
   const [firstPerson,setFirstPerson]=useState(false),[fullscreen,setFullscreen]=useState(false),[locked,setLocked]=useState(false);
   const [resumingInput,setResumingInput]=useState(false);
+  const [movementMode,setMovementMode]=useState({collisionEnabled:false,flying:true});
   const [inventoryOpen,setInventoryOpen]=useState(false),[deviceOpen,setDeviceOpen]=useState(false);
   const [slots,setSlots]=useState<HotbarSlot[]>(initialHotbar),[selectedSlot,setSelectedSlot]=useState(0);
   const appRef=useRef<HTMLElement>(null),deviceDialog=useRef<HTMLDialogElement>(null);
@@ -120,6 +121,7 @@ function App() {
     connection.addEventListener('status',onStatus);connection.addEventListener('catalog',onCatalog);connection.addEventListener('error',onError);connection.addEventListener('cells',refreshSelection);connection.connect();
     const viewport=new CircuitViewport(viewportRef.current!);view.current=viewport;viewport.onHover=setHover;viewport.onFps=setFps;
     viewport.onPointerLockChange=value=>{setLocked(value);setResumingInput(false);};
+    viewport.onMovementModeChange=setMovementMode;
     viewport.onInputError=message=>{setResumingInput(false);fail(message);};
     viewport.onPickBlock=pos=>callbacks.current.pickBlock(pos);
     viewport.onUse=(pos,shift)=>callbacks.current.useBlock(pos,shift);
@@ -267,11 +269,11 @@ function App() {
         <div className="paletteNote"><Cpu size={16}/><span>原生 C++ 仿真<br/><small>标注区分已实现 / 部分实现 / 需环境输入，均未声称完整差分验证</small></span></div></aside>
       <section className="centerWorkspace"><div className="viewportArea"><div className="viewportCanvas" ref={viewportRef}/>
         {firstPerson&&<>
-          <div className="creativeTop"><span>第一人称搭建 · 飞行 <i/> {connected?'内核已连接':'内核已断开'} <i/> {status.running?'运行中':'已暂停'}</span><div><button onClick={()=>void command(status.running?'pause':'play')} disabled={!connected}>{status.running?'暂停仿真':'运行仿真'}</button><button title={fullscreen?'退出全屏':'进入全屏'} onClick={toggleFullscreen}>{fullscreen?'退出全屏':'进入全屏'}</button><button onClick={leaveFirstPerson}>返回工作台</button></div></div>
+          <div className="creativeTop"><span>第一人称搭建 · {movementMode.collisionEnabled?(movementMode.flying?'飞行 · 碰撞':'行走 · 重力'):'自由飞行'} <i/> {connected?'内核已连接':'内核已断开'} <i/> {status.running?'运行中':'已暂停'}</span><div><button aria-pressed={movementMode.collisionEnabled} title="开启后受重力并与方块碰撞；双击 Space 切换飞行" onClick={()=>view.current?.setCollisionEnabled(!movementMode.collisionEnabled)}>碰撞与重力：{movementMode.collisionEnabled?'开':'关'}</button><button onClick={()=>void command(status.running?'pause':'play')} disabled={!connected}>{status.running?'暂停仿真':'运行仿真'}</button><button title={fullscreen?'退出全屏':'进入全屏'} onClick={toggleFullscreen}>{fullscreen?'退出全屏':'进入全屏'}</button><button onClick={leaveFirstPerson}>返回工作台</button></div></div>
           {locked&&<div className="creativeCrosshair" aria-hidden="true"/>}
-          {!locked&&!resumingInput&&!inventoryOpen&&!deviceOpen&&<div className="creativeResume"><strong>第一人称搭建</strong><p>鼠标转向 · 左键拆除 · 右键使用 / 放置</p><button className="runButton" onClick={()=>view.current?.requestPointerLock()}>继续搭建</button><button onClick={openInventory}>打开物品栏 E</button><small>WASD 移动 · Space / Shift 升降 · Ctrl 加速<br/>1–9 / 滚轮 切换物品 · 中键取物 · Esc 释放鼠标</small></div>}
+          {!locked&&!resumingInput&&!inventoryOpen&&!deviceOpen&&<div className="creativeResume"><strong>第一人称搭建</strong><p>鼠标转向 · 左键拆除 · 右键使用 / 放置</p><button className="runButton" onClick={()=>view.current?.requestPointerLock()}>继续搭建</button><button onClick={openInventory}>打开物品栏 E</button><small>WASD 移动 · {movementMode.collisionEnabled&&!movementMode.flying?'Space 跳跃':'Space / Shift 升降'} · Ctrl 加速<br/>{movementMode.collisionEnabled?'双击 Space 切换飞行 · 飞行仍有碰撞':'无碰撞 · 无重力'}<br/>1–9 / 滚轮 切换物品 · 中键取物 · Esc 释放鼠标</small></div>}
           <CreativeHotbar slots={slots} selected={selectedSlot} onSelect={selectSlot} onInventory={openInventory}/>
-          <div className="creativeHint">E 物品栏 · Shift + 右键放置 · Esc 释放鼠标</div>
+          <div className="creativeHint">{movementMode.collisionEnabled?'双击 Space 切换飞行 · ':''}E 物品栏 · Shift + 右键放置 · Esc 释放鼠标 / 设置</div>
         </>}
         {inventoryOpen&&<CreativeInventory catalog={catalog.filter(item=>itemForm(item.name)===item.name)} slots={slots} selected={selectedSlot} connected={connected} onSelect={selectSlot} onAssign={assignSlot} onClear={index=>{const next=[...gameRef.current.slots];next[index]=null;gameRef.current.slots=next;setSlots(next);if(index===selectedSlot)dispatch({type:'chooseBlock',name:'minecraft:air'});}} onClose={closeInventory}/>}
 {!firstPerson&&<div className="viewportTop"><span className="sceneBadge"><span className={status.running?'liveDot':'pausedDot'}/>{status.running?'SIMULATING':'EDIT MODE'}<i/><span className="toolReadout">当前工具 · {toolLabel(state.tool)}{state.tool==='place'?` · ${blockLabel(state.placement.name)}`:''}</span></span><div className="viewButtons"><button title="第一人称搭建" onClick={enterFirstPerson}><MousePointer2 size={15}/>第一人称</button><button title={fullscreen?"退出全屏":"进入全屏"} onClick={toggleFullscreen}><Maximize size={15}/>全屏</button><button title="物品栏 E" onClick={openInventory}><Box size={15}/></button><button title="俯视" onClick={()=>view.current?.top()}><Grid2X2 size={15}/></button><button title="适合画面" onClick={()=>view.current?.fit()}><Maximize size={15}/></button></div></div>}
@@ -320,7 +322,7 @@ function App() {
       onClick={event=>{if(event.target===helpDialog.current)dispatch({type:'setHelp',value:false});}}>
       <button className="modalClose" title="关闭帮助" aria-label="关闭帮助" onClick={()=>dispatch({type:'setHelp',value:false})}><X size={18}/></button><span className="eyebrow">YOUR REDSTONE WORKBENCH</span><h1>从一条信号开始。</h1><p>浏览器负责搭建与显示，本地 C++ 内核执行电路。示波器保留游戏刻内的信号变化。</p>
       <div className="helpSteps"><div><b>01</b><strong>搭建电路</strong><p>模式 2 左键拆除，右键优先操作器件，否则贴面放置；Shift + 右键绕过操作直接放置。空处放在当前 Y 层，按 R 调整朝向。</p></div><div><b>02</b><strong>驱动与运行</strong><p>模式 4 左右键都可操作拉杆、按钮或打开容器面板。Enter 运行，F 前进 1 gt。器件编辑会暂停运行。</p></div><div><b>03</b><strong>检查信号</strong><p>探针工具点击方块，下方查看 0–15 信号。探针菜单可设置上升沿或下降沿断点。</p></div></div>
-      <p className="subtleText">第一人称 / 全屏：鼠标转向，左键拆除，右键优先使用，Shift + 右键放置，中键取物；1–9 / 滚轮切换快捷栏，E 打开物品列表，Esc 释放鼠标。目前采用飞行搭建，不包含玩家重力与碰撞。</p><div className="helpKeys"><span className="miniLabel">快捷键</span><div><kbd>1</kbd>–<kbd>4</kbd> 切换工具</div><div><kbd>Enter</kbd> 运行 / 暂停</div><div><kbd>W A S D</kbd> 前后左右</div><div><kbd>Space</kbd> / <kbd>Shift</kbd> 上升 / 下降</div><div><kbd>F</kbd> 前进 1 gt</div><div><kbd>R</kbd> 旋转待放置方块</div><div><kbd>/</kbd> 聚焦器件搜索</div><div><kbd>{shortcutHint(apple,'S')}</kbd> 导出电路</div><div><kbd>{shortcutHint(apple,'Z')}</kbd> 撤销</div><div><kbd>{shortcutHint(apple,'Z',true)}</kbd> 重做</div><div><kbd>Esc</kbd> 逐层关闭弹窗并清除选择</div></div>
+      <p className="subtleText">第一人称 / 全屏：鼠标转向，左键拆除，右键优先使用，Shift + 右键放置，中键取物；1–9 / 滚轮切换快捷栏，E 打开物品列表，Esc 释放鼠标。右上角可切换碰撞与重力；开启后 Space 跳跃，双击 Space 切换飞行，飞行时仍有碰撞。关闭后无重力自由飞行。</p><div className="helpKeys"><span className="miniLabel">快捷键</span><div><kbd>1</kbd>–<kbd>4</kbd> 切换工具</div><div><kbd>Enter</kbd> 运行 / 暂停</div><div><kbd>W A S D</kbd> 前后左右</div><div><kbd>Space</kbd> / <kbd>Shift</kbd> 上升 / 下降</div><div><kbd>F</kbd> 前进 1 gt</div><div><kbd>R</kbd> 旋转待放置方块</div><div><kbd>/</kbd> 聚焦器件搜索</div><div><kbd>{shortcutHint(apple,'S')}</kbd> 导出电路</div><div><kbd>{shortcutHint(apple,'Z')}</kbd> 撤销</div><div><kbd>{shortcutHint(apple,'Z',true)}</kbd> 重做</div><div><kbd>Esc</kbd> 逐层关闭弹窗并清除选择</div></div>
       <p className="subtleText">预览版本只开放内核已登记的器件，并按“已实现 / 部分实现 / 需环境输入”标注；这些标注不代表已通过完整的 Minecraft 26.2 差分验证。电路文件保存方块设计，运行快照还包含队列和器件内部状态。</p>
       <button className="runButton" onClick={()=>dispatch({type:'setHelp',value:false})}>开始搭建<ExternalLink size={14}/></button>
     </dialog>
