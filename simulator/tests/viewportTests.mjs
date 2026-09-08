@@ -39,8 +39,8 @@ test('placement reuses world geometry and preserves negative world coordinates',
     view.camera.position.set(-2,18,4); view.controls.target.set(-2,1,-3); view.controls.update();
   });
   const point=await page.evaluate(() => pointAt([-1.5,1,-2.5]));
-  await page.mouse.move(...point); await page.mouse.click(...point);
-  assert.deepEqual(await page.evaluate(() => picks.at(-1)),{pos:[-2,1,-3],tool:'place'});
+  await page.mouse.move(...point); await page.mouse.click(...point,{button:'right'});
+  assert.deepEqual(await page.evaluate(() => picks.at(-1)),{pos:[-2,2,-3],tool:'place'});
   const geometry=await page.evaluate(() => {
     const world=view.handles.get('-2,1,-3'), preview=view.previewHandles;
     const parts=handles=>handles.map(h=>{
@@ -51,7 +51,7 @@ test('placement reuses world geometry and preserves negative world coordinates',
     const previewParts=preview.map(h=>{const m=new THREE.Matrix4();h.pool.mesh.getMatrixAt(h.index,m);const c=new THREE.Color();h.pool.mesh.getColorAt(h.index,c);return {matrix:m.elements,color:c.getHex()};});
     return {world:parts(world),preview:previewParts,position:view.ghost.position.toArray(),visible:view.ghost.visible};
   });
-  assert.equal(geometry.visible,true); assert.deepEqual(geometry.position,[-2,1,-3]);
+  assert.equal(geometry.visible,true); assert.deepEqual(geometry.position,[-2,2,-3]);
   assert.equal(geometry.world.length,geometry.preview.length);
   geometry.world.forEach((part,i)=>{
     assert.equal(part.color,geometry.preview[i].color);
@@ -60,6 +60,8 @@ test('placement reuses world geometry and preserves negative world coordinates',
 });
 
 test('layer and tool changes update an idle pointer preview immediately', async () => {
+  const point=await page.evaluate(() => pointAt([.5,1,.5]));
+  await page.mouse.move(...point);
   await page.evaluate(() => view.setLayer(4,true));
   assert.equal(await page.evaluate(() => view.hover[1]),4);
   assert.equal(await page.evaluate(() => view.grid.position.y),4.002);
@@ -107,6 +109,54 @@ test('three-axis section hides selection and placement without mutating world ce
   await page.evaluate(()=>view.setSection('none'));
   assert.deepEqual(await page.evaluate(()=>view.hover),[0,1,0]);
   assert.equal(await page.evaluate(()=>JSON.stringify([...connection.cells])),before);
+});
+
+test('building clicks remove or place while right drags never edit, including return to start', async () => {
+  await page.evaluate(() => {
+    view.setSection('none');view.setLayer(1,false);view.tool='place';view.controls.enableDamping=false;
+    view.camera.position.set(-2,18,4);view.controls.target.set(-2,1,-3);view.controls.update();picks.length=0;
+  });
+  let point=await page.evaluate(()=>pointAt([-1.5,1.1,-2.5]));
+  await page.mouse.click(...point);
+  assert.deepEqual(await page.evaluate(()=>picks.at(-1)),{pos:[-2,1,-3],tool:'erase'});
+  await page.mouse.click(...point,{button:'right'});
+  assert.deepEqual(await page.evaluate(()=>picks.at(-1)),{pos:[-2,2,-3],tool:'place'});
+  const camera=await page.evaluate(()=>view.camera.position.toArray());
+  await page.mouse.down({button:'right'});await page.mouse.move(point[0]+70,point[1]+30,{steps:5});
+  assert.notDeepEqual(await page.evaluate(()=>view.camera.position.toArray()),camera);
+  await page.mouse.move(...point,{steps:5});await page.mouse.up({button:'right'});
+  assert.equal(await page.evaluate(()=>picks.length),2);
+  point=await page.evaluate(()=>pointAt([2.5,1,2.5]));
+  await page.mouse.click(...point,{button:'right'});
+  assert.deepEqual(await page.evaluate(()=>picks.at(-1)),{pos:[2,1,2],tool:'place'});
+  for(const tool of ['select','probe','interact']) {
+    await page.evaluate(tool=>{view.tool=tool;},tool);
+    point=await page.evaluate(()=>pointAt([-1.5,1.1,-2.5]));await page.mouse.click(...point);
+    assert.deepEqual(await page.evaluate(()=>picks.at(-1)),{pos:[-2,1,-3],tool});
+  }
+});
+
+test('held movement follows heading horizontally, ascends and descends, and stops on blur', async () => {
+  await page.evaluate(()=>{view.camera.position.set(0,12,12);view.controls.target.set(0,0,0);view.controls.update();});
+  await page.locator('canvas').focus();
+  const position=()=>page.evaluate(()=>view.camera.position.toArray());
+  const hold=async key=>{const before=await position();await page.keyboard.down(key);await page.waitForTimeout(150);await page.keyboard.up(key);return {before,after:await position()};};
+  for(const [key,axis,sign] of [['w',2,-1],['s',2,1],['a',0,-1],['d',0,1],['Space',1,1],['Shift',1,-1]]) {
+    const {before,after}=await hold(key);
+    assert.ok((after[axis]-before[axis])*sign>.1,key+' must move continuously');
+    for(let i=0;i<3;i++)if(i!==axis)assert.ok(Math.abs(after[i]-before[i])<1e-6,key+' must preserve other axes');
+  }
+  await page.evaluate(()=>{view.camera.position.set(12,12,0);view.controls.target.set(0,0,0);view.controls.update();});
+  const rotated=await hold('w');assert.ok(rotated.after[0]<rotated.before[0]-.1);assert.ok(Math.abs(rotated.after[1]-rotated.before[1])<1e-6);
+  await page.keyboard.down('w');
+  await page.evaluate(()=>{const input=document.createElement('input');input.id='edit';document.body.append(input);input.focus();});
+  const stopped=await position();await page.waitForTimeout(150);await page.keyboard.up('w');
+  assert.deepEqual(await position(),stopped);
+  await page.keyboard.press('Space');await page.keyboard.press('w');await page.keyboard.press('Shift');
+  assert.deepEqual(await position(),stopped);
+  await page.evaluate(()=>document.querySelector('#edit').remove());await page.locator('canvas').focus();
+  await page.keyboard.down('Control');const modified=await hold('w');await page.keyboard.up('Control');
+  assert.deepEqual(modified.after,modified.before);
 });
 
 test('render placement preview for visual review', async () => {

@@ -133,7 +133,7 @@ export type InteractionState = {
   messageSeq: number;
 };
 export const initialInteractionState: InteractionState = {
-  tool: 'select',
+  tool: 'place',
   placement: { name: 'minecraft:redstone_wire', properties: {} },
   selection: null,
   selectedDef: null,
@@ -276,7 +276,7 @@ export function resolveShortcut(event: ShortcutEvent, context: ShortcutContext):
     return null; // 其余组合键交还浏览器，例如 Ctrl+R 刷新、Ctrl+F 查找。
   }
   if (event.altKey) return null;
-  if (event.code === 'Space') return context.connected ? { result: { kind: 'command', command: context.running ? 'pause' : 'play' }, preventDefault: true } : unavailable();
+  if (event.code === 'Enter' || event.code === 'NumpadEnter') return context.connected ? { result: { kind: 'command', command: context.running ? 'pause' : 'play' }, preventDefault: true } : unavailable();
   if (event.code === 'KeyF') return context.connected ? { result: { kind: 'command', command: 'step' }, preventDefault: true } : unavailable();
   if (event.key === '/') return { result: { kind: 'focusSearch' }, preventDefault: true };
   // R 只在放置工具下调整待放置方块，不影响已选中的器件。

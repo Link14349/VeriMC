@@ -145,11 +145,13 @@ test('旋转按当前有效朝向推进，默认未知时选定第一个水平�
 });
 
 test('帮助弹窗、工程菜单和输入控件屏蔽全局快捷键，但 Esc 始终可用', () => {
-  const space = key({ key: ' ', code: 'Space' });
-  assert.deepEqual(resolveShortcut(space, context()).result, { kind: 'command', command: 'play' });
-  assert.equal(resolveShortcut(space, context({ help: true })), null);
-  assert.equal(resolveShortcut(space, context({ menu: true })), null);
-  assert.equal(resolveShortcut(key({ key: ' ', code: 'Space', source: 'text' }), context()), null);
+  const enter = key({ key: 'Enter', code: 'Enter' });
+  assert.equal(resolveShortcut(key({ key: ' ', code: 'Space' }), context()), null);
+  assert.deepEqual(resolveShortcut(key({ key: 'Enter', code: 'NumpadEnter' }), context({ running: true })).result, { kind: 'command', command: 'pause' });
+  assert.deepEqual(resolveShortcut(enter, context()).result, { kind: 'command', command: 'play' });
+  assert.equal(resolveShortcut(enter, context({ help: true })), null);
+  assert.equal(resolveShortcut(enter, context({ menu: true })), null);
+  assert.equal(resolveShortcut(key({ key: 'Enter', code: 'Enter', source: 'text' }), context()), null);
   assert.equal(resolveShortcut(key({ key: '1', source: 'text' }), context()), null, '在输入框里按 1 不应切换工具');
   assert.equal(resolveShortcut(key({ key: '1', source: 'search' }), context()), null);
   assert.equal(resolveShortcut(key({ key: 'Delete', source: 'text' }), context({ hasSelection: true })), null);
@@ -242,7 +244,7 @@ test('编辑层所有入口都限制在 -64..319 的有限整数', () => {
 
 test('断线时不能执行的命令被拒绝并给出原因', () => {
   const offline = context({ connected: false, hasSelection: true, hasSelectedDef: true, hasClipboard: true });
-  for (const event of [key({ key: ' ', code: 'Space' }), key({ key: 'f', code: 'KeyF' }), key({ key: 's', ctrlKey: true }), key({ key: 'z', ctrlKey: true }), key({ key: 'Delete' })]) {
+  for (const event of [key({ key: 'Enter', code: 'Enter' }), key({ key: 'f', code: 'KeyF' }), key({ key: 's', ctrlKey: true }), key({ key: 'z', ctrlKey: true }), key({ key: 'Delete' })]) {
     const decision = resolveShortcut(event, offline);
     assert.equal(decision.result.kind, 'unavailable', `${event.key} 断线时不应发出命令`);
     assert.equal(decision.result.reason, offlineReason);
@@ -413,8 +415,8 @@ test('界面渲染：断线时命令按钮禁用，帮助弹窗使用原生 dial
   assert.match(html, /<fieldset class="offlineGuard[^"]*" disabled=""/, '子面板的表单控件在断线时应整体禁用');
   assert.match(html, /<dialog class="helpModal"/, '帮助弹窗使用原生 dialog 以获得焦点限制');
   assert.doesNotMatch(html, /open=""/, '帮助弹窗默认关闭');
-  assert.match(textOf(html), /当前工具 · 选择/);
-  assert.match(textOf(html), new RegExp(shortcutHint(isApplePlatform(process.platform === 'darwin' ? 'MacIntel' : 'Win32'), 'S').replace(/\+/g, '\\+')));
+  assert.match(textOf(html), /当前工具 · 放置/);
+  assert.match(textOf(html), new RegExp(shortcutHint(isApplePlatform(typeof navigator === 'undefined' ? '' : navigator.platform, typeof navigator === 'undefined' ? '' : navigator.userAgent), 'S').replace(/\+/g, '\\+')));
 });
 
 test('界面渲染：编辑层输入与底板按钮遵守 -64..319', () => {

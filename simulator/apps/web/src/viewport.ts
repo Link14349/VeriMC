@@ -46,7 +46,7 @@ export class CircuitViewport {
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera(42, 1, .1, 3000);
   controls: OrbitControls;
-  private activeTool: Tool = 'select';
+  private activeTool: Tool = 'place';
   get tool(): Tool { return this.activeTool; }
   set tool(value: Tool) { this.activeTool = value; this.refreshHover(); }
   layer = 1;
@@ -71,7 +71,12 @@ export class CircuitViewport {
   private section: { axis: 'x'|'y'|'z'; maximum: number } | null = null;
   private resizeObserver: ResizeObserver;
   private frameId = 0;
-  private down: [number,number] | null = null;
+  private down: { x: number; y: number; button: number; pointerId: number; dragged: boolean } | null = null;
+  private movementKeys = new Set<string>();
+  private lastFrame = performance.now();
+  private moveRight = new THREE.Vector3();
+  private moveForward = new THREE.Vector3();
+  private moveDelta = new THREE.Vector3();
   private selected: Pos | null = null;
   private lastFps = performance.now(); private frameCount = 0;
   onPick: (pos: Pos, tool: Tool, additive: boolean) => void = () => {};
@@ -82,24 +87,24 @@ export class CircuitViewport {
     this.renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); this.renderer.setClearColor(0x20272b); this.renderer.outputColorSpace = THREE.SRGBColorSpace; this.renderer.localClippingEnabled = true;
     material.clippingPlanes = [this.clipPlane, this.sectionPlane];
     this.renderer.domElement.tabIndex = 0;
-    this.renderer.domElement.setAttribute('aria-label', '三维工作台，WASD 平移视角');
+    this.renderer.domElement.setAttribute('aria-label', '三维工作台，WASD 前后左右，Space 上升，Shift 下降');
     container.appendChild(this.renderer.domElement);
     this.scene.add(new THREE.HemisphereLight(0xf2f2e4, 0x4c5b69, 2.7)); const light = new THREE.DirectionalLight(0xffefcf, 3.1); light.position.set(-12,30,15); this.scene.add(light);
     this.camera.position.set(18,18,22); this.controls = new OrbitControls(this.camera, this.renderer.domElement); this.controls.target.set(4,0,2); this.controls.enableDamping = true; this.controls.dampingFactor = .12; this.controls.minDistance = 2; this.controls.maxDistance = 700;
     this.controls.mouseButtons = { LEFT: -1 as THREE.MOUSE, MIDDLE: THREE.MOUSE.PAN, RIGHT: THREE.MOUSE.ROTATE };
-    this.controls.keys = { UP: 'KeyW', LEFT: 'KeyA', BOTTOM: 'KeyS', RIGHT: 'KeyD' };
-    this.controls.keyPanSpeed = 21;
-    // Ctrl/Cmd+S 等组合键保留给应用快捷键，不触发键盘旋转。
-    this.controls.keyRotateSpeed = 0;
-    this.controls.listenToKeyEvents(this.renderer.domElement);
+    this.renderer.domElement.addEventListener('keydown', this.keyDown);
+    this.renderer.domElement.addEventListener('keyup', this.keyUp);
+    this.renderer.domElement.addEventListener('blur', this.clearInput);
+    window.addEventListener('blur', this.clearInput);
+    document.addEventListener('visibilitychange', this.clearInput);
     this.grid = new THREE.GridHelper(128,128,0x5c6668,0x343e42); this.grid.position.y = this.layer + .002; this.scene.add(this.grid);
     const axes = new THREE.AxesHelper(2.2); axes.position.set(-.5,.025,-.5); this.scene.add(axes);
     this.previewChunk = { group: this.ghost, box: new InstancePool(this.ghost, box, true, this.previewMaterial), cylinder: new InstancePool(this.ghost, cylinder, true, this.previewMaterial) };
     this.previewArrow = new THREE.ArrowHelper(new THREE.Vector3(0,0,1), new THREE.Vector3(.5,1.15,.5), .9, 0xf0c88a, .22, .13);
     this.previewArrow.visible = false; this.ghost.add(this.previewArrow);
     this.selection.visible = false; this.ghost.visible = false; this.scene.add(this.selection, this.ghost);
-    this.resizeObserver = new ResizeObserver(() => this.resize()); this.resizeObserver.observe(container);
-    this.renderer.domElement.addEventListener('pointerdown', this.pointerDown); this.renderer.domElement.addEventListener('pointerup', this.pointerUp); this.renderer.domElement.addEventListener('pointermove', this.pointerMove); this.renderer.domElement.addEventListener('pointerleave', this.pointerLeave); this.controls.addEventListener('change', this.refreshHover); this.renderer.domElement.addEventListener('contextmenu', event => event.preventDefault());
+    this.resizeObserver = new ResizeObserver(() => this.resize()); this.resizeObserver.observe(container); this.resize();
+    this.renderer.domElement.addEventListener('pointerdown', this.pointerDown); this.renderer.domElement.addEventListener('pointerup', this.pointerUp); this.renderer.domElement.addEventListener('pointermove', this.pointerMove); this.renderer.domElement.addEventListener('pointerleave', this.pointerLeave); this.renderer.domElement.addEventListener('pointercancel', this.clearInput); this.controls.addEventListener('change', this.refreshHover); this.renderer.domElement.addEventListener('contextmenu', event => event.preventDefault());
     connection.addEventListener('cells', this.applyChanges); this.rebuild(); this.animate();
   }
   private resize() { const { clientWidth: w, clientHeight: h } = this.container; this.renderer.setSize(w, h); this.camera.aspect = w / Math.max(h,1); this.camera.updateProjectionMatrix(); }
@@ -363,7 +368,7 @@ export class CircuitViewport {
     }
     return handles;
   }
-  private applyChanges = (event: Event) => { const { full, changes } = (event as CustomEvent<{ full: boolean; changes: BlockCell[] }>).detail; if (full) this.rebuild(); else for (const cell of changes) this.drawCell(cell); };
+  private applyChanges = (event: Event) => { const { full, changes } = (event as CustomEvent<{ full: boolean; changes: BlockCell[] }>).detail; if (full) this.rebuild(); else for (const cell of changes) this.drawCell(cell); this.refreshHover(); };
   private rebuild() { for (const chunk of this.chunks.values()) { chunk.box.dispose(); chunk.cylinder.dispose(); chunk.pick?.dispose(); this.scene.remove(chunk.group); } this.chunks.clear(); this.handles.clear(); for (const cell of connection.cells.values()) this.drawCell(cell); }
   setLayer(layer: number, cutaway: boolean) {
     this.layer = Number.isFinite(layer) ? Math.max(-64, Math.min(319, Math.trunc(layer))) : this.layer;
@@ -410,23 +415,67 @@ export class CircuitViewport {
   select(pos: Pos | null) { this.selected = pos; this.selection.visible = !!pos && this.positionVisible(pos); if (pos) { this.selection.box.min.fromArray(pos).addScalar(-.007); this.selection.box.max.fromArray(pos).addScalar(1.007); } }
   fit() { const bounds = new THREE.Box3(); for (const cell of connection.cells.values()) bounds.expandByPoint(new THREE.Vector3(...cell.pos)); if (bounds.isEmpty()) bounds.set(new THREE.Vector3(-4,0,-4),new THREE.Vector3(4,0,4)); const center = bounds.getCenter(new THREE.Vector3()), size = bounds.getSize(new THREE.Vector3()).length(); this.controls.target.copy(center); this.camera.position.copy(center).add(new THREE.Vector3(1,1.25,1.4).multiplyScalar(Math.max(size*.65,8))); }
   top() { this.camera.position.copy(this.controls.target).add(new THREE.Vector3(0,Math.max(this.camera.position.distanceTo(this.controls.target),15),.001)); }
-  private locate(event: { clientX: number; clientY: number }): Pos | null {
-    const rect = this.renderer.domElement.getBoundingClientRect(); if (!rect.width || !rect.height) return null; this.camera.updateMatrixWorld(); this.pointer.set((event.clientX-rect.left)/rect.width*2-1,-(event.clientY-rect.top)/rect.height*2+1); this.raycaster.setFromCamera(this.pointer,this.camera);
-    if (this.tool === 'place') { const hit = this.raycaster.ray.intersectPlane(this.plane, new THREE.Vector3()); const pos: Pos | null = hit ? [Math.floor(hit.x),this.layer,Math.floor(hit.z)] : null; return pos && this.positionVisible(pos) ? pos : null; }
+  private locate(event: { clientX: number; clientY: number }, tool: Tool = this.tool): Pos | null {
+    const rect = this.renderer.domElement.getBoundingClientRect(); if (!rect.width || !rect.height) return null; this.camera.updateMatrixWorld(); this.scene.updateMatrixWorld(); this.pointer.set((event.clientX-rect.left)/rect.width*2-1,-(event.clientY-rect.top)/rect.height*2+1); this.raycaster.setFromCamera(this.pointer,this.camera);
     const meshes: THREE.Object3D[] = []; for (const chunk of this.chunks.values()) { meshes.push(chunk.box.mesh,chunk.cylinder.mesh); if (chunk.pick) meshes.push(chunk.pick.mesh); }
-    for (const hit of this.raycaster.intersectObjects(meshes)) { const pool = hit.object.userData.pool as InstancePool; const pos = pool.positions[hit.instanceId!]; if (pos && this.positionVisible(pos)) return pos; }
-    return null;
+    for (const hit of this.raycaster.intersectObjects(meshes)) {
+      const pool = hit.object.userData.pool as InstancePool; const pos = pool.positions[hit.instanceId!];
+      if (!pos || !this.positionVisible(pos)) continue;
+      if (tool !== 'place') return pos;
+      if (!hit.face) return null;
+      // 将实例几何的表面法线还原到世界坐标，再选择相邻方块格。
+      pool.mesh.getMatrixAt(hit.instanceId!, matrix);
+      matrix.premultiply(pool.mesh.matrixWorld);
+      const normal = hit.face.normal.clone().transformDirection(matrix);
+      const axis = Math.abs(normal.x) >= Math.abs(normal.y) && Math.abs(normal.x) >= Math.abs(normal.z) ? 0 : Math.abs(normal.y) >= Math.abs(normal.z) ? 1 : 2;
+      const adjacent: Pos = [...pos]; adjacent[axis] += Math.sign(normal.getComponent(axis));
+      return this.placementVisible(adjacent) ? adjacent : null;
+    }
+    if (tool !== 'place') return null;
+    const hit = this.raycaster.ray.intersectPlane(this.plane, new THREE.Vector3());
+    const pos: Pos | null = hit ? [Math.floor(hit.x),this.layer,Math.floor(hit.z)] : null;
+    return pos && this.placementVisible(pos) ? pos : null;
   }
-  private pointerDown = (event: PointerEvent) => { this.renderer.domElement.focus({ preventScroll: true }); if (event.button === 0) this.down = [event.clientX,event.clientY]; };
-  private pointerUp = (event: PointerEvent) => { if (event.button === 0 && this.down && Math.hypot(event.clientX-this.down[0],event.clientY-this.down[1]) < 5) { const pos = this.locate(event); if (pos) this.onPick(pos,this.tool,event.shiftKey); } this.down = null; };
+  private placementVisible(pos: Pos) {
+    return pos[1] >= -64 && pos[1] <= 319 && this.positionVisible(pos) && !connection.cells.has(posKey(pos));
+  }
+  private pointerDown = (event: PointerEvent) => {
+    this.renderer.domElement.focus({ preventScroll: true });
+    if (event.button === 0 || event.button === 2) this.down = { x:event.clientX, y:event.clientY, button:event.button, pointerId:event.pointerId, dragged:false };
+  };
+  private pointerUp = (event: PointerEvent) => {
+    const down = this.down; this.down = null;
+    if (!down || event.pointerId !== down.pointerId || event.button !== down.button || down.dragged || Math.hypot(event.clientX-down.x,event.clientY-down.y) >= 5) return;
+    const tool = event.button === 2 ? 'place' : this.tool === 'place' ? 'erase' : this.tool;
+    const pos = this.locate(event, tool); if (pos) this.onPick(pos,tool,event.shiftKey);
+  };
+  private keyDown = (event: KeyboardEvent) => {
+    if (event.ctrlKey || event.metaKey || event.altKey) { this.movementKeys.clear(); return; }
+    if (!['KeyW','KeyA','KeyS','KeyD','Space','ShiftLeft','ShiftRight'].includes(event.code)) return;
+    event.preventDefault(); this.movementKeys.add(event.code);
+  };
+  private keyUp = (event: KeyboardEvent) => { this.movementKeys.delete(event.code); };
+  private clearInput = () => { this.movementKeys.clear(); this.down = null; };
+  private moveCamera(seconds: number) {
+    if (!this.movementKeys.size) return;
+    const held = (code: string) => Number(this.movementKeys.has(code));
+    // 水平移动只取朝向，不随俯仰改变高度；俯视时仍保留左右方向。
+    this.moveRight.set(1,0,0).applyQuaternion(this.camera.quaternion).setY(0).normalize();
+    this.moveForward.set(this.moveRight.z,0,-this.moveRight.x);
+    this.moveDelta.copy(this.moveRight).multiplyScalar(held('KeyD')-held('KeyA'));
+    this.moveDelta.addScaledVector(this.moveForward, held('KeyW')-held('KeyS'));
+    this.moveDelta.y = held('Space')-Number(this.movementKeys.has('ShiftLeft') || this.movementKeys.has('ShiftRight'));
+    this.moveDelta.normalize().multiplyScalar(12*seconds);
+    this.camera.position.add(this.moveDelta); this.controls.target.add(this.moveDelta);
+  }
   private refreshHover = () => {
     const pos = this.lastPointer ? this.locate(this.lastPointer) : null;
     if ((pos ? posKey(pos) : null) !== (this.hover ? posKey(this.hover) : null)) this.onHover(pos);
     this.hover = pos; this.ghost.visible = this.tool === 'place' && !!pos && !!this.placementKey;
     if (pos) this.ghost.position.fromArray(pos);
   };
-  private pointerMove = (event: PointerEvent) => { this.lastPointer = { clientX:event.clientX, clientY:event.clientY }; this.refreshHover(); };
+  private pointerMove = (event: PointerEvent) => { if (this.down && Math.hypot(event.clientX-this.down.x,event.clientY-this.down.y) >= 5) this.down.dragged = true; this.lastPointer = { clientX:event.clientX, clientY:event.clientY }; this.refreshHover(); };
   private pointerLeave = () => { this.lastPointer = null; this.down = null; this.refreshHover(); };
-  private animate = () => { this.frameId = requestAnimationFrame(this.animate); this.controls.update(); this.renderer.render(this.scene,this.camera); this.frameCount++; const now = performance.now(); if (now-this.lastFps > 1000) { this.onFps(Math.round(this.frameCount*1000/(now-this.lastFps))); this.lastFps=now; this.frameCount=0; } };
-  dispose() { cancelAnimationFrame(this.frameId); this.resizeObserver.disconnect(); connection.removeEventListener('cells',this.applyChanges); this.controls.removeEventListener('change', this.refreshHover); this.controls.dispose(); this.previewChunk.box.dispose(); this.previewChunk.cylinder.dispose(); this.previewChunk.pick?.dispose(); this.previewMaterial.dispose(); this.previewArrow.dispose(); this.grid.dispose(); this.selection.dispose(); for (const c of this.chunks.values()) { c.box.dispose(); c.cylinder.dispose(); c.pick?.dispose(); } this.renderer.dispose(); this.renderer.domElement.remove(); }
+  private animate = () => { this.frameId = requestAnimationFrame(this.animate); const now = performance.now(); this.moveCamera(Math.min((now-this.lastFrame)/1000,.05)); this.lastFrame = now; this.controls.update(); this.renderer.render(this.scene,this.camera); this.frameCount++; if (now-this.lastFps > 1000) { this.onFps(Math.round(this.frameCount*1000/(now-this.lastFps))); this.lastFps=now; this.frameCount=0; } };
+  dispose() { cancelAnimationFrame(this.frameId); window.removeEventListener('blur', this.clearInput); document.removeEventListener('visibilitychange', this.clearInput); this.resizeObserver.disconnect(); connection.removeEventListener('cells',this.applyChanges); this.controls.removeEventListener('change', this.refreshHover); this.controls.dispose(); this.previewChunk.box.dispose(); this.previewChunk.cylinder.dispose(); this.previewChunk.pick?.dispose(); this.previewMaterial.dispose(); this.previewArrow.dispose(); this.grid.dispose(); this.selection.dispose(); for (const c of this.chunks.values()) { c.box.dispose(); c.cylinder.dispose(); c.pick?.dispose(); } this.renderer.dispose(); this.renderer.domElement.remove(); }
 }

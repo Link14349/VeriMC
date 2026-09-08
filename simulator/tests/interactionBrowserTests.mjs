@@ -50,6 +50,7 @@ test('selection to palette change replaces inspector context and Escape clears i
     const p=new THREE.Vector3(4.5,1.1,2.5).project(camera);
     return [rect.left+(p.x+1)*rect.width/2,rect.top+(1-p.y)*rect.height/2];
   });
+  await page.keyboard.press('1');
   await page.mouse.click(...point);
   await page.waitForFunction(()=>document.querySelector('.inspector .panelHeading')?.textContent.includes('器件检查'));
   await page.locator('.paletteItem').filter({hasText:'redstone_torch'}).click();
@@ -68,7 +69,7 @@ test('search shortcut and help modal isolate editing shortcuts',async()=>{
   await page.getByTitle('使用帮助').click();
   await page.locator('.helpModal h1').evaluate(el=>{el.tabIndex=-1;el.focus();});
   const count=await page.evaluate(()=>commands.length);
-  await page.keyboard.press('Space');await page.keyboard.press('f');await page.keyboard.press('Delete');
+  await page.keyboard.press('Enter');await page.keyboard.press('f');await page.keyboard.press('Delete');
   assert.equal(await page.evaluate(()=>commands.length),count);
   await page.keyboard.press('Escape');
   assert.equal(await page.getByTitle('使用帮助').evaluate(el=>el===document.activeElement),true);
@@ -82,10 +83,23 @@ test('layer inputs remain bounded and disconnected shortcuts cannot send edits',
   await page.evaluate(()=>{kernel.connected=false;kernel.dispatchEvent(new Event('status'));});
   await page.locator('.viewportCanvas canvas').focus();
   const count=await page.evaluate(()=>commands.length);
-  await page.keyboard.press('Space');await page.keyboard.press('f');
+  await page.keyboard.press('Enter');await page.keyboard.press('f');
   assert.equal(await page.evaluate(()=>commands.length),count);
   await page.evaluate(()=>{kernel.connected=true;kernel.dispatchEvent(new Event('status'));});
   await layer.fill('1');await layer.press('Tab');
+});
+
+test('Enter toggles simulation once per press and Space only moves the camera',async()=>{
+  await page.locator('.viewportCanvas canvas').focus();
+  await page.evaluate(()=>{commands.length=0;kernel.status.running=false;kernel.dispatchEvent(new Event('status'));});
+  await page.keyboard.press('Space');
+  assert.equal(await page.evaluate(()=>commands.length),0);
+  await page.keyboard.down('Enter');await page.keyboard.down('Enter');await page.keyboard.up('Enter');
+  assert.deepEqual(await page.evaluate(()=>commands.map(c=>c.cmd)),['play']);
+  await page.keyboard.press('Enter');
+  assert.deepEqual(await page.evaluate(()=>commands.map(c=>c.cmd)),['play','pause']);
+  await page.locator('.search input').focus();await page.keyboard.press('Enter');
+  assert.equal(await page.evaluate(()=>commands.length),2);
 });
 
 test('capture full workbench for visual review',async()=>{
