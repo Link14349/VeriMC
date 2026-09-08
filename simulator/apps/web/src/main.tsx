@@ -101,7 +101,8 @@ function App() {
     if(existing>=0)selectSlot(existing);else assignSlot(name,gameRef.current.selectedSlot);
   };
   const useBlock=(pos:Pos,shift:boolean)=>{
-    if(shift && gameRef.current.slots[gameRef.current.selectedSlot])return false;
+    const held=gameRef.current.firstPerson?gameRef.current.slots[gameRef.current.selectedSlot]:stateRef.current.placement.name!=='minecraft:air';
+    if(shift && held)return false;
     const def=connection.states.get(connection.cells.get(posKey(pos))?.stateId??0);
     const entry=connection.catalog.find(c=>c.name===def?.name);if(!entry||!def)return false;
     const action=creativeUse(entry);if(!action)return false;
@@ -126,6 +127,7 @@ function App() {
     viewport.onPick=(pos,active,_additive,face,hitHeight)=>{
       const {placement}=stateRef.current;const run=callbacks.current.command;
       if(active==='select'){const cell=connection.cells.get(posKey(pos));dispatch({type:'select',pos,def:cell?connection.states.get(cell.stateId)??null:null});return;}
+      if(active==='interact' && callbacks.current.useBlock(pos,false))return;
       // 断线时不发出无法执行的编辑命令，直接给出可见提示。
       const routing=pickCommand(active,connection.connected);
       if(!routing)return;
@@ -273,10 +275,10 @@ function App() {
         </>}
         {inventoryOpen&&<CreativeInventory catalog={catalog.filter(item=>itemForm(item.name)===item.name)} slots={slots} selected={selectedSlot} connected={connected} onSelect={selectSlot} onAssign={assignSlot} onClear={index=>{const next=[...gameRef.current.slots];next[index]=null;gameRef.current.slots=next;setSlots(next);if(index===selectedSlot)dispatch({type:'chooseBlock',name:'minecraft:air'});}} onClose={closeInventory}/>}
 {!firstPerson&&<div className="viewportTop"><span className="sceneBadge"><span className={status.running?'liveDot':'pausedDot'}/>{status.running?'SIMULATING':'EDIT MODE'}<i/><span className="toolReadout">当前工具 · {toolLabel(state.tool)}{state.tool==='place'?` · ${blockLabel(state.placement.name)}`:''}</span></span><div className="viewButtons"><button title="第一人称搭建" onClick={enterFirstPerson}><MousePointer2 size={15}/>第一人称</button><button title={fullscreen?"退出全屏":"进入全屏"} onClick={toggleFullscreen}><Maximize size={15}/>全屏</button><button title="物品栏 E" onClick={openInventory}><Box size={15}/></button><button title="俯视" onClick={()=>view.current?.top()}><Grid2X2 size={15}/></button><button title="适合画面" onClick={()=>view.current?.fit()}><Maximize size={15}/></button></div></div>}
-        <div className="toolRail">{toolOrder.map(t=>{const Icon=toolIcons[t.id];return <button key={t.id} className={state.tool===t.id?'active':''} aria-pressed={state.tool===t.id} title={`${t.label} [${t.key}]${t.id==='place'?' · 左键拆除，右键放置':''}`} onClick={()=>dispatch({type:'setTool',tool:t.id})}><Icon size={18}/><kbd>{t.key}</kbd></button>;})}</div>
+        <div className="toolRail">{toolOrder.map(t=>{const Icon=toolIcons[t.id];return <button key={t.id} className={state.tool===t.id?'active':''} aria-pressed={state.tool===t.id} title={`${t.label} [${t.key}]${t.id==='place'?' · 左键拆除，右键使用 / 放置，Shift + 右键放置':t.id==='interact'?' · 左右键均操作器件':''}`} onClick={()=>dispatch({type:'setTool',tool:t.id})}><Icon size={18}/><kbd>{t.key}</kbd></button>;})}</div>
         <div className="layerControl"><Layers size={15}/><span>编辑层 Y</span><button title="下降一层" disabled={state.layer<=layerRange.min} onClick={()=>dispatch({type:'setLayer',value:state.layer-1})}>−</button><input aria-label={`编辑层 Y，范围 ${layerRange.min} 到 ${layerRange.max}`} inputMode="numeric" value={state.layerText} onChange={e=>dispatch({type:'typeLayer',value:e.target.value})} onBlur={()=>dispatch({type:'commitLayerText'})}/><button title="上升一层" disabled={state.layer>=layerRange.max} onClick={()=>dispatch({type:'setLayer',value:state.layer+1})}>+</button><i/><button title="隐藏编辑层以上方块" aria-pressed={state.cutaway} className={state.cutaway?'active':''} onClick={()=>dispatch({type:'setCutaway',value:!state.cutaway})}><Eye size={15}/></button></div>
         <div className="sectionControl"><label>剖切 <select aria-label="剖切轴" value={sectionAxis} onChange={e=>setSectionAxis(e.target.value as typeof sectionAxis)}><option value="none">关闭</option><option value="x">X</option><option value="y">Y</option><option value="z">Z</option></select></label>{sectionAxis!=='none'&&<label>显示 ≤ <input aria-label="剖切坐标" type="number" step={1} value={sectionText} onChange={e=>{setSectionText(e.target.value);const n=Number(e.target.value);if(e.target.value.trim()&&Number.isFinite(n))setSectionMaximum(Math.trunc(n));}} onBlur={()=>setSectionText(String(sectionMaximum))}/></label>}<span>仅影响显示</span></div>
-        <div className="viewportBottom"><span>右键放置 / 拖动旋转 · 左键拆除（搭建工具） · WASD 移动 · Space / Shift 升降</span><span className="coord">{hover?`X ${hover[0]}   Y ${hover[1]}   Z ${hover[2]}`:'X —   Y —   Z —'}</span></div>
+        <div className="viewportBottom"><span>{state.tool==='interact'?'左右键操作器件':state.tool==='place'?'左键拆除 · 右键使用 / 放置 · Shift + 右键放置':'右键放置'} · 右拖旋转 · WASD 移动 · Space / Shift 升降</span><span className="coord">{hover?`X ${hover[0]}   Y ${hover[1]}   Z ${hover[2]}`:'X —   Y —   Z —'}</span></div>
         {status.pauseReason&&<div className="pauseBanner" role="alert">{status.pauseReason}</div>}
       </div><fieldset className="offlineGuard column" disabled={!connected}><Waveform status={status} command={command}/></fieldset></section>
       <aside className="inspector"><div className="panelHeading"><span>{state.selectedDef?'器件检查':'放置设置'}</span>{state.selection&&<button title="取消选择" onClick={()=>dispatch({type:'clearSelection'})}><X size={14}/></button>}</div>
@@ -317,7 +319,7 @@ function App() {
       onClose={()=>{dispatch({type:'setHelp',value:false});const back=helpReturn.current??helpButton.current;helpReturn.current=null;back?.focus();}}
       onClick={event=>{if(event.target===helpDialog.current)dispatch({type:'setHelp',value:false});}}>
       <button className="modalClose" title="关闭帮助" aria-label="关闭帮助" onClick={()=>dispatch({type:'setHelp',value:false})}><X size={18}/></button><span className="eyebrow">YOUR REDSTONE WORKBENCH</span><h1>从一条信号开始。</h1><p>浏览器负责搭建与显示，本地 C++ 内核执行电路。示波器保留游戏刻内的信号变化。</p>
-      <div className="helpSteps"><div><b>01</b><strong>搭建电路</strong><p>器件库选择方块，右键点击方块表面相邻放置，空处放在当前 Y 层；搭建工具下左键拆除。用右侧按钮快速铺底板，搭建工具下按 R 调整朝向。</p></div><div><b>02</b><strong>驱动与运行</strong><p>选择操作工具点击拉杆或按钮，Enter 运行，F 前进 1 gt。器件编辑会暂停运行。</p></div><div><b>03</b><strong>检查信号</strong><p>探针工具点击方块，下方查看 0–15 信号。探针菜单可设置上升沿或下降沿断点。</p></div></div>
+      <div className="helpSteps"><div><b>01</b><strong>搭建电路</strong><p>模式 2 左键拆除，右键优先操作器件，否则贴面放置；Shift + 右键绕过操作直接放置。空处放在当前 Y 层，按 R 调整朝向。</p></div><div><b>02</b><strong>驱动与运行</strong><p>模式 4 左右键都可操作拉杆、按钮或打开容器面板。Enter 运行，F 前进 1 gt。器件编辑会暂停运行。</p></div><div><b>03</b><strong>检查信号</strong><p>探针工具点击方块，下方查看 0–15 信号。探针菜单可设置上升沿或下降沿断点。</p></div></div>
       <p className="subtleText">第一人称 / 全屏：鼠标转向，左键拆除，右键优先使用，Shift + 右键放置，中键取物；1–9 / 滚轮切换快捷栏，E 打开物品列表，Esc 释放鼠标。目前采用飞行搭建，不包含玩家重力与碰撞。</p><div className="helpKeys"><span className="miniLabel">快捷键</span><div><kbd>1</kbd>–<kbd>4</kbd> 切换工具</div><div><kbd>Enter</kbd> 运行 / 暂停</div><div><kbd>W A S D</kbd> 前后左右</div><div><kbd>Space</kbd> / <kbd>Shift</kbd> 上升 / 下降</div><div><kbd>F</kbd> 前进 1 gt</div><div><kbd>R</kbd> 旋转待放置方块</div><div><kbd>/</kbd> 聚焦器件搜索</div><div><kbd>{shortcutHint(apple,'S')}</kbd> 导出电路</div><div><kbd>{shortcutHint(apple,'Z')}</kbd> 撤销</div><div><kbd>{shortcutHint(apple,'Z',true)}</kbd> 重做</div><div><kbd>Esc</kbd> 逐层关闭弹窗并清除选择</div></div>
       <p className="subtleText">预览版本只开放内核已登记的器件，并按“已实现 / 部分实现 / 需环境输入”标注；这些标注不代表已通过完整的 Minecraft 26.2 差分验证。电路文件保存方块设计，运行快照还包含队列和器件内部状态。</p>
       <button className="runButton" onClick={()=>dispatch({type:'setHelp',value:false})}>开始搭建<ExternalLink size={14}/></button>

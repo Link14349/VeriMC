@@ -30,6 +30,8 @@
 
 右键拉杆、按钮、中继器、比较器、红石粉、音符盒、门等转发已支持的 `interact`；箱、漏斗、投掷器等打开现有库存/环境面板。讲台、堆肥桶只显示对应环境面板，不伪造库存操作。
 
+工作台共用上述器件操作分派：模式 4 的左右键均操作命中器件；模式 2 右键优先操作，不能操作时才相邻放置，Shift + 右键可绕过操作。工作台按当前待放置方块判断是否持有物品，不受第一人称快捷栏空格影响。拖动判定先于动作分派，右键旋转视角不会误触器件。
+
 ## 机制依据与边界
 
 基础键位参考 [Minecraft Controls](https://www.minecraft.net/en-us/article/minecraft-controls)。常用器件朝向对照本地固定 Java Edition 26.2 参考源码的 `getStateForPlacement`：DiodeBlock、PistonBaseBlock、ObserverBlock、DispenserBlock、HopperBlock、FaceAttachedHorizontalDirectionalBlock、BarrelBlock、SlabBlock 等。中继器/比较器指向水平视向的反方向；侦测器朝视向，活塞/投掷器朝其反方向；拉杆/按钮依命中面选择 floor/wall/ceiling。半砖和活板门使用实际命中高度选择上/下半格。中键活塞头按 type 返回对应活塞，移动活塞不取物。

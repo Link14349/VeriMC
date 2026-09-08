@@ -605,8 +605,14 @@ export class CircuitViewport {
     if (this.immersive || this.inputBlocked) return;
     const down = this.down; this.down = null;
     if (!down || event.pointerId !== down.pointerId || event.button !== down.button || down.dragged || Math.hypot(event.clientX-down.x,event.clientY-down.y) >= 5) return;
-    const tool = event.button === 2 ? 'place' : this.tool === 'place' ? 'erase' : this.tool;
-    const target = this.locate(event, tool); if (target) this.onPick(target.pos,tool,event.shiftKey,target.face);
+    // 工作台操作工具的左右键一致；搭建工具右键先使用命中器件，再考虑相邻放置。
+    // 必须在拖动判定之后分派，避免右键旋转视角时误触器件。
+    if(this.tool==='place' && event.button===2){
+      const hit=this.locate(event,'select');
+      if(hit && this.onUse(hit.pos,event.shiftKey))return;
+    }
+    const tool = this.tool === 'interact' ? 'interact' : event.button === 2 ? 'place' : this.tool === 'place' ? 'erase' : this.tool;
+    const target = this.locate(event, tool); if (target) this.onPick(target.pos,tool,event.shiftKey,target.face,target.hitHeight);
   };
   private keyDown = (event: KeyboardEvent) => {
     if (this.inputBlocked || (this.immersive && !this.pointerLocked)) return;

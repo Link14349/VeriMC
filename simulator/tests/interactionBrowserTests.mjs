@@ -24,6 +24,7 @@ before(async()=>{
       {stateId:3,name:'minecraft:lever',properties:{facing:'north',face:'floor',powered:'false'}},
       {stateId:4,name:'minecraft:stone',properties:{}},
       {stateId:5,name:'minecraft:redstone_wall_torch',properties:{facing:'north',lit:'true'}},
+      {stateId:6,name:'minecraft:stone_button',properties:{facing:'north',face:'floor',powered:'false'}},
     ];
     defs.forEach(def=>connection.states.set(def.stateId,def));
     connection.catalog=defs.map(def=>({name:def.name,defaultState:def.stateId,defaultProperties:def.properties,device:2,supportLevel:def.stateId===3?'externalStimulus':'implemented',properties:Object.fromEntries(Object.entries(def.properties).map(([key,value])=>[key,key==='facing'?['north','east','south','west']:[value]]))}));
@@ -42,6 +43,28 @@ before(async()=>{
   });
 });
 after(async()=>{await browser?.close();});
+
+// The workbench starts with this camera. Keep any camera-drag regression last.
+const pointAt=async pos=>page.evaluate(async pos=>{
+  const THREE=await import('/node_modules/.vite/deps/three.js');
+  const rect=document.querySelector('.viewportCanvas canvas').getBoundingClientRect();
+  const camera=new THREE.PerspectiveCamera(42,rect.width/rect.height,.1,3000);
+  camera.position.set(18,18,22);camera.lookAt(4,0,2);camera.updateMatrixWorld();
+  const p=new THREE.Vector3(...pos).project(camera);
+  return [rect.left+(p.x+1)*rect.width/2,rect.top+(1-p.y)*rect.height/2];
+},pos);
+const setFixtureBlock=async stateId=>page.evaluate(stateId=>{
+  kernel.cells.clear();commands.length=0;
+  const cell={pos:[4,1,2],stateId,renderStateId:stateId,value:0,motion:0};
+  kernel.cells.set('4,1,2',cell);
+  kernel.dispatchEvent(new CustomEvent('cells',{detail:{full:true,changes:[cell]}}));
+},stateId);
+const chooseStone=()=>page.locator('.paletteItem').filter({has:page.locator('small').filter({hasText:/^stone$/})}).click();
+const chooseTool=async key=>{
+  await page.locator('.viewportCanvas canvas').focus();
+  await page.keyboard.press(key);
+  await page.waitForFunction(key=>document.querySelector('.toolRail button.active kbd')?.textContent===key,key);
+};
 
 test('selection to palette change replaces inspector context and Escape clears it',async()=>{
   const point=await page.evaluate(async()=>{
@@ -118,14 +141,6 @@ test('ordinary torch clicks send wall state and facing on a side, and standing s
     kernel.cells.set('4,1,2',cell);
     kernel.dispatchEvent(new CustomEvent('cells',{detail:{full:true,changes:[cell]}}));
   });
-  const pointAt=async pos=>page.evaluate(async pos=>{
-    const THREE=await import('/node_modules/.vite/deps/three.js');
-    const rect=document.querySelector('.viewportCanvas canvas').getBoundingClientRect();
-    const camera=new THREE.PerspectiveCamera(42,rect.width/rect.height,.1,3000);
-    camera.position.set(18,18,22);camera.lookAt(4,0,2);camera.updateMatrixWorld();
-    const p=new THREE.Vector3(...pos).project(camera);
-    return [rect.left+(p.x+1)*rect.width/2,rect.top+(1-p.y)*rect.height/2];
-  },pos);
   await page.locator('.paletteItem').filter({hasText:'redstone_torch'}).click();
   for(const [point,pos,name,properties] of [
     [[4.99,1.5,2.5],[5,1,2],'minecraft:redstone_wall_torch',{facing:'east'}],
@@ -137,4 +152,90 @@ test('ordinary torch clicks send wall state and facing on a side, and standing s
     await page.waitForFunction(count=>commands.length>count,count);
     assert.deepEqual(await page.evaluate(()=>commands.at(-1)),{cmd:'place',body:{pos,name,properties}});
   }
+});
+
+test('tool 4 uses levers and buttons identically with either mouse button',async()=>{
+  await chooseTool('4');
+  for(const stateId of [3,6]){
+    await setFixtureBlock(stateId);
+    const point=await pointAt([4.5,1.12,2.5]);
+    for(const button of ['left','right']){
+      await page.mouse.click(...point,{button});
+    }
+    assert.deepEqual(await page.evaluate(()=>commands),[
+      {cmd:'interact',body:{pos:[4,1,2]}},
+      {cmd:'interact',body:{pos:[4,1,2]}},
+    ]);
+  }
+});
+
+test('tool 2 right click uses levers and buttons before considering placement',async()=>{
+  await chooseStone();
+  await chooseTool('2');
+  for(const stateId of [3,6]){
+    await setFixtureBlock(stateId);
+    await page.mouse.click(...await pointAt([4.5,1.12,2.5]),{button:'right'});
+    assert.deepEqual(await page.evaluate(()=>commands),[{cmd:'interact',body:{pos:[4,1,2]}}]);
+  }
+});
+
+test('tool 2 still places on an ordinary block with right click',async()=>{
+  await setFixtureBlock(4);
+  await chooseStone();
+  await chooseTool('2');
+  await page.mouse.click(...await pointAt([4.5,1.99,2.5]),{button:'right'});
+  assert.deepEqual(await page.evaluate(()=>commands),[
+    {cmd:'place',body:{pos:[4,2,2],name:'minecraft:stone',properties:{}}},
+  ]);
+});
+
+test('disconnected workbench clicks do not send interaction or placement commands',async()=>{
+  await setFixtureBlock(6);
+  await page.evaluate(()=>{kernel.connected=false;kernel.dispatchEvent(new Event('status'));});
+  try{
+    for(const key of ['4','2']){
+      await chooseTool(key);
+      const point=await pointAt([4.5,1.12,2.5]);
+      await page.mouse.click(...point,{button:'right'});
+      if(key==='4')await page.mouse.click(...point,{button:'left'});
+    }
+    assert.deepEqual(await page.evaluate(()=>commands),[]);
+  }finally{
+    await page.evaluate(()=>{kernel.connected=true;kernel.dispatchEvent(new Event('status'));});
+  }
+});
+
+test('tool 2 Shift right click places the palette item even when the hotbar slot is empty',async()=>{
+  await setFixtureBlock(6);
+  await page.locator('.viewportCanvas canvas').focus();
+  await page.keyboard.press('e');
+  const slot=page.locator('.creativeInventoryHotbar .creativeSlot[aria-pressed="true"]');
+  await slot.click({button:'right'});
+  assert.match(await slot.getAttribute('aria-label'),/空/);
+  await page.keyboard.press('Escape');
+  await page.locator('.creativeInventory').waitFor({state:'detached'});
+  await chooseStone();
+  await chooseTool('2');
+  // A real modified click covers both viewport routing and the workbench's held-item decision.
+  const point=await pointAt([4.5,1.15,2.5]);
+  const canvas=page.locator('.viewportCanvas canvas');
+  const rect=await canvas.boundingBox();
+  await canvas.click({position:{x:point[0]-rect.x,y:point[1]-rect.y},button:'right',modifiers:['Shift']});
+  assert.deepEqual(await page.evaluate(()=>commands),[
+    {cmd:'place',body:{pos:[4,2,2],name:'minecraft:stone',properties:{}}},
+  ]);
+});
+
+test('right dragging over an interactive block never activates it even after returning to the press point',async()=>{
+  await setFixtureBlock(3);
+  for(const key of ['2','4']){
+    await chooseTool(key);
+    const [x,y]=await pointAt([4.5,1.12,2.5]);
+    await page.mouse.move(x,y);
+    await page.mouse.down({button:'right'});
+    await page.mouse.move(x+30,y,{steps:3});
+    await page.mouse.move(x,y,{steps:3});
+    await page.mouse.up({button:'right'});
+  }
+  assert.deepEqual(await page.evaluate(()=>commands),[]);
 });
