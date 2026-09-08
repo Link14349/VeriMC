@@ -21,7 +21,7 @@ for (const file of (await readdir(fileURLToPath(webSrc))).filter(name => name.en
   }
   const output = ts.transpileModule(source, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext, jsx: ts.JsxEmit.ReactJSX } }).outputText;
   await writeFile(join(scratch, file.replace(/\.tsx?$/, '.mjs')), output
-    .replace("import './styles.css';", '')
+    .replace(/import ['"]\.\/[^'"]+\.css['"];?/g, '')
     .replace(/(from\s+['"])(\.\/[A-Za-z0-9_]+)(['"])/g, '$1$2.mjs$3'));
 }
 await writeFile(join(scratch, 'harness.mjs'), "export { createElement } from 'react';\nexport { renderToStaticMarkup } from 'react-dom/server';\n");
@@ -448,4 +448,36 @@ test('快捷工具切换到放置也清除旧选择', () => {
   const selected=reduce([{type:'select',pos:[1,2,3],def:{stateId:6000,name:repeater.name,properties:{facing:'west'}}}]);
   const placing=interactionReducer(selected,{type:'setTool',tool:'place'});
   assert.equal(placing.selection,null);assert.equal(placing.selectedDef,null);assert.equal(placing.tool,'place');
+});
+
+
+const creative = await load('creativeInteraction.mjs');
+test('creative hotbar wraps and pick-block resolves actual item forms', () => {
+  assert.equal(creative.hotbarIndex(0,-120),8);
+  assert.equal(creative.hotbarIndex(8,120),0);
+  assert.equal(creative.itemForm('minecraft:redstone_wall_torch'),'minecraft:redstone_torch');
+  assert.equal(creative.itemForm('minecraft:piston_head',{type:'sticky'}),'minecraft:sticky_piston');
+  assert.equal(creative.itemForm('minecraft:moving_piston'),null);
+});
+test('creative placements follow distinct Java 26.2 redstone facing rules', () => {
+  const item=name=>({name:'minecraft:'+name,properties:{facing:['north','south','east','west','up','down'],face:['floor','wall','ceiling'],type:['top','bottom'],half:['top','bottom']}});
+  const north={x:0,y:0,z:-1};
+  for(const [name,facing] of [['repeater','south'],['comparator','south'],['observer','north'],['piston','south'],['oak_fence_gate','north'],['calibrated_sculk_sensor','north'],['decorated_pot','north']]) {
+    assert.equal(creative.creativePlacement(item(name),north,'up').facing,facing,name);
+  }
+  assert.deepEqual(creative.creativePlacement(item('lever'),north,'west'),{face:'wall',facing:'west'});
+  assert.equal(creative.creativePlacement(item('hopper'),north,'up').facing,'down');
+  assert.equal(creative.creativePlacement(item('hopper'),north,'west').facing,'east');
+  assert.equal(creative.creativePlacement(item('lightning_rod'),north,'up').facing,'up');
+  assert.equal(creative.creativePlacement(item('observer'),{x:0,y:1,z:0},'west').facing,'up');
+  assert.equal(creative.creativePlacement(item('piston'),{x:0,y:1,z:0},'west').facing,'down');
+  assert.equal(creative.creativePlacement(item('stone_slab'),north,'west',.8).type,'top');
+  assert.equal(creative.creativePlacement(item('oak_trapdoor'),north,'west',.8).half,'top');
+});
+test('creative right click separates direct use from device inventory', () => {
+  assert.equal(creative.creativeUse({name:'minecraft:lever',device:4}),'interact');
+  assert.equal(creative.creativeUse({name:'minecraft:iron_door',device:15}),null);
+  assert.equal(creative.creativeUse({name:'minecraft:hopper',device:16}),'inspect');
+  assert.equal(creative.creativeUse({name:'minecraft:composter',device:30}),'inspect');
+  assert.equal(creative.creativeUse({name:'minecraft:stone',device:1}),null);
 });

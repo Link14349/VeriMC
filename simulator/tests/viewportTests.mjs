@@ -22,7 +22,7 @@ before(async () => {
       window.THREE=THREE; window.connection=connection;
       window.view=new CircuitViewport(document.querySelector('#scene'));
       window.picks=[]; view.onPick=(pos,tool)=>picks.push({pos,tool});
-      window.pointAt=pos=>{ const p=new THREE.Vector3(...pos).project(view.camera); return [(p.x+1)*550,(1-p.y)*400]; };
+      window.pointAt=pos=>{ view.camera.updateMatrixWorld(); const p=new THREE.Vector3(...pos).project(view.camera); return [(p.x+1)*550,(1-p.y)*400]; };
     </script>` }));
   await page.goto(`${base}/viewport-harness`);
   await page.waitForFunction(() => !!window.view);
@@ -141,6 +141,7 @@ test('held movement follows heading horizontally, ascends and descends, and stop
   await page.evaluate(()=>{view.camera.position.set(0,12,12);view.controls.target.set(0,0,0);view.controls.update();});
   await page.locator('canvas').focus();
   const position=()=>page.evaluate(()=>view.camera.position.toArray());
+  const samePosition=(actual,expected)=>actual.forEach((value,index)=>assert.ok(Math.abs(value-expected[index])<1e-8,'camera must remain stationary within floating-point precision'));
   const hold=async key=>{const before=await position();await page.keyboard.down(key);await page.waitForTimeout(150);await page.keyboard.up(key);return {before,after:await position()};};
   for(const [key,axis,sign] of [['w',2,-1],['s',2,1],['a',0,-1],['d',0,1],['Space',1,1],['Shift',1,-1]]) {
     const {before,after}=await hold(key);
@@ -152,12 +153,12 @@ test('held movement follows heading horizontally, ascends and descends, and stop
   await page.keyboard.down('w');
   await page.evaluate(()=>{const input=document.createElement('input');input.id='edit';document.body.append(input);input.focus();});
   const stopped=await position();await page.waitForTimeout(150);await page.keyboard.up('w');
-  assert.deepEqual(await position(),stopped);
+  samePosition(await position(),stopped);
   await page.keyboard.press('Space');await page.keyboard.press('w');await page.keyboard.press('Shift');
-  assert.deepEqual(await position(),stopped);
+  samePosition(await position(),stopped);
   await page.evaluate(()=>document.querySelector('#edit').remove());await page.locator('canvas').focus();
   await page.keyboard.down('Control');const modified=await hold('w');await page.keyboard.up('Control');
-  assert.deepEqual(modified.after,modified.before);
+  samePosition(modified.after,modified.before);
 });
 
 test('render placement preview for visual review', async () => {

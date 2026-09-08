@@ -4,10 +4,11 @@ import { connection, type BlockCell, type BlockDef, type Pos, posKey } from './a
 import { shortName } from './blockLabels';
 import { DeviceTextures } from './deviceTextures';
 import { surfacePlacement, type PlacementFace } from './surfacePlacement';
+import { creativePlacement } from './creativeInteraction';
 
 import type { Tool, PickAction } from './interactionState';
 type Handle = { pool: InstancePool; index: number };
-type PickTarget = { pos: Pos; face: PlacementFace | null };
+type PickTarget = { pos: Pos; face: PlacementFace | null; hitHeight?: number };
 const box = new THREE.BoxGeometry(1, 1, 1);
 const cylinder = new THREE.CylinderGeometry(.5, .5, 1, 8);
 const face = new THREE.PlaneGeometry(1, 1);
@@ -50,6 +51,19 @@ export class CircuitViewport {
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera(42, 1, .1, 3000);
   controls: OrbitControls;
+  private immersive = false;
+  private inputBlocked = false;
+  private look = new THREE.Euler(0,0,0,'YXZ');
+  private heldButton: number | null = null;
+  private nextAction = 0;
+  private savedOrbit: {position: THREE.Vector3; target: THREE.Vector3} | null = null;
+  get firstPerson() { return this.immersive; }
+  get pointerLocked() { return document.pointerLockElement === this.renderer.domElement; }
+  onPointerLockChange: (locked: boolean) => void = () => {};
+  onInputError: (message: string) => void = () => {};
+  onPickBlock: (pos: Pos) => void = () => {};
+  onHotbarScroll: (delta: number) => void = () => {};
+  onUse: (pos: Pos, shift: boolean) => boolean = () => false;
   private activeTool: Tool = 'place';
   get tool(): Tool { return this.activeTool; }
   set tool(value: Tool) { this.activeTool = value; this.refreshHover(); }
@@ -62,6 +76,7 @@ export class CircuitViewport {
   private pointer = new THREE.Vector2();
   private plane = new THREE.Plane(new THREE.Vector3(0,1,0), -1);
   private grid: THREE.GridHelper;
+  private axes = new THREE.AxesHelper(2.2);
   private selection = new THREE.Box3Helper(new THREE.Box3(new THREE.Vector3(), new THREE.Vector3(1,1,1)), 0xf0c88a);
   private ghost = new THREE.Group();
   private previewMaterial = new THREE.MeshStandardMaterial({ roughness: .84, transparent: true, opacity: .6, depthWrite: false });
@@ -85,7 +100,7 @@ export class CircuitViewport {
   private moveDelta = new THREE.Vector3();
   private selected: Pos | null = null;
   private lastFps = performance.now(); private frameCount = 0;
-  onPick: (pos: Pos, tool: PickAction, additive: boolean, face: PlacementFace | null) => void = () => {};
+  onPick: (pos: Pos, tool: PickAction, additive: boolean, face: PlacementFace | null, hitHeight?: number) => void = () => {};
   onHover: (pos: Pos | null) => void = () => {};
   onFps: (value: number) => void = () => {};
   constructor(readonly container: HTMLDivElement) {
@@ -103,8 +118,13 @@ export class CircuitViewport {
     this.renderer.domElement.addEventListener('blur', this.clearInput);
     window.addEventListener('blur', this.clearInput);
     document.addEventListener('visibilitychange', this.clearInput);
+    document.addEventListener('pointerlockchange', this.lockChange);
+    document.addEventListener('pointerlockerror', this.lockError);
+    document.addEventListener('mousemove', this.mouseLook);
+    document.addEventListener('pointerup', this.releaseButton);
+    this.renderer.domElement.addEventListener('wheel', this.wheel, {passive:false});
     this.grid = new THREE.GridHelper(128,128,0x5c6668,0x343e42); this.grid.position.y = this.layer + .002; this.scene.add(this.grid);
-    const axes = new THREE.AxesHelper(2.2); axes.position.set(-.5,.025,-.5); this.scene.add(axes);
+    this.axes.position.set(-.5,.025,-.5); this.scene.add(this.axes);
     this.previewChunk = { group: this.ghost, box: new InstancePool(this.ghost, box, true, this.previewMaterial), cylinder: new InstancePool(this.ghost, cylinder, true, this.previewMaterial) };
     this.previewArrow = new THREE.ArrowHelper(new THREE.Vector3(0,0,1), new THREE.Vector3(.5,1.15,.5), .9, 0xf0c88a, .22, .13);
     this.previewArrow.visible = false; this.ghost.add(this.previewArrow);
@@ -112,6 +132,73 @@ export class CircuitViewport {
     this.resizeObserver = new ResizeObserver(() => this.resize()); this.resizeObserver.observe(container); this.resize();
     this.renderer.domElement.addEventListener('pointerdown', this.pointerDown); this.renderer.domElement.addEventListener('pointerup', this.pointerUp); this.renderer.domElement.addEventListener('pointermove', this.pointerMove); this.renderer.domElement.addEventListener('pointerleave', this.pointerLeave); this.renderer.domElement.addEventListener('pointercancel', this.clearInput); this.controls.addEventListener('change', this.refreshHover); this.renderer.domElement.addEventListener('contextmenu', event => event.preventDefault());
     connection.addEventListener('cells', this.applyChanges); this.rebuild(); this.animate();
+  }
+  setFirstPerson(value: boolean) {
+    if (this.immersive === value) return;
+    this.clearInput();
+    if (value) {
+      this.controls.update();
+      this.savedOrbit = {position:this.camera.position.clone(),target:this.controls.target.clone()};
+      this.controls.enabled = false;
+      // 从正在观察的电路旁进入，避免在远离电路的轨道相机位置开始。
+      const heading = this.camera.getWorldDirection(new THREE.Vector3());
+      this.camera.position.copy(this.controls.target).addScaledVector(heading,-4);
+      this.camera.fov = 70;
+    } else {
+      this.releasePointerLock();
+      if (this.savedOrbit) {this.camera.position.copy(this.savedOrbit.position);this.controls.target.copy(this.savedOrbit.target);}
+      this.controls.enabled = true; this.controls.update(); this.camera.fov = 42;
+    }
+    this.immersive = value;
+    this.grid.visible = !value;
+    this.axes.visible = !value;
+    this.camera.updateProjectionMatrix();
+    this.renderer.domElement.setAttribute('aria-label',value ? '第一人称搭建，点击捕获鼠标，E 物品栏，Esc 释放鼠标' : '三维工作台，WASD 前后左右，Space 上升，Shift 下降');
+    this.refreshHover();
+  }
+  setInputBlocked(value: boolean) { this.inputBlocked = value; if (value) {this.clearInput();this.releasePointerLock();} this.refreshHover(); }
+  requestPointerLock() {
+    if (!this.immersive || this.inputBlocked || this.pointerLocked) return;
+    this.renderer.domElement.focus({preventScroll:true});
+    try {
+      if (!this.renderer.domElement.requestPointerLock) {this.lockError();return;}
+      const pending = this.renderer.domElement.requestPointerLock();
+      pending?.catch(() => this.lockError());
+    } catch { this.lockError(); }
+  }
+  releasePointerLock() { this.clearInput(); if (this.pointerLocked) document.exitPointerLock(); }
+  private lockChange = () => {
+    this.clearInput();
+    if (this.pointerLocked && (!this.immersive || this.inputBlocked)) {document.exitPointerLock();return;}
+    if (this.pointerLocked) this.renderer.domElement.focus({preventScroll:true});
+    this.onPointerLockChange(this.pointerLocked); this.refreshHover();
+  };
+  private lockError = () => this.onInputError('浏览器未能锁定鼠标，请点击“继续搭建”重试，或返回工作台。');
+  private mouseLook = (event: MouseEvent) => {
+    if (!this.immersive || !this.pointerLocked || this.inputBlocked) return;
+    this.look.setFromQuaternion(this.camera.quaternion,'YXZ');
+    this.look.y -= event.movementX * .002;
+    this.look.x = Math.max(-Math.PI/2+.001,Math.min(Math.PI/2-.001,this.look.x-event.movementY*.002));
+    this.camera.quaternion.setFromEuler(this.look); this.refreshHover();
+  };
+  private wheel = (event: WheelEvent) => {
+    if (!this.immersive || this.inputBlocked || !this.pointerLocked || !event.deltaY) return;
+    event.preventDefault(); this.onHotbarScroll(Math.sign(event.deltaY));
+  };
+  private releaseButton = () => { this.heldButton = null; };
+  private centerPointer() { const rect=this.renderer.domElement.getBoundingClientRect();return {clientX:rect.left+rect.width/2,clientY:rect.top+rect.height/2}; }
+  private creativeAction(button: number, shift: boolean) {
+    if (!this.pointerLocked || this.inputBlocked) return;
+    const event=this.centerPointer(), hit=this.locate(event,'select');
+    if (button === 1) {if(hit)this.onPickBlock(hit.pos);return;}
+    if (button === 0) {if(hit)this.onPick(hit.pos,'erase',shift,null);return;}
+    if (button !== 2) return;
+    if (hit && this.onUse(hit.pos,shift)) return;
+    const target=this.locate(event,'place');
+    if(target)this.onPick(target.pos,'place',shift,target.face,target.hitHeight);
+  }
+  placementProperties(face: PlacementFace | null, hitHeight?: number) {
+    return creativePlacement(connection.catalog.find(item=>item.name===this.placement?.name),this.camera.getWorldDirection(new THREE.Vector3()),face,hitHeight);
   }
   private resize() { const { clientWidth: w, clientHeight: h } = this.container; this.renderer.setSize(w, h); this.camera.aspect = w / Math.max(h,1); this.camera.updateProjectionMatrix(); }
   private getChunk(pos: Pos): Chunk {
@@ -454,7 +541,7 @@ export class CircuitViewport {
   private updatePreview(face: PlacementFace | null) {
     // Older kernels may not have sent an unused block's default state yet.
     // Hide the model instead of inventing a facing or generating NaN geometry.
-    const resolved = this.placement?.properties ? surfacePlacement(this.placement.name,this.placement.properties,face) : null;
+    const resolved = this.placement?.properties ? surfacePlacement(this.placement.name,{...this.placement.properties,...(this.immersive?this.placementProperties(face):{})},face) : null;
     if (!resolved) { this.placementKey = ''; return; }
     const { name, properties } = resolved;
     const key = JSON.stringify([name, Object.entries(properties).sort(([a],[b]) => a.localeCompare(b))]);
@@ -477,6 +564,7 @@ export class CircuitViewport {
   top() { this.camera.position.copy(this.controls.target).add(new THREE.Vector3(0,Math.max(this.camera.position.distanceTo(this.controls.target),15),.001)); }
   private locate(event: { clientX: number; clientY: number }, tool: PickAction = this.tool): PickTarget | null {
     const rect = this.renderer.domElement.getBoundingClientRect(); if (!rect.width || !rect.height) return null; this.camera.updateMatrixWorld(); this.scene.updateMatrixWorld(); this.pointer.set((event.clientX-rect.left)/rect.width*2-1,-(event.clientY-rect.top)/rect.height*2+1); this.raycaster.setFromCamera(this.pointer,this.camera);
+    this.raycaster.far = this.immersive ? 5 : Infinity;
     const meshes: THREE.Object3D[] = []; for (const chunk of this.chunks.values()) { meshes.push(chunk.box.mesh,chunk.cylinder.mesh); if (chunk.pick) meshes.push(chunk.pick.mesh); }
     for (const hit of this.raycaster.intersectObjects(meshes)) {
       const pool = hit.object.userData.pool as InstancePool; const pos = pool.positions[hit.instanceId!];
@@ -490,9 +578,9 @@ export class CircuitViewport {
       const axis = Math.abs(normal.x) >= Math.abs(normal.y) && Math.abs(normal.x) >= Math.abs(normal.z) ? 0 : Math.abs(normal.y) >= Math.abs(normal.z) ? 1 : 2;
       const adjacent: Pos = [...pos]; adjacent[axis] += Math.sign(normal.getComponent(axis));
       const face: PlacementFace = axis === 0 ? (normal.x > 0 ? 'east' : 'west') : axis === 1 ? (normal.y > 0 ? 'up' : 'down') : (normal.z > 0 ? 'south' : 'north');
-      return this.placementVisible(adjacent) ? { pos: adjacent, face } : null;
+      return this.placementVisible(adjacent) ? { pos: adjacent, face, hitHeight:hit.point.y-pos[1] } : null;
     }
-    if (tool !== 'place') return null;
+    if (tool !== 'place' || this.immersive) return null;
     const hit = this.raycaster.ray.intersectPlane(this.plane, new THREE.Vector3());
     const pos: Pos | null = hit ? [Math.floor(hit.x),this.layer,Math.floor(hit.z)] : null;
     return pos && this.placementVisible(pos) ? { pos, face: null } : null;
@@ -501,22 +589,37 @@ export class CircuitViewport {
     return pos[1] >= -64 && pos[1] <= 319 && this.positionVisible(pos) && !connection.cells.has(posKey(pos));
   }
   private pointerDown = (event: PointerEvent) => {
+    if (this.inputBlocked) return;
     this.renderer.domElement.focus({ preventScroll: true });
+    if (this.immersive) {
+      event.preventDefault();
+      if (!this.pointerLocked) {this.requestPointerLock();return;}
+      this.heldButton = event.button === 1 ? null : event.button;
+      this.nextAction = performance.now()+250;
+      this.creativeAction(event.button,event.shiftKey);return;
+    }
     if (event.button === 0 || event.button === 2) this.down = { x:event.clientX, y:event.clientY, button:event.button, pointerId:event.pointerId, dragged:false };
   };
   private pointerUp = (event: PointerEvent) => {
+    if (this.immersive || this.inputBlocked) return;
     const down = this.down; this.down = null;
     if (!down || event.pointerId !== down.pointerId || event.button !== down.button || down.dragged || Math.hypot(event.clientX-down.x,event.clientY-down.y) >= 5) return;
     const tool = event.button === 2 ? 'place' : this.tool === 'place' ? 'erase' : this.tool;
     const target = this.locate(event, tool); if (target) this.onPick(target.pos,tool,event.shiftKey,target.face);
   };
   private keyDown = (event: KeyboardEvent) => {
+    if (this.inputBlocked || (this.immersive && !this.pointerLocked)) return;
+    if (this.immersive) {
+      if (event.metaKey || event.altKey) {this.clearInput();return;}
+      if (!['KeyW','KeyA','KeyS','KeyD','Space','ShiftLeft','ShiftRight','ControlLeft','ControlRight'].includes(event.code)) return;
+      event.preventDefault();this.movementKeys.add(event.code);return;
+    }
     if (event.ctrlKey || event.metaKey || event.altKey) { this.movementKeys.clear(); return; }
     if (!['KeyW','KeyA','KeyS','KeyD','Space','ShiftLeft','ShiftRight'].includes(event.code)) return;
     event.preventDefault(); this.movementKeys.add(event.code);
   };
   private keyUp = (event: KeyboardEvent) => { this.movementKeys.delete(event.code); };
-  private clearInput = () => { this.movementKeys.clear(); this.down = null; };
+  private clearInput = () => { this.movementKeys.clear(); this.down = null; this.heldButton = null; };
   private moveCamera(seconds: number) {
     if (!this.movementKeys.size) return;
     const held = (code: string) => Number(this.movementKeys.has(code));
@@ -526,19 +629,31 @@ export class CircuitViewport {
     this.moveDelta.copy(this.moveRight).multiplyScalar(held('KeyD')-held('KeyA'));
     this.moveDelta.addScaledVector(this.moveForward, held('KeyW')-held('KeyS'));
     this.moveDelta.y = held('Space')-Number(this.movementKeys.has('ShiftLeft') || this.movementKeys.has('ShiftRight'));
-    this.moveDelta.normalize().multiplyScalar(12*seconds);
+    const sprint = this.immersive && (this.movementKeys.has('ControlLeft') || this.movementKeys.has('ControlRight'));
+    this.moveDelta.normalize().multiplyScalar((this.immersive ? (sprint ? 21.78 : 10.89) : 12)*seconds);
     this.camera.position.add(this.moveDelta); this.controls.target.add(this.moveDelta);
   }
   private refreshHover = () => {
-    const target = this.lastPointer ? this.locate(this.lastPointer) : null;
+    const pointer = this.immersive ? (this.pointerLocked && !this.inputBlocked ? this.centerPointer() : null) : this.lastPointer;
+    const target = pointer ? this.locate(pointer,this.immersive?'place':this.tool) : null;
     const pos = target?.pos ?? null;
     this.updatePreview(target?.face ?? null);
     if ((pos ? posKey(pos) : null) !== (this.hover ? posKey(this.hover) : null)) this.onHover(pos);
-    this.hover = pos; this.ghost.visible = this.tool === 'place' && !!pos && !!this.placementKey;
+    this.hover = pos; this.ghost.visible = !this.immersive && this.tool === 'place' && !!pos && !!this.placementKey;
+    if (this.immersive) {
+      const hit=pointer?this.locate(pointer,'select'):null;
+      this.selection.visible=!!hit;
+      if(hit){this.selection.box.min.fromArray(hit.pos).addScalar(-.007);this.selection.box.max.fromArray(hit.pos).addScalar(1.007);}
+    }
     if (pos) this.ghost.position.fromArray(pos);
   };
-  private pointerMove = (event: PointerEvent) => { if (this.down && Math.hypot(event.clientX-this.down.x,event.clientY-this.down.y) >= 5) this.down.dragged = true; this.lastPointer = { clientX:event.clientX, clientY:event.clientY }; this.refreshHover(); };
-  private pointerLeave = () => { this.lastPointer = null; this.down = null; this.refreshHover(); };
-  private animate = () => { this.frameId = requestAnimationFrame(this.animate); const now = performance.now(); this.moveCamera(Math.min((now-this.lastFrame)/1000,.05)); this.lastFrame = now; this.controls.update(); this.renderer.render(this.scene,this.camera); this.frameCount++; if (now-this.lastFps > 1000) { this.onFps(Math.round(this.frameCount*1000/(now-this.lastFps))); this.lastFps=now; this.frameCount=0; } };
-  dispose() { cancelAnimationFrame(this.frameId); window.removeEventListener('blur', this.clearInput); document.removeEventListener('visibilitychange', this.clearInput); this.resizeObserver.disconnect(); connection.removeEventListener('cells',this.applyChanges); this.controls.removeEventListener('change', this.refreshHover); this.controls.dispose(); this.previewChunk.box.dispose(); this.previewChunk.cylinder.dispose(); this.previewChunk.pick?.dispose(); for(const pool of this.previewChunk.surfaces?.values() ?? [])pool.dispose(); this.previewMaterial.dispose(); this.previewArrow.dispose(); this.grid.dispose(); this.selection.dispose(); for (const c of this.chunks.values()) { c.box.dispose(); c.cylinder.dispose(); c.pick?.dispose(); for(const pool of c.surfaces?.values() ?? [])pool.dispose(); } this.deviceTextures.dispose(); this.renderer.dispose(); this.renderer.domElement.remove(); }
+  private pointerMove = (event: PointerEvent) => { if(this.immersive)return; if (this.down && Math.hypot(event.clientX-this.down.x,event.clientY-this.down.y) >= 5) this.down.dragged = true; this.lastPointer = { clientX:event.clientX, clientY:event.clientY }; this.refreshHover(); };
+  private pointerLeave = () => { if(this.immersive)return; this.lastPointer = null; this.down = null; this.refreshHover(); };
+  private animate = () => { this.frameId = requestAnimationFrame(this.animate); const now = performance.now(); this.moveCamera(Math.min((now-this.lastFrame)/1000,.05)); this.lastFrame = now;
+    if(this.immersive) {
+      if(this.heldButton!==null && now>=this.nextAction){this.nextAction=now+250;this.creativeAction(this.heldButton,this.movementKeys.has('ShiftLeft')||this.movementKeys.has('ShiftRight'));}
+      if(this.movementKeys.size)this.refreshHover();
+    } else this.controls.update();
+    this.renderer.render(this.scene,this.camera); this.frameCount++; if (now-this.lastFps > 1000) { this.onFps(Math.round(this.frameCount*1000/(now-this.lastFps))); this.lastFps=now; this.frameCount=0; } };
+  dispose() { this.releasePointerLock(); document.removeEventListener('pointerlockchange',this.lockChange);document.removeEventListener('pointerlockerror',this.lockError);document.removeEventListener('mousemove',this.mouseLook);document.removeEventListener('pointerup',this.releaseButton); cancelAnimationFrame(this.frameId); window.removeEventListener('blur', this.clearInput); document.removeEventListener('visibilitychange', this.clearInput); this.resizeObserver.disconnect(); connection.removeEventListener('cells',this.applyChanges); this.controls.removeEventListener('change', this.refreshHover); this.controls.dispose(); this.previewChunk.box.dispose(); this.previewChunk.cylinder.dispose(); this.previewChunk.pick?.dispose(); for(const pool of this.previewChunk.surfaces?.values() ?? [])pool.dispose(); this.previewMaterial.dispose(); this.previewArrow.dispose(); this.grid.dispose(); this.axes.dispose(); this.selection.dispose(); for (const c of this.chunks.values()) { c.box.dispose(); c.cylinder.dispose(); c.pick?.dispose(); for(const pool of c.surfaces?.values() ?? [])pool.dispose(); } this.deviceTextures.dispose(); this.renderer.dispose(); this.renderer.domElement.remove(); }
 }

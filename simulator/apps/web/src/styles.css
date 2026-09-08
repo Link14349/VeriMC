@@ -97,3 +97,23 @@ dialog.helpModal::backdrop{background:#0c1418bb;backdrop-filter:blur(8px)}
 .fileDialog button{border:1px solid var(--border);border-radius:6px;padding:7px 22px}.fileDialog small{display:block;margin-top:16px;color:var(--muted);font-size:11px}
 
 .sectionControl{position:absolute;right:15px;top:104px;display:flex;align-items:center;gap:8px;background:#222b30ee;border:1px solid #48575d77;border-radius:5px;padding:4px 7px;font-size:11px}.sectionControl label{display:flex;align-items:center;gap:5px}.sectionControl input{width:65px}.sectionControl>span{font-size:10px;color:var(--muted)}
+
+/* 第一人称搭建占满当前窗口；原生全屏以 main 为根，弹窗与错误提示仍可见。 */
+.app.firstPerson{min-width:0;width:100%;height:100dvh}
+.firstPerson>.appHeader,.firstPerson>.toolbar,.firstPerson>.statusBar,.firstPerson .palette,.firstPerson .inspector,.firstPerson .centerWorkspace>.offlineGuard{display:none}
+.firstPerson .viewportArea{min-height:0}
+.firstPerson .viewportTop,.firstPerson .toolRail,.firstPerson .layerControl,.firstPerson .sectionControl,.firstPerson .viewportBottom{display:none}
+.creativeTop{position:absolute;top:16px;left:20px;right:20px;display:flex;align-items:center;justify-content:space-between;gap:15px;pointer-events:none;color:#cbd6d6;font-size:11px}
+.creativeTop>span{padding:9px 12px;background:#162024c9;border:1px solid #53606477;border-radius:4px}
+.creativeTop i{display:inline-block;border-left:1px solid #627175;height:10px;margin:0 8px}
+.creativeTop>div{display:flex;gap:6px;pointer-events:auto}.creativeTop button{background:#202b30e6;border:1px solid #65777e88;padding:8px 12px}
+.creativeCrosshair{position:absolute;top:50%;left:50%;width:20px;height:20px;transform:translate(-50%,-50%);pointer-events:none;filter:drop-shadow(0 1px 1px #000)}
+.creativeCrosshair::before,.creativeCrosshair::after{content:'';position:absolute;background:#f4f5e7;opacity:.9}
+.creativeCrosshair::before{top:9px;left:2px;width:16px;height:2px}.creativeCrosshair::after{top:2px;left:9px;width:2px;height:16px}
+.creativeResume{position:absolute;top:44%;left:50%;transform:translate(-50%,-50%);text-align:center;background:#182329f5;border:1px solid #66787d;padding:28px 36px;box-shadow:0 12px 70px #0006;width:min(450px,85%);border-radius:8px}
+.creativeResume strong{font-size:23px;color:#efe0c3}.creativeResume p{font-size:12px;color:#bac9cb;margin:18px 0}.creativeResume button{margin:12px auto;min-width:170px}.creativeResume small{display:block;line-height:1.9;color:#8fa5ac}
+.creativeHint{position:absolute;bottom:116px;left:0;right:0;text-align:center;pointer-events:none;font-size:11px;color:#c4cfcb;text-shadow:0 2px 3px #000}
+.firstPerson .pauseBanner{bottom:152px;left:20px;right:20px}.firstPerson>.toast{bottom:150px;z-index:90}
+.creativeDeviceModal{color:var(--text);background:#253137;border:1px solid #72858b;border-radius:8px;width:440px;max-width:90vw;max-height:85vh;overflow:auto;padding:8px}
+.creativeDeviceModal::backdrop{background:#071015b8}.creativeDeviceModal .inventoryGrid button{height:36px}
+@media(max-width:700px){.creativeTop{top:8px;left:8px;right:8px;align-items:flex-start}.creativeTop>span{max-width:170px;line-height:1.8}.creativeTop>div{flex-wrap:wrap;justify-content:flex-end}.creativeTop button{padding:6px}.creativeHint{font-size:10px}}
