@@ -3,9 +3,11 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { connection, type BlockCell, type BlockDef, type Pos, posKey } from './api';
 import { shortName } from './blockLabels';
 import { DeviceTextures } from './deviceTextures';
+import { surfacePlacement, type PlacementFace } from './surfacePlacement';
 
 import type { Tool, PickAction } from './interactionState';
 type Handle = { pool: InstancePool; index: number };
+type PickTarget = { pos: Pos; face: PlacementFace | null };
 const box = new THREE.BoxGeometry(1, 1, 1);
 const cylinder = new THREE.CylinderGeometry(.5, .5, 1, 8);
 const face = new THREE.PlaneGeometry(1, 1);
@@ -67,6 +69,7 @@ export class CircuitViewport {
   private previewHandles: Handle[] = [];
   private previewArrow: THREE.ArrowHelper;
   private placementKey = '';
+  private placement: { name: string; properties: Record<string,string> | null } | null = null;
   private lastPointer: { clientX: number; clientY: number } | null = null;
   private clipPlane = new THREE.Plane(new THREE.Vector3(0,-1,0), 2000000);
   private sectionPlane = new THREE.Plane(new THREE.Vector3(0,0,0), 0);
@@ -82,7 +85,7 @@ export class CircuitViewport {
   private moveDelta = new THREE.Vector3();
   private selected: Pos | null = null;
   private lastFps = performance.now(); private frameCount = 0;
-  onPick: (pos: Pos, tool: PickAction, additive: boolean) => void = () => {};
+  onPick: (pos: Pos, tool: PickAction, additive: boolean, face: PlacementFace | null) => void = () => {};
   onHover: (pos: Pos | null) => void = () => {};
   onFps: (value: number) => void = () => {};
   constructor(readonly container: HTMLDivElement) {
@@ -129,8 +132,9 @@ export class CircuitViewport {
     const motionDir = directionVectors[['down','up','north','south','west','east'][(cell.motion >> 3) & 7]] ?? [0,0,0];
     if (moving && !(source && !extending)) { const offset = extending ? progress - 1 : 1 - progress; x += motionDir[0] * offset; y += motionDir[1] * offset; z += motionDir[2] * offset; }
     const transform = new THREE.Matrix4();
-    const part = (center: [number,number,number], size: [number,number,number], tint: number, shape: 'box'|'cylinder' = 'box', rotation = 0) => {
-      quaternion.setFromAxisAngle(vector.set(0,1,0), rotation); transform.compose(vector.set(x + center[0], y + center[1], z + center[2]), quaternion, scaleVector.fromArray(size)); handles.push(chunk[shape].add(cell.pos, transform, tint));
+    const part = (center: [number,number,number], size: [number,number,number], tint: number, shape: 'box'|'cylinder' = 'box', rotation: number | THREE.Quaternion = 0) => {
+      if (typeof rotation === 'number') quaternion.setFromAxisAngle(vector.set(0,1,0), rotation); else quaternion.copy(rotation);
+      transform.compose(vector.set(x + center[0], y + center[1], z + center[2]), quaternion, scaleVector.fromArray(size)); handles.push(chunk[shape].add(cell.pos, transform, tint));
     };
     const surface = (key: string, center: THREE.Vector3, size: [number,number], rotation: THREE.Quaternion) => {
       const surfaces = chunk.surfaces ??= new Map<string, InstancePool>();
@@ -156,10 +160,11 @@ export class CircuitViewport {
     };
     const on = p.lit === 'true' || cell.value > 0, red = on ? new THREE.Color().setRGB(.28 + cell.value / 22,.035 + cell.value / 110,.025).getHex() : 0x4d2728;
     const facing = p.facing ?? 'north', dir = directionVectors[facing], angle = Math.atan2(dir[0], dir[2]);
-    const torch = (cx: number, cz: number, lit: boolean, height = .5, base = 0) => {
-      part([cx,(base+height)/2,cz],[.125,height-base,.125],0x9c7651);
-      part([cx,height-.0625,cz],[.126,.125,.126],lit ? 0xff5541 : 0x713637);
-      cubeSurfaces(Array(6).fill(`torch:${Number(lit)}`),undefined,.128,.127,.128,new THREE.Vector3(cx,height-.0625,cz));
+    const torch = (cx: number, cz: number, lit: boolean, height = .5, base = 0, rotation = new THREE.Quaternion()) => {
+      const center = (h: number) => new THREE.Vector3(0,h-base,0).applyQuaternion(rotation).add(new THREE.Vector3(cx,base,cz));
+      part(center((base+height)/2).toArray(),[.125,height-base,.125],0x9c7651,'box',rotation);
+      part(center(height-.0625).toArray(),[.126,.125,.126],lit ? 0xff5541 : 0x713637,'box',rotation);
+      cubeSurfaces(Array(6).fill(`torch:${Number(lit)}`),rotation,.128,.127,.128,center(height-.0625));
     };
     if (name === 'redstone_wire') {
       part([.5,.024,.5],[.22,.042,.22],red);
@@ -181,7 +186,12 @@ export class CircuitViewport {
         torch(.5-v[0]*5/16,.5-v[2]*5/16,subtract,subtract?5/16:4/16,2/16);
         for(const sign of [-1,1])torch(.5+v[0]*4/16+v[2]*sign*3/16,.5+v[2]*4/16-v[0]*sign*3/16,powered,7/16,2/16);
       }
-    } else if (name.includes('redstone_torch')) torch(.5,.5,on,.62);
+    } else if (name === 'redstone_torch') torch(.5,.5,on,.62);
+    else if (name === 'redstone_wall_torch') {
+      const tilt = Math.PI/8;
+      const rotation = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0,1,0),new THREE.Vector3(dir[0]*Math.sin(tilt),Math.cos(tilt),dir[2]*Math.sin(tilt)));
+      torch(.5-dir[0]*.47,.5-dir[2]*.47,on,.82,.2,rotation);
+    }
     else if (name === 'lever') { part([.5,.09,.5],[.46,.18,.46],0x747d7d); part([on ? .65 : .35,.36,.5],[.12,.5,.12],0xc4ad80); part([on ? .65 : .35,.6,.5],[.18,.09,.18],on ? 0xee6550 : 0x80776b); }
     else if (name.endsWith('_button')) part([.5,on ? .035 : .08,.5],[.35,on ? .07 : .16,.5],name.includes('stone') ? 0x9b9f95 : 0xba8c58);
     else if (name === 'redstone_lamp') {
@@ -438,9 +448,15 @@ export class CircuitViewport {
     return !this.section || pos[{x:0,y:1,z:2}[this.section.axis]] <= this.section.maximum;
   }
   setPlacement(name: string, properties: Record<string,string> | null) {
+    this.placement = { name, properties };
+    this.refreshHover();
+  }
+  private updatePreview(face: PlacementFace | null) {
     // Older kernels may not have sent an unused block's default state yet.
     // Hide the model instead of inventing a facing or generating NaN geometry.
-    if (!properties) { this.placementKey = ''; this.refreshHover(); return; }
+    const resolved = this.placement?.properties ? surfacePlacement(this.placement.name,this.placement.properties,face) : null;
+    if (!resolved) { this.placementKey = ''; return; }
+    const { name, properties } = resolved;
     const key = JSON.stringify([name, Object.entries(properties).sort(([a],[b]) => a.localeCompare(b))]);
     if (key === this.placementKey) return;
     this.placementKey = key;
@@ -455,18 +471,17 @@ export class CircuitViewport {
       this.previewArrow.setDirection(new THREE.Vector3(...direction).multiplyScalar(output ? -1 : 1));
       this.previewArrow.setColor(name === 'minecraft:observer' ? 0x80bec4 : 0xf0c88a);
     }
-    this.refreshHover();
   }
   select(pos: Pos | null) { this.selected = pos; this.selection.visible = !!pos && this.positionVisible(pos); if (pos) { this.selection.box.min.fromArray(pos).addScalar(-.007); this.selection.box.max.fromArray(pos).addScalar(1.007); } }
   fit() { const bounds = new THREE.Box3(); for (const cell of connection.cells.values()) bounds.expandByPoint(new THREE.Vector3(...cell.pos)); if (bounds.isEmpty()) bounds.set(new THREE.Vector3(-4,0,-4),new THREE.Vector3(4,0,4)); const center = bounds.getCenter(new THREE.Vector3()), size = bounds.getSize(new THREE.Vector3()).length(); this.controls.target.copy(center); this.camera.position.copy(center).add(new THREE.Vector3(1,1.25,1.4).multiplyScalar(Math.max(size*.65,8))); }
   top() { this.camera.position.copy(this.controls.target).add(new THREE.Vector3(0,Math.max(this.camera.position.distanceTo(this.controls.target),15),.001)); }
-  private locate(event: { clientX: number; clientY: number }, tool: PickAction = this.tool): Pos | null {
+  private locate(event: { clientX: number; clientY: number }, tool: PickAction = this.tool): PickTarget | null {
     const rect = this.renderer.domElement.getBoundingClientRect(); if (!rect.width || !rect.height) return null; this.camera.updateMatrixWorld(); this.scene.updateMatrixWorld(); this.pointer.set((event.clientX-rect.left)/rect.width*2-1,-(event.clientY-rect.top)/rect.height*2+1); this.raycaster.setFromCamera(this.pointer,this.camera);
     const meshes: THREE.Object3D[] = []; for (const chunk of this.chunks.values()) { meshes.push(chunk.box.mesh,chunk.cylinder.mesh); if (chunk.pick) meshes.push(chunk.pick.mesh); }
     for (const hit of this.raycaster.intersectObjects(meshes)) {
       const pool = hit.object.userData.pool as InstancePool; const pos = pool.positions[hit.instanceId!];
       if (!pos || !this.positionVisible(pos)) continue;
-      if (tool !== 'place') return pos;
+      if (tool !== 'place') return { pos, face: null };
       if (!hit.face) return null;
       // 将实例几何的表面法线还原到世界坐标，再选择相邻方块格。
       pool.mesh.getMatrixAt(hit.instanceId!, matrix);
@@ -474,12 +489,13 @@ export class CircuitViewport {
       const normal = hit.face.normal.clone().transformDirection(matrix);
       const axis = Math.abs(normal.x) >= Math.abs(normal.y) && Math.abs(normal.x) >= Math.abs(normal.z) ? 0 : Math.abs(normal.y) >= Math.abs(normal.z) ? 1 : 2;
       const adjacent: Pos = [...pos]; adjacent[axis] += Math.sign(normal.getComponent(axis));
-      return this.placementVisible(adjacent) ? adjacent : null;
+      const face: PlacementFace = axis === 0 ? (normal.x > 0 ? 'east' : 'west') : axis === 1 ? (normal.y > 0 ? 'up' : 'down') : (normal.z > 0 ? 'south' : 'north');
+      return this.placementVisible(adjacent) ? { pos: adjacent, face } : null;
     }
     if (tool !== 'place') return null;
     const hit = this.raycaster.ray.intersectPlane(this.plane, new THREE.Vector3());
     const pos: Pos | null = hit ? [Math.floor(hit.x),this.layer,Math.floor(hit.z)] : null;
-    return pos && this.placementVisible(pos) ? pos : null;
+    return pos && this.placementVisible(pos) ? { pos, face: null } : null;
   }
   private placementVisible(pos: Pos) {
     return pos[1] >= -64 && pos[1] <= 319 && this.positionVisible(pos) && !connection.cells.has(posKey(pos));
@@ -492,7 +508,7 @@ export class CircuitViewport {
     const down = this.down; this.down = null;
     if (!down || event.pointerId !== down.pointerId || event.button !== down.button || down.dragged || Math.hypot(event.clientX-down.x,event.clientY-down.y) >= 5) return;
     const tool = event.button === 2 ? 'place' : this.tool === 'place' ? 'erase' : this.tool;
-    const pos = this.locate(event, tool); if (pos) this.onPick(pos,tool,event.shiftKey);
+    const target = this.locate(event, tool); if (target) this.onPick(target.pos,tool,event.shiftKey,target.face);
   };
   private keyDown = (event: KeyboardEvent) => {
     if (event.ctrlKey || event.metaKey || event.altKey) { this.movementKeys.clear(); return; }
@@ -514,7 +530,9 @@ export class CircuitViewport {
     this.camera.position.add(this.moveDelta); this.controls.target.add(this.moveDelta);
   }
   private refreshHover = () => {
-    const pos = this.lastPointer ? this.locate(this.lastPointer) : null;
+    const target = this.lastPointer ? this.locate(this.lastPointer) : null;
+    const pos = target?.pos ?? null;
+    this.updatePreview(target?.face ?? null);
     if ((pos ? posKey(pos) : null) !== (this.hover ? posKey(this.hover) : null)) this.onHover(pos);
     this.hover = pos; this.ghost.visible = this.tool === 'place' && !!pos && !!this.placementKey;
     if (pos) this.ghost.position.fromArray(pos);

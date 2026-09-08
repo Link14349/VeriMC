@@ -22,6 +22,8 @@ before(async()=>{
       {stateId:1,name:'minecraft:repeater',properties:{facing:'west',delay:'1',locked:'false',powered:'false'}},
       {stateId:2,name:'minecraft:redstone_torch',properties:{lit:'true'}},
       {stateId:3,name:'minecraft:lever',properties:{facing:'north',face:'floor',powered:'false'}},
+      {stateId:4,name:'minecraft:stone',properties:{}},
+      {stateId:5,name:'minecraft:redstone_wall_torch',properties:{facing:'north',lit:'true'}},
     ];
     defs.forEach(def=>connection.states.set(def.stateId,def));
     connection.catalog=defs.map(def=>({name:def.name,defaultState:def.stateId,defaultProperties:def.properties,device:2,supportLevel:def.stateId===3?'externalStimulus':'implemented',properties:Object.fromEntries(Object.entries(def.properties).map(([key,value])=>[key,key==='facing'?['north','east','south','west']:[value]]))}));
@@ -107,4 +109,32 @@ test('capture full workbench for visual review',async()=>{
   const close=page.getByRole('button',{name:'关闭提示',exact:true});if(await close.count())await close.click();
   await mkdir(new URL('../testResults/',import.meta.url),{recursive:true});
   await page.screenshot({path:fileURLToPath(new URL('../testResults/interactionWorkbench.png',import.meta.url))});
+});
+
+test('ordinary torch clicks send wall state and facing on a side, and standing state on top',async()=>{
+  await page.evaluate(()=>{
+    kernel.cells.clear();commands.length=0;
+    const cell={pos:[4,1,2],stateId:4,renderStateId:4,value:0,motion:0};
+    kernel.cells.set('4,1,2',cell);
+    kernel.dispatchEvent(new CustomEvent('cells',{detail:{full:true,changes:[cell]}}));
+  });
+  const pointAt=async pos=>page.evaluate(async pos=>{
+    const THREE=await import('/node_modules/.vite/deps/three.js');
+    const rect=document.querySelector('.viewportCanvas canvas').getBoundingClientRect();
+    const camera=new THREE.PerspectiveCamera(42,rect.width/rect.height,.1,3000);
+    camera.position.set(18,18,22);camera.lookAt(4,0,2);camera.updateMatrixWorld();
+    const p=new THREE.Vector3(...pos).project(camera);
+    return [rect.left+(p.x+1)*rect.width/2,rect.top+(1-p.y)*rect.height/2];
+  },pos);
+  await page.locator('.paletteItem').filter({hasText:'redstone_torch'}).click();
+  for(const [point,pos,name,properties] of [
+    [[4.99,1.5,2.5],[5,1,2],'minecraft:redstone_wall_torch',{facing:'east'}],
+    [[4.5,1.5,2.99],[4,1,3],'minecraft:redstone_wall_torch',{facing:'south'}],
+    [[4.5,1.99,2.5],[4,2,2],'minecraft:redstone_torch',{}],
+  ]) {
+    const count=await page.evaluate(()=>commands.length);
+    await page.mouse.click(...await pointAt(point),{button:'right'});
+    await page.waitForFunction(count=>commands.length>count,count);
+    assert.deepEqual(await page.evaluate(()=>commands.at(-1)),{cmd:'place',body:{pos,name,properties}});
+  }
 });

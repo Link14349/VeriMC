@@ -248,3 +248,70 @@ test('render device material gallery for visual review',async()=>{
   await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
   await page.screenshot({path:fileURLToPath(new URL('../testResults/repeaterDelays.png',import.meta.url))});
 });
+
+test('torch face picking, preview and placed geometry agree on four walls and the top',async()=>{
+  await page.evaluate(()=>{
+    connection.cells.clear();connection.states.clear();view.setSection('none');view.setLayer(4,false);view.tool='place';view.select(null);
+    connection.states.set(1,{stateId:1,name:'minecraft:stone',properties:{}});
+    connection.cells.set('-2,4,-3',{pos:[-2,4,-3],stateId:1,renderStateId:1,motion:0,value:0});
+    connection.dispatchEvent(new CustomEvent('cells',{detail:{full:true,changes:[]}}));
+    view.controls.enableDamping=false;
+    view.onPick=(pos,tool,_additive,face)=>picks.push({pos,tool,face});picks.length=0;
+    view.setPlacement('minecraft:redstone_torch',{lit:'true'});
+  });
+  const directions={north:[0,0,-1],south:[0,0,1],east:[1,0,0],west:[-1,0,0],up:[0,1,0],down:[0,-1,0]};
+  for(const [face,v] of Object.entries(directions)) {
+    const point=await page.evaluate(v=>{
+      const center=new THREE.Vector3(-1.5,4.5,-2.5);
+      view.camera.position.copy(center).addScaledVector(new THREE.Vector3(...v),8);
+      if(v[1])view.camera.position.z+=.01;
+      view.controls.target.copy(center);view.controls.update();
+      return pointAt(center.addScaledVector(new THREE.Vector3(...v),.49).toArray());
+    },v);
+    await page.mouse.move(...point);
+    await page.mouse.click(...point,{button:'right'});
+    const pos=[-2+v[0],4+v[1],-3+v[2]];
+    assert.deepEqual(await page.evaluate(()=>picks.at(-1)),{pos,tool:'place',face});
+    assert.equal(await page.evaluate(()=>view.ghost.visible),face!=='down');
+    if(face==='down')continue;
+    const name=face==='up'?'minecraft:redstone_torch':'minecraft:redstone_wall_torch';
+    const properties=face==='up'?{lit:'true'}:{lit:'true',facing:face};
+    const result=await page.evaluate(({name,properties,pos,v})=>{
+      const stateId=2;
+      const cell={pos,stateId,renderStateId:stateId,motion:0,value:0};
+      connection.states.set(stateId,{name,properties,stateId});connection.cells.set(pos.join(','),cell);
+      // Draw without refreshing the pointer so we can compare the placement preview to the placed block.
+      view.drawCell(cell);
+      const matrices=(handles,origin)=>handles.map(h=>{
+        const m=new THREE.Matrix4();h.pool.mesh.getMatrixAt(h.index,m);
+        m.elements[12]+=h.pool.group.position.x-origin[0];
+        m.elements[13]+=h.pool.group.position.y-origin[1];
+        m.elements[14]+=h.pool.group.position.z-origin[2];
+        return m.elements;
+      });
+      const preview=matrices(view.previewHandles,pos),world=matrices(view.handles.get(pos.join(',')),pos);
+      const stem=new THREE.Matrix4();view.previewChunk.box.mesh.getMatrixAt(view.previewHandles[0].index,stem);
+      const tilt=new THREE.Vector3(0,1,0).transformDirection(stem);
+      const textureCount=view.previewHandles.filter(h=>h.pool.poolMaterial===view.deviceTextures.get('torch:1',true)).length;
+      connection.cells.delete(pos.join(','));view.drawCell({...cell,stateId:0});
+      return {preview,world,tilt:tilt.toArray(),textureCount};
+    },{name,properties,pos,v});
+    assert.equal(result.preview.length,8,'torch must have a stem, head and six textured faces');
+    assert.equal(result.textureCount,6);
+    result.world.forEach((m,i)=>m.forEach((value,j)=>assert.ok(Math.abs(value-result.preview[i][j])<1e-5,`${face}: placed model must match preview`)));
+    assert.ok(result.tilt[1]>.9);
+    if(face!=='up')assert.ok(result.tilt[0]*v[0]+result.tilt[2]*v[2]>.3,'torch must lean away from its support');
+    if(face==='south') {
+      await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(resolve)));
+      await page.screenshot({path:fileURLToPath(new URL('../testResults/wallTorchPreview.png',import.meta.url))});
+    }
+  }
+  // A copied wall torch also becomes a standing torch on the empty edit plane.
+  await page.evaluate(()=>{
+    view.camera.position.set(0,12,8);view.controls.target.set(0,4,0);view.controls.update();
+    view.setPlacement('minecraft:redstone_wall_torch',{facing:'west',lit:'false'});
+  });
+  const point=await page.evaluate(()=>pointAt([.5,4,.5]));await page.mouse.move(...point);
+  assert.deepEqual(await page.evaluate(()=>JSON.parse(view.placementKey)),['minecraft:redstone_torch',[['lit','false']]]);
+  assert.equal(await page.evaluate(()=>view.ghost.visible),true);
+});

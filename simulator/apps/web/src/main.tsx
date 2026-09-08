@@ -4,6 +4,7 @@ import { Play, Pause, StepForward, SkipForward, RotateCcw, MousePointer2, Box, C
 import { connection, downloadFile, posKey, type Pos, type CatalogItem, type Status, type FileProgress } from './api';
 import { blockLabel, propertyLabels, shortName, valueLabels } from './blockLabels';
 import { CircuitViewport } from './viewport';
+import { surfacePlacement } from './surfacePlacement';
 import { Waveform } from './waveform';
 import { EnvironmentControls } from './environmentControls';
 import { InventoryControls } from './inventoryControls';
@@ -49,14 +50,19 @@ function App() {
     const refreshSelection=()=>{const p=stateRef.current.selection;if(!p)return;const cell=connection.cells.get(posKey(p));dispatch({type:'refreshSelection',def:cell?connection.states.get(cell.stateId)??null:null});};
     connection.addEventListener('status',onStatus);connection.addEventListener('catalog',onCatalog);connection.addEventListener('error',onError);connection.addEventListener('cells',refreshSelection);connection.connect();
     const viewport=new CircuitViewport(viewportRef.current!);view.current=viewport;viewport.onHover=setHover;viewport.onFps=setFps;
-    viewport.onPick=(pos,active)=>{
+    viewport.onPick=(pos,active,_additive,face)=>{
       const {placement}=stateRef.current;const run=callbacks.current.command;
       if(active==='select'){const cell=connection.cells.get(posKey(pos));dispatch({type:'select',pos,def:cell?connection.states.get(cell.stateId)??null:null});return;}
       // 断线时不发出无法执行的编辑命令，直接给出可见提示。
       const routing=pickCommand(active,connection.connected);
       if(!routing)return;
       if('blocked' in routing){dispatch({type:'notify',kind:'error',text:routing.blocked});return;}
-      if(routing.command==='place'){const target=connection.catalog.find(c=>c.name===placement.name);void run('place',{pos,name:placement.name,properties:placementPayload(target,placement.properties)});return;}
+      if(routing.command==='place'){
+        const resolved=surfacePlacement(placement.name,placement.properties,face);
+        if(!resolved){dispatch({type:'notify',kind:'error',text:'红石火把只能放在方块顶面或侧面。'});return;}
+        const target=connection.catalog.find(c=>c.name===resolved.name);
+        void run('place',{pos,name:resolved.name,properties:placementPayload(target,resolved.properties)});return;
+      }
       if(routing.command==='probe'){void run('probe',{pos,name:blockLabel(connection.states.get(connection.cells.get(posKey(pos))?.stateId??0)?.name??'信号')});return;}
       void run(routing.command,{pos});
     };
@@ -193,8 +199,9 @@ function App() {
             return <label key={key} className="propertyRow"><span>{propertyLabels[key]??key}</span><select value={value} onChange={e=>dispatch({type:'setPlacementProperty',key,value:e.target.value})}>{!defaults&&<option value="">默认（由内核决定）</option>}{values.map(v=><option value={v} key={v}>{valueLabels[v]??v}</option>)}</select></label>;})}
           <button className="wideButton" disabled={!item} onClick={rotate}><RotateCw size={15}/>旋转方向<kbd>R</kbd></button>
           <p className="subtleText">{defaults?'未修改的项目采用器件默认值。':'尚未收到器件默认属性，未修改的项目会在放置时采用默认值。'}</p>
+          {(state.placement.name==='minecraft:redstone_torch'||state.placement.name==='minecraft:redstone_wall_torch')&&<p className="subtleText">右键点击顶面放直立火把，点击侧面放墙上火把；附墙朝向自动跟随点击面。</p>}
           <p className="subtleText">R 只在搭建工具下生效。中继器、比较器的“朝向”指向输入端；侦测器的朝向指向检测面。</p></div>
-          <div className="inspectorSection"><label className="miniLabel">搭建起点</label><button className="wideButton" disabled={!connected||baseLayer===null} onClick={()=>{if(baseLayer===null)return;const blocks=[];for(let x=-2;x<=13;x++)for(let z=-2;z<=9;z++)blocks.push({pos:[x,baseLayer,z],name:'minecraft:white_concrete'});void command('edit',{blocks});}}><Plus size={15}/>铺设 16 × 12 底板</button><p className="subtleText">{baseLayer===null?`编辑层已在 Y ${layerRange.min}，下方超出世界范围，无法铺设底板。`:`底板铺在 Y ${baseLayer}。粉线、火把和中继器需要下方支撑。`}</p>{state.clipboard&&<button className="wideButton" onClick={()=>dispatch({type:'paste'})}><ClipboardPaste size={15}/>粘贴 {blockLabel(state.clipboard.name)}</button>}</div></>}
+          <div className="inspectorSection"><label className="miniLabel">搭建起点</label><button className="wideButton" disabled={!connected||baseLayer===null} onClick={()=>{if(baseLayer===null)return;const blocks=[];for(let x=-2;x<=13;x++)for(let z=-2;z<=9;z++)blocks.push({pos:[x,baseLayer,z],name:'minecraft:white_concrete'});void command('edit',{blocks});}}><Plus size={15}/>铺设 16 × 12 底板</button><p className="subtleText">{baseLayer===null?`编辑层已在 Y ${layerRange.min}，下方超出世界范围，无法铺设底板。`:`底板铺在 Y ${baseLayer}。粉线和中继器需要下方支撑；红石火把也可附在方块侧面。`}</p>{state.clipboard&&<button className="wideButton" onClick={()=>dispatch({type:'paste'})}><ClipboardPaste size={15}/>粘贴 {blockLabel(state.clipboard.name)}</button>}</div></>}
         <div className="inspectorFooter"><span className="miniLabel">运行状态</span><div><span>计划事件</span><code>{status.pending.toLocaleString()}</code></div><div><span>分块存储</span><code>{(status.storageBytes/1048576).toFixed(2)} MB</code></div><div><span>已处理事件</span><code>{status.events.toLocaleString()}</code></div></div>
       </aside>
     </div>
