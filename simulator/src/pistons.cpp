@@ -172,8 +172,8 @@ void Simulator::finishMotion(BlockPos pos, bool force) {
     motions.erase(pos);
     if (at(pos).device != Device::movingPiston) return;
     auto next = force && motion.source ? 0 : motion.movedState;
-    if (next && !survives(pos, next)) next = 0;
-    if (registry[next].device == Device::wire) next = wireConnections(pos, next);
+    // 原版 finalTick 先做完整的 Block.updateFromNeighbourShapes，再决定放置或销毁。
+    if (next) next = updateFromNeighborShapes(pos, next);
     if (next && registry.has(next, "waterlogged")) next = registry.withBool(next, "waterlogged", false);
     if (next == 0 && !force) { setBlock(pos, motion.movedState, 340); setBlock(pos, 0); }
     // 原版 finalTick 用刚落地的方块作为 sourceBlock。

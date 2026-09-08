@@ -350,45 +350,48 @@ void Simulator::indirectShapes(BlockPos p, StateId id, unsigned flags, int depth
         }
     }
 }
+// 原版 BlockBehaviour.updateShape 的纯状态形式：只返回新状态，副作用限于原版同样会做的排刻。
+// 钟和箱子带方块实体、不可被活塞移动，仍由 executeShape 用各自的辅助函数处理。
+StateId Simulator::shapeUpdated(BlockPos p, StateId id, Direction direction, StateId neighborState) {
+    const auto& s = registry[id];
+    if (s.device == Device::noteBlock) return axis(direction) == 0 ? noteInstrument(p, id) : id;
+    if (isRail(s.device)) return id; // Rail support is checked by neighborChanged.
+    if (s.device == Device::tripwireHook) return opposite(direction) == s.facing && !survives(p, id) ? 0 : id;
+    if (s.device == Device::tripwire)
+        return axis(direction) != 0 ? registry.withBool(id, directionNames[static_cast<unsigned>(direction)], connectsTripwire(neighborState, direction)) : id;
+    if (s.device == Device::door && axis(direction) == 0 && ((registry.property(id, "half") == "lower") == (direction == Direction::up))) {
+        bool fits = registry[neighborState].device == Device::door && registry.property(neighborState, "half") != registry.property(id, "half");
+        return fits ? registry.with(neighborState, "half", registry.property(id, "half")) : 0;
+    }
+    // 原版只在水平方向的形状更新里重算楼梯 SHAPE，竖直方向落到基类的空实现。
+    if (registry.type(id).stairs) return axis(direction) != 0 ? stairsShape(p, id) : id;
+    if (!survives(p, id)) return 0;
+    if (s.device == Device::observer && direction == s.facing && !s.powered && !blockTicks.hasScheduled(p, s.type)) schedule(p, 2, 0, s.type);
+    if (s.device == Device::repeater && axis(direction) != 0 && axis(direction) != axis(s.facing)) return registry.withBool(id, "locked", diodeSideInput(p) > 0);
+    if (s.device == Device::wire && direction != Direction::down) {
+        StateId next = id;
+        if (direction == Direction::up) next = wireConnections(p, id);
+        else {
+            auto side = wireSide(p, direction); auto index = sideIndex(direction);
+            const bool cross = std::all_of(s.wireSides.begin(), s.wireSides.end(), [](auto value) { return value != 0; });
+            if ((side != 0) == (s.wireSides[index] != 0) && !cross) next = registry.with(id, directionNames[static_cast<unsigned>(direction)], std::string(side == 2 ? "up" : side == 1 ? "side" : "none"));
+            else { for (auto d : horizontal) next = registry.with(next, directionNames[static_cast<unsigned>(d)], std::string("side")); next = wireConnections(p, next); }
+        }
+        return next;
+    }
+    return id;
+}
+// 原版 Block.updateFromNeighbourShapes：按形状更新顺序折叠六次 updateShape，中途不写世界。
+StateId Simulator::updateFromNeighborShapes(BlockPos p, StateId id) {
+    for (auto d : shapeOrder) id = shapeUpdated(p, id, d, world.get(p.relative(d)));
+    return id;
+}
 void Simulator::executeShape(const Update& u) {
     auto id = world.get(u.pos); const auto& s = registry[id];
-    if(s.device==Device::bell){updateBellShape(u);return;}
-    if(s.device==Device::noteBlock && axis(u.direction)==0) {setBlock(u.pos,noteInstrument(u.pos,id),u.flags,u.depth);return;}
-    if (isRail(s.device)) return; // Rail support is checked by neighborChanged.
-    if (s.device == Device::tripwireHook) {
-        if (opposite(u.direction) == s.facing && !survives(u.pos, id)) setBlock(u.pos, 0, 3, u.depth);
-        return;
-    }
-    if (s.device == Device::tripwire) {
-        if (axis(u.direction) != 0) setBlock(u.pos, registry.withBool(id, directionNames[static_cast<unsigned>(u.direction)], connectsTripwire(u.neighborState, u.direction)), u.flags, u.depth);
-        return;
-    }
-    if (s.device == Device::door && axis(u.direction) == 0 && ((registry.property(id, "half") == "lower") == (u.direction == Direction::up))) {
-        bool fits = registry[u.neighborState].device == Device::door && registry.property(u.neighborState, "half") != registry.property(id, "half");
-        auto next = fits ? registry.with(u.neighborState, "half", registry.property(id, "half")) : 0;
-        setBlock(u.pos, next, next == 0 ? 3 : u.flags, u.depth);
-        return;
-    }
+    if (s.device == Device::bell) { updateBellShape(u); return; }
     if (s.device == Device::container && registry.has(id, "type")) { updateChestShape(u); return; }
-    if (registry.type(id).stairs) {
-        // 原版只在水平方向的形状更新里重算 SHAPE，竖直方向落到基类的空实现。
-        if (axis(u.direction) != 0) setBlock(u.pos, stairsShape(u.pos, id), u.flags, u.depth);
-        return;
-    }
-    if (!survives(u.pos, id)) { setBlock(u.pos, 0, 3, u.depth); return; }
-    if (s.device == Device::observer && u.direction == s.facing && !s.powered && !hasScheduled(u.pos)) schedule(u.pos, 2);
-    if (s.device == Device::repeater && axis(u.direction) != 0 && axis(u.direction) != axis(s.facing)) setBlock(u.pos, registry.withBool(id, "locked", diodeSideInput(u.pos) > 0), u.flags, u.depth);
-    if (s.device == Device::wire && u.direction != Direction::down) {
-        StateId next = id;
-        if (u.direction == Direction::up) next = wireConnections(u.pos, id);
-        else {
-            auto side = wireSide(u.pos, u.direction); auto index = sideIndex(u.direction);
-            const bool cross = std::all_of(s.wireSides.begin(), s.wireSides.end(), [](auto value) { return value != 0; });
-            if ((side != 0) == (s.wireSides[index] != 0) && !cross) next = registry.with(id, directionNames[static_cast<unsigned>(u.direction)], std::string(side == 2 ? "up" : side == 1 ? "side" : "none"));
-            else { for (auto d : horizontal) next = registry.with(next, directionNames[static_cast<unsigned>(d)], std::string("side")); next = wireConnections(u.pos, next); }
-        }
-        setBlock(u.pos, next, u.flags, u.depth);
-    }
+    auto next = shapeUpdated(u.pos, id, u.direction, u.neighborState);
+    if (next != id) setBlock(u.pos, next, next == 0 ? 3 : u.flags, u.depth);
 }
 int Simulator::diodeInput(BlockPos p) const { auto d = at(p).facing; auto q = p.relative(d); return std::max(signal(q, d), at(q).device == Device::wire ? static_cast<int>(at(q).power) : 0); }
 int Simulator::diodeSideInput(BlockPos p) const {
@@ -487,11 +490,11 @@ void Simulator::executeReactiveNeighbor(BlockPos p, StateId id, StateId source) 
     default: break;
     }
 }
-void Simulator::schedule(BlockPos p, Tick delay, int priority) {
-    auto type = at(p).type;
+void Simulator::schedule(BlockPos p, Tick delay, int priority, std::uint16_t type) {
+    auto blockType = type == 0xFFFFu ? at(p).type : type;
     if (delay > std::numeric_limits<Tick>::max() - currentTick) throw std::invalid_argument("计划时间超出范围");
     // Vanilla allocates subTickOrder even when the chunk rejects a duplicate.
-    blockTicks.schedule({currentTick + delay, priority, nextOrder++, p, type});
+    blockTicks.schedule({currentTick + delay, priority, nextOrder++, p, blockType});
 }
 bool Simulator::hasScheduled(BlockPos p) const { return blockTicks.hasScheduled(p, at(p).type); }
 void Simulator::executeTick(const ScheduledEvent& event) {

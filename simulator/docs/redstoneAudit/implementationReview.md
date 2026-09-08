@@ -158,7 +158,7 @@
 
 ---
 
-### ★R8 活塞落地状态用 `survives()` 近似 `Block.updateFromNeighbourShapes`
+### ★R8 活塞落地状态用 `survives()` 近似 `Block.updateFromNeighbourShapes`（已复现并修复，见 [fixProgress.md](fixProgress.md)）
 
 | | 位置 |
 | --- | --- |

@@ -9,6 +9,49 @@
 GameTest 功能开关 `minecraft:vanilla` + `minecraft:trade_rebalance`，`randomTickSpeed=0`，
 实验红石关闭。仍然不能称为严格 vanilla-only 专用服务器验证。
 
+## R8 活塞落地未完整重算邻居形状（issue #8）已复现并修复
+
+**根因**：原版 `PistonMovingBlockEntity.finalTick` / `tick` 在放置被移动方块前调用
+`Block.updateFromNeighbourShapes`，即按 `UPDATE_SHAPE_ORDER`（西、东、北、南、下、上）
+折叠六次 `updateShape`，中途不写世界。C++ `finishMotion` 只做 `survives()` 近似，
+外加红石粉重连和 `waterlogged=false`。
+
+**改动**：
+
+- 把 `executeShape` 的分支体抽成纯状态函数 `Simulator::shapeUpdated(pos, state, direction, neighborState)`，
+  返回新状态（0 表示空气），副作用只保留原版同样会做的排刻。
+  钟和箱子带方块实体、不可能被活塞移动，仍由 `executeShape` 用各自的辅助函数处理。
+- 新增 `Simulator::updateFromNeighborShapes(pos, state)` 按 `shapeOrder` 折叠六次。
+- `executeShape` 改为 `shapeUpdated` + 一次 `setBlock`；`finishMotion` 用折叠结果替代
+  原来的 `survives`/红石粉近似。
+- `Simulator::schedule` 增加显式 `type` 参数：折叠发生在世界仍是 `moving_piston` 的时刻，
+  侦测器排刻必须按被移动方块的类型登记。
+
+**原版证据**：新增 `tests/fixtures/java26_2PistonLandingShape.json`
+（SHA-256 `00a229a59d462d6cdb0ca3a5bc149b56265c2d4f06b3c0020d08d64e14a0495e`，
+原点 `[6086446, -58, 2762786]`，21 帧 × 12 点 = 252 次位置/帧观测），
+脚本 `tools/reference/capturePistonLandingShape.py`。三组，按 watch 切片后逐组对照旧实现全部为差异：
+
+| 组 | 布置 | 旧实现 |
+|---|---|---|
+| stairs | 活塞**向上**推楼梯，落点与既有楼梯构成内角 | 7 gt、`[10,3,8]`：`straight` vs `inner_left` |
+| noteBlock | 音符盒被推到金块上方 | 7 gt、`[11,2,20]`：`instrument=harp` vs `bell` |
+| observer | 侦测器被推动 | 9 gt、`[11,2,32]`：`powered=false` vs `powered=true` |
+
+楼梯必须**向上**推：水平推动时活塞头落地会再给落点发一次水平形状更新，
+把形状顺带修好，反而看不出差别；向上推时唯一变化的邻居在下方，
+而竖直形状更新在原版本来就不重算楼梯形状。
+
+Release `ctest` 3/3，核心检查 93/93；`tests/fixtures/` 下全部 **30 个场景重新从原版捕获**后全部 `match`。
+
+**明确排除的范围**：
+
+- `shapeUpdated` 不覆盖钟和箱子。两者都带方块实体，`PistonBaseBlock.isPushable`
+  的末行 `!state.hasBlockEntity()` 已经排除它们，因此活塞落地路径不可能用到。
+- 折叠里的中继器 `locked` 分支用 `diodeSideInput(p)` 读世界当前状态；
+  中继器的推动反应是 DESTROY，不会被移动，这条路径在落地时不可达。
+- 只覆盖楼梯、音符盒、侦测器三类落地形状。栅栏、墙、玻璃板等连接类方块尚未进入调色板。
+
 ## R4 侦测器移除缺少计划刻判断（issue #7）已复现并修复
 
 **根因**：原版 `ObserverBlock.affectNeighborsAfterRemoval` 的条件是

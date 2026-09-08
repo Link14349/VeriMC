@@ -78,7 +78,8 @@ public:
     }
     void updateNeighbors(BlockPos pos, int skip = -1, StateId source = UINT32_MAX);
     void neighborChanged(BlockPos pos, StateId source = 0);
-    void schedule(BlockPos pos, Tick delay, int priority = 0);
+    // type 默认取世界当前方块；活塞落地路径必须显式传入被移动方块的类型。
+    void schedule(BlockPos pos, Tick delay, int priority = 0, std::uint16_t type = 0xFFFFu);
     bool hasScheduled(BlockPos pos) const;
     bool stepEvent();
     std::size_t advanceTo(Tick target, std::size_t eventBudget = 1000000, std::chrono::microseconds wallBudget = std::chrono::seconds(10));
@@ -186,6 +187,8 @@ private:
     void executeNeighbor(BlockPos pos, StateId source = 0);
     void executeReactiveNeighbor(BlockPos pos, StateId state, StateId source);
     void executeShape(const Update& update);
+    StateId shapeUpdated(BlockPos pos, StateId state, Direction direction, StateId neighborState);
+    StateId updateFromNeighborShapes(BlockPos pos, StateId state);
     void executeTick(const ScheduledEvent& event);
     void onPlace(BlockPos pos, StateId state, StateId oldState);
     void onRemove(BlockPos pos, StateId oldState, bool movedByPiston = false);
