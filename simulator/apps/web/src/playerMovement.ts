@@ -40,7 +40,16 @@ export class PlayerMovement {
     direction.normalize().multiplyScalar(speed);
     if (this.flying) {
       const delta=direction.multiplyScalar(seconds);
-      return this.collisionEnabled ? world.move(eye,delta) : delta;
+      if (!this.collisionEnabled) return delta;
+      const accepted=world.move(eye,delta);
+      // Only foot support ends flight: walls and head contact must not do so.
+      // Check the final position to include exact landings and exclude sliding
+      // past a platform edge. Upward input still allows double-Space takeoff.
+      if (delta.y <= 0 && world.move(eye.clone().add(accepted),new Vector3(0,-1e-5,0)).y > -1e-5+1e-7) {
+        this.setFlying(false);
+        this.clearInput();
+      }
+      return accepted;
     }
     const position=eye.clone();
     if (this.jumpRequested && world.move(position,new Vector3(0,-.02,0)).y > -.02+1e-7) this.verticalSpeed=jumpSpeed;

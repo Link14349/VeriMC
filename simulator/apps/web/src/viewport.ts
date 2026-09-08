@@ -681,7 +681,7 @@ export class CircuitViewport {
   };
   private moveCamera(seconds: number) {
     if(this.inputBlocked || (this.immersive && (!this.pointerLocked || !this.inputFocused || document.hidden)))return false;
-    if (!this.movementKeys.size && (!this.immersive || this.movement.flying)) return false;
+    if (!this.movementKeys.size && (!this.immersive || (this.movement.flying && !this.movement.collisionEnabled))) return false;
     const held = (code: string) => Number(this.movementKeys.has(code));
     // 水平移动只取朝向，不随俯仰改变高度；俯视时仍保留左右方向。
     this.moveRight.set(1,0,0).applyQuaternion(this.camera.quaternion).setY(0).normalize();
@@ -690,7 +690,11 @@ export class CircuitViewport {
     this.moveDelta.addScaledVector(this.moveForward, held('KeyW')-held('KeyS'));
     this.moveDelta.y = held('Space')-Number(this.movementKeys.has('ShiftLeft') || this.movementKeys.has('ShiftRight'));
     const sprint = this.immersive && (this.movementKeys.has('ControlLeft') || this.movementKeys.has('ControlRight'));
-    if(this.immersive)this.moveDelta.copy(this.movement.move(this.collisionWorld,this.camera.position,this.moveDelta,seconds,sprint));
+    if(this.immersive) {
+      const wasFlying=this.movement.flying;
+      this.moveDelta.copy(this.movement.move(this.collisionWorld,this.camera.position,this.moveDelta,seconds,sprint));
+      if(this.movement.flying!==wasFlying)this.reportMovementMode();
+    }
     else this.moveDelta.normalize().multiplyScalar(12*seconds);
     this.camera.position.add(this.moveDelta); this.controls.target.add(this.moveDelta);
     return this.moveDelta.lengthSq()>0;

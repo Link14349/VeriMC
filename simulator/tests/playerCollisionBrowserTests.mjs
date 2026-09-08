@@ -79,7 +79,9 @@ test('first-person player volume collides with blocks while flying and building'
       connection.catalog=[{name:'minecraft:stone',defaultState:1,defaultProperties:{},device:2,properties:{},supportLevel:'implemented'}];
       window.view=new CircuitViewport(document.querySelector('#scene'));
       window.calls=[];
+      window.movementModeChanges=[];
       view.onPick=(pos,tool,shift,face)=>calls.push({pos,tool,shift,face});
+      view.onMovementModeChange=mode=>movementModeChanges.push(mode);
       document.querySelector('#capture').onclick=()=>view.requestPointerLock();
       view.setPlacement('minecraft:stone',{});
       view.setCollisionEnabled(true);
@@ -97,6 +99,7 @@ test('first-person player volume collides with blocks while flying and building'
         view.camera.position.fromArray(camera);view.controls.target.fromArray(target);
         view.camera.lookAt(...target);view.camera.updateMatrixWorld();
         calls.length=0;
+        movementModeChanges.length=0;
       };
       window.moveSteps=(codes,steps=10)=>{
         view.movementKeys.clear();
@@ -142,6 +145,8 @@ test('first-person player volume collides with blocks while flying and building'
       near(position[0],.5,'horizontal center');
       near(position[1],1.62,'flight height');
       near(position[2],1.295,'stone south face plus player radius');
+      assert.equal(await page.evaluate(() => view.movement.flying),true,'sideways wall contact must preserve flight');
+      assert.deepEqual(await page.evaluate(() => movementModeChanges),[],'wall contact must not report a mode change');
       const stopped=await page.evaluate(() => view.camera.position.toArray());
       await page.waitForTimeout(100);
       assert.deepEqual(await page.evaluate(() => view.camera.position.toArray()),stopped);
@@ -161,10 +166,34 @@ test('first-person player volume collides with blocks while flying and building'
       await scene([[0,0,0],[0,4,0]], [.5,3,.5], [.5,3,-1]);
       const floor=await move(['ShiftLeft'],10);
       near(floor[1],2.615,'floor top plus eye height');
-      const ceiling=await move(['Space'],10);
+      assert.equal(await page.evaluate(() => view.movement.flying),false,'descending onto a block must exit flight');
+      assert.deepEqual(await page.evaluate(() => movementModeChanges),[{collisionEnabled:true,flying:false}],'landing must notify the viewport consumer once');
+      const ceiling=await page.evaluate(() => {view.movement.setFlying(true);return moveSteps(['Space'],10);});
       near(ceiling[1],3.825,'ceiling bottom minus height above eyes');
       near(ceiling[0],.5,'vertical flight preserves x');
       near(ceiling[2],.5,'vertical flight preserves z');
+      assert.equal(await page.evaluate(() => view.movement.flying),true,'head contact with a ceiling must preserve flight');
+      assert.deepEqual(await page.evaluate(() => movementModeChanges),[{collisionEnabled:true,flying:false}],'ceiling contact must not report another mode change');
+    });
+
+    await t.test('landing restores jumping and a later double Space can start flight again', async () => {
+      await scene([[0,0,0]],[.5,3,.5],[.5,3,-1]);
+      near((await move(['ShiftLeft'],10))[1],2.615,'flight lands on the floor');
+      assert.equal(await page.evaluate(() => view.movement.flying),false,'landed flight must become walking');
+      near((await move(['ShiftLeft'],4))[1],2.615,'continued descent input must keep a landed player on the floor');
+      assert.deepEqual(await page.evaluate(() => movementModeChanges),[{collisionEnabled:true,flying:false}],'remaining on the floor must not repeat the landing notification');
+      await page.keyboard.press('Space');
+      await page.waitForFunction(() => view.camera.position.y>2.8);
+      assert.equal(await page.evaluate(() => view.movement.flying),false,'one Space after landing must only jump');
+      await page.waitForFunction(() => Math.abs(view.camera.position.y-2.615)<2e-5);
+      await page.waitForTimeout(350);
+      await page.keyboard.press('Space');
+      await page.waitForTimeout(70);
+      await page.keyboard.press('Space');
+      assert.equal(await page.evaluate(() => view.movement.flying),true,'a new double Space must permit takeoff after landing');
+      const takeoffHeight=await page.evaluate(() => view.camera.position.y);
+      assert.ok((await move(['Space'],2))[1]>takeoffHeight+.5,'restarted flight must ascend');
+      assert.deepEqual(await page.evaluate(() => movementModeChanges),[{collisionEnabled:true,flying:false},{collisionEnabled:true,flying:true}],'landing and the subsequent takeoff must both update the consumer');
     });
 
     await t.test('incremental removal immediately opens the former collision area', async () => {
@@ -200,7 +229,7 @@ test('first-person player volume collides with blocks while flying and building'
       await scene([cell([0,0,0],6)],[.5,3,.5],[.5,3,-1]);
       near((await move(['ShiftLeft'],10))[1],1.8075,'closed trapdoor top plus eye height');
       await update([cell([0,0,0],7)]);
-      assert.ok((await move(['ShiftLeft'],5))[1]<0,'opened trapdoor must remove the former floor');
+      assert.ok((await move(['ShiftLeft'],10))[1]<0,'opened trapdoor must remove the former floor and let the landed player fall');
       await scene([cell([0,0,0],7)]);
       const stopped=await move(['ControlLeft','KeyW'],10);
       assert.ok(stopped[2]>=1.295&&stopped[2]<1.32,'opened trapdoor remains a thin vertical obstacle');
@@ -275,6 +304,10 @@ test('first-person player volume collides with blocks while flying and building'
       const raised=await move(['Space'],2);
       assert.ok(raised[1]>crossed[1]+.5,'Space ascends in free flight');
       near((await move(['ShiftLeft'],2))[1],crossed[1],'Shift descends in free flight');
+      await scene([[0,0,0]],[.5,3,.5],[.5,3,-1]);
+      assert.ok((await move(['ShiftLeft'],10))[1]<0,'free flight must descend through a block without landing');
+      assert.equal(await page.evaluate(() => view.movement.flying),true,'disabled collisions must preserve flight while crossing a floor');
+      assert.deepEqual(await page.evaluate(() => movementModeChanges),[],'crossing a floor without collision must not report a mode change');
     });
 
     await t.test('enabling collision defaults to walking, falls while idle, jumps, and keeps Shift above the floor', async () => {

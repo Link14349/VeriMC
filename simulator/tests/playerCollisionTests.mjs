@@ -138,12 +138,42 @@ test('two distinct Space presses toggle flight; repeats and input reset cannot c
   movement.pressSpace(1000,false);movement.clearInput();movement.pressSpace(1100,false);assert.equal(movement.flying,false);
 });
 
-test('enabled flight holds altitude, retains collision and resumes gravity when switched off',()=>{
+test('enabled flight holds altitude and automatically returns to walking on landing',()=>{
   const world=floorWorld(), movement=new PlayerMovement();movement.setCollisionEnabled(true);movement.setFlying(true);
   const eye=vec(0,5,0);advance(movement,world,eye,60);near(eye.y,5);
   advance(movement,world,eye,60,1/60,vec(0,-1,0));near(eye.y,2.62);
-  advance(movement,world,eye,30,1/60,vec(0,1,0));assert.ok(eye.y>6);
-  movement.setFlying(false);advance(movement,world,eye,120);near(eye.y,2.62);
+  assert.equal(movement.flying,false);
+  advance(movement,world,eye,30,1/60,vec(0,1,0));near(eye.y,2.62,'held ascent cannot continue flying after landing');
+  movement.pressSpace(1000,false);advance(movement,world,eye,5);
+  assert.equal(movement.flying,false,'a single Space only jumps after landing');
+  movement.pressSpace(1100,false);advance(movement,world,eye,30,1/60,vec(0,1,0));
+  assert.equal(movement.flying,true);assert.ok(eye.y>6,'double Space takes off again');
+});
+
+test('exact and idle foot contact ends flight but wall, ceiling and hovering do not',()=>{
+  const world=floorWorld(), movement=new PlayerMovement();movement.setCollisionEnabled(true);
+  movement.setFlying(true);
+  let eye=vec(0,2.62+10.89*.05,0);
+  eye.add(movement.move(world,eye,vec(0,-1,0),.05,false));near(eye.y,2.62);
+  assert.equal(movement.flying,false,'exactly reaching a surface must count as landing');
+  movement.setFlying(true);movement.move(world,eye,vec(0,0,0),.05,false);
+  assert.equal(movement.flying,false,'standing on a block cannot remain in idle flight');
+  movement.setFlying(true);movement.move(world,vec(0,2.63,0),vec(0,0,0),.05,false);
+  assert.equal(movement.flying,true,'hovering above the block is not a landing');
+  world.set('wall',[box([1,0,-2],[2,5,2])]);
+  movement.move(world,vec(0,3,0),vec(1,0,0),.2,false);
+  assert.equal(movement.flying,true,'side contact preserves flight');
+  world.set('ceiling',[box([-2,4,-2],[2,5,2])]);
+  movement.move(world,vec(0,3,0),vec(0,1,0),.2,false);
+  assert.equal(movement.flying,true,'head contact preserves flight');
+});
+
+test('landing tests use final support so diagonal flight past a ledge remains airborne',()=>{
+  const world=new PlayerCollisionWorld(), movement=new PlayerMovement();movement.setCollisionEnabled(true);movement.setFlying(true);
+  world.set('platform',[box([0,0,0],[1,1,1])]);
+  const eye=vec(.5,3,.5);eye.add(movement.move(world,eye,vec(1,-1,0),.2,false));
+  assert.ok(eye.x>1.3,'horizontal movement leaves the platform');
+  assert.equal(movement.flying,true,'no support beneath final feet means still airborne');
 });
 
 test('jumping hits a low ceiling and falling lands without tunneling at the terminal speed',()=>{
