@@ -104,8 +104,14 @@ void Simulator::enqueue(Update update) {
 }
 void Simulator::updateNeighbors(BlockPos p, int skip, StateId source) { Update u{UpdateKind::multi, p}; u.skip = skip; u.neighborState = source == UINT32_MAX ? world.get(p) : source; enqueue(u); }
 void Simulator::neighborChanged(BlockPos p, StateId source) { Update u{UpdateKind::neighbor, p}; u.neighborState = source; enqueue(u); }
-void Simulator::notifyFront(BlockPos p, Direction facing) { auto out = p.relative(opposite(facing)); neighborChanged(out, world.get(p)); updateNeighbors(out, static_cast<int>(facing), world.get(p)); }
-void Simulator::notifyAttached(BlockPos p, Direction connected) { updateNeighbors(p); updateNeighbors(p.relative(opposite(connected)), -1, world.get(p)); }
+void Simulator::notifyFront(BlockPos p, Direction facing, StateId source) {
+    auto out = p.relative(opposite(facing)); auto block = source == UINT32_MAX ? world.get(p) : source;
+    neighborChanged(out, block); updateNeighbors(out, static_cast<int>(facing), block);
+}
+void Simulator::notifyAttached(BlockPos p, Direction connected, StateId source) {
+    auto block = source == UINT32_MAX ? world.get(p) : source;
+    updateNeighbors(p, -1, block); updateNeighbors(p.relative(opposite(connected)), -1, block);
+}
 void Simulator::setBlock(BlockPos p, StateId id, unsigned flags, int depth) {
     if (faulted) throw std::runtime_error("当前执行已中止，请撤销、加载快照或新建电路");
     const auto old = world.get(p);
@@ -245,10 +251,10 @@ void Simulator::onRemove(BlockPos p, StateId old, bool movedByPiston) {
         if(registry.property(old,"sculk_sensor_phase")=="active") {updateNeighbors(p,-1,old);updateNeighbors(p.relative(Direction::down),-1,old);}break;
     case Device::wire: if (movedByPiston) break; for (auto d : directions) updateNeighbors(p.relative(d), -1, old); updateWire(p, old); wireCorners(p); break;
     case Device::torch: case Device::wallTorch: if (movedByPiston) break; for (auto d : directions) updateNeighbors(p.relative(d), -1, old); break;
-    case Device::lever: case Device::button: if (!movedByPiston && s.powered) notifyAttached(p, s.connectedDirection); break;
-    case Device::repeater: case Device::comparator: if (!movedByPiston) notifyFront(p, s.facing); break;
+    case Device::lever: case Device::button: if (!movedByPiston && s.powered) notifyAttached(p, s.connectedDirection, old); break;
+    case Device::repeater: case Device::comparator: if (!movedByPiston) notifyFront(p, s.facing, old); break;
     // 原版还要求 hasScheduledTick，且必须按被移除的旧类型查询：此时世界上已经是新方块。
-    case Device::observer: if (s.powered && blockTicks.hasScheduled(p, s.type)) notifyFront(p, s.facing); break;
+    case Device::observer: if (s.powered && blockTicks.hasScheduled(p, s.type)) notifyFront(p, s.facing, old); break;
     case Device::pressurePlate: case Device::weightedPlate: if (!movedByPiston && (s.powered || s.power > 0)) { updateNeighbors(p, -1, old); updateNeighbors(p.relative(Direction::down), -1, old); } break;
     case Device::lightningRod: if (s.powered) updateNeighbors(p.relative(opposite(s.facing)), -1, old); break;
     case Device::lectern: if (s.powered) updateNeighbors(p.relative(Direction::down), -1, old); break;

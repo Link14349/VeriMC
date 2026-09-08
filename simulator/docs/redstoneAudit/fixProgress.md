@@ -247,6 +247,32 @@ C++ 的 `updateNeighbors(p)` 在不传 `source` 时取 `world.get(p)`，即“�
 并把 `tests/fixtures/` 下全部 26 个场景重新从原版捕获（各自新随机原点）逐帧对照，**全部 match**，
 确认这次改动没有回归红石粉、铁轨、火把、刻批次、活塞等既有场景。
 
+### 补充：移除回调里的来源方块（同属 R1，issue #4 关闭后追加）
+
+在做 R2/R3/R4 时发现 `onRemove` 里的 `notifyFront` / `notifyAttached` 仍用
+`world.get(p)` 作为来源，而此刻世界上已经写入新方块（通常是空气）。
+原版 `LeverBlock.updateNeighbours`、`ButtonBlock`、`DiodeBlock.updateNeighborsInFront`、
+`ObserverBlock.affectNeighborsAfterRemoval` 传的都是 `this`（被移除的方块）。
+
+两个函数增加可选 `source` 参数，`onRemove` 的拉杆/按钮、中继器/比较器、侦测器分支显式传 `old`。
+`notifyAttached` 的第一次通知原本是 `updateNeighbors(p)`（默认来源），现在也走同一个来源。
+
+新增 `tests/fixtures/java26_2RemovalNotifySource.json`
+（SHA-256 `0cf0ddc55c2d0845d742498d6b0c4588c457a011c3fe5c5b00e0f5f30bb90898`，
+原点 `[2135833, -58, -10975893]`，17 帧 × 20 点 = 340 次位置/帧观测），
+脚本 `tools/reference/captureRemovalNotifySource.py`。四组，读取方是三向普通铁轨，
+放在被通知位置再外一格，只有这两个调用能够到：
+
+| 组 | 旧实现 |
+|---|---|
+| 带电墙拉杆被移除 | **差异**：8 gt、`[9,2,8]`，`north_south` vs `east_west` |
+| 不带电拉杆被移除（原版根本不发通知） | 一致 |
+| 中继器被移除 | **差异**：8 gt、`[10,2,28]`，`south_west` vs `north_west` |
+| 比较器被移除 | **差异**：8 gt、`[10,2,38]`，`south_west` vs `north_west` |
+
+修复后整份 fixture `match`；全部 **32 个场景重新从原版捕获**后全部 `match`；
+`ctest` 3/3，核心检查 95/95。
+
 **明确排除的范围**：
 
 - **门这一路径没有找到可达反例**。原版七元素集合里几乎总还有另一个与目标门半扇相邻、

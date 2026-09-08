@@ -194,8 +194,9 @@ private:
     void onRemove(BlockPos pos, StateId oldState, bool movedByPiston = false);
     bool survives(BlockPos pos, StateId state) const;
     void indirectShapes(BlockPos pos, StateId state, unsigned flags, int depth);
-    void notifyFront(BlockPos pos, Direction facing);
-    void notifyAttached(BlockPos pos, Direction connected);
+    // source 默认取世界当前方块；移除回调里世界已经写入新方块，必须显式传被移除的状态。
+    void notifyFront(BlockPos pos, Direction facing, StateId source = UINT32_MAX);
+    void notifyAttached(BlockPos pos, Direction connected, StateId source = UINT32_MAX);
     void updateWire(BlockPos pos, StateId state);
     StateId wireConnections(BlockPos pos, StateId state) const;
     StateId stairsShape(BlockPos pos, StateId state) const;
