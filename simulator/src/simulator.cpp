@@ -71,6 +71,16 @@ int Simulator::displayValue(BlockPos pos) const {
     int value = 0; for (auto d : directions) value = std::max(value, signal(pos, d));
     return value;
 }
+void Simulator::appendUpdateTrace(Json entry) {
+    if (updateTrace.size() >= updateTraceLimit) { updateTraceTruncated = true; return; }
+    updateTrace.push_back(std::move(entry));
+}
+// 与原版 NeighborUpdates.forEachUpdatedPos 一致：多向更新列出除跳过方向外的六个邻居，
+// 其余种类只列出目标坐标本身。
+void Simulator::recordUpdateTrace(const Update& update) {
+    if (update.kind != UpdateKind::multi) { appendUpdateTrace(Json(update.pos)); return; }
+    for (auto d : updateOrder) if (static_cast<int>(d) != update.skip) appendUpdateTrace(Json(update.pos.relative(d)));
+}
 void Simulator::enqueue(Update update) {
     if (++updateCount > updateBudget) {
         breakRequested = true; faulted = true; pauseReason = "邻居更新超过预算，电路状态已停止；请从快照恢复或撤销本次操作";
@@ -79,18 +89,23 @@ void Simulator::enqueue(Update update) {
     if (updating) { addedUpdates.push_back(update); return; }
     updating = true; updateStack.push_back(update);
     try {
+        // 原版在每次“取栈顶”时调用 debugListener；只有换了栈顶对象才算新的一次取出。
+        bool peeked = false;
         while (!updateStack.empty() || !addedUpdates.empty()) {
+            if (!addedUpdates.empty()) peeked = false;
             for (auto it = addedUpdates.rbegin(); it != addedUpdates.rend(); ++it) updateStack.push_back(*it);
             addedUpdates.clear();
             auto current = updateStack.back();
+            if (updateTraceLimit && !peeked) recordUpdateTrace(current);
+            peeked = true;
             if (current.kind == UpdateKind::multi) {
                 while (current.index < 6 && static_cast<int>(updateOrder[static_cast<std::size_t>(current.index)]) == current.skip) ++current.index;
-                if (current.index >= 6) { updateStack.pop_back(); continue; }
+                if (current.index >= 6) { updateStack.pop_back(); peeked = false; continue; }
                 auto d = updateOrder[static_cast<std::size_t>(current.index++)];
                 updateStack.back().index = current.index;
                 executeNeighbor(current.pos.relative(d), current.neighborState);
             } else {
-                updateStack.pop_back();
+                updateStack.pop_back(); peeked = false;
                 if (current.kind == UpdateKind::shape) executeShape(current); else executeNeighbor(current.pos, current.neighborState);
             }
             ++statistics.updates;
@@ -678,6 +693,7 @@ void Simulator::clear() {
     sensors.clear();sensorSections.clear();jukeboxes.clear();
     world.clear(); runtime.clear(); motions.clear(); hoppers.clear(); entityOrders.clear(); nextEntityOrder = 0; scheduled = {}; scheduledKeys.clear(); blockTicks = {}; changes.clear(); currentTick = 0; nextOrder = 0; sequence = 0; currentPhase = 4;
     probes.clear(); probeDependencies.clear(); nextProbeId = 1; trace.clear(); traceDropped = 0; statistics = {}; breakRequested = false; faulted = false; pauseReason.clear(); ++revision;
+    updateTrace = Json::array(); updateTraceTruncated = false;
     if (retainedTrace) retainedTrace = 0;
 }
 std::vector<Cell> Simulator::takeChanges() { std::vector<Cell> result; result.reserve(changes.size()); for (const auto& [p, id] : changes) result.push_back({p, id}); changes.clear(); return result; }

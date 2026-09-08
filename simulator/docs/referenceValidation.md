@@ -64,6 +64,8 @@
 
 `ExportComposting` 在通常四路径参数之后，追加 `data/compostingRules.json` 的绝对输出路径，导出 115 种材料和 4,176 次隔离插入记录。`captureComposters.py` 增加第二十一组 GameTest，111 刻 / 26 点，验证临时输入/输出容器及失败抽取副作用，见 [堆肥桶说明](composters.md)。
 
+`captureUpdateTrace.py` 增加刻内更新轨迹组：14 刻 / 9 点，另逐条对照 3,327 条邻居/形状更新坐标。原版侧使用 `CollectingNeighborUpdater.setDebugListener` 这一公开钩子，不修改游戏代码；截断不判为通过。加 `--no-trace` 可用同一时间线复跑以验证跟踪不改变执行语义。详见 [刻内更新轨迹](redstoneAudit/updateTrace.md)。
+
 `runReferenceTool.py ExportBlockCapabilities <绝对输出路径>` 用反射记录固定版每个方块实际重写的红石相关回调。构建 `exportSupportInventory` 目标导出内核逐方块支持等级，再运行 `python3 tools/buildSupportInventory.py <导出的 JSON>` 生成 [逐方块支持清单](redstoneAudit/supportInventory.md)。核心测试 “26.2 redstone capability coverage gate” 对已开放集合和 243 个仍拒绝放置的红石相关方块设门禁。
 
 `captureItemFrameComparator.py` 增加比较器展示框组：17 刻 / 12 点，覆盖旋转与物品开关、重复候选、朝向过滤、第一格导体要求、直接输入 15 短路，以及与第二格模拟量取较大者。捕获器直接生成真实 `ItemFrame` 实体；独立内核用受限实体输入表达，见 [环境输入](environmentInputs.md)。

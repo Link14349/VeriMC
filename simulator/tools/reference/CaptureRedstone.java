@@ -34,6 +34,30 @@ import net.minecraft.core.registries.BuiltInRegistries;
 public class CaptureRedstone extends TestFunctionLoader {
     static JsonObject scenario;
     static Path output;
+    // Intra-tick neighbour/shape update trace. Vanilla exposes exactly this hook through
+    // CollectingNeighborUpdater.setDebugListener, so no game code is modified.
+    static int traceLimit = 0;
+    static boolean traceTruncated = false;
+    static JsonArray traceEntries = new JsonArray();
+    static BlockPos traceOrigin = BlockPos.ZERO;
+    static void appendTrace(JsonElement entry) {
+        if (traceEntries.size() >= traceLimit) { traceTruncated = true; return; }
+        traceEntries.add(entry);
+    }
+    static void recordTraceEntry(BlockPos pos) {
+        JsonArray relative = new JsonArray();
+        relative.add(pos.getX() - traceOrigin.getX());
+        relative.add(pos.getY() - traceOrigin.getY());
+        relative.add(pos.getZ() - traceOrigin.getZ());
+        appendTrace(relative);
+    }
+    static net.minecraft.world.level.redstone.CollectingNeighborUpdater neighborUpdaterOf(Level level) {
+        try {
+            var field = Level.class.getDeclaredField("neighborUpdater");
+            field.setAccessible(true);
+            return (net.minecraft.world.level.redstone.CollectingNeighborUpdater)field.get(level);
+        } catch (ReflectiveOperationException e) { throw new RuntimeException(e); }
+    }
     static Map<BlockPos, List<Entity>> occupants = new HashMap<>();
     static Map<BlockPos, List<Player>> viewers = new HashMap<>();
     static BlockPos pos(JsonArray p) { return new BlockPos(p.get(0).getAsInt(), p.get(1).getAsInt(), p.get(2).getAsInt()); }
@@ -298,10 +322,19 @@ public class CaptureRedstone extends TestFunctionLoader {
                 }
         }
         for (int x = 0; x < 48; ++x) for (int y = 0; y < 6; ++y) for (int z = 0; z < 48; ++z) helper.getLevel().setBlock(helper.absolutePos(new BlockPos(x,y,z)), Block.stateById(0), 18);
+        traceLimit = scenario.has("updateTraceLimit") ? scenario.get("updateTraceLimit").getAsInt() : 0;
+        traceTruncated = false; traceEntries = new JsonArray();
         int end = scenario.get("endTick").getAsInt();
         for (int t = 0; t <= end; ++t) {
             final int tick = t;
             Runnable run = () -> {
+                if (traceLimit > 0) {
+                    // ServerLevel.tick clears the listener every tick when nothing subscribes,
+                    // so reinstall it here; it then covers the next server tick and these commands.
+                    traceOrigin = helper.absolutePos(BlockPos.ZERO);
+                    neighborUpdaterOf(helper.getLevel()).setDebugListener(CaptureRedstone::recordTraceEntry);
+                    appendTrace(new JsonPrimitive(tick));
+                }
                 for (var value : scenario.getAsJsonArray("commands")) {
                     JsonObject command = value.getAsJsonObject(); if (command.get("tick").getAsInt() != tick) continue;
                     var absolute = helper.absolutePos(pos(command.getAsJsonArray("pos")));
@@ -335,6 +368,11 @@ public class CaptureRedstone extends TestFunctionLoader {
                 if(scenario.has("watchBells"))frame.add("bells",bells);
                 if(scenario.has("watchJukeboxes"))frame.add("jukeboxes",jukeboxes);
                 if (tick == end) {
+                    if (traceLimit > 0) {
+                        result.addProperty("updateTraceLimit", traceLimit);
+                        result.addProperty("updateTraceTruncated", traceTruncated);
+                        result.add("updateTrace", traceEntries);
+                    }
                     try { Files.writeString(output, new GsonBuilder().setPrettyPrinting().create().toJson(result)); }
                     catch (Exception e) { throw new RuntimeException(e); }
                     helper.succeed();

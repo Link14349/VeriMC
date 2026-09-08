@@ -50,6 +50,13 @@ public:
     bool faulted{};
     std::string pauseReason;
     std::size_t updateBudget{1000000};
+    // 刻内更新轨迹：对应原版 CollectingNeighborUpdater 的 debugListener，
+    // 每次从栈顶取出一个更新对象时记录它的受影响坐标。容量为 0 表示关闭。
+    // 容量耗尽时置 updateTraceTruncated 并停止记录，截断的轨迹不得判为通过。
+    std::size_t updateTraceLimit{};
+    bool updateTraceTruncated{};
+    Json updateTrace = Json::array();
+    void markUpdateTrace(Tick tick) { if (updateTraceLimit) appendUpdateTrace(Json(tick)); }
     std::size_t traceCapacity{500000};
     std::uint64_t traceDropped{};
     // History is trimmed only after consumers acknowledge it. A single atomic
@@ -161,6 +168,8 @@ private:
     enum class UpdateKind { neighbor, shape, multi };
     struct Update { UpdateKind kind; BlockPos pos; Direction direction{Direction::down}; StateId neighborState{}; int index{}, skip{-1}, depth{512}; unsigned flags{2}; };
     void updateBellShape(const Update& update);
+    void appendUpdateTrace(Json entry);
+    void recordUpdateTrace(const Update& update);
     std::vector<Update> updateStack, addedUpdates;
     bool updating{};
     std::size_t updateCount{};

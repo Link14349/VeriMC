@@ -192,12 +192,14 @@ int main() {
         try { restored.loadProject(invalid); } catch (...) { threw = true; }
         expect(threw && before == restored.saveProject("before", true), "invalid batch import changed world");
     });
-    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers", "java26_2Hoppers", "java26_2Torches", "java26_2Rails", "java26_2TickBatches", "java26_2Tripwire", "java26_2Buttons", "java26_2Droppers", "java26_2Targets", "java26_2CopperChests", "java26_2Bookshelves", "java26_2Pots", "java26_2Vibrations", "java26_2DeviceVibrations", "java26_2Notes", "java26_2Bells", "java26_2Jukeboxes", "java26_2JukeboxHoppers", "java26_2Composters", "java26_2WireGeometry", "java26_2PistonPushability", "java26_2DaylightVibration", "java26_2StairShapes", "java26_2RailNotificationSource", "java26_2PistonRemovalCallback", "java26_2DiodeSupportBreak", "java26_2ObserverRemoval", "java26_2PistonLandingShape", "java26_2WireShapeToggle", "java26_2RemovalNotifySource", "java26_2RepeaterLockRefresh", "java26_2ItemFrameComparator"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
+    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers", "java26_2Hoppers", "java26_2Torches", "java26_2Rails", "java26_2TickBatches", "java26_2Tripwire", "java26_2Buttons", "java26_2Droppers", "java26_2Targets", "java26_2CopperChests", "java26_2Bookshelves", "java26_2Pots", "java26_2Vibrations", "java26_2DeviceVibrations", "java26_2Notes", "java26_2Bells", "java26_2Jukeboxes", "java26_2JukeboxHoppers", "java26_2Composters", "java26_2WireGeometry", "java26_2PistonPushability", "java26_2DaylightVibration", "java26_2StairShapes", "java26_2RailNotificationSource", "java26_2PistonRemovalCallback", "java26_2DiodeSupportBreak", "java26_2ObserverRemoval", "java26_2PistonLandingShape", "java26_2WireShapeToggle", "java26_2RemovalNotifySource", "java26_2RepeaterLockRefresh", "java26_2ItemFrameComparator", "java26_2UpdateTrace"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
         std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/../tests/fixtures/" + fixtureName + ".json"); expect(static_cast<bool>(file), "missing vanilla reference fixture");
         auto fixture = Json::parse(file); auto origin = fixture["origin"].get<BlockPos>(); Simulator s(r);
+        const bool tracing = fixture.contains("updateTrace");
+        if (tracing) s.updateTraceLimit = fixture["updateTraceLimit"].get<std::size_t>();
         auto absolute = [&](const Json& p) { auto pos = p.get<BlockPos>(); return BlockPos{origin.x + pos.x, origin.y + pos.y, origin.z + pos.z}; };
         for (const auto& frame : fixture["frames"]) {
-            Tick tick = frame["tick"]; s.advanceTo(tick);
+            Tick tick = frame["tick"]; s.advanceTo(tick); s.markUpdateTrace(tick);
             for (const auto& command : fixture["commands"]) if (command["tick"] == tick) {
                 auto p = absolute(command["pos"]);
                 if (command.contains("placedBy") || command.contains("playerPlace")) s.place(p, command["stateId"]);
@@ -216,6 +218,20 @@ int main() {
                 }
                 if (frame.contains("inventories")) expect(s.inventoryJson(p, false) == frame["inventories"][i], "inventory mismatch at " + std::to_string(tick) + " " + fixture["watch"][i].dump() + " expected " + frame["inventories"][i].dump() + " got " + s.inventoryJson(p, false).dump());
             }
+        }
+        if (tracing) {
+            // 截断的轨迹不得判为通过。
+            expect(!fixture.value("updateTraceTruncated", false) && !s.updateTraceTruncated, "update trace truncated");
+            Json actual = Json::array();
+            for (const auto& entry : s.updateTrace) {
+                if (!entry.is_array()) { actual.push_back(entry); continue; }
+                auto pos = entry.get<BlockPos>();
+                actual.push_back(Json(BlockPos{pos.x - origin.x, pos.y - origin.y, pos.z - origin.z}));
+            }
+            const auto& expected = fixture["updateTrace"];
+            expect(actual.size() == expected.size(), "update trace length " + std::to_string(actual.size()) + " expected " + std::to_string(expected.size()));
+            for (std::size_t i = 0; i < std::min(actual.size(), expected.size()); ++i)
+                expect(actual[i] == expected[i], "update trace entry " + std::to_string(i) + " expected " + expected[i].dump() + " got " + actual[i].dump());
         }
     });
     test("all original compost probabilities and random insertion samples", [&] {

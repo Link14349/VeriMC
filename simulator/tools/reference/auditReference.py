@@ -88,7 +88,8 @@ def main():
             continue
         scenarioDir = output / source.stem
         scenarioDir.mkdir()
-        scenario = {key: value for key, value in baseline.items() if key not in ('frames', 'origin', 'reference')}
+        scenario = {key: value for key, value in baseline.items()
+                    if key not in ('frames', 'origin', 'reference', 'referenceEnvironment', 'updateTrace', 'updateTraceTruncated')}
         scenarioPath = scenarioDir / 'scenario.json'
         scenarioPath.write_text(json.dumps(scenario))
         instancePath = captureRedstone.packDir / 'data/simulator/test_instance/capture.json'
