@@ -629,7 +629,20 @@ void Simulator::interact(BlockPos p) {
     case Device::wire: {
         bool dot = std::all_of(s.wireSides.begin(), s.wireSides.end(), [](auto x) { return x == 0; });
         bool cross = std::all_of(s.wireSides.begin(), s.wireSides.end(), [](auto x) { return x != 0; });
-        if (dot || cross) { auto next = id; for (auto d : horizontal) next = registry.with(next, directionNames[static_cast<unsigned>(d)], std::string(dot ? "side" : "none")); setBlock(p, wireConnections(p, next)); for (auto d : horizontal) if (at(p.relative(d)).conductor) updateNeighbors(p.relative(d), static_cast<int>(opposite(d)), world.get(p)); }
+        if (dot || cross) {
+            auto base = id;
+            for (auto d : horizontal) base = registry.with(base, directionNames[static_cast<unsigned>(d)], std::string(dot ? "side" : "none"));
+            const auto next = wireConnections(p, base);
+            // 原版在新旧状态相同时直接 PASS，且只通知“连接性确实变化”且邻居是导体的方向。
+            if (next != id) {
+                setBlock(p, next);
+                for (auto d : horizontal) {
+                    const auto index = sideIndex(d);
+                    if ((registry[id].wireSides[index] != 0) != (registry[next].wireSides[index] != 0) && at(p.relative(d)).conductor)
+                        updateNeighbors(p.relative(d), static_cast<int>(opposite(d)), next);
+                }
+            }
+        }
         break;
     }
     default: if (!interactDevice(p)) throw std::invalid_argument("该器件没有直接点击操作；请编辑属性或使用环境刺激");

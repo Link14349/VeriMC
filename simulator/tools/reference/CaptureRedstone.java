@@ -70,7 +70,7 @@ public class CaptureRedstone extends TestFunctionLoader {
                     bell.attemptToRing(level,pos,direction);
                 }
                 else if (state.getBlock() instanceof ButtonBlock button) { if (!state.getValue(ButtonBlock.POWERED)) button.press(state, level, pos, null); }
-                else if (state.getBlock() instanceof NoteBlock || state.getBlock() instanceof DaylightDetectorBlock) {
+                else if (state.getBlock() instanceof NoteBlock || state.getBlock() instanceof DaylightDetectorBlock || state.getBlock() instanceof RedStoneWireBlock) {
                     var player=helper.makeMockPlayer(GameType.CREATIVE);
                     var hit=new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(pos),Direction.UP,pos,false);
                     var method=state.getBlock().getClass().getDeclaredMethod("useWithoutItem",BlockState.class,Level.class,BlockPos.class,Player.class,net.minecraft.world.phys.BlockHitResult.class);

@@ -9,6 +9,45 @@
 GameTest 功能开关 `minecraft:vanilla` + `minecraft:trade_rebalance`，`randomTickSpeed=0`，
 实验红石关闭。仍然不能称为严格 vanilla-only 专用服务器验证。
 
+## R9 粉线点/十字切换的额外邻居通知（issue #9）已复现并修复
+
+**根因**：原版 `RedStoneWireBlock.useWithoutItem` 只有在 `newState != state` 时才写入并调用
+`updatesOnShapeChange`；后者又只在**该方向的 `RedstoneSide.isConnected()` 确实变化**
+且邻居是导体时才 `updateNeighborsAtExceptFromFacing`。
+C++ 在 `dot || cross` 成立时无条件对每个导体水平邻居发通知。
+
+**改动**：`Simulator::interact` 的粉线分支先算出新状态，`next == id` 时直接返回；
+否则只对连接性发生变化且邻居是导体的方向发通知，来源方块用新状态。
+
+**原版证据**：新增 `tests/fixtures/java26_2WireShapeToggle.json`
+（SHA-256 `4750ae509c596878a50e5aa7dd9434644d3db5d4b4c092438ecc117fceafb88c`，
+原点 `[943864, -58, 10837183]`，21 帧 × 6 点 = 126 次位置/帧观测），
+脚本 `tools/reference/captureWireShapeToggle.py`。读取方同样是准连接、未被通知过的活塞。
+
+| 组 | 布置 | 原版 |
+|---|---|---|
+| A | 四个水平邻居都是导体且上方有粉线，粉线四面都是 `up`（`isCross` 用 `isConnected()`，`up` 也算连接） | 重算结果与原状态**相同** → 整个 `useWithoutItem` PASS，活塞全程缩回 |
+| B | 孤立粉线（自然十字）旁放一个裸导体 | 十字→点，四面连接性都变 → 原版**确实**通知导体，活塞 9 gt 伸出 |
+
+旧实现在 A 组 9 gt、相对坐标 `[12,2,8]` 让活塞伸出（`extended=true` 2258），原版为 `extended=false`（2264）。
+B 组两侧一致，说明修复没有把该发的通知也砍掉。
+
+配套改动：`tools/reference/CaptureRedstone.java` 的 `interact` 增加 `RedStoneWireBlock` 分支
+（与音符盒、阳光探测器共用同一段反射调用 `useWithoutItem`），否则原版侧无法执行粉线右键。
+
+Release `ctest` 3/3，核心检查 94/94；`tests/fixtures/` 下全部 **31 个场景重新从原版捕获**后全部 `match`
+（这次也顺带验证了捕获器改动没有影响既有场景）。
+
+**明确排除的范围**：
+
+- **“连接性未变”这一半条件没有可达反例**。逐条推演后：自然十字的重算结果必然等于自身
+  （四面都已连接，`getMissingConnections` 会填回同样的值），因此走 PASS；自然点只在
+  完全没有真实连接时存在，切换成十字时四面连接性全部改变。人为用 `setBlock` 摆出
+  “四面 side 但东侧真实连接是 up”的状态会被形状更新立刻修回（本次实测到了这一点，
+  见脚本注释与 issue 说明）。所以 `SIDE→UP` 视为未变化的分支已按原版实现，但属于对齐，
+  不是已复现故障。
+- 只覆盖水平方向的通知条件；`updateNeighborsAtExceptFromFacing` 的跳过方向沿用既有实现。
+
 ## R8 活塞落地未完整重算邻居形状（issue #8）已复现并修复
 
 **根因**：原版 `PistonMovingBlockEntity.finalTick` / `tick` 在放置被移动方块前调用

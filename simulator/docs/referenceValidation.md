@@ -64,6 +64,8 @@
 
 `ExportComposting` 在通常四路径参数之后，追加 `data/compostingRules.json` 的绝对输出路径，导出 115 种材料和 4,176 次隔离插入记录。`captureComposters.py` 增加第二十一组 GameTest，111 刻 / 26 点，验证临时输入/输出容器及失败抽取副作用，见 [堆肥桶说明](composters.md)。
 
+`captureWireShapeToggle.py` 增加粉线点/十字切换组：21 刻 / 6 点，用准连接未通知的活塞检测右键切换发出的邻居通知；捕获器的 `interact` 相应支持红石粉。
+
 `capturePistonLandingShape.py` 增加活塞落地形状组：21 刻 / 12 点，被推动的楼梯重算内角、音符盒重读乐器、侦测器落地即排脉冲。
 
 `captureObserverRemoval.py` 增加侦测器移除组：21 刻 / 11 点，用准连接但未被通知的活塞检测移除时是否发出输出侧通知，覆盖过时供电状态、计划刻仍排队、探测器后放置以及移除后立即重放置四种情形。
