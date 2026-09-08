@@ -35,6 +35,7 @@ function App() {
   const [status,setStatus]=useState<Status>(connection.status),[connected,setConnected]=useState(false),[catalog,setCatalog]=useState(connection.catalog),[hover,setHover]=useState<Pos|null>(null),[fps,setFps]=useState(0);
   const [fileProgress,setFileProgress]=useState<FileProgress|null>(null);
   const [firstPerson,setFirstPerson]=useState(false),[fullscreen,setFullscreen]=useState(false),[locked,setLocked]=useState(false);
+  const [resumingInput,setResumingInput]=useState(false);
   const [inventoryOpen,setInventoryOpen]=useState(false),[deviceOpen,setDeviceOpen]=useState(false);
   const [slots,setSlots]=useState<HotbarSlot[]>(initialHotbar),[selectedSlot,setSelectedSlot]=useState(0);
   const appRef=useRef<HTMLElement>(null),deviceDialog=useRef<HTMLDialogElement>(null);
@@ -63,10 +64,13 @@ function App() {
     gameRef.current.inventoryOpen=true;setInventoryOpen(true);view.current?.setInputBlocked(true);
     dispatch({type:'setMenu',value:false});
   };
-  const closeInventory=(resume=false)=>{
+  const closeInventory=()=>{
     gameRef.current.inventoryOpen=false;setInventoryOpen(false);view.current?.setInputBlocked(false);
     view.current?.renderer.domElement.focus({preventScroll:true});
-    if(resume&&gameRef.current.firstPerson)view.current?.requestPointerLock();
+    if(gameRef.current.firstPerson){
+      // Esc 关闭物品栏与 E 一样回到搭建；等待真实锁定事件时不闪出暂停面板。
+      setResumingInput(true);view.current?.requestPointerLock();
+    }
   };
   const enterFirstPerson=()=>{
     gameRef.current.firstPerson=true;setFirstPerson(true);dispatch({type:'setTool',tool:'place'});
@@ -76,7 +80,7 @@ function App() {
     view.current?.requestPointerLock();
   };
   const leaveFirstPerson=()=>{
-    gameRef.current.firstPerson=false;setFirstPerson(false);setInventoryOpen(false);setDeviceOpen(false);
+    gameRef.current.firstPerson=false;setFirstPerson(false);setInventoryOpen(false);setDeviceOpen(false);setResumingInput(false);
     gameRef.current.inventoryOpen=false;gameRef.current.deviceOpen=false;
     view.current?.setFirstPerson(false);view.current?.setInputBlocked(false);
     if(document.fullscreenElement===appRef.current)void document.exitFullscreen().catch(()=>fail('浏览器未能退出全屏，请按 Esc。'));
@@ -84,9 +88,9 @@ function App() {
   const toggleFullscreen=()=>{
     if(document.fullscreenElement===appRef.current){void document.exitFullscreen().catch(()=>fail('浏览器未能退出全屏，请按 Esc。'));return;}
     if(!appRef.current?.requestFullscreen){fail('当前浏览器不支持全屏，请使用 Chrome 或 Edge。');return;}
-    // 两个权限都在用户手势中申请；不等待全屏 Promise 后再请求鼠标锁。
-    void appRef.current.requestFullscreen().catch(()=>fail('浏览器拒绝全屏；仍可在当前窗口使用第一人称搭建。'));
+    // Fullscreen 会消耗用户激活，先请求鼠标锁，再在同一手势中请求全屏。
     if(!gameRef.current.firstPerson)enterFirstPerson();
+    void appRef.current.requestFullscreen().catch(()=>fail('浏览器拒绝全屏；仍可在当前窗口使用第一人称搭建。'));
   };
   const pickBlock=(pos:Pos)=>{
     const def=connection.states.get(connection.cells.get(posKey(pos))?.stateId??0);if(!def)return;
@@ -114,7 +118,8 @@ function App() {
     const refreshSelection=()=>{const p=stateRef.current.selection;if(!p)return;const cell=connection.cells.get(posKey(p));dispatch({type:'refreshSelection',def:cell?connection.states.get(cell.stateId)??null:null});};
     connection.addEventListener('status',onStatus);connection.addEventListener('catalog',onCatalog);connection.addEventListener('error',onError);connection.addEventListener('cells',refreshSelection);connection.connect();
     const viewport=new CircuitViewport(viewportRef.current!);view.current=viewport;viewport.onHover=setHover;viewport.onFps=setFps;
-    viewport.onPointerLockChange=setLocked;viewport.onInputError=fail;
+    viewport.onPointerLockChange=value=>{setLocked(value);setResumingInput(false);};
+    viewport.onInputError=message=>{setResumingInput(false);fail(message);};
     viewport.onPickBlock=pos=>callbacks.current.pickBlock(pos);
     viewport.onUse=(pos,shift)=>callbacks.current.useBlock(pos,shift);
     viewport.onHotbarScroll=delta=>callbacks.current.selectSlot(hotbarIndex(gameRef.current.selectedSlot,delta));
@@ -262,7 +267,7 @@ function App() {
         {firstPerson&&<>
           <div className="creativeTop"><span>第一人称搭建 · 飞行 <i/> {connected?'内核已连接':'内核已断开'} <i/> {status.running?'运行中':'已暂停'}</span><div><button onClick={()=>void command(status.running?'pause':'play')} disabled={!connected}>{status.running?'暂停仿真':'运行仿真'}</button><button title={fullscreen?'退出全屏':'进入全屏'} onClick={toggleFullscreen}>{fullscreen?'退出全屏':'进入全屏'}</button><button onClick={leaveFirstPerson}>返回工作台</button></div></div>
           {locked&&<div className="creativeCrosshair" aria-hidden="true"/>}
-          {!locked&&!inventoryOpen&&!deviceOpen&&<div className="creativeResume"><strong>第一人称搭建</strong><p>鼠标转向 · 左键拆除 · 右键使用 / 放置</p><button className="runButton" onClick={()=>view.current?.requestPointerLock()}>继续搭建</button><button onClick={openInventory}>打开物品栏 E</button><small>WASD 移动 · Space / Shift 升降 · Ctrl 加速<br/>1–9 / 滚轮 切换物品 · 中键取物 · Esc 释放鼠标</small></div>}
+          {!locked&&!resumingInput&&!inventoryOpen&&!deviceOpen&&<div className="creativeResume"><strong>第一人称搭建</strong><p>鼠标转向 · 左键拆除 · 右键使用 / 放置</p><button className="runButton" onClick={()=>view.current?.requestPointerLock()}>继续搭建</button><button onClick={openInventory}>打开物品栏 E</button><small>WASD 移动 · Space / Shift 升降 · Ctrl 加速<br/>1–9 / 滚轮 切换物品 · 中键取物 · Esc 释放鼠标</small></div>}
           <CreativeHotbar slots={slots} selected={selectedSlot} onSelect={selectSlot} onInventory={openInventory}/>
           <div className="creativeHint">E 物品栏 · Shift + 右键放置 · Esc 释放鼠标</div>
         </>}

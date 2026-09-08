@@ -610,6 +610,7 @@ export class CircuitViewport {
   private keyDown = (event: KeyboardEvent) => {
     if (this.inputBlocked || (this.immersive && !this.pointerLocked)) return;
     if (this.immersive) {
+      if(event.code==='Escape'){event.preventDefault();this.releasePointerLock();return;}
       if (event.metaKey || event.altKey) {this.clearInput();return;}
       if (!['KeyW','KeyA','KeyS','KeyD','Space','ShiftLeft','ShiftRight','ControlLeft','ControlRight'].includes(event.code)) return;
       event.preventDefault();this.movementKeys.add(event.code);return;

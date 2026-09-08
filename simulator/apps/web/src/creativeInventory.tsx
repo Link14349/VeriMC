@@ -37,10 +37,11 @@ export function CreativeHotbar({ slots, selected, onSelect, onInventory }: {
 export function CreativeInventory({ catalog, slots, selected, connected, onSelect, onAssign, onClear, onClose }: {
   catalog: CatalogItem[]; slots: HotbarSlot[]; selected: number; connected: boolean;
   onSelect: (index: number) => void; onAssign: (name: string, index: number) => void;
-  onClear: (index: number) => void; onClose: (resume?: boolean) => void;
+  onClear: (index: number) => void; onClose: () => void;
 }) {
   const dialog = useRef<HTMLDialogElement>(null), search = useRef<HTMLInputElement>(null), ghost = useRef<HTMLDivElement>(null);
   const pointer = useRef({ x: 0, y: 0 });
+  const closingWithEscape = useRef(false);
   const [query, setQuery] = useState(''), [category, setCategory] = useState('全部');
   const [held, setHeld] = useState<string | null>(null), [hovered, setHovered] = useState<string | null>(null);
   const titleId = useId();
@@ -50,7 +51,7 @@ export function CreativeInventory({ catalog, slots, selected, connected, onSelec
     // The caller unmounts this dialog and restores canvas focus. Closing in
     // cleanup would restore focus to an earlier, potentially removed control.
   }, []);
-  const close = (resume = false) => { dialog.current?.close(); onClose(resume); };
+  const close = () => { dialog.current?.close(); onClose(); };
   const queryText = query.trim().toLowerCase();
   const filtered = catalog.filter(item => {
     if (category === '红石器件' && item.device <= 1) return false;
@@ -64,8 +65,12 @@ export function CreativeInventory({ catalog, slots, selected, connected, onSelec
     event.stopPropagation();
     const target = event.target;
     const editing = target instanceof HTMLElement && !!target.closest('input,textarea,select,[contenteditable="true"]');
-    if (event.key === 'Escape' || (!editing && event.key.toLowerCase() === 'e' && !event.ctrlKey && !event.metaKey && !event.altKey)) {
-      event.preventDefault(); if(!event.repeat)close(event.key !== 'Escape'); return;
+    if (event.key === 'Escape') {
+      // 保持 dialog 到松键，避免本次 Esc 又释放刚恢复的 Pointer Lock。
+      event.preventDefault(); closingWithEscape.current = true; return;
+    }
+    if (!editing && event.key.toLowerCase() === 'e' && !event.ctrlKey && !event.metaKey && !event.altKey) {
+      event.preventDefault(); if(!event.repeat)close(); return;
     }
     if (editing || event.ctrlKey || event.metaKey || event.altKey || !/^[1-9]$/.test(event.key)) return;
     const index = Number(event.key) - 1;
@@ -73,16 +78,22 @@ export function CreativeInventory({ catalog, slots, selected, connected, onSelec
     if (hovered && filtered.some(item => item.name === hovered)) { event.preventDefault(); assign(hovered, index); }
     else if (!editing) { event.preventDefault(); onSelect(index); }
   };
+  const handleKeyUp = (event: KeyboardEvent<HTMLDialogElement>) => {
+    event.stopPropagation();
+    if(event.key==='Escape' && closingWithEscape.current){
+      event.preventDefault();closingWithEscape.current=false;close();
+    }
+  };
   const movePointer = (event: PointerEvent<HTMLDialogElement>) => {
     pointer.current = { x: event.clientX, y: event.clientY };
     if (ghost.current) ghost.current.style.transform = `translate(${event.clientX + 16}px,${event.clientY + 16}px)`;
   };
   return <dialog ref={dialog} className="creativeInventory" aria-labelledby={titleId}
-    onCancel={event => { event.preventDefault(); close(); }} onKeyDownCapture={handleKey} onKeyUp={event => event.stopPropagation()}
+    onCancel={event => { event.preventDefault(); if(!closingWithEscape.current)close(); }} onKeyDownCapture={handleKey} onKeyUp={handleKeyUp}
     onPointerMove={movePointer} onContextMenu={event => event.preventDefault()}>
     <header className="creativeInventoryHeader">
       <div><span className="creativeInventoryEyebrow">CREATIVE INVENTORY</span><h1 id={titleId}>物品栏</h1><p>从器件列表中选择，放入下方快捷栏。</p></div>
-      <button className="creativeInventoryClose" onClick={() => close(true)} aria-label="关闭物品栏" title="关闭物品栏 Esc"><span aria-hidden="true">×</span><kbd>Esc</kbd></button>
+      <button className="creativeInventoryClose" onClick={close} aria-label="关闭物品栏" title="关闭物品栏 Esc"><span aria-hidden="true">×</span><kbd>Esc</kbd></button>
     </header>
     <div className="creativeInventoryFilters">
       <div className="creativeInventoryTabs" role="group" aria-label="物品分类">{['全部','红石器件','结构'].map(name => <button key={name} aria-pressed={category === name} onClick={() => {setCategory(name);setHovered(null);}}>{name}</button>)}</div>

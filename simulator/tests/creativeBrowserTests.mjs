@@ -195,6 +195,16 @@ test('creative workbench supports fullscreen, nine slots and isolated E inventor
       await page.getByTitle('进入全屏',{exact:true}).click();
       await page.waitForFunction(() => !!document.fullscreenElement);
       await page.getByTitle('退出全屏',{exact:true}).waitFor({state:'visible'});
+      await page.waitForFunction(() => document.pointerLockElement === document.querySelector('.viewportCanvas canvas'));
+      await page.keyboard.press('e');
+      const inventory = page.locator('dialog.creativeInventory');
+      await inventory.waitFor({state:'visible'});
+      await page.waitForFunction(() => !document.pointerLockElement);
+      await page.keyboard.press('Escape');
+      await inventory.waitFor({state:'hidden'});
+      await page.waitForFunction(() => document.pointerLockElement === document.querySelector('.viewportCanvas canvas'));
+      assert.equal(await page.locator('.creativeResume').isVisible(), false, 'closing inventory must return directly to building');
+      assert.equal(await page.evaluate(() => !!document.fullscreenElement), true, 'inventory Escape must preserve fullscreen');
       await page.evaluate(() => document.exitPointerLock());
       await page.waitForFunction(() => !document.pointerLockElement);
       await page.getByTitle('退出全屏',{exact:true}).click();
@@ -206,6 +216,8 @@ test('creative workbench supports fullscreen, nine slots and isolated E inventor
     });
 
     await t.test('E opens a modal inventory; text editing and modal keys cannot reach the world', async () => {
+      // Chrome 使用 2 秒的鼠标锁请求窗口；独立场景之间等待窗口到期。
+      await page.waitForTimeout(2200);
       await page.getByTitle('第一人称搭建',{exact:true}).click();
       await page.waitForFunction(() => document.querySelectorAll('.creativeHotbar button').length === 9);
       await page.keyboard.press('e');
@@ -227,14 +239,18 @@ test('creative workbench supports fullscreen, nine slots and isolated E inventor
       await page.screenshot({path:fileURLToPath(new URL('../testResults/creativeInventory.png',import.meta.url))});
       await page.keyboard.press('e');
       await inventory.waitFor({state:'hidden'});
+      await page.waitForFunction(() => document.pointerLockElement === document.querySelector('.viewportCanvas canvas'));
       await page.keyboard.press('e');
       await inventory.waitFor({state:'visible'});
       await page.keyboard.press('Escape');
       await inventory.waitFor({state:'hidden'});
+      await page.waitForFunction(() => document.pointerLockElement === document.querySelector('.viewportCanvas canvas'));
+      assert.equal(await page.locator('.creativeResume').isVisible(), false, 'inventory Escape must not show the resume panel');
       assert.equal(await page.evaluate(() => commands.length), count);
     });
 
     await t.test('inventory actually assigns, clears and searches without world edits', async () => {
+      await page.waitForTimeout(2200);
       const count=await page.evaluate(()=>commands.length);
       await page.keyboard.press('e');
       const inventory=page.locator('dialog.creativeInventory');
@@ -259,8 +275,23 @@ test('creative workbench supports fullscreen, nine slots and isolated E inventor
       await page.screenshot({path:fileURLToPath(new URL('../testResults/creativeInventoryCompact.png',import.meta.url))});
       await page.keyboard.press('Escape');
       await inventory.waitFor({state:'hidden'});
+      await page.waitForFunction(() => document.pointerLockElement === document.querySelector('.viewportCanvas canvas'));
+      assert.equal(await page.locator('.creativeResume').isVisible(), false, 'Escape from the search input must resume building');
       await page.setViewportSize({width:1440,height:1000});
       assert.equal(await page.evaluate(()=>commands.length),count);
+    });
+
+    await t.test('Escape in the world still releases capture and allows resuming', async () => {
+      await page.waitForTimeout(2200);
+      await page.waitForFunction(() => document.pointerLockElement === document.querySelector('.viewportCanvas canvas'));
+      await page.keyboard.press('Escape');
+      await page.waitForFunction(() => !document.pointerLockElement);
+      await page.locator('.creativeResume').waitFor({state:'visible'});
+      assert.equal(await page.locator('dialog.creativeInventory').isVisible(), false);
+      await page.getByRole('button',{name:'继续搭建',exact:true}).click();
+      await page.waitForFunction(() => document.pointerLockElement === document.querySelector('.viewportCanvas canvas'));
+      await page.locator('.creativeResume').waitFor({state:'hidden'});
+      assert.equal(await page.locator('.creativeResume').isVisible(), false);
     });
 
     await t.test('number keys select all nine hotbar slots and returning restores the workbench', async () => {
@@ -273,7 +304,9 @@ test('creative workbench supports fullscreen, nine slots and isolated E inventor
         assert.equal(await page.locator('.creativeHotbar button[aria-pressed="true"]').count(), 1);
       }
       await page.screenshot({path:fileURLToPath(new URL('../testResults/creativeWorkbench.png',import.meta.url))});
-      // Escape has released capture, so this button is reachable with the normal cursor.
+      // Release capture explicitly before using the workbench controls with the cursor.
+      await page.evaluate(() => document.exitPointerLock());
+      await page.waitForFunction(() => !document.pointerLockElement);
       await page.getByRole('button',{name:'返回工作台',exact:true}).click();
       assert.equal(await page.locator('.creativeHotbar').count(), 0);
       assert.equal(await page.getByTitle('第一人称搭建',{exact:true}).isVisible(), true);
