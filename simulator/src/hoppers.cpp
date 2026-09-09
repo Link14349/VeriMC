@@ -92,11 +92,12 @@ bool Simulator::hasBlockContainer(BlockPos pos) const {
 
 // 原版 ejectItems 一开始就调用 getAttachedContainer，方块容器为空才查实体容器；
 // 后者只要该格有候选就消耗一次 nextInt，与本次推出是否成功无关。
-bool Simulator::hopperEject(BlockPos pos) {
+bool Simulator::hopperEject(BlockPos pos, bool* drew) {
     const auto target = pos.relative(at(pos).facing);
     if (hasBlockContainer(target)) return transferItem(pos, target);
     const auto entity = chooseContainerEntity(target);
     if (!entity) return false;
+    if (drew) *drew = true;
     return transferSlots(containerSlots(pos), entityContainerSlots(target, *entity), pos, target, false);
 }
 
@@ -321,7 +322,13 @@ void Simulator::tickHopper(const ScheduledEvent& event) {
     }
     if (registry.property(world.get(event.pos), "enabled") != "true") return;
     bool moved = false;
-    if (!inventoryEmpty(event.pos)) moved = hopperEject(event.pos);
+    // 原版 tryMoveItems 失败时**不设冷却**，因此下一刻还会整套重跑一遍。内核为省事在空转后
+    // 就不再排程，靠库存/拓扑/信号变化唤醒——只要空转确实没有可观测效果，这是等价的。
+    // 容器实体打破了这个前提：只要那一格有矿车，getEntityContainer 每刻都消耗一次
+    // nextInt，哪怕这次一件也搬不动。少抽的那些会让世界随机源整体错位，进而改变之后
+    // 任何一次抽取（投掷器选槽等）的结果，所以这种空转必须逐刻重试。
+    bool drew = false;
+    if (!inventoryEmpty(event.pos)) moved = hopperEject(event.pos, &drew);
     bool retryExtraction = false;
     if (!inventoryFull(event.pos)) {
         auto source = event.pos.relative(Direction::up);
@@ -330,8 +337,10 @@ void Simulator::tickHopper(const ScheduledEvent& event) {
         if (!hasBlockContainer(source)) {
             // getSourceContainer 的实体分支：容器实体优先于掉落物，选中一个就只从它拉取，
             // 拉不到也不会退回去吸掉落物（原版 container != null 分支直接 return false）。
-            if (const auto entity = chooseContainerEntity(source))
+            if (const auto entity = chooseContainerEntity(source)) {
+                drew = true;
                 moved = transferSlots(entityContainerSlots(source, *entity), containerSlots(event.pos), source, event.pos, true) || moved;
+            }
             else {
                 const auto aboveId = world.get(source);
                 const bool blocked = registry[aboveId].fullCube && !registry.type(aboveId).doesNotBlockHoppers;
@@ -354,7 +363,7 @@ void Simulator::tickHopper(const ScheduledEvent& event) {
         containerChanged(event.pos);
         hopper.wakeAt = hopper.readyAt;
         schedulePhase(event.pos, hopper.readyAt, 2, hopper.generation);
-    } else if (retryExtraction) {
+    } else if (retryExtraction || drew) {
         hopper.wakeAt = currentTick + 1;
         schedulePhase(event.pos, hopper.wakeAt, 2, hopper.generation);
     }

@@ -357,7 +357,8 @@ private:
     bool transferSlots(const std::vector<InventorySlot>& sourceSlots, const std::vector<InventorySlot>& targetSlots,
                        BlockPos from, BlockPos to, bool pulling);
     // 原版 ejectItems：先 getAttachedContainer（方块容器优先、实体容器兜底），再推出一件。
-    bool hopperEject(BlockPos pos);
+    // drew 回报这一次是否消耗了 getEntityContainer 的 nextInt，供空转重试判断使用。
+    bool hopperEject(BlockPos pos, bool* drew = nullptr);
     void wakeHopper(BlockPos pos);
     void wakeHoppers(BlockPos changed);
     void tickHopper(const ScheduledEvent& event);

@@ -1030,6 +1030,59 @@ int main() {
         expect(restored.containerEntitiesJson(front) == push.containerEntitiesJson(front), "transferred cart inventory lost across checkpoint");
         expect(restored.saveProject("push", true) == saved, "container entity checkpoint diverged");
     });
+    test("a hopper blocked by a container entity keeps drawing every tick", [&] {
+        // 原版 tryMoveItems 搬不动东西时**不设冷却**，下一刻整套重跑一遍。内核为省事在空转之后
+        // 就不再排程，靠库存/拓扑/信号变化唤醒——只要空转确实没有可观测效果，这是等价的。
+        // 容器实体打破了这个前提：只要那一格有矿车，getEntityContainer 每刻都消耗一次
+        // nextInt，哪怕一件也搬不动。少抽的那些会让世界随机源整体错位，
+        // 进而改变之后任何一次抽取（投掷器选槽等）的结果。
+        auto stone = [](int slot, int count) { return Json{{"slot", slot}, {"item", "minecraft:stone"}, {"count", count}}; };
+        auto dirt = Json::array({{{"slot", 0}, {"item", "minecraft:dirt"}, {"count", 1}}});
+        auto draws = [](const Simulator& world) {
+            return std::stoull(world.saveProject("draws", true).at("randomSource").at("draws").get<std::string>());
+        };
+        const BlockPos pusher{0, 1, 0}, front{1, 1, 0};
+        // 推出侧：朝向格里是一辆装满的漏斗矿车，每刻都抽一次、每刻都搬不动。
+        Simulator s(r); floor(s);
+        s.place(pusher, r.state("hopper", {{"facing", "east"}}));
+        Json full = Json::array();
+        for (int slot = 0; slot < 5; ++slot) full.push_back(stone(slot, 64));
+        s.stimulate(front, {{"containerEntities", Json::array({{{"type", "hopper_minecart"}, {"inventory", full}}})}});
+        s.stimulate(pusher, {{"inventory", dirt}});
+        s.advanceTo(10); const auto atTen = draws(s);
+        s.advanceTo(20);
+        expect(draws(s) - atTen == 10, "a hopper blocked by a full container entity stopped drawing: "
+               + std::to_string(draws(s) - atTen) + " draws over 10 ticks");
+        expect(s.inventoryJson(pusher, false) == dirt, "an item moved into a full minecart");
+        expect(s.containerEntitiesJson(front).at(0).at("inventory").size() == 5, "the full minecart changed");
+        // 拉取侧：上方是一辆空的运输矿车，同样每刻抽一次。
+        Simulator pull(r); floor(pull);
+        const BlockPos puller{0, 1, 0}, above{0, 2, 0};
+        pull.place(puller, r.state("hopper", {{"facing", "down"}}));
+        pull.stimulate(above, {{"containerEntities", Json::array({{{"type", "chest_minecart"}, {"inventory", Json::array()}}})}});
+        pull.advanceTo(10); const auto pullTen = draws(pull);
+        pull.advanceTo(20);
+        expect(draws(pull) - pullTen == 10, "a hopper pulling from an empty container entity stopped drawing");
+        // 对照一：那一格没有容器实体时不该有任何抽取，空转仍然可以休眠。
+        Simulator idle(r); floor(idle);
+        idle.place(pusher, r.state("hopper", {{"facing", "east"}}));
+        idle.stimulate(pusher, {{"inventory", dirt}});
+        idle.advanceTo(10); const auto idleTen = draws(idle);
+        idle.advanceTo(20);
+        expect(draws(idle) == idleTen, "an idle hopper with no container entity consumed randomness");
+        // 对照二：搬成功那一刻起 8 gt 冷却，原版 isOnCooldown 期间根本走不到 getEntityContainer，
+        // 所以冷却里的那几刻**不**抽——每 8 刻只有一次。
+        Simulator moving(r); floor(moving);
+        moving.place(pusher, r.state("hopper", {{"facing", "east"}}));
+        moving.stimulate(front, {{"containerEntities", Json::array({{{"type", "chest_minecart"}, {"inventory", Json::array()}}})}});
+        Json many = Json::array();
+        for (int slot = 0; slot < 5; ++slot) many.push_back(stone(slot, 64));
+        moving.stimulate(pusher, {{"inventory", many}});
+        moving.advanceTo(10); const auto movingTen = draws(moving);
+        moving.advanceTo(26);
+        expect(draws(moving) - movingTen == 2, "a transferring hopper drew during its 8 gt cooldown: "
+               + std::to_string(draws(moving) - movingTen) + " draws over 16 ticks");
+    });
     test("full 26.2 sine table and daylight index boundaries", [&] {
         std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/../tests/fixtures/java26_2SineTable.json");
         expect(static_cast<bool>(file), "missing vanilla sine table fixture");
