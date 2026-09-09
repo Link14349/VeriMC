@@ -906,6 +906,12 @@ int main() {
         // 恢复后钟还应当摆完剩下的刻数，而不是一恢复就停。
         for (Simulator* world : {&s, &restored}) {
             world->setChunkState(0, 0, Simulator::ChunkState::entityTicking);
+            // 恢复之后、下一次推进之前再存读一次：此刻 bellWakeAt 已被后移，
+            // 而那个过期事件还没被 finishBell 重排，两者必然不相等。
+            // 这个窗口里产出的快照也必须能读回来。
+            auto resumed = world->saveProject("resumed", true);
+            Simulator again(r); again.loadProject(resumed);
+            expect(again.saveProject("resumed", true) == resumed, "checkpoint taken right after resuming a stalled chunk diverged");
             world->advanceTo(301);
             expect(world->inspect({1, 0, 6})["runtime"]["ringing"] == true, "bell stopped immediately after the chunk resumed");
             world->advanceTo(360);

@@ -104,12 +104,35 @@ void Simulator::setChunkState(int chunkX, int chunkZ, ChunkState state, std::opt
     // 恢复执行时，把停摆期间本该递减却没有递减的倒计时整体后移，等价于原版
     // 「区块不 ticking 时方块实体根本不 tick」。方块计划刻不移动：原版保留原触发时刻，
     // 恢复后把过期的一并执行。
-    if (!wasTicking && state >= ChunkState::blockTicking && !stalledSince && currentTick > previousStall)
+    if (!wasTicking && state >= ChunkState::blockTicking && !stalledSince && currentTick > previousStall) {
         shiftBlockEntityTimers(chunk, currentTick - previousStall);
+        liftStaleEvents(chunk);
+    }
     ++revision;
 }
 // 只移动「倒计时/进度」类的时刻。wakeAt 与被延后的事件保持同步，由事件处理器在恢复后
 // 按新的 readyAt 重新排期，因此这里不动它。
+// 停摆期间最后一批事件被放回**当刻**，随后空闲推进把 currentTick 直接跳到目标刻，
+// 于是这些事件停在过去。它们本来就会在恢复后的第一次推进里立刻执行，把触发时刻抬到
+// currentTick 完全等价；但留在过去会让快照违反「运行队列里的事件不早于当前刻」这条不变量，
+// 使得「恢复之后、下一次推进之前」存出来的快照读不回来。抬升的同时同步各方块实体的 wakeAt。
+void Simulator::liftStaleEvents(BlockPos chunk) {
+    std::vector<ScheduledEvent> kept;
+    kept.reserve(scheduled.size());
+    bool changed = false;
+    while (!scheduled.empty()) {
+        auto event = scheduled.top(); scheduled.pop();
+        if (event.phase != 0 && event.tick < currentTick && chunkOf(event.pos) == chunk) { event.tick = currentTick; changed = true; }
+        kept.push_back(event);
+    }
+    for (const auto& event : kept) scheduled.push(event);
+    if (!changed) return;
+    const auto sync = [&](auto& table) {
+        for (auto& [pos, entry] : table)
+            if (chunkOf(pos) == chunk && entry.wakeAt != UINT64_MAX && entry.wakeAt < currentTick) entry.wakeAt = currentTick;
+    };
+    sync(hoppers); sync(jukeboxes); sync(sensors);
+}
 void Simulator::shiftBlockEntityTimers(BlockPos chunk, Tick delta) {
     const auto inChunk = [&](BlockPos pos) { return chunkOf(pos) == chunk; };
     const auto shift = [&](Tick& value) { if (value != UINT64_MAX) value += delta; };
@@ -694,7 +717,7 @@ void Simulator::executeReactiveNeighbor(BlockPos p, StateId id, StateId source) 
     // 原版 PistonHeadBlock.neighborChanged 把**收到的来源方块**原样转发给活塞本体，
     // 不是用空气或活塞头自己。
     case Device::pistonHead: if (survives(p, id)) neighborChanged(p.relative(opposite(s.facing)), source); break;
-    case Device::rail: case Device::poweredRail: case Device::activatorRail: case Device::detectorRail: updateRail(p, source); break;
+    case Device::rail: case Device::poweredRail: case Device::activatorRail: case Device::detectorRail: updateRail(p, id, source); break;
     case Device::hopper: {
         bool enabled = bestSignal(p) == 0;
         if ((registry.property(id, "enabled") == "true") != enabled) setBlock(p, registry.withBool(id, "enabled", enabled), 2);

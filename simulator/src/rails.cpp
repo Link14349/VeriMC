@@ -172,15 +172,19 @@ bool Simulator::poweredRailPath(BlockPos pos, StateId state, bool forward, int d
     return poweredAt(next) || (!climbing && poweredAt(next.relative(Direction::down)));
 }
 
-void Simulator::updateRail(BlockPos pos, StateId source) {
-    auto state = world.get(pos); auto shape = railShape(*this, state);
+// state 是 FullNeighborUpdate 入队时的**快照**，不是当前世界里的方块。原版
+// BaseRailBlock.neighborChanged(state, ...) 全程用这个参数，PoweredRailBlock 更是把
+// 整个快照写回：`setBlock(pos, state.setValue(POWERED, shouldPower), 3)`。
+// 因此同一层里铁轨形状被改掉时，这条更新会把**旧形状**连同新的通电状态一起写回去。
+void Simulator::updateRail(BlockPos pos, StateId state, StateId source) {
+    auto shape = railShape(*this, state);
     auto slope = slopeDirection(shape);
     if (!survives(pos, state) || (slope && (at(pos.relative(*slope)).rigidMask & 2u) == 0)) { setBlock(pos, 0); return; }
-    if (at(pos).device == Device::rail) {
+    if (registry[state].device == Device::rail) {
         if (!registry[registry.type(source).defaultState].signalSource) return;
         int count = 0; for (auto d : horizontal) if (railAt(*this, pos.relative(d))) ++count;
         if (count == 3) RailConnection(*this, pos).place(bestSignal(pos) > 0, false);
-    } else if (at(pos).device == Device::poweredRail || at(pos).device == Device::activatorRail) {
+    } else if (registry[state].device == Device::poweredRail || registry[state].device == Device::activatorRail) {
         bool powered = bestSignal(pos) > 0 || poweredRailPath(pos, state, true, 0) || poweredRailPath(pos, state, false, 0);
         if (powered != registry[state].powered) {
             setBlock(pos, registry.withBool(state, "powered", powered));

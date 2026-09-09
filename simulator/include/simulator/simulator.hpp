@@ -110,6 +110,8 @@ public:
     // 区块不 ticking 时方块实体根本不执行，它们的倒计时也不会递减。事件被延后一刻时
     // 把「绝对唤醒时刻」一起后移，等价于原版的冷却与计时在停摆期间冻结。
     void shiftBlockEntityTimers(BlockPos chunk, Tick delta);
+    // 恢复执行时把停在过去的事件抬到当前刻，保持「队列事件不早于当前刻」的快照不变量。
+    void liftStaleEvents(BlockPos chunk);
     TickCheck blockTickCheck() const {
         if (chunkStates.empty()) return {};
         return {[](const void* owner, BlockPos chunk) {
@@ -365,7 +367,7 @@ private:
     void tickHopper(const ScheduledEvent& event);
     void startHopper(BlockPos pos);
     void placeRail(BlockPos pos);
-    void updateRail(BlockPos pos, StateId source);
+    void updateRail(BlockPos pos, StateId state, StateId source);
     void removeRail(BlockPos pos, StateId state);
     bool poweredRailPath(BlockPos pos, StateId state, bool forward, int depth) const;
     void updateDetectorRail(BlockPos pos);

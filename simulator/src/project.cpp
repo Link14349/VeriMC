@@ -420,8 +420,12 @@ void Simulator::loadProject(ProjectSource& source) {
             const auto& values=candidate.runtime.at(event.pos).values;
             // 停摆区块里事件被放回当刻，而 bellWakeAt 保持冻结的结束时刻，两者可以不等；
             // 恢复后 finishBell 会按 bellWakeAt 重排，届时又必须相等。
-            const bool bellStalled=!candidate.chunkBlockTicking(event.pos);
-            if(!values.value("ringing",false) || (!bellStalled && values.at("bellWakeAt")!=event.tick) || values.at("bellGeneration")!=event.data || !queuedBells.insert(event.pos).second)throw std::invalid_argument("钟摆动与队列不一致");
+            // 两种合法的不相等：一是区块停摆，事件被放回当刻而 bellWakeAt 保持冻结的结束时刻；
+            // 二是区块刚恢复、shiftBlockEntityTimers 已把 bellWakeAt 后移而那个过期事件还没被
+            // finishBell 重排——此时事件在过去、结束时刻在现在或将来。其余不相等一律拒绝。
+            const bool bellPending=!candidate.chunkBlockTicking(event.pos)
+                || (event.tick<=candidate.currentTick && values.at("bellWakeAt").get<Tick>()>=candidate.currentTick);
+            if(!values.value("ringing",false) || (!bellPending && values.at("bellWakeAt")!=event.tick) || values.at("bellGeneration")!=event.data || !queuedBells.insert(event.pos).second)throw std::invalid_argument("钟摆动与队列不一致");
         }
         candidate.world.forEachCell([&](Cell cell) { if(registry[cell.state].device==Device::bell) {
             if(!candidate.entityOrders.contains(cell.pos))throw std::invalid_argument("钟缺少方块实体顺序");
