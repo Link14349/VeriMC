@@ -878,6 +878,28 @@ int main() {
         expect(s.inventoryJson({2, 0, 6}, false) == restored.inventoryJson({2, 0, 6}, false),
                "hopper cooldown differs after restoring a stalled checkpoint");
     });
+    test("实体接触按掉落物自己所在的区块判定，而不是漏斗所在的区块", [&] {
+        // 原版有两条吸取路径，判据不同：`suckInItems` 是漏斗自己的方块实体 tick，
+        // 用 AABB 查实体，**不关心物品所在区块**；`entityInside` 由掉落物自己的 tick 驱动，
+        // 判据是**物品所在区块**。要隔离后者，就得用上方的完整方块挡掉前者。
+        // 物品放在 x=-0.05：0.25 立方包围盒仍与漏斗那一格相交，
+        // 但 BlockPos.containing(-0.05) = -1，落在区块 (-1,0) 里。
+        Simulator s(r); floor(s, -20, 20);
+        const BlockPos hopper{0, 1, 0};
+        s.place(hopper, r.state("hopper", {{"facing", "down"}}));
+        s.place({0, 2, 0}, r.state("stone"));  // 挡掉 suckInItems，只剩 entityInside
+        s.stimulate(hopper, {{"groundItems", Json::array({{{"item", "minecraft:stone"}, {"count", 1}, {"x", -0.05}, {"y", 0.75}, {"z", 0.5}}})}});
+        expect(s.suckableItems(hopper).size() == 1, "the declared item was not inside the suck volume");
+        // 漏斗所在区块照常 entityTicking，只把**物品所在**的区块降到 blockTicking。
+        s.setChunkState(-1, 0, Simulator::ChunkState::blockTicking);
+        s.advanceTo(20);
+        expect(s.suckableItems(hopper).size() == 1 && s.inventoryJson(hopper, false).empty(),
+               "an item whose own chunk is not entity ticking was still picked up");
+        s.setChunkState(-1, 0, Simulator::ChunkState::entityTicking);
+        s.advanceTo(24);
+        expect(s.suckableItems(hopper).empty() && s.inventoryJson(hopper, false).size() == 1,
+               "the item was not picked up once its own chunk resumed entity ticking");
+    });
     test("唱片机、感测体与钟在停摆区块里也能存读，且钟的摆动计时同样冻结", [&] {
         // 停摆时 `stepEvent` 把最后一批事件放回**当前刻**并停下，随后空闲推进把 currentTick
         // 直接跳到目标刻，于是这些方块实体的 wakeAt 落在 currentTick 之前。漏斗的快照校验

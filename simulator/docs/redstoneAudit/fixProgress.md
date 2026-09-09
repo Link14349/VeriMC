@@ -283,7 +283,51 @@ R15 到此为**已排除**，不是假设。
 `REDSTONE_EXPERIMENTS` 从启用集合里减掉。
 目标固定为非实验红石，因此该分支在本兼容目标内**不可达**，缺少它不构成缺陷。
 
-### ☆R13 入队状态快照：未找到可达反例，保持假设
+### ☆R13 入队状态快照：**2026-09-09 已找到可达原版见证，内核不复现（开口缺陷）**
+
+下面「未找到可达反例」那段是**旧结论，已被推翻**，保留作为过程记录。
+新结果：见证在直线型铁轨的**自通知**路径上，不在比较器路径上。
+
+- 原版 `CollectingNeighborUpdater.runUpdates` 把 `addedThisLayer` 逆序压栈，
+  兄弟更新按**插入顺序**带整棵子树执行；因此只有**更早插入**的兄弟子树改掉目标，
+  Full 才会拿到过期快照。
+- 任务简报里那个「容器 → 比较器」构造**结构上不可达**：
+  `Level.java:1009/1014` 保证 Full 的目标是比较器，而 `DiodeBlock.java:73`
+  的 `if (level.getBlockState(pos).is(this))` 是**实时**守卫——
+  目标被换掉就是 no-op，实时读到空气也是 no-op，两种语义结果相同。
+- 可达的是 `BaseRailBlock.java:70-77`：Full 在 `updateDir`/`RailState.place()`
+  的整个级联**之后**才入队，而 `PoweredRailBlock.java:127-140` 把**整个快照**写回：
+  `level.setBlock(pos, state.setValue(POWERED, shouldPower), 3)`——
+  `isPowered` 取自快照，`shouldPower` 取自实时世界。
+
+**见证**：`captureFullUpdateSnapshot.py` → `java26_2FullUpdateSnapshot`，
+严格 vanilla-only、固定原点 `[64,-59,64]`。在红石块上放一条
+`powered_rail[shape=east_west]`，它自己的 `place()` 级联把相邻红石粉从 15 打到 0，
+由此触发的信号源更新翻转了一个三向普通铁轨路口，又把这条铁轨 `connectTo` 成 `east_west`；
+随后那条 Full 带着**过期的 `north_south` 快照**执行。轨迹里那条 `f` 记录的快照是
+`2200`（`powered=false, shape=north_south`），而同一瞬间世界里是 `2190`。
+原版最终停在 `shape=north_south, powered=true`——**快照被整个写回去了**。
+两个内置对照：`detector_rail` 同样出现快照错配但保持 `east_west`
+（它没有四参 `updateState` 覆写）；可弯折的 `rail` 根本不发这条 Full。
+
+**内核当前不复现**，`checkReference` 报
+`tick 4, [6,2,6], states: expected 2188 (north_south) / actual 2190 (east_west)`。
+本轮已把 `updateRail` 改成使用传入的快照（原版 `BaseRailBlock.neighborChanged(state,…)`
+全程用这个参数），50 个既有 fixture 逐条不变，**但这一步不足以让见证通过**：
+分叉点在快照的**捕获时机**或之后的覆写，尚未定位到。
+因此 `java26_2FullUpdateSnapshot` 目前是仓库里**唯一不 match** 的时间线 fixture，
+它是**已知缺陷的证据**，不是回归——**没有**注册进 `coreTests` 的差分列表，
+以免用一个必然失败的用例阻塞构建。
+
+普通 `rail` 分支（`rails.cpp` 的 `Device::rail`）有同样的快照缺口，
+但这个场景不隔离它；修复时需要第二个场景。
+
+补充：随机搜索（25 个随机电路 × 12 轮，含铁轨/活塞/红石粉）**零命中**——
+这个竞争不是模糊测试能撞上的。
+
+---
+
+### （旧结论，已被上面推翻）☆R13 入队状态快照：未找到可达反例，保持假设
 
 带状态的 `neighborChanged(BlockState, …)` 在 26.2 的调用点只有：
 `Level.updateNeighbourForOutputSignal`（比较器）、`BaseRailBlock.onPlace`、

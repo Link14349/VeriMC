@@ -140,9 +140,25 @@ blockTicking=true、entityTicking=false 的中间状态。21 帧 / 2 点，漏�
 热路径没有额外开销。卡住期间 `current` 存在而 `remaining==0`，运行快照的
 感测体一致性校验为这一种状态开了口子。
 
-**证据边界**：这一条目前只有核心单元回归（缺省行为不变、被挡住时不投递也不丢弃、
-停摆中存读往返、校准感测体走同一条路径），**还没有原版差分**。
-它要求区块边界落在已知的相对坐标上，只能走
-`captureChunkLifecycle.py` 那条按区块对齐原点的严格 vanilla-only 捕获，
-与本轮正在进行的其他捕获串行排队。在拿到差分之前，
-上面这段是**从原版源码推出的期望**，不是实测到的原版行为。
+**原版差分（已补上）**：`captureSensorEdgeChunks.py` 用严格 vanilla-only 服务器、
+按区块对齐原点捕获了三个场景，各 79 帧、11 个观测格：
+
+- `java26_2SensorEdgeChunks`（原点 `[16,-59,32]`）：监听者在**中间那个 level-32 区块**，
+  它自己 block ticking（原版自报 `shouldTickBlocksAt=true / isPositionEntityTicking=false`，
+  方块实体确实在跳），但 3×3 里有 level-33 区块。对照组感测体在 level-31 区块，
+  同样距离 4 的事件在第 10 刻投递、`power=8`；边缘组**连续 25 刻保持 inactive**，
+  票据在第 31 刻还回来后**当刻**就投递——没有重新计时，
+  说明 `currentVibration` 既没被清也没重新出发，确实是每刻在重试。
+  第 20 刻那个距离 2 的事件被整个丢弃（投递出来的仍是 `power=8` 而不是 12），
+  对应 `Listener.handleGameEvent` 在 `getCurrentVibration() != null` 时返回 false。
+- `java26_2SensorEdgeDiagonal`：只保留 (0,0)/(1,0)/(0,1) 的票据，
+  于是 **3×3 里唯一不是 block ticking 的就是对角那一个区块**，停摆行为完全相同。
+  这一条专门钉死对角项：只查四个正交邻居的实现会在这里投递，从而被抓住。
+- `java26_2SensorEdgeNegative`（原点 `[-64,-59,-80]`）：负区块下标下时序一致。
+
+三个场景 `checkReference` 全部 match，且**已注册进 `coreTests` 的差分列表**。
+仍属推理而非实测的只剩一条：`areAdjacentChunksTicking` 里
+`getChunkNow(x,z) == null` 那个分支在原版**不可达**
+（票据等级对切比雪夫距离是 1-Lipschitz，监听者自身区块必须 ≤32 才会跳方块实体，
+因此每个邻居必然 ≤33 = FULL），所以内核把它折叠成单个 `chunkBlockTicking`
+在该论证下等价——这一步没有实测支撑。
