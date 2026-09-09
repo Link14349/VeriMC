@@ -1,4 +1,5 @@
 #include "simulator/simulator.hpp"
+#include "simulator/referenceReplay.hpp"
 #include "simulator/legacyRandom.hpp"
 #include <iostream>
 #include <functional>
@@ -15,13 +16,6 @@ void tripwireLine(Simulator& s) {
     for (int x = 1; x < 6; ++x) s.place({x,1,0}, s.registry.state("tripwire"));
     s.advanceTo(20);
 }
-}
-simulator::Simulator::ChunkState parseChunkState(const std::string& name) {
-    if (name == "unloaded") return simulator::Simulator::ChunkState::unloaded;
-    if (name == "loaded") return simulator::Simulator::ChunkState::loaded;
-    if (name == "blockTicking") return simulator::Simulator::ChunkState::blockTicking;
-    if (name == "entityTicking") return simulator::Simulator::ChunkState::entityTicking;
-    throw std::invalid_argument("unknown chunk state " + name);
 }
 int main() {
     BlockRegistry r; int passed = 0, failed = 0;
@@ -201,97 +195,11 @@ int main() {
     });
     for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers", "java26_2Hoppers", "java26_2Torches", "java26_2Rails", "java26_2TickBatches", "java26_2Tripwire", "java26_2Buttons", "java26_2Droppers", "java26_2Targets", "java26_2CopperChests", "java26_2Bookshelves", "java26_2Pots", "java26_2Vibrations", "java26_2DeviceVibrations", "java26_2Notes", "java26_2Bells", "java26_2Jukeboxes", "java26_2JukeboxHoppers", "java26_2Composters", "java26_2WireGeometry", "java26_2PistonPushability", "java26_2DaylightVibration", "java26_2StairShapes", "java26_2RailNotificationSource", "java26_2PistonRemovalCallback", "java26_2DiodeSupportBreak", "java26_2ObserverRemoval", "java26_2PistonLandingShape", "java26_2WireShapeToggle", "java26_2RemovalNotifySource", "java26_2RepeaterLockRefresh", "java26_2ItemFrameComparator", "java26_2UpdateTrace", "java26_2MachineMatrix", "java26_2SupportDirection", "java26_2FenceGateInWall", "java26_2UpdateSource", "java26_2HopperPickup", "java26_2ChunkLifecycle", "java26_2ChunkLifecycleNegative", "java26_2ScheduledQueue", "java26_2RandomState", "java26_2BlockEntityOrder", "java26_2EntityContainers", "java26_2BlockTicking"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
         std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/../tests/fixtures/" + fixtureName + ".json"); expect(static_cast<bool>(file), "missing vanilla reference fixture");
-        auto fixture = Json::parse(file); auto origin = fixture["origin"].get<BlockPos>(); Simulator s(r);
-        const bool tracing = fixture.contains("updateTrace");
-        if (tracing) s.updateTraceLimit = fixture["updateTraceLimit"].get<std::size_t>();
-        auto absolute = [&](const Json& p) { auto pos = p.get<BlockPos>(); return BlockPos{origin.x + pos.x, origin.y + pos.y, origin.z + pos.z}; };
-        for (std::size_t frameIndex = 0; frameIndex < fixture["frames"].size(); ++frameIndex) {
-            const auto& frame = fixture["frames"][frameIndex];
-            Tick tick = frame["tick"];
-            if (fixture.contains("randomSeed") && tick == 0) s.setRandomSeed(fixture["randomSeed"].get<std::uint64_t>());
-            s.advanceTo(tick);
-            expect(s.currentTick == tick && !s.breakRequested && !s.hasPendingActions(), "reference replay did not complete observation tick");
-            s.markUpdateTrace(tick);
-            for (const auto& command : fixture["commands"]) if (command["tick"] == tick) {
-                auto p = absolute(command["pos"]);
-                if (command.contains("chunkState")) s.setChunkState(p.x >> 4, p.z >> 4, parseChunkState(command["chunkState"]));
-                else if (command.contains("chunkForced")) {}
-                else if (command.contains("placedBy") || command.contains("playerPlace")) s.place(p, command["stateId"]);
-                else if (command.contains("stateId")) s.setBlock(p, command["stateId"]);
-                else if (command.contains("interact")) {
-                    std::optional<Direction> facing;
-                    if (command.contains("playerFacing")) facing = parseDirection(command["playerFacing"]);
-                    if (fixture.value("lenientInteract", false)) { try { s.interact(p, facing); } catch (const std::invalid_argument&) {} }
-                    else s.interact(p, facing);
-                }
-                else s.stimulate(p, command["stimulus"]);
-            }
-            expect(!s.breakRequested && !s.hasPendingActions(), "reference replay requires explicit external-action feedback");
-            if (frame.contains("randomState"))
-                expect(static_cast<std::int64_t>(s.randomState()) == frame["randomState"].get<std::int64_t>(),
-                       "random source state differs at " + std::to_string(tick) + " expected " + frame["randomState"].dump()
-                       + " got " + std::to_string(s.randomState()));
-            if (frame.contains("blockEntityOrder")) {
-                Json actualOrder = s.blockEntityOrderJson();
-                for (auto& row : actualOrder) { row[0] = row[0].get<int>() - origin.x; row[1] = row[1].get<int>() - origin.y; row[2] = row[2].get<int>() - origin.z; }
-                expect(actualOrder == frame["blockEntityOrder"], "block entity order differs at " + std::to_string(tick)
-                    + " expected " + frame["blockEntityOrder"].dump() + " got " + actualOrder.dump());
-            }
-            if (frame.contains("blockTicks")) {
-                auto relative = [&](Json rows) {
-                    for (auto& row : rows) { row[0] = row[0].get<int>() - origin.x; row[1] = row[1].get<int>() - origin.y; row[2] = row[2].get<int>() - origin.z; }
-                    return rows;
-                };
-                expect(relative(s.pendingBlockTicksJson()) == frame["blockTicks"], "pending block ticks differ at " + std::to_string(tick)
-                    + " expected " + frame["blockTicks"].dump() + " got " + relative(s.pendingBlockTicksJson()).dump());
-                expect(relative(s.pendingBlockEventsJson()) == frame["blockEvents"], "pending block events differ at " + std::to_string(tick)
-                    + " expected " + frame["blockEvents"].dump() + " got " + relative(s.pendingBlockEventsJson()).dump());
-            }
-            for (std::size_t i = 0; i < fixture["watch"].size(); ++i) {
-                auto p = absolute(fixture["watch"][i]); auto expected = frame["states"][i].get<StateId>();
-                expect(s.world.get(p) == expected, "tick " + std::to_string(tick) + " position " + fixture["watch"][i].dump() + " expected " + r.describe(expected).dump() + " got " + r.describe(s.world.get(p)).dump());
-                if (frame["analogs"][i] != -1) expect(s.analogOutput(p) == frame["analogs"][i].get<int>(), "analog mismatch at " + std::to_string(tick) + " " + fixture["watch"][i].dump());
-                if(frame.contains("chunkStates") && frameIndex + 1 < fixture["frames"].size()) {
-                    // 区块状态是输入：本帧命令生效后的状态，对应原版下一帧报告的派生标志。
-                    const auto& expectedChunk = fixture["frames"][frameIndex + 1]["chunkStates"][i];
-                    Json actualChunk{{"blockTicking", s.chunkBlockTicking(p)}, {"entityTicking", s.chunkEntityTicking(p)}, {"loaded", s.chunkLoaded(p)}};
-                    expect(actualChunk==expectedChunk,"chunk state differs at "+std::to_string(tick)+" "+fixture["watch"][i].dump()+" expected "+expectedChunk.dump()+" got "+actualChunk.dump());
-                }
-                if(frame.contains("groundItems") && !frame["groundItems"][i].is_null())
-                    expect(s.suckableItems(p)==frame["groundItems"][i],"ground items differ at "+std::to_string(tick)+" "+fixture["watch"][i].dump()+" expected "+frame["groundItems"][i].dump()+" got "+s.suckableItems(p).dump());
-                // 容器实体按原版 getContainerAt 的查询顺序报告，顺序本身就是被比较的内容：
-                // getEntityContainer 正是拿 nextInt 去索引这张表。
-                if(frame.contains("containerEntities"))
-                    expect(s.containerEntitiesJson(p)==frame["containerEntities"][i],"container entities differ at "+std::to_string(tick)+" "+fixture["watch"][i].dump()+" expected "+frame["containerEntities"][i].dump()+" got "+s.containerEntitiesJson(p).dump());
-                if(frame.contains("bells"))expect(s.inspect(p)["runtime"].value("ringing",false)==frame["bells"][i].get<bool>(),"bell shaking differs at "+std::to_string(tick)+" "+fixture["watch"][i].dump());
-                if(frame.contains("jukeboxes") && !frame["jukeboxes"][i].is_null()) {
-                    auto player=s.inspect(p)["jukebox"];const auto& expectedPlayer=frame["jukeboxes"][i];
-                    expect(player["playing"]==expectedPlayer["playing"] && player["elapsed"]==expectedPlayer["elapsed"],"jukebox playback differs at "+std::to_string(tick)+" "+fixture["watch"][i].dump()+" expected "+expectedPlayer.dump()+" got "+player.dump());
-                }
-                if (frame.contains("inventories")) expect(s.inventoryJson(p, false) == frame["inventories"][i], "inventory mismatch at " + std::to_string(tick) + " " + fixture["watch"][i].dump() + " expected " + frame["inventories"][i].dump() + " got " + s.inventoryJson(p, false).dump());
-            }
-        }
-        if (tracing) {
-            // 截断的轨迹不得判为通过。
-            expect(!fixture.value("updateTraceTruncated", false) && !s.updateTraceTruncated, "update trace truncated");
-            Json actual = Json::array();
-            for (const auto& entry : s.updateTrace) {
-                if (!entry.is_array()) { actual.push_back(entry); continue; }
-                Json converted = entry;
-                const std::size_t groups = entry.at(0).get<std::string>() == "s" ? 2 : 1;
-                for (std::size_t group = 0; group < groups; ++group) {
-                    const std::size_t base = 1 + group * 3;
-                    converted[base] = entry[base].get<int>() - origin.x;
-                    converted[base + 1] = entry[base + 1].get<int>() - origin.y;
-                    converted[base + 2] = entry[base + 2].get<int>() - origin.z;
-                }
-                actual.push_back(std::move(converted));
-            }
-            const auto& expected = fixture["updateTrace"];
-            expect(actual.size() == expected.size(), "update trace length " + std::to_string(actual.size()) + " expected " + std::to_string(expected.size()));
-            for (std::size_t i = 0; i < std::min(actual.size(), expected.size()); ++i)
-                expect(actual[i] == expected[i], "update trace entry " + std::to_string(i) + " expected " + expected[i].dump() + " got " + actual[i].dump());
-        }
+        const auto fixture = Json::parse(file); Simulator s(r);
+        // 差分重放循环与 checkReference 工具共用 referenceReplay.hpp 里的同一份实现，
+        // 免得某个字段只在其中一条入口里被比较。
+        const auto outcome = replayReferenceFixture(s, fixture);
+        expect(outcome.at("status") == "match", "vanilla differential: " + outcome.dump());
     });
     test("all original compost probabilities and random insertion samples", [&] {
         std::ifstream file(std::string(SIMULATOR_DATA_DIR)+"/../tests/fixtures/java26_2Composting.json");auto fixture=Json::parse(file);
