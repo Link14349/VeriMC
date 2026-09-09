@@ -1,7 +1,8 @@
 # 器件层实体输入/输出协议
 
-2026-09-09 收尾补充：当前 `containerEntities` 只支持运输/漏斗矿车的被动库存。
-原版 `Container` 选择器也包含运输船/竹筏，尚未实现；漏斗矿车主动吸取也仍是缺口。
+2026-09-09 收尾补充：`containerEntities` 覆盖原版 `Container` 选择器的**全部**实体类型，
+即运输矿车、漏斗矿车与运输船/运输竹筏的被动库存；漏斗矿车主动吸取仍是缺口。
+运输船/竹筏那一支**尚无原版差分**——只有内核单元回归，需要一次新的捕获才算实测验证。
 新的严格 vanilla-only 实体容器复跑与检查器审计见 [layeredAudit.md](layeredAudit.md)。
 
 对应 issue #12 的第一条验收：**先定义器件层实体输入/输出协议及时间、坐标、库存和随机源语义**。
@@ -75,19 +76,49 @@
 体积内唯一的自由空间就在漏斗那一格里，而那里恰好由不受阻挡的 `entityInside` 路径接管。
 阻挡判据仍按原版实现，但本轮的固定场景**没有**构造出让它改变结果的历史。
 
-## 已实现：漏斗与容器实体（运输矿车 / 漏斗矿车）
+## 已实现：漏斗与容器实体（运输/漏斗矿车、运输船/运输竹筏）
 
-输入写在**矿车所在的那一格**上，可以是空气格：
+输入写在**实体所在的那一格**上，可以是空气格：
 
 ```json
 {"containerEntities": [{"type": "chest_minecart", "inventory": [{"slot": 0, "item": "minecraft:stone", "count": 6}]}]}
 ```
 
 一次刺激**整体替换**该格的容器实体列表，空数组表示全部移除（空气格上连器件数据行也一并删掉）；
-不能与其他刺激字段混用；最多 16 辆；只接受 `type` 与 `inventory` 两个字段。
-只有两种实体实现 `Container`：`chest_minecart`（27 槽）与 `hopper_minecart`（5 槽），
-其余类型一律拒绝。位置与运动**不建模**：矿车视作停在格中心，
+不能与其他刺激字段混用；最多 16 个；只接受 `type` 与 `inventory` 两个字段。
+
+`EntitySelector.CONTAINER_ENTITY_SELECTOR` 是 `entity instanceof Container && entity.isAlive()`
+（`net/minecraft/world/entity/EntitySelector.java:13`）。26.2 里满足它的实体只有两条继承线：
+
+| 继承线 | 类 | `getContainerSize()` | 注册 ID |
+|---|---|---|---|
+| `AbstractMinecartContainer implements ContainerEntity` | `MinecartChest` | 27 | `chest_minecart` |
+| 同上 | `MinecartHopper` | 5 | `hopper_minecart` |
+| `AbstractChestBoat implements ContainerEntity` | `ChestBoat` | 27 | `oak_/spruce_/birch_/jungle_/acacia_/dark_oak_/mangrove_/cherry_/pale_oak_chest_boat` |
+| 同上 | `ChestRaft` | 27 | `bamboo_chest_raft` |
+
+共 12 个注册 ID。`ContainerEntity extends Container`
+（`net/minecraft/world/entity/vehicle/ContainerEntity.java:32`）；
+`AbstractChestBoat.getContainerSize()` 在 `vehicle/boat/AbstractChestBoat.java:114` 返回 27，
+`ChestBoat` 与 `ChestRaft` 都**不**覆写它（两个子类只覆写 `rideHeight`）。
+木头种类各自是**独立的 `EntityType`**（`EntityTypeIds.java` 的 `*_CHEST_BOAT` / `BAMBOO_CHEST_RAFT`，
+注册见 `EntityTypes.java` 的 `chestBoatFactory` / `chestRaftFactory`），共用同一个 Java 类。
+
+不是候选的常见误判：`Player`（`Avatar implements ContainerUser`，`player/Player.java:126`）、
+`CopperGolem`（`ContainerUser`，`animal/golem/CopperGolem.java:58`）、
+`AbstractHorse` 及其 `AbstractChestedHorse`/`Donkey`/`Llama` 子类
+（只实现 `PlayerRideableJumping, HasCustomInventoryScreen, OwnableEntity`，
+`animal/equine/AbstractHorse.java:80`）——它们都**不**实现 `Container`。
+不带箱子的 `oak_boat` / `bamboo_raft` 同理。其余类型一律拒绝。
+
+位置与运动**不建模**：矿车与船一律视作停在格中心，
 `getEntityContainer` 那个 1×1×1 判据在这个约定下恒为真。
+船的浮力、水面行为、乘骑、划桨与撞碎同样**完全不建模**——
+「支持运输船」指的只是「它是 `getContainerAt` 的一个候选容器」这一件事。
+
+**运输船/竹筏这一支尚无原版差分。** 既有的 `java26_2EntityContainers` 捕获里只出现矿车；
+船的分支目前只有内核单元回归（含与矿车逐刻对比的一致性用例），
+需要一次新的捕获才算实测验证。
 
 原版 `HopperBlockEntity.getContainerAt` 的查询顺序被逐条复现：
 
@@ -95,16 +126,17 @@
    同一格里即使停着装满的矿车也完全看不见。
 2. 没有方块容器才查 `getEntityContainer`，它收集该格所有 `Container && isAlive` 的实体，
    然后 `nextInt(size)` 选一个。**候选非空就一定抽一次**，与本次是否真的搬动无关。
-3. 选中之后就只跟这一辆打交道，搬不动也**不会**退回去吸掉落物
-   （原版 `container != null` 分支直接 `return false`）。因此一辆**空**矿车照样能把
-   底下够得着的掉落物完全挡住。
+3. 选中之后就只跟这一个打交道，搬不动也**不会**退回去吸掉落物
+   （原版 `container != null` 分支直接 `return false`）。因此一辆**空**矿车（或一条空船）
+   照样能把底下够得着的掉落物完全挡住。
 
-矿车不是方块实体：`AbstractMinecartContainer.setChanged` 不发比较器通知，
-所以写入矿车库存**不**触发比较器更新。矿车也不是 `WorldlyContainer`，
-没有 `canPlaceItem`/`canTakeItem` 覆写，分面限制对它不适用。
+矿车与船都不是方块实体：`AbstractMinecartContainer.setChanged`（`:66`）与
+`AbstractChestBoat.setChanged`（`:144`）都是**空实现**，所以写入它们的库存
+**不**触发比较器更新。两者也都不是 `WorldlyContainer`，
+没有 `canPlaceItem`/`canTakeItem` 覆写，分面限制对它们不适用。
 
 **空转也要抽**。原版 `tryMoveItems` 搬不动东西时**不设冷却**，下一刻整套重跑一遍；
-只要那一格有矿车，`getEntityContainer` 就每刻消耗一次 `nextInt`，一件都没搬动也照抽。
+只要那一格有容器实体，`getEntityContainer` 就每刻消耗一次 `nextInt`，一件都没搬动也照抽。
 内核原本在空转一刻后就让漏斗休眠（对方块容器是等价的，因为那条路径不消耗随机），
 容器实体把这个惰性排程变成了可观测量，现已按原版逐刻重试。
 搬成功之后的 8 gt 冷却期间原版走不到 `getEntityContainer`，因此冷却里**不**抽。
@@ -128,9 +160,14 @@
    放在矿车正上方时 12 刻内一件没少。全程随机源一步没动——矿车这一侧命中的是
    `getBlockContainer`，根本走不到 `getEntityContainer`。
    这条路径**完全没有建模**，内核不会掏空方块漏斗。本轮 fixture 全部刻意绕开。
-4. **矿车的运动与轨道交互**。矿车停在格中心是**输入约定**，不是推导结果；
-   推动、加速、脱轨、跨格移动都不在模型内。多辆矿车的**顺序**同样是显式输入
+4. **矿车/船的运动与轨道、水面交互**。停在格中心是**输入约定**，不是推导结果；
+   推动、加速、脱轨、跨格移动、浮力、划桨、乘骑、撞碎都不在模型内。
+   多个容器实体的**顺序**同样是显式输入
    （原版顺序来自实体分区的插入顺序），只在被实测覆盖的配置上得到验证。
+6. **运输船/运输竹筏尚无原版差分**。类型集合、槽位数与拒绝路径按 26.2 反编译源码实现，
+   漏斗侧走的是与矿车**完全同一条**代码路径，并有「混放时逐刻与两辆矿车对照」的单元回归；
+   但**没有**任何一帧原版观测覆盖过船。需要一个新的 `captureEntityContainers` 变体
+   （至少覆盖：单船候选的 `nextInt(1)`、船与矿车混放的选择序列、装满 27 槽的船挡住推入时的逐刻空转）。
 5. **包围盒上探 0.2 格——已实测到分叉**。矿车在格中心时包围盒是
    y ∈ `[cellY+0.5, cellY+1.2]`，会探进上面一格，于是**上面那一格**的
    `getContainerAt` 查询也能命中它。探针实测：原版在矿车正上方那一格报告有一辆
@@ -156,6 +193,15 @@
 证明它一直可达）、两辆矿车时 `nextInt(2)` 的选择序列，
 以及**稳态空转**：拉取侧上方一辆空运输矿车、推出侧对着一辆五槽全满的漏斗矿车。
 各场景的抽取刻互不重叠，因此结论不依赖刻内的方块实体顺序。
+**这个捕获里只有矿车，一条船都没有。**
+
+运输船/运输竹筏目前**只有 `coreTests.cpp` 的单元回归**
+（用例 `chest boats and rafts are container entities too`）：
+12 个注册 ID 的槽位数边界（最后一格接受、再往后一格拒绝）、非容器实体（普通船/竹筏、驴、骡、
+羊驼、玩家、铜傀儡、普通矿车、类名而非注册 ID）的拒绝、快照往返与破坏后的拒绝、
+从运输船拉取、向运输竹筏推入、装满 27 槽的船挡住推入时逐刻仍抽，
+以及「船+矿车混放 40 刻的随机源与库存逐刻等于两辆矿车」的一致性对照。
+这些都是**内核内部一致性**，不是原版实测。
 
 全程共 41 次抽取，逐帧的 48 位状态可以反推出每刻的抽取次数，
 「空转也要抽」与「冷却期间不抽」都是**直接读出来的**，不是推断：

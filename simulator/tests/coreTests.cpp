@@ -1120,7 +1120,7 @@ int main() {
             {"acacia_chest_boat", 27}, {"dark_oak_chest_boat", 27}, {"mangrove_chest_boat", 27},
             {"cherry_chest_boat", 27}, {"pale_oak_chest_boat", 27}, {"bamboo_chest_raft", 27}};
         for (const auto& [type, size] : sizes) {
-            s.stimulate(cell, declares(type, size - 1));
+            expect(!rejects(cell, declares(type, size - 1)), type + " rejected its own last slot " + std::to_string(size - 1));
             expect(s.containerEntitiesJson(cell).at(0).at("inventory") == Json::array({stone(size - 1, 1)}),
                    type + " lost its last slot");
             expect(rejects(cell, declares(type, size)), type + " accepted a slot past " + std::to_string(size - 1));
