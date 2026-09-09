@@ -276,6 +276,13 @@ void Simulator::hopperEntityContact(BlockPos pos) {
         if (registry.property(world.get(pos), "enabled") != "true") break;
         const Json entry = runtime.at(pos).values.at("groundItems").at(index);
         if (!itemInsideHopperBlock(pos, entry) || !itemInSuckRange(pos, entry)) continue;
+        // 原版 entityInside 是由掉落物**自己**的 tick 驱动的，因此判据是**物品所在区块**
+        // 是否 entity ticking，而不是漏斗所在区块。声明的坐标允许落到相邻区块里，
+        // 两个区块状态不同时这个区别就是可观测的。
+        const BlockPos itemCell{static_cast<int>(std::floor(pos.x + entry.value("x", 0.5))),
+                                static_cast<int>(std::floor(pos.y + entry.value("y", 1.0))),
+                                static_cast<int>(std::floor(pos.z + entry.value("z", 0.5)))};
+        if (!chunkEntityTicking(itemCell)) continue;
         bool changed = false;
         if (!inventoryEmpty(pos)) changed = hopperEject(pos);
         if (!inventoryFull(pos)) {

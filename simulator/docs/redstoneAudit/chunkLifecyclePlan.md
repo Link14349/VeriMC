@@ -34,8 +34,22 @@
      触发时刻与插入序号保持不变（与 `sortContainersToTick` 一致）；
    - 方块事件（阶段 1）在区块不可 blockTicking 时**改排到下一刻**；
    - 方块实体（阶段 2）要求 `blockTicking`；实体接触（阶段 3）要求 `entityTicking`，否则顺延；
-     原版 `LevelChunk.isTicking` 还要求实体数据已加载，当前显式状态输入假定该条件已满足，
-     不模拟实体数据异步加载窗口。之前把阶段 2 也要求 entityTicking 是错误的；
+     之前把阶段 2 也要求 entityTicking 是错误的。
+     **这里有一处必须写清的近似**：原版方块实体跳动是**两层与门**——
+     `Level.tickBlockEntities`（`Level.java:548`）先查 `shouldTickBlocksAt`（纯票据等级），
+     `LevelChunk.isTicking`（`LevelChunk.java:413-416`）再查
+     `getFullStatus() >= BLOCK_TICKING && areEntitiesLoaded`。
+     内核只有 `chunkBlockTicking` **一个布尔**：两个票据条件本来就同源，
+     真正被折叠掉的是 `areEntitiesLoaded`，当前显式状态输入**假定它恒为真**，
+     不模拟实体数据异步加载窗口。方向上内核偏宽不偏严（不会少跑），
+     但**不能说它与 `LevelChunk.isTicking` 等价**。
+     捕获侧记录的也是 `shouldTickBlocksAt`（`CaptureRedstone.java`），
+     因此现有 fixture **无法证伪**这一折叠——它只能说明内核与捕获用的是同一个近似；
+   - 阶段 3 的判据对象是**掉落物自己所在的区块**，不是漏斗所在区块
+     （原版 `entityInside` 由实体自己的 tick 驱动）。声明的坐标允许落到相邻区块，
+     两个区块状态不同时该区别可观测。**已实现的方向**：物品所在区块不 entityTicking 时跳过。
+     **仍未建模的方向**：漏斗所在区块不 entityTicking 而物品所在区块 ticking 时，
+     原版仍会触发 `entityInside`，内核不会——阶段 3 事件目前挂在漏斗那一格上；
    - `updateComparatorNeighbors` 对 `unloaded` 位置跳过（对应 `hasChunkAt`）；
    - 写入 `unloaded` 区块直接报错，不静默成功。
 3. **倒计时冻结**。原版里方块实体的冷却是每次 tick 递减一次，区块不 tick 就不递减。
