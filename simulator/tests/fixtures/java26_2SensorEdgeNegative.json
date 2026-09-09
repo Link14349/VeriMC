@@ -1,0 +1,8298 @@
+{
+  "endTick": 78,
+  "commands": [
+    {
+      "tick": 0,
+      "pos": [
+        24,
+        0,
+        24
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        25,
+        0,
+        24
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        8,
+        0,
+        8
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        9,
+        0,
+        8
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        24,
+        1,
+        24
+      ],
+      "stateId": 27164
+    },
+    {
+      "tick": 0,
+      "pos": [
+        8,
+        1,
+        8
+      ],
+      "stateId": 27164
+    },
+    {
+      "tick": 0,
+      "pos": [
+        25,
+        1,
+        24
+      ],
+      "stateId": 9480
+    },
+    {
+      "tick": 0,
+      "pos": [
+        9,
+        1,
+        8
+      ],
+      "stateId": 9480
+    },
+    {
+      "tick": 2,
+      "pos": [
+        24,
+        1,
+        8
+      ],
+      "chunkForced": false
+    },
+    {
+      "tick": 2,
+      "pos": [
+        8,
+        1,
+        24
+      ],
+      "chunkForced": false
+    },
+    {
+      "tick": 2,
+      "pos": [
+        24,
+        1,
+        24
+      ],
+      "chunkForced": false
+    },
+    {
+      "tick": 2,
+      "pos": [
+        40,
+        1,
+        8
+      ],
+      "chunkForced": false
+    },
+    {
+      "tick": 2,
+      "pos": [
+        40,
+        1,
+        24
+      ],
+      "chunkForced": false
+    },
+    {
+      "tick": 2,
+      "pos": [
+        40,
+        1,
+        40
+      ],
+      "chunkForced": false
+    },
+    {
+      "tick": 2,
+      "pos": [
+        24,
+        1,
+        40
+      ],
+      "chunkForced": false
+    },
+    {
+      "tick": 2,
+      "pos": [
+        8,
+        1,
+        40
+      ],
+      "chunkForced": false
+    },
+    {
+      "tick": 2,
+      "pos": [
+        24,
+        1,
+        8
+      ],
+      "chunkState": "blockTicking"
+    },
+    {
+      "tick": 2,
+      "pos": [
+        8,
+        1,
+        24
+      ],
+      "chunkState": "blockTicking"
+    },
+    {
+      "tick": 2,
+      "pos": [
+        24,
+        1,
+        24
+      ],
+      "chunkState": "blockTicking"
+    },
+    {
+      "tick": 2,
+      "pos": [
+        40,
+        1,
+        8
+      ],
+      "chunkState": "loaded"
+    },
+    {
+      "tick": 2,
+      "pos": [
+        40,
+        1,
+        24
+      ],
+      "chunkState": "loaded"
+    },
+    {
+      "tick": 2,
+      "pos": [
+        40,
+        1,
+        40
+      ],
+      "chunkState": "loaded"
+    },
+    {
+      "tick": 2,
+      "pos": [
+        24,
+        1,
+        40
+      ],
+      "chunkState": "loaded"
+    },
+    {
+      "tick": 2,
+      "pos": [
+        8,
+        1,
+        40
+      ],
+      "chunkState": "loaded"
+    },
+    {
+      "tick": 6,
+      "pos": [
+        20,
+        1,
+        24
+      ],
+      "stimulus": {
+        "gameEvent": "minecraft:block_place"
+      }
+    },
+    {
+      "tick": 6,
+      "pos": [
+        4,
+        1,
+        8
+      ],
+      "stimulus": {
+        "gameEvent": "minecraft:block_place"
+      }
+    },
+    {
+      "tick": 20,
+      "pos": [
+        22,
+        1,
+        24
+      ],
+      "stimulus": {
+        "gameEvent": "minecraft:block_place"
+      }
+    },
+    {
+      "tick": 30,
+      "pos": [
+        24,
+        1,
+        8
+      ],
+      "chunkForced": true
+    },
+    {
+      "tick": 30,
+      "pos": [
+        8,
+        1,
+        24
+      ],
+      "chunkForced": true
+    },
+    {
+      "tick": 30,
+      "pos": [
+        24,
+        1,
+        24
+      ],
+      "chunkForced": true
+    },
+    {
+      "tick": 30,
+      "pos": [
+        40,
+        1,
+        8
+      ],
+      "chunkForced": true
+    },
+    {
+      "tick": 30,
+      "pos": [
+        40,
+        1,
+        24
+      ],
+      "chunkForced": true
+    },
+    {
+      "tick": 30,
+      "pos": [
+        40,
+        1,
+        40
+      ],
+      "chunkForced": true
+    },
+    {
+      "tick": 30,
+      "pos": [
+        24,
+        1,
+        40
+      ],
+      "chunkForced": true
+    },
+    {
+      "tick": 30,
+      "pos": [
+        8,
+        1,
+        40
+      ],
+      "chunkForced": true
+    },
+    {
+      "tick": 30,
+      "pos": [
+        24,
+        1,
+        8
+      ],
+      "chunkState": "entityTicking"
+    },
+    {
+      "tick": 30,
+      "pos": [
+        8,
+        1,
+        24
+      ],
+      "chunkState": "entityTicking"
+    },
+    {
+      "tick": 30,
+      "pos": [
+        24,
+        1,
+        24
+      ],
+      "chunkState": "entityTicking"
+    },
+    {
+      "tick": 30,
+      "pos": [
+        40,
+        1,
+        8
+      ],
+      "chunkState": "entityTicking"
+    },
+    {
+      "tick": 30,
+      "pos": [
+        40,
+        1,
+        24
+      ],
+      "chunkState": "entityTicking"
+    },
+    {
+      "tick": 30,
+      "pos": [
+        40,
+        1,
+        40
+      ],
+      "chunkState": "entityTicking"
+    },
+    {
+      "tick": 30,
+      "pos": [
+        24,
+        1,
+        40
+      ],
+      "chunkState": "entityTicking"
+    },
+    {
+      "tick": 30,
+      "pos": [
+        8,
+        1,
+        40
+      ],
+      "chunkState": "entityTicking"
+    }
+  ],
+  "watch": [
+    [
+      8,
+      1,
+      8
+    ],
+    [
+      9,
+      1,
+      8
+    ],
+    [
+      24,
+      1,
+      24
+    ],
+    [
+      25,
+      1,
+      24
+    ],
+    [
+      24,
+      1,
+      8
+    ],
+    [
+      8,
+      1,
+      24
+    ],
+    [
+      40,
+      1,
+      8
+    ],
+    [
+      40,
+      1,
+      24
+    ],
+    [
+      40,
+      1,
+      40
+    ],
+    [
+      24,
+      1,
+      40
+    ],
+    [
+      8,
+      1,
+      40
+    ]
+  ],
+  "watchChunkState": true,
+  "requiresAlignedOrigin": true,
+  "reference": "Minecraft Java 26.2 strict vanilla-only dedicated server, nonexperimental redstone",
+  "referenceEnvironment": {
+    "javaVersion": "25.0.4.1",
+    "randomTickSpeed": 0,
+    "featureFlags": [
+      "minecraft:vanilla"
+    ],
+    "dataPacks": [
+      "vanilla"
+    ],
+    "gameTime": 22,
+    "clockTicks": 22
+  },
+  "origin": [
+    -64,
+    -59,
+    -80
+  ],
+  "frames": [
+    {
+      "tick": 0,
+      "states": [
+        27164,
+        9480,
+        27164,
+        9480,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        0,
+        -1,
+        0,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 1,
+      "states": [
+        27164,
+        9480,
+        27164,
+        9480,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        0,
+        -1,
+        0,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 2,
+      "states": [
+        27164,
+        9480,
+        27164,
+        9480,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        0,
+        -1,
+        0,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 3,
+      "states": [
+        27164,
+        9480,
+        27164,
+        9480,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        0,
+        -1,
+        0,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 4,
+      "states": [
+        27164,
+        9480,
+        27164,
+        9480,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        0,
+        -1,
+        0,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 5,
+      "states": [
+        27164,
+        9480,
+        27164,
+        9480,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        0,
+        -1,
+        0,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 6,
+      "states": [
+        27164,
+        9480,
+        27164,
+        9480,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        0,
+        -1,
+        0,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 7,
+      "states": [
+        27164,
+        9480,
+        27164,
+        9480,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        0,
+        -1,
+        0,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 8,
+      "states": [
+        27164,
+        9480,
+        27164,
+        9480,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        0,
+        -1,
+        0,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 9,
+      "states": [
+        27164,
+        9480,
+        27164,
+        9480,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        0,
+        -1,
+        0,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 10,
+      "states": [
+        27214,
+        9479,
+        27164,
+        9480,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        13,
+        -1,
+        0,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 11,
+      "states": [
+        27214,
+        9479,
+        27164,
+        9480,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        13,
+        -1,
+        0,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 12,
+      "states": [
+        27214,
+        9479,
+        27164,
+        9480,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        13,
+        -1,
+        0,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 13,
+      "states": [
+        27214,
+        9479,
+        27164,
+        9480,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        13,
+        -1,
+        0,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 14,
+      "states": [
+        27214,
+        9479,
+        27164,
+        9480,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        13,
+        -1,
+        0,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 15,
+      "states": [
+        27214,
+        9479,
+        27164,
+        9480,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        13,
+        -1,
+        0,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 16,
+      "states": [
+        27214,
+        9479,
+        27164,
+        9480,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        13,
+        -1,
+        0,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 17,
+      "states": [
+        27214,
+        9479,
+        27164,
+        9480,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        13,
+        -1,
+        0,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 18,
+      "states": [
+        27214,
+        9479,
+        27164,
+        9480,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        13,
+        -1,
+        0,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 19,
+      "states": [
+        27214,
+        9479,
+        27164,
+        9480,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        13,
+        -1,
+        0,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 20,
+      "states": [
+        27214,
+        9479,
+        27164,
+        9480,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        13,
+        -1,
+        0,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 21,
+      "states": [
+        27214,
+        9479,
+        27164,
+        9480,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        13,
+        -1,
+        0,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 22,
+      "states": [
+        27214,
+        9479,
+        27164,
+        9480,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        13,
+        -1,
+        0,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 23,
+      "states": [
+        27214,
+        9479,
+        27164,
+        9480,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        13,
+        -1,
+        0,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 24,
+      "states": [
+        27214,
+        9479,
+        27164,
+        9480,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        13,
+        -1,
+        0,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 25,
+      "states": [
+        27214,
+        9479,
+        27164,
+        9480,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        13,
+        -1,
+        0,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 26,
+      "states": [
+        27214,
+        9479,
+        27164,
+        9480,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        13,
+        -1,
+        0,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 27,
+      "states": [
+        27214,
+        9479,
+        27164,
+        9480,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        13,
+        -1,
+        0,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 28,
+      "states": [
+        27214,
+        9479,
+        27164,
+        9480,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        13,
+        -1,
+        0,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 29,
+      "states": [
+        27214,
+        9479,
+        27164,
+        9480,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        13,
+        -1,
+        0,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 30,
+      "states": [
+        27214,
+        9479,
+        27164,
+        9480,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        13,
+        -1,
+        0,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 31,
+      "states": [
+        27214,
+        9479,
+        27214,
+        9479,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        13,
+        -1,
+        13,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 32,
+      "states": [
+        27214,
+        9479,
+        27214,
+        9479,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        13,
+        -1,
+        13,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 33,
+      "states": [
+        27214,
+        9479,
+        27214,
+        9479,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        13,
+        -1,
+        13,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 34,
+      "states": [
+        27214,
+        9479,
+        27214,
+        9479,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        13,
+        -1,
+        13,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 35,
+      "states": [
+        27214,
+        9479,
+        27214,
+        9479,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        13,
+        -1,
+        13,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 36,
+      "states": [
+        27214,
+        9479,
+        27214,
+        9479,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        13,
+        -1,
+        13,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 37,
+      "states": [
+        27214,
+        9479,
+        27214,
+        9479,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        13,
+        -1,
+        13,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 38,
+      "states": [
+        27214,
+        9479,
+        27214,
+        9479,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        13,
+        -1,
+        13,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 39,
+      "states": [
+        27214,
+        9479,
+        27214,
+        9479,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        13,
+        -1,
+        13,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 40,
+      "states": [
+        27168,
+        9479,
+        27214,
+        9479,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        0,
+        -1,
+        13,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 41,
+      "states": [
+        27168,
+        9479,
+        27214,
+        9479,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        0,
+        -1,
+        13,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 42,
+      "states": [
+        27168,
+        9479,
+        27214,
+        9479,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        0,
+        -1,
+        13,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 43,
+      "states": [
+        27168,
+        9479,
+        27214,
+        9479,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        0,
+        -1,
+        13,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 44,
+      "states": [
+        27168,
+        9480,
+        27214,
+        9479,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        0,
+        -1,
+        13,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 45,
+      "states": [
+        27168,
+        9480,
+        27214,
+        9479,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        0,
+        -1,
+        13,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 46,
+      "states": [
+        27168,
+        9480,
+        27214,
+        9479,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        0,
+        -1,
+        13,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 47,
+      "states": [
+        27168,
+        9480,
+        27214,
+        9479,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        0,
+        -1,
+        13,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 48,
+      "states": [
+        27168,
+        9480,
+        27214,
+        9479,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        0,
+        -1,
+        13,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 49,
+      "states": [
+        27168,
+        9480,
+        27214,
+        9479,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        0,
+        -1,
+        13,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 50,
+      "states": [
+        27164,
+        9480,
+        27214,
+        9479,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        0,
+        -1,
+        13,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 51,
+      "states": [
+        27164,
+        9480,
+        27214,
+        9479,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        0,
+        -1,
+        13,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 52,
+      "states": [
+        27164,
+        9480,
+        27214,
+        9479,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        0,
+        -1,
+        13,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 53,
+      "states": [
+        27164,
+        9480,
+        27214,
+        9479,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        0,
+        -1,
+        13,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 54,
+      "states": [
+        27164,
+        9480,
+        27214,
+        9479,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        0,
+        -1,
+        13,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 55,
+      "states": [
+        27164,
+        9480,
+        27214,
+        9479,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        0,
+        -1,
+        13,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 56,
+      "states": [
+        27164,
+        9480,
+        27214,
+        9479,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        0,
+        -1,
+        13,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 57,
+      "states": [
+        27164,
+        9480,
+        27214,
+        9479,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        0,
+        -1,
+        13,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 58,
+      "states": [
+        27164,
+        9480,
+        27214,
+        9479,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        0,
+        -1,
+        13,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 59,
+      "states": [
+        27164,
+        9480,
+        27214,
+        9479,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        0,
+        -1,
+        13,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 60,
+      "states": [
+        27164,
+        9480,
+        27214,
+        9479,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        0,
+        -1,
+        13,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 61,
+      "states": [
+        27164,
+        9480,
+        27168,
+        9479,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        0,
+        -1,
+        0,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 62,
+      "states": [
+        27164,
+        9480,
+        27168,
+        9479,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        0,
+        -1,
+        0,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 63,
+      "states": [
+        27164,
+        9480,
+        27168,
+        9479,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        0,
+        -1,
+        0,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 64,
+      "states": [
+        27164,
+        9480,
+        27168,
+        9479,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        0,
+        -1,
+        0,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 65,
+      "states": [
+        27164,
+        9480,
+        27168,
+        9480,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        0,
+        -1,
+        0,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 66,
+      "states": [
+        27164,
+        9480,
+        27168,
+        9480,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        0,
+        -1,
+        0,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 67,
+      "states": [
+        27164,
+        9480,
+        27168,
+        9480,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        0,
+        -1,
+        0,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 68,
+      "states": [
+        27164,
+        9480,
+        27168,
+        9480,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        0,
+        -1,
+        0,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 69,
+      "states": [
+        27164,
+        9480,
+        27168,
+        9480,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        0,
+        -1,
+        0,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 70,
+      "states": [
+        27164,
+        9480,
+        27168,
+        9480,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        0,
+        -1,
+        0,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 71,
+      "states": [
+        27164,
+        9480,
+        27164,
+        9480,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        0,
+        -1,
+        0,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 72,
+      "states": [
+        27164,
+        9480,
+        27164,
+        9480,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        0,
+        -1,
+        0,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 73,
+      "states": [
+        27164,
+        9480,
+        27164,
+        9480,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        0,
+        -1,
+        0,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 74,
+      "states": [
+        27164,
+        9480,
+        27164,
+        9480,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        0,
+        -1,
+        0,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 75,
+      "states": [
+        27164,
+        9480,
+        27164,
+        9480,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        0,
+        -1,
+        0,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 76,
+      "states": [
+        27164,
+        9480,
+        27164,
+        9480,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        0,
+        -1,
+        0,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 77,
+      "states": [
+        27164,
+        9480,
+        27164,
+        9480,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        0,
+        -1,
+        0,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 78,
+      "states": [
+        27164,
+        9480,
+        27164,
+        9480,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "analogs": [
+        0,
+        -1,
+        0,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    }
+  ]
+}
