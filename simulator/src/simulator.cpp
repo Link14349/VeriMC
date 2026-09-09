@@ -82,7 +82,7 @@ void Simulator::setChunkState(int chunkX, int chunkZ, ChunkState state, std::opt
     if (faulted) throw std::runtime_error("当前执行已中止，请从有效快照恢复");
     const BlockPos chunk{chunkX, 0, chunkZ};
     auto previous = chunkStates;
-    const bool wasTicking = chunkState({chunkX * 16, 0, chunkZ * 16}) == ChunkState::entityTicking;
+    const bool wasTicking = chunkBlockTicking({chunkX * 16, 0, chunkZ * 16});
     const Tick previousStall = wasTicking ? currentTick : previous.at(chunk).stalledSince;
     if (state == ChunkState::entityTicking && !stalledSince) chunkStates.erase(chunk);
     else chunkStates[chunk] = {state, stalledSince.value_or(wasTicking ? currentTick : previousStall)};
@@ -104,7 +104,7 @@ void Simulator::setChunkState(int chunkX, int chunkZ, ChunkState state, std::opt
     // 恢复执行时，把停摆期间本该递减却没有递减的倒计时整体后移，等价于原版
     // 「区块不 ticking 时方块实体根本不 tick」。方块计划刻不移动：原版保留原触发时刻，
     // 恢复后把过期的一并执行。
-    if (!wasTicking && state == ChunkState::entityTicking && !stalledSince && currentTick > previousStall)
+    if (!wasTicking && state >= ChunkState::blockTicking && !stalledSince && currentTick > previousStall)
         shiftBlockEntityTimers(chunk, currentTick - previousStall);
     ++revision;
 }
@@ -124,7 +124,7 @@ bool Simulator::runnable() const {
     while (!queue.empty()) {
         const auto event = queue.top(); queue.pop();
         if (!scheduledKeys.contains({event.pos, event.type, event.phase, event.data})) continue;
-        const bool needsEntities = event.phase == 2 || event.phase == 3;
+        const bool needsEntities = event.phase == 3;
         if (event.phase == 0 || (needsEntities ? chunkEntityTicking(event.pos) : chunkBlockTicking(event.pos))) return true;
     }
     return false;
@@ -772,7 +772,9 @@ bool Simulator::stepEvent() {
     // 原版 runBlockEvents 在区块不可 ticking 时把方块事件**改排到下一刻**而不是丢弃；
     // 方块实体与实体阶段则等区块恢复后照常执行。两者都不是「丢事件继续」。
     if (!chunkStates.empty() && event.phase != 0) {
-        const bool needsEntities = event.phase == 2 || event.phase == 3;
+        // LevelChunk.isTicking: BLOCK_TICKING + 已加载实体数据即可执行方块实体。
+        // 显式区块输入假定实体数据已加载；只有实体接触阶段要求 ENTITY_TICKING。
+        const bool needsEntities = event.phase == 3;
         if (needsEntities ? !chunkEntityTicking(event.pos) : !chunkBlockTicking(event.pos)) {
             // 还有别的事件可跑时逐刻顺延，对应原版 runBlockEvents 的重排；
             // 剩下的全都停摆时就放回**当前刻**并停下，避免逐刻空转，

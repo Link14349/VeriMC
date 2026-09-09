@@ -1,0 +1,758 @@
+[
+  {
+    "fixture": "java26_2Bells.json",
+    "sha256": "8aca4041b9db727583a43826829baca047f4f5e2c3d7e5c951abecbe9ca8bd81",
+    "exitCode": 0,
+    "result": {
+      "fixture": "/mnt/f/\u5b66\u4e60\u548c\u7814\u7a76/VeriMC/simulator/tests/fixtures/java26_2Bells.json",
+      "frames": 123,
+      "origin": [
+        -14049326,
+        -58,
+        -10596872
+      ],
+      "status": "match",
+      "watch": 34
+    }
+  },
+  {
+    "fixture": "java26_2BlockEntityOrder.json",
+    "sha256": "e502dfab300292b262bd397467f8c91e7572b5c9e37567a90a83f641148c08b1",
+    "exitCode": 0,
+    "result": {
+      "fixture": "/mnt/f/\u5b66\u4e60\u548c\u7814\u7a76/VeriMC/simulator/tests/fixtures/java26_2BlockEntityOrder.json",
+      "frames": 19,
+      "origin": [
+        -7210920,
+        -58,
+        12108403
+      ],
+      "status": "match",
+      "watch": 9
+    }
+  },
+  {
+    "fixture": "java26_2BlockTicking.json",
+    "sha256": "0b47f4ef0c6beb3e292425be111c9d071599c432412b80384ad384712605e3eb",
+    "exitCode": 0,
+    "result": {
+      "fixture": "/mnt/f/\u5b66\u4e60\u548c\u7814\u7a76/VeriMC/simulator/tests/fixtures/java26_2BlockTicking.json",
+      "frames": 21,
+      "origin": [
+        16,
+        -59,
+        32
+      ],
+      "status": "match",
+      "watch": 2
+    }
+  },
+  {
+    "fixture": "java26_2Bookshelves.json",
+    "sha256": "96feae8403f43c44183588cefc6161589a380c12d747d1de90527907cb9b5d3f",
+    "exitCode": 0,
+    "result": {
+      "fixture": "/mnt/f/\u5b66\u4e60\u548c\u7814\u7a76/VeriMC/simulator/tests/fixtures/java26_2Bookshelves.json",
+      "frames": 57,
+      "origin": [
+        3983569,
+        -58,
+        4279358
+      ],
+      "status": "match",
+      "watch": 11
+    }
+  },
+  {
+    "fixture": "java26_2Buttons.json",
+    "sha256": "a86fc3fdbfe0b706785e8b71c26ed501d24bddc0a8364bc0acf780fc0a1c27c7",
+    "exitCode": 0,
+    "result": {
+      "fixture": "/mnt/f/\u5b66\u4e60\u548c\u7814\u7a76/VeriMC/simulator/tests/fixtures/java26_2Buttons.json",
+      "frames": 101,
+      "origin": [
+        -10233118,
+        -58,
+        14461212
+      ],
+      "status": "match",
+      "watch": 16
+    }
+  },
+  {
+    "fixture": "java26_2ChunkLifecycle.json",
+    "sha256": "de620c2dd58436f6a97def1f46231c080e5153551b181dff30b0ed824c44892f",
+    "exitCode": 0,
+    "result": {
+      "fixture": "/mnt/f/\u5b66\u4e60\u548c\u7814\u7a76/VeriMC/simulator/tests/fixtures/java26_2ChunkLifecycle.json",
+      "frames": 61,
+      "origin": [
+        16,
+        -59,
+        32
+      ],
+      "status": "match",
+      "watch": 40
+    }
+  },
+  {
+    "fixture": "java26_2ChunkLifecycleNegative.json",
+    "sha256": "80a126fff8c680e8b18da9c55ebfc3c7ea9e816bdd31991a8e85f1258638c1b9",
+    "exitCode": 0,
+    "result": {
+      "fixture": "/mnt/f/\u5b66\u4e60\u548c\u7814\u7a76/VeriMC/simulator/tests/fixtures/java26_2ChunkLifecycleNegative.json",
+      "frames": 61,
+      "origin": [
+        -64,
+        -59,
+        -80
+      ],
+      "status": "match",
+      "watch": 40
+    }
+  },
+  {
+    "fixture": "java26_2Composters.json",
+    "sha256": "74b4c0689f1ac1838da268392dc04884aa949856e80e9d37b274bd278e94ef35",
+    "exitCode": 0,
+    "result": {
+      "fixture": "/mnt/f/\u5b66\u4e60\u548c\u7814\u7a76/VeriMC/simulator/tests/fixtures/java26_2Composters.json",
+      "frames": 111,
+      "origin": [
+        -9326557,
+        -58,
+        -10713973
+      ],
+      "status": "match",
+      "watch": 26
+    }
+  },
+  {
+    "fixture": "java26_2Containers.json",
+    "sha256": "ac797de4adc921c74ce57f926dba7fc4832ab90e40ccda530cc32ca961b3e924",
+    "exitCode": 0,
+    "result": {
+      "fixture": "/mnt/f/\u5b66\u4e60\u548c\u7814\u7a76/VeriMC/simulator/tests/fixtures/java26_2Containers.json",
+      "frames": 17,
+      "origin": [
+        5989768,
+        -58,
+        -8891929
+      ],
+      "status": "match",
+      "watch": 14
+    }
+  },
+  {
+    "fixture": "java26_2CopperChests.json",
+    "sha256": "c1c9bcf6bac0756f2df5013bdfb3cbd6ee32ad64cb678cb1ae73d62fe7c764a7",
+    "exitCode": 0,
+    "result": {
+      "fixture": "/mnt/f/\u5b66\u4e60\u548c\u7814\u7a76/VeriMC/simulator/tests/fixtures/java26_2CopperChests.json",
+      "frames": 25,
+      "origin": [
+        13040393,
+        -58,
+        -12232346
+      ],
+      "status": "match",
+      "watch": 132
+    }
+  },
+  {
+    "fixture": "java26_2DaylightVibration.json",
+    "sha256": "08124b0e86b129862dd31807e37962a42866609c12b3cd5ba8147e0d7b15b0cd",
+    "exitCode": 0,
+    "result": {
+      "fixture": "/mnt/f/\u5b66\u4e60\u548c\u7814\u7a76/VeriMC/simulator/tests/fixtures/java26_2DaylightVibration.json",
+      "frames": 81,
+      "origin": [
+        1143225,
+        -58,
+        8980703
+      ],
+      "status": "match",
+      "watch": 6
+    }
+  },
+  {
+    "fixture": "java26_2DeviceVibrations.json",
+    "sha256": "4702d4c9e3af9e69c922caf4c050362e7b06e0a9c50c188ff1723845ceff0152",
+    "exitCode": 0,
+    "result": {
+      "fixture": "/mnt/f/\u5b66\u4e60\u548c\u7814\u7a76/VeriMC/simulator/tests/fixtures/java26_2DeviceVibrations.json",
+      "frames": 155,
+      "origin": [
+        1820430,
+        -58,
+        -12403104
+      ],
+      "status": "match",
+      "watch": 31
+    }
+  },
+  {
+    "fixture": "java26_2Devices.json",
+    "sha256": "59b186243440a31bf362912ac7ae9707acf7158b29d1e0a6bf4b6ee423fb9fbc",
+    "exitCode": 0,
+    "result": {
+      "fixture": "/mnt/f/\u5b66\u4e60\u548c\u7814\u7a76/VeriMC/simulator/tests/fixtures/java26_2Devices.json",
+      "frames": 29,
+      "origin": [
+        1966432,
+        -58,
+        -3022375
+      ],
+      "status": "match",
+      "watch": 32
+    }
+  },
+  {
+    "fixture": "java26_2DiodeSupportBreak.json",
+    "sha256": "a760c4c55bc33908afe64b83e845392dff83a30345a74c1f27f519e16c6513ab",
+    "exitCode": 0,
+    "result": {
+      "fixture": "/mnt/f/\u5b66\u4e60\u548c\u7814\u7a76/VeriMC/simulator/tests/fixtures/java26_2DiodeSupportBreak.json",
+      "frames": 21,
+      "origin": [
+        -7739412,
+        -58,
+        -11836995
+      ],
+      "status": "match",
+      "watch": 34
+    }
+  },
+  {
+    "fixture": "java26_2Droppers.json",
+    "sha256": "9c76f9243457aaf2fa3852e29a4f9dc693b018c1e47e90ada5603ed36e372a13",
+    "exitCode": 0,
+    "result": {
+      "fixture": "/mnt/f/\u5b66\u4e60\u548c\u7814\u7a76/VeriMC/simulator/tests/fixtures/java26_2Droppers.json",
+      "frames": 31,
+      "origin": [
+        5114651,
+        -58,
+        9071297
+      ],
+      "status": "match",
+      "watch": 19
+    }
+  },
+  {
+    "fixture": "java26_2EntityContainers.json",
+    "sha256": "e684257e7c253c9b43c733eddcb3612f8be6945a75247b71be8013564dff655e",
+    "exitCode": 0,
+    "result": {
+      "fixture": "/mnt/f/\u5b66\u4e60\u548c\u7814\u7a76/VeriMC/simulator/tests/fixtures/java26_2EntityContainers.json",
+      "frames": 57,
+      "origin": [
+        5924788,
+        -58,
+        -4808652
+      ],
+      "status": "match",
+      "watch": 14
+    }
+  },
+  {
+    "fixture": "java26_2FenceGateInWall.json",
+    "sha256": "7144cb2f5724ecaff173382cec76c5830d9582d537628032a552914a47501efb",
+    "exitCode": 0,
+    "result": {
+      "fixture": "/mnt/f/\u5b66\u4e60\u548c\u7814\u7a76/VeriMC/simulator/tests/fixtures/java26_2FenceGateInWall.json",
+      "frames": 15,
+      "origin": [
+        8979371,
+        -58,
+        10150572
+      ],
+      "status": "match",
+      "watch": 4
+    }
+  },
+  {
+    "fixture": "java26_2HopperPickup.json",
+    "sha256": "3c7f386edb292b01683717b01dd14b7b5b75680b20fb62b592c43ae20a9c4cea",
+    "exitCode": 0,
+    "result": {
+      "fixture": "/mnt/f/\u5b66\u4e60\u548c\u7814\u7a76/VeriMC/simulator/tests/fixtures/java26_2HopperPickup.json",
+      "frames": 31,
+      "origin": [
+        307216,
+        -58,
+        5454477
+      ],
+      "status": "match",
+      "watch": 11
+    }
+  },
+  {
+    "fixture": "java26_2Hoppers.json",
+    "sha256": "8fd30e3fb271afc8f6a4739df26de372358ea21980e273e2b533cab4d4c2dc00",
+    "exitCode": 0,
+    "result": {
+      "fixture": "/mnt/f/\u5b66\u4e60\u548c\u7814\u7a76/VeriMC/simulator/tests/fixtures/java26_2Hoppers.json",
+      "frames": 65,
+      "origin": [
+        -856042,
+        -58,
+        3444279
+      ],
+      "status": "match",
+      "watch": 25
+    }
+  },
+  {
+    "fixture": "java26_2ItemFrameComparator.json",
+    "sha256": "fe19981d48b9b934d4f9bc8c5cc14e23b178c57f84fbcab0fa6e4b9d0227d752",
+    "exitCode": 0,
+    "result": {
+      "fixture": "/mnt/f/\u5b66\u4e60\u548c\u7814\u7a76/VeriMC/simulator/tests/fixtures/java26_2ItemFrameComparator.json",
+      "frames": 17,
+      "origin": [
+        -5533787,
+        -58,
+        4412942
+      ],
+      "status": "match",
+      "watch": 12
+    }
+  },
+  {
+    "fixture": "java26_2JukeboxHoppers.json",
+    "sha256": "aa5d6df6e3c16fd16dffe80948c5b905c8a2eceaeca3e5635a36af8d7d521440",
+    "exitCode": 0,
+    "result": {
+      "fixture": "/mnt/f/\u5b66\u4e60\u548c\u7814\u7a76/VeriMC/simulator/tests/fixtures/java26_2JukeboxHoppers.json",
+      "frames": 1456,
+      "origin": [
+        -9394005,
+        -58,
+        -14437702
+      ],
+      "status": "match",
+      "watch": 11
+    }
+  },
+  {
+    "fixture": "java26_2Jukeboxes.json",
+    "sha256": "ddfc18dd444477e7a489c365c265fd2a52a91739af2eb12f1e85a78d5bc73e57",
+    "exitCode": 0,
+    "result": {
+      "fixture": "/mnt/f/\u5b66\u4e60\u548c\u7814\u7a76/VeriMC/simulator/tests/fixtures/java26_2Jukeboxes.json",
+      "frames": 151,
+      "origin": [
+        -13392970,
+        -58,
+        -9615899
+      ],
+      "status": "match",
+      "watch": 68
+    }
+  },
+  {
+    "fixture": "java26_2MachineMatrix.json",
+    "sha256": "f04acb035aec58ae2c3160217ca4e27a19312bfc59f1c075fc679f6d341d29a1",
+    "exitCode": 0,
+    "result": {
+      "fixture": "/mnt/f/\u5b66\u4e60\u548c\u7814\u7a76/VeriMC/simulator/tests/fixtures/java26_2MachineMatrix.json",
+      "frames": 15,
+      "origin": [
+        -5150761,
+        -58,
+        7234962
+      ],
+      "status": "match",
+      "traceEntries": 11725,
+      "watch": 88
+    }
+  },
+  {
+    "fixture": "java26_2Notes.json",
+    "sha256": "ec2865f41a988304b64c5875c6531029b7c7e349d1fbe49e03833ce0515d3420",
+    "exitCode": 0,
+    "result": {
+      "fixture": "/mnt/f/\u5b66\u4e60\u548c\u7814\u7a76/VeriMC/simulator/tests/fixtures/java26_2Notes.json",
+      "frames": 100,
+      "origin": [
+        14701786,
+        -58,
+        -11623910
+      ],
+      "status": "match",
+      "watch": 32
+    }
+  },
+  {
+    "fixture": "java26_2ObserverRemoval.json",
+    "sha256": "e6752c0986bce92d9c3627ef88b1ca1c526d79d0d96a3dbff092eb8365bd5907",
+    "exitCode": 0,
+    "result": {
+      "fixture": "/mnt/f/\u5b66\u4e60\u548c\u7814\u7a76/VeriMC/simulator/tests/fixtures/java26_2ObserverRemoval.json",
+      "frames": 21,
+      "origin": [
+        9962628,
+        -58,
+        -13625201
+      ],
+      "status": "match",
+      "watch": 11
+    }
+  },
+  {
+    "fixture": "java26_2PistonLandingShape.json",
+    "sha256": "d274248ed59467877fed1d5b72592a8ddc691a6f1f503b89fd74dd26f0d34c61",
+    "exitCode": 0,
+    "result": {
+      "fixture": "/mnt/f/\u5b66\u4e60\u548c\u7814\u7a76/VeriMC/simulator/tests/fixtures/java26_2PistonLandingShape.json",
+      "frames": 21,
+      "origin": [
+        9124004,
+        -58,
+        6828433
+      ],
+      "status": "match",
+      "watch": 12
+    }
+  },
+  {
+    "fixture": "java26_2PistonPushability.json",
+    "sha256": "727537ecf188fc7a77e163f8249e4e6101eaf6cee96620add442ead5fbf9bd9d",
+    "exitCode": 0,
+    "result": {
+      "fixture": "/mnt/f/\u5b66\u4e60\u548c\u7814\u7a76/VeriMC/simulator/tests/fixtures/java26_2PistonPushability.json",
+      "frames": 25,
+      "origin": [
+        -5699130,
+        -58,
+        -4056318
+      ],
+      "status": "match",
+      "watch": 36
+    }
+  },
+  {
+    "fixture": "java26_2PistonRemovalCallback.json",
+    "sha256": "9a4369909910880376fd39042355ad5218af4a70c4c943af1c4f8232d8a144a8",
+    "exitCode": 0,
+    "result": {
+      "fixture": "/mnt/f/\u5b66\u4e60\u548c\u7814\u7a76/VeriMC/simulator/tests/fixtures/java26_2PistonRemovalCallback.json",
+      "frames": 31,
+      "origin": [
+        8031564,
+        -58,
+        2828500
+      ],
+      "status": "match",
+      "watch": 14
+    }
+  },
+  {
+    "fixture": "java26_2Pots.json",
+    "sha256": "ec88554d13062a953c76ccb278d2b8f13b1048ec448cdfe47002b16b4ccc8046",
+    "exitCode": 0,
+    "result": {
+      "fixture": "/mnt/f/\u5b66\u4e60\u548c\u7814\u7a76/VeriMC/simulator/tests/fixtures/java26_2Pots.json",
+      "frames": 73,
+      "origin": [
+        2968535,
+        -58,
+        -5626229
+      ],
+      "status": "match",
+      "watch": 26
+    }
+  },
+  {
+    "fixture": "java26_2RailNotificationSource.json",
+    "sha256": "c40fad86654a2f0fd81e22b4c8ec38e3432291ffd01e17b915d5b9a5463f47fb",
+    "exitCode": 0,
+    "result": {
+      "fixture": "/mnt/f/\u5b66\u4e60\u548c\u7814\u7a76/VeriMC/simulator/tests/fixtures/java26_2RailNotificationSource.json",
+      "frames": 41,
+      "origin": [
+        -9595944,
+        -58,
+        -14553421
+      ],
+      "status": "match",
+      "watch": 29
+    }
+  },
+  {
+    "fixture": "java26_2Rails.json",
+    "sha256": "f673eae2845ac28ecf2c88e86c633858a5a39b73d281c1f0dcb89cfa07c518ae",
+    "exitCode": 0,
+    "result": {
+      "fixture": "/mnt/f/\u5b66\u4e60\u548c\u7814\u7a76/VeriMC/simulator/tests/fixtures/java26_2Rails.json",
+      "frames": 45,
+      "origin": [
+        8496047,
+        -58,
+        11779676
+      ],
+      "status": "match",
+      "watch": 95
+    }
+  },
+  {
+    "fixture": "java26_2RandomState.json",
+    "sha256": "8f58066f4076ecea468d471c1dbb730b0dc31e7582270075136aa99ee6187fd9",
+    "exitCode": 0,
+    "result": {
+      "fixture": "/mnt/f/\u5b66\u4e60\u548c\u7814\u7a76/VeriMC/simulator/tests/fixtures/java26_2RandomState.json",
+      "frames": 21,
+      "origin": [
+        -13640259,
+        -58,
+        -3720850
+      ],
+      "status": "match",
+      "watch": 7
+    }
+  },
+  {
+    "fixture": "java26_2Redstone.json",
+    "sha256": "3c902188c44253e94041e9e48a7e635a4958979c3c36eb8a31f831cb12d8dde4",
+    "exitCode": 0,
+    "result": {
+      "fixture": "/mnt/f/\u5b66\u4e60\u548c\u7814\u7a76/VeriMC/simulator/tests/fixtures/java26_2Redstone.json",
+      "frames": 25,
+      "origin": [
+        -2631425,
+        -58,
+        -5683228
+      ],
+      "status": "match",
+      "watch": 47
+    }
+  },
+  {
+    "fixture": "java26_2RemovalNotifySource.json",
+    "sha256": "17e31578e0ee9c5701007bfdcf30ead105558165f5b4cc12a10b1dfaea1fd4a6",
+    "exitCode": 0,
+    "result": {
+      "fixture": "/mnt/f/\u5b66\u4e60\u548c\u7814\u7a76/VeriMC/simulator/tests/fixtures/java26_2RemovalNotifySource.json",
+      "frames": 17,
+      "origin": [
+        -2858404,
+        -58,
+        -987839
+      ],
+      "status": "match",
+      "watch": 20
+    }
+  },
+  {
+    "fixture": "java26_2RepeaterLockRefresh.json",
+    "sha256": "ccc6a85adc66f0cc917d5fd1d98840f52c5ba63c9413fe70f116f98dea49cb2d",
+    "exitCode": 0,
+    "result": {
+      "fixture": "/mnt/f/\u5b66\u4e60\u548c\u7814\u7a76/VeriMC/simulator/tests/fixtures/java26_2RepeaterLockRefresh.json",
+      "frames": 13,
+      "origin": [
+        -12173775,
+        -58,
+        9901759
+      ],
+      "status": "match",
+      "watch": 7
+    }
+  },
+  {
+    "fixture": "java26_2ScheduledQueue.json",
+    "sha256": "5289ab023a084404bac60d93d7da5e7416f4b61a8b8cc0a85a52ddd2bc5d9f99",
+    "exitCode": 0,
+    "result": {
+      "fixture": "/mnt/f/\u5b66\u4e60\u548c\u7814\u7a76/VeriMC/simulator/tests/fixtures/java26_2ScheduledQueue.json",
+      "frames": 25,
+      "origin": [
+        10079138,
+        -58,
+        13697556
+      ],
+      "status": "match",
+      "watch": 25
+    }
+  },
+  {
+    "fixture": "java26_2StairShapes.json",
+    "sha256": "19c55eaebdc6f467d0f3ee8a581464bf8e036a166d19e3ca2210123318f126c7",
+    "exitCode": 0,
+    "result": {
+      "fixture": "/mnt/f/\u5b66\u4e60\u548c\u7814\u7a76/VeriMC/simulator/tests/fixtures/java26_2StairShapes.json",
+      "frames": 17,
+      "origin": [
+        6525337,
+        -58,
+        -9130779
+      ],
+      "status": "match",
+      "watch": 153
+    }
+  },
+  {
+    "fixture": "java26_2SupportDirection.json",
+    "sha256": "3ca402134749a75949306bfee8f4ac842e157225e62989626af9fa0f896e559e",
+    "exitCode": 0,
+    "result": {
+      "fixture": "/mnt/f/\u5b66\u4e60\u548c\u7814\u7a76/VeriMC/simulator/tests/fixtures/java26_2SupportDirection.json",
+      "frames": 15,
+      "origin": [
+        -106755,
+        -58,
+        -2152453
+      ],
+      "status": "match",
+      "traceEntries": 3456,
+      "watch": 40
+    }
+  },
+  {
+    "fixture": "java26_2Targets.json",
+    "sha256": "9dabd206a6dffa7e8680bcb38dca42dbd51d621d6c4c3d88c36e9a21a9e7490f",
+    "exitCode": 0,
+    "result": {
+      "fixture": "/mnt/f/\u5b66\u4e60\u548c\u7814\u7a76/VeriMC/simulator/tests/fixtures/java26_2Targets.json",
+      "frames": 53,
+      "origin": [
+        -7477302,
+        -58,
+        -6374480
+      ],
+      "status": "match",
+      "watch": 26
+    }
+  },
+  {
+    "fixture": "java26_2TickBatches.json",
+    "sha256": "162d565c2f6ed486b3772b4e750e234fe40f0b171779000f319ebeb7bae73a7e",
+    "exitCode": 0,
+    "result": {
+      "fixture": "/mnt/f/\u5b66\u4e60\u548c\u7814\u7a76/VeriMC/simulator/tests/fixtures/java26_2TickBatches.json",
+      "frames": 25,
+      "origin": [
+        -8304977,
+        -58,
+        14011654
+      ],
+      "status": "match",
+      "watch": 8
+    }
+  },
+  {
+    "fixture": "java26_2Torches.json",
+    "sha256": "e295756ac43a8b61eeeb40c10c2c90c6ec303531195426a0f86a097646e9d36c",
+    "exitCode": 0,
+    "result": {
+      "fixture": "/mnt/f/\u5b66\u4e60\u548c\u7814\u7a76/VeriMC/simulator/tests/fixtures/java26_2Torches.json",
+      "frames": 195,
+      "origin": [
+        -14957215,
+        -58,
+        -12421527
+      ],
+      "status": "match",
+      "watch": 5
+    }
+  },
+  {
+    "fixture": "java26_2Tripwire.json",
+    "sha256": "0c7966545fb60a616411b2ba2abd47e920340102e5fed26b5a7f82ac27faff23",
+    "exitCode": 0,
+    "result": {
+      "fixture": "/mnt/f/\u5b66\u4e60\u548c\u7814\u7a76/VeriMC/simulator/tests/fixtures/java26_2Tripwire.json",
+      "frames": 70,
+      "origin": [
+        673012,
+        -58,
+        -8119270
+      ],
+      "status": "match",
+      "watch": 121
+    }
+  },
+  {
+    "fixture": "java26_2UpdateSource.json",
+    "sha256": "1331941c2585768e62edf5012e3ab98355653931fe7e1d73dcb62172aae69b8c",
+    "exitCode": 0,
+    "result": {
+      "fixture": "/mnt/f/\u5b66\u4e60\u548c\u7814\u7a76/VeriMC/simulator/tests/fixtures/java26_2UpdateSource.json",
+      "frames": 15,
+      "origin": [
+        6670936,
+        -58,
+        -10325381
+      ],
+      "status": "match",
+      "traceEntries": 3831,
+      "watch": 19
+    }
+  },
+  {
+    "fixture": "java26_2UpdateTrace.json",
+    "sha256": "aab94b105aee711df67b3b3a368e2de87557a3774082d79cc6b07bbcd9297aed",
+    "exitCode": 0,
+    "result": {
+      "fixture": "/mnt/f/\u5b66\u4e60\u548c\u7814\u7a76/VeriMC/simulator/tests/fixtures/java26_2UpdateTrace.json",
+      "frames": 15,
+      "origin": [
+        -9834974,
+        -58,
+        -2507009
+      ],
+      "status": "match",
+      "traceEntries": 1280,
+      "watch": 9
+    }
+  },
+  {
+    "fixture": "java26_2Vibrations.json",
+    "sha256": "63bd568264b357d0787cce3fc6429a164ec1b0fef90b36158e75011357d46768",
+    "exitCode": 0,
+    "result": {
+      "fixture": "/mnt/f/\u5b66\u4e60\u548c\u7814\u7a76/VeriMC/simulator/tests/fixtures/java26_2Vibrations.json",
+      "frames": 161,
+      "origin": [
+        -3247623,
+        -58,
+        -6718575
+      ],
+      "status": "match",
+      "watch": 13
+    }
+  },
+  {
+    "fixture": "java26_2WireGeometry.json",
+    "sha256": "28c1ab200d479ce334f071a87a4d1b630239cb26038c182d4614352f6d3b5f1d",
+    "exitCode": 0,
+    "result": {
+      "fixture": "/mnt/f/\u5b66\u4e60\u548c\u7814\u7a76/VeriMC/simulator/tests/fixtures/java26_2WireGeometry.json",
+      "frames": 37,
+      "origin": [
+        -1199760,
+        -58,
+        8449887
+      ],
+      "status": "match",
+      "watch": 80
+    }
+  },
+  {
+    "fixture": "java26_2WireShapeToggle.json",
+    "sha256": "a3efef951621a6fc339cf14b3c8b0889d552e6acb5d08ef40242b7da65848c42",
+    "exitCode": 0,
+    "result": {
+      "fixture": "/mnt/f/\u5b66\u4e60\u548c\u7814\u7a76/VeriMC/simulator/tests/fixtures/java26_2WireShapeToggle.json",
+      "frames": 21,
+      "origin": [
+        11279512,
+        -58,
+        -7914499
+      ],
+      "status": "match",
+      "watch": 6
+    }
+  }
+]

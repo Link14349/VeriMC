@@ -319,7 +319,7 @@ void Simulator::loadProject(ProjectSource& source) {
             if(e.phase==1 && e.type==registry[registry.state("bell")].type && ((e.data&3u)!=1 || (e.data>>2)<2))throw std::invalid_argument("无效钟方块事件");
             if (e.phase == 3 && (candidate.at(e.pos).type != e.type || (candidate.at(e.pos).device != Device::tripwire && candidate.at(e.pos).device != Device::button && candidate.at(e.pos).device != Device::hopper) || e.data != 0 || e.entityOrder != 0)) throw std::invalid_argument("无效的环境接触事件");
             // 区块不可 ticking 时事件合法地停在过去，等区块恢复才执行。
-            const bool tickableChunk = (e.phase == 2 || e.phase == 3) ? candidate.chunkEntityTicking(e.pos) : candidate.chunkBlockTicking(e.pos);
+            const bool tickableChunk = e.phase == 3 ? candidate.chunkEntityTicking(e.pos) : candidate.chunkBlockTicking(e.pos);
             if ((e.phase != 0 && e.tick < candidate.currentTick && tickableChunk) || e.type >= registry.typeCount() || e.priority < -3 || e.priority > 3 || e.phase > 3 || e.order >= candidate.nextOrder || !usedOrders.insert(e.order).second) throw std::invalid_argument("无效的运行队列");
             if (e.phase == 0) {
                 if (!data.contains("blockTickState") && e.tick <= candidate.currentTick) throw std::invalid_argument("旧版快照缺少本刻计划事件批次，请使用电路工程重新开始运行");
@@ -344,7 +344,7 @@ void Simulator::loadProject(ProjectSource& source) {
         for (const auto& row : source.rows("hoppers")) {
             auto pos = row.at("pos").get<BlockPos>();
             HopperState hopper{row.at("readyAt"), row.at("firstTick"), readWakeTime(row.at("wakeAt")), row.at("generation")};
-            if (candidate.at(pos).device != Device::hopper || !candidate.entityOrders.contains(pos) || hopper.generation >= candidate.nextOrder || (hopper.wakeAt != UINT64_MAX && hopper.wakeAt < candidate.currentTick && candidate.chunkEntityTicking(pos)) || !candidate.hoppers.emplace(pos, hopper).second) throw std::invalid_argument("无效漏斗运行状态");
+            if (candidate.at(pos).device != Device::hopper || !candidate.entityOrders.contains(pos) || hopper.generation >= candidate.nextOrder || (hopper.wakeAt != UINT64_MAX && hopper.wakeAt < candidate.currentTick && candidate.chunkBlockTicking(pos)) || !candidate.hoppers.emplace(pos, hopper).second) throw std::invalid_argument("无效漏斗运行状态");
             if (hopper.wakeAt != UINT64_MAX && !candidate.scheduledKeys.contains({pos, candidate.at(pos).type, 2, hopper.generation})) throw std::invalid_argument("快照缺少漏斗唤醒事件");
         }
         auto hopperQueue = candidate.scheduled;

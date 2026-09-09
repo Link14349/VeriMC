@@ -132,7 +132,7 @@ namespace {
 constexpr std::size_t chestMinecartSlots = 27, hopperMinecartSlots = 5;
 }
 // MinecartChest.getContainerSize()=27、MinecartHopper.getContainerSize()=5。
-// 只有这两种矿车实现 Container，因此只有它们满足 CONTAINER_ENTITY_SELECTOR。
+// 当前协议只支持这两种矿车。原版选择器也接受运输船/运输竹筏，尚未建模。
 std::size_t Simulator::containerEntitySize(const std::string& type) {
     if (type == "chest_minecart") return chestMinecartSlots;
     if (type == "hopper_minecart") return hopperMinecartSlots;
@@ -167,7 +167,7 @@ void Simulator::stimulateContainerEntities(BlockPos pos, const Json& input) {
     runtimeChanged(pos, false);
 }
 void Simulator::validateContainerEntities(const Json& entities) const {
-    if (!entities.is_array() || entities.size() > containerEntityLimit) throw std::invalid_argument("无效容器实体列表");
+    if (!entities.is_array() || entities.empty() || entities.size() > containerEntityLimit) throw std::invalid_argument("无效容器实体列表");
     for (const auto& entry : entities) {
         if (!entry.is_object() || entry.size() != 2 || !entry.contains("type") || !entry.contains("inventory") || !entry.at("type").is_string())
             throw std::invalid_argument("无效容器实体记录");

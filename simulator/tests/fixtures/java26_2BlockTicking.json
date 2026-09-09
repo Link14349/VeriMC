@@ -1,0 +1,923 @@
+{
+  "endTick": 20,
+  "commands": [
+    {
+      "tick": 0,
+      "pos": [
+        4,
+        1,
+        4
+      ],
+      "stateId": 11317
+    },
+    {
+      "tick": 0,
+      "pos": [
+        5,
+        1,
+        4
+      ],
+      "stateId": 3988
+    },
+    {
+      "tick": 0,
+      "pos": [
+        4,
+        1,
+        4
+      ],
+      "stimulus": {
+        "inventory": [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 30
+          }
+        ]
+      }
+    },
+    {
+      "tick": 2,
+      "pos": [
+        4,
+        1,
+        4
+      ],
+      "chunkForced": false
+    },
+    {
+      "tick": 2,
+      "pos": [
+        4,
+        1,
+        4
+      ],
+      "chunkState": "blockTicking"
+    },
+    {
+      "tick": 12,
+      "pos": [
+        4,
+        1,
+        4
+      ],
+      "chunkForced": true
+    },
+    {
+      "tick": 12,
+      "pos": [
+        4,
+        1,
+        4
+      ],
+      "chunkState": "entityTicking"
+    }
+  ],
+  "watch": [
+    [
+      4,
+      1,
+      4
+    ],
+    [
+      5,
+      1,
+      4
+    ]
+  ],
+  "watchChunkState": true,
+  "requiresAlignedOrigin": true,
+  "reference": "Minecraft Java 26.2 strict vanilla-only dedicated server, nonexperimental redstone",
+  "referenceEnvironment": {
+    "javaVersion": "25.0.4.1",
+    "randomTickSpeed": 0,
+    "featureFlags": [
+      "minecraft:vanilla"
+    ],
+    "dataPacks": [
+      "vanilla"
+    ],
+    "gameTime": 22,
+    "clockTicks": 22
+  },
+  "origin": [
+    16,
+    -59,
+    32
+  ],
+  "frames": [
+    {
+      "tick": 0,
+      "states": [
+        11317,
+        3988
+      ],
+      "analogs": [
+        2,
+        0
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 30
+          }
+        ],
+        []
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 1,
+      "states": [
+        11317,
+        3988
+      ],
+      "analogs": [
+        2,
+        1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 29
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ]
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 2,
+      "states": [
+        11317,
+        3988
+      ],
+      "analogs": [
+        2,
+        1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 29
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ]
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 3,
+      "states": [
+        11317,
+        3988
+      ],
+      "analogs": [
+        2,
+        1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 29
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ]
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 4,
+      "states": [
+        11317,
+        3988
+      ],
+      "analogs": [
+        2,
+        1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 29
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ]
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 5,
+      "states": [
+        11317,
+        3988
+      ],
+      "analogs": [
+        2,
+        1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 29
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ]
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 6,
+      "states": [
+        11317,
+        3988
+      ],
+      "analogs": [
+        2,
+        1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 29
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ]
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 7,
+      "states": [
+        11317,
+        3988
+      ],
+      "analogs": [
+        2,
+        1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 29
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ]
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 8,
+      "states": [
+        11317,
+        3988
+      ],
+      "analogs": [
+        2,
+        1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 29
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ]
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 9,
+      "states": [
+        11317,
+        3988
+      ],
+      "analogs": [
+        2,
+        1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 28
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ]
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 10,
+      "states": [
+        11317,
+        3988
+      ],
+      "analogs": [
+        2,
+        1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 28
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ]
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 11,
+      "states": [
+        11317,
+        3988
+      ],
+      "analogs": [
+        2,
+        1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 28
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ]
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 12,
+      "states": [
+        11317,
+        3988
+      ],
+      "analogs": [
+        2,
+        1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 28
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ]
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": false,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 13,
+      "states": [
+        11317,
+        3988
+      ],
+      "analogs": [
+        2,
+        1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 28
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ]
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 14,
+      "states": [
+        11317,
+        3988
+      ],
+      "analogs": [
+        2,
+        1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 28
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ]
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 15,
+      "states": [
+        11317,
+        3988
+      ],
+      "analogs": [
+        2,
+        1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 28
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ]
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 16,
+      "states": [
+        11317,
+        3988
+      ],
+      "analogs": [
+        2,
+        1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 28
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ]
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 17,
+      "states": [
+        11317,
+        3988
+      ],
+      "analogs": [
+        2,
+        1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 27
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 3
+          }
+        ]
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 18,
+      "states": [
+        11317,
+        3988
+      ],
+      "analogs": [
+        2,
+        1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 27
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 3
+          }
+        ]
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 19,
+      "states": [
+        11317,
+        3988
+      ],
+      "analogs": [
+        2,
+        1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 27
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 3
+          }
+        ]
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "tick": 20,
+      "states": [
+        11317,
+        3988
+      ],
+      "analogs": [
+        2,
+        1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 27
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 3
+          }
+        ]
+      ],
+      "chunkStates": [
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        }
+      ]
+    }
+  ]
+}

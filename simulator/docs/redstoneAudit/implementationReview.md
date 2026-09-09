@@ -239,7 +239,7 @@ C++ 的 `executeNeighbor`（`src/simulator.cpp:385-395`）总是重新读 `world
 | 缺口 | 位置 | 影响 |
 | --- | --- | --- |
 | 物品实体（掉落物） | `HopperBlockEntity.java:218-246`、`:358-361` | 漏斗不吸取地面物品；投掷器抛出物变成外部动作 `itemEjected`（`src/droppers.cpp:26-28`） |
-| 实体容器（箱子矿车/漏斗矿车/驴子） | `HopperBlockEntity.java:393-398`，含 `level.getRandom().nextInt(entities.size())` | 漏斗与投掷器完全不与实体容器交互；原版这一次 RNG 抽取在仿真中不存在 |
+| 实体容器（运输/漏斗矿车、运输船/竹筏） | `HopperBlockEntity.java:393-398`，含 `level.getRandom().nextInt(entities.size())` | 后续已实现方块漏斗与声明的两类矿车库存传输及 RNG 对照；漏斗矿车主动吸取、运输船/竹筏仍缺失。驴不是该 Container 选择器的候选，原记录有误。投掷器路径仍须另核对。 |
 | 物品展示框比较器输入 | `ComparatorBlock.java:107-114、120-127` | 比较器读不到展示框 |
 | 命令方块矿车的探测铁轨读数 | `DetectorRailBlock.java:147-151` | 只实现容器矿车分支（`src/rails.cpp:231-238`） |
 | `ShelfBlock`（26.2 中存在，`POWERED` + 比较器输出 + 侧向链） | `ShelfBlock.java:49-133` | `classify()` 返回 `unsupported`，不可放置 |

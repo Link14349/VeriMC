@@ -6,8 +6,8 @@ container. `getEntityContainer` collects every `Container && isAlive` entity who
 meets a 1x1x1 box centred on the cell centre and then picks one with
 `level.getRandom().nextInt(list.size())` — **a draw happens even when there is a single candidate**,
 which is why this scenario turns on `randomSeed` and compares the raw 48 bit state every frame.
-Only two entities implement `Container`: the chest minecart (27 slots) and the hopper minecart
-(5 slots), so those are the two declared types.
+This protocol currently covers the chest minecart (27 slots) and the hopper minecart (5 slots).
+Vanilla also selects chest boats/rafts; these remain outside this fixture's coverage.
 
 The carts are spawned at the cell centre with zero velocity and gravity switched off, the same
 convention the dropped-item, pressure plate and tripwire contact inputs already use: this models

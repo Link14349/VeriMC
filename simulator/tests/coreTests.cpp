@@ -199,7 +199,7 @@ int main() {
         try { restored.loadProject(invalid); } catch (...) { threw = true; }
         expect(threw && before == restored.saveProject("before", true), "invalid batch import changed world");
     });
-    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers", "java26_2Hoppers", "java26_2Torches", "java26_2Rails", "java26_2TickBatches", "java26_2Tripwire", "java26_2Buttons", "java26_2Droppers", "java26_2Targets", "java26_2CopperChests", "java26_2Bookshelves", "java26_2Pots", "java26_2Vibrations", "java26_2DeviceVibrations", "java26_2Notes", "java26_2Bells", "java26_2Jukeboxes", "java26_2JukeboxHoppers", "java26_2Composters", "java26_2WireGeometry", "java26_2PistonPushability", "java26_2DaylightVibration", "java26_2StairShapes", "java26_2RailNotificationSource", "java26_2PistonRemovalCallback", "java26_2DiodeSupportBreak", "java26_2ObserverRemoval", "java26_2PistonLandingShape", "java26_2WireShapeToggle", "java26_2RemovalNotifySource", "java26_2RepeaterLockRefresh", "java26_2ItemFrameComparator", "java26_2UpdateTrace", "java26_2MachineMatrix", "java26_2SupportDirection", "java26_2FenceGateInWall", "java26_2UpdateSource", "java26_2HopperPickup", "java26_2ChunkLifecycle", "java26_2ChunkLifecycleNegative", "java26_2ScheduledQueue", "java26_2RandomState", "java26_2BlockEntityOrder", "java26_2EntityContainers"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
+    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers", "java26_2Hoppers", "java26_2Torches", "java26_2Rails", "java26_2TickBatches", "java26_2Tripwire", "java26_2Buttons", "java26_2Droppers", "java26_2Targets", "java26_2CopperChests", "java26_2Bookshelves", "java26_2Pots", "java26_2Vibrations", "java26_2DeviceVibrations", "java26_2Notes", "java26_2Bells", "java26_2Jukeboxes", "java26_2JukeboxHoppers", "java26_2Composters", "java26_2WireGeometry", "java26_2PistonPushability", "java26_2DaylightVibration", "java26_2StairShapes", "java26_2RailNotificationSource", "java26_2PistonRemovalCallback", "java26_2DiodeSupportBreak", "java26_2ObserverRemoval", "java26_2PistonLandingShape", "java26_2WireShapeToggle", "java26_2RemovalNotifySource", "java26_2RepeaterLockRefresh", "java26_2ItemFrameComparator", "java26_2UpdateTrace", "java26_2MachineMatrix", "java26_2SupportDirection", "java26_2FenceGateInWall", "java26_2UpdateSource", "java26_2HopperPickup", "java26_2ChunkLifecycle", "java26_2ChunkLifecycleNegative", "java26_2ScheduledQueue", "java26_2RandomState", "java26_2BlockEntityOrder", "java26_2EntityContainers", "java26_2BlockTicking"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
         std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/../tests/fixtures/" + fixtureName + ".json"); expect(static_cast<bool>(file), "missing vanilla reference fixture");
         auto fixture = Json::parse(file); auto origin = fixture["origin"].get<BlockPos>(); Simulator s(r);
         const bool tracing = fixture.contains("updateTrace");
@@ -209,7 +209,9 @@ int main() {
             const auto& frame = fixture["frames"][frameIndex];
             Tick tick = frame["tick"];
             if (fixture.contains("randomSeed") && tick == 0) s.setRandomSeed(fixture["randomSeed"].get<std::uint64_t>());
-            s.advanceTo(tick); s.markUpdateTrace(tick);
+            s.advanceTo(tick);
+            expect(s.currentTick == tick && !s.breakRequested && !s.hasPendingActions(), "reference replay did not complete observation tick");
+            s.markUpdateTrace(tick);
             for (const auto& command : fixture["commands"]) if (command["tick"] == tick) {
                 auto p = absolute(command["pos"]);
                 if (command.contains("chunkState")) s.setChunkState(p.x >> 4, p.z >> 4, parseChunkState(command["chunkState"]));
@@ -224,6 +226,7 @@ int main() {
                 }
                 else s.stimulate(p, command["stimulus"]);
             }
+            expect(!s.breakRequested && !s.hasPendingActions(), "reference replay requires explicit external-action feedback");
             if (frame.contains("randomState"))
                 expect(static_cast<std::int64_t>(s.randomState()) == frame["randomState"].get<std::int64_t>(),
                        "random source state differs at " + std::to_string(tick) + " expected " + frame["randomState"].dump()
@@ -852,6 +855,47 @@ int main() {
         threw = false; try { s.setChunkState(6, 5, Simulator::ChunkState::entityTicking); } catch (...) { threw = true; }
         expect(threw, "a ticking chunk was allowed next to an unloaded one");
     });
+    test("block ticking runs block entities and restores only the frozen interval", [&] {
+        // Source-derived: LevelChunk.isTicking checks BLOCK_TICKING, not ENTITY_TICKING.
+        // Compare against a continuously ticking control to catch both skipped ticks and
+        // accidental extra cooldown shifts on blockTicking -> entityTicking transitions.
+        Simulator s(r), control(r);
+        const BlockPos hopper{2, 0, 2}, chest{3, 0, 2};
+        for (auto* world : {&s, &control}) {
+            world->place(hopper, r.state("hopper", {{"facing", "east"}}));
+            world->place(chest, r.state("chest"));
+            world->stimulate(hopper, {{"inventory", Json::array({{{"slot", 0}, {"item", "minecraft:stone"}, {"count", 30}}})}});
+        }
+        s.setChunkState(0, 0, Simulator::ChunkState::blockTicking);
+        expect(s.runnable(), "block entity in blockTicking chunk considered unrunnable");
+        s.advanceTo(10); control.advanceTo(10);
+        expect(s.inventoryJson(chest, false) == control.inventoryJson(chest, false), "blockTicking skipped hopper ticks");
+        s.setChunkState(0, 0, Simulator::ChunkState::loaded);
+        s.advanceTo(30);
+        const auto saved = s.saveProject("block-only", true);
+        Simulator restored(r); restored.loadProject(saved);
+        for (auto* world : {&s, &restored}) world->setChunkState(0, 0, Simulator::ChunkState::blockTicking);
+        for (Tick tick = 31; tick <= 50; ++tick) {
+            if (tick == 36) for (auto* world : {&s, &restored}) world->setChunkState(0, 0, Simulator::ChunkState::entityTicking);
+            control.advanceTo(tick - 20);
+            for (auto* world : {&s, &restored}) {
+                world->advanceTo(tick);
+                expect(world->inventoryJson(chest, false) == control.inventoryJson(chest, false), "restored cooldown differs from exactly 20 frozen ticks");
+            }
+        }
+        // Entity contact must still stay gated. A solid block above disables BE pickup
+        // but does not disable HopperBlock.entityInside for an item in the hopper itself.
+        Simulator contact(r);
+        contact.place(hopper, r.state("hopper"));
+        contact.place(hopper.relative(Direction::up), r.state("stone"));
+        contact.setChunkState(0, 0, Simulator::ChunkState::blockTicking);
+        contact.stimulate(hopper, {{"groundItems", Json::array({{{"item", "minecraft:dirt"}, {"count", 1}, {"y", 0.7}}})}});
+        contact.advanceTo(5);
+        expect(contact.inventoryJson(hopper, false).empty(), "entity contact ran in blockTicking chunk: " + contact.inventoryJson(hopper, false).dump() + " above=" + std::to_string(contact.world.get(hopper.relative(Direction::up))) + " full=" + std::to_string(r[contact.world.get(hopper.relative(Direction::up))].fullCube));
+        contact.setChunkState(0, 0, Simulator::ChunkState::entityTicking);
+        contact.advanceTo(6);
+        expect(!contact.inventoryJson(hopper, false).empty(), "entity contact did not resume");
+    });
     test("vibration delivery needs the 3x3 chunks around the listener to be block ticking", [&] {
         // 原版 VibrationSystem.Ticker.receiveVibration 第一句就是
         // requiresAdjacentChunksToBeTicking && !areAdjacentChunksTicking -> return false，
@@ -868,10 +912,12 @@ int main() {
         Simulator base(r); build(base, "sculk_sensor");
         base.advanceTo(6); expect(base.displayValue(pos) == 0, "default vibration arrived early");
         base.advanceTo(7); expect(base.displayValue(pos) == 4, "default vibration delivery changed");
-        // 二、感测体所在区块保持 entityTicking，只把**相邻**区块降到 loaded（加载环允许）。
+        // 二、监听者在 blockTicking 边缘区块，相邻区块只有 loaded。
+        // entityTicking 区块的八邻居至少 blockTicking，不能用那个不可达构造作原版证据。
         // 感测体一旦被激活就会先 active 再 cooldown 最后回到 inactive，所以要在这三段之内
         // 直接看 sculk_sensor_phase，光看功率会漏掉「已经响过又冷却完了」。
         Simulator s(r); build(s, "sculk_sensor");
+        s.setChunkState(0, 0, Simulator::ChunkState::blockTicking);
         s.setChunkState(1, 0, Simulator::ChunkState::loaded);
         auto idle = [&](const Simulator& world) {
             return world.displayValue(pos) == 0 && r.property(world.world.get(pos), "sculk_sensor_phase") == "inactive";
@@ -886,16 +932,17 @@ int main() {
         Simulator restored(r); restored.loadProject(saved);
         expect(restored.saveProject("stuck", true) == saved, "blocked vibration checkpoint changed across a reload");
         for (Simulator* world : {&s, &restored}) {
-            world->setChunkState(1, 0, Simulator::ChunkState::entityTicking);
+            world->setChunkState(1, 0, Simulator::ChunkState::blockTicking);
             world->advanceTo(41);
             expect(world->displayValue(pos) == 4, "vibration was dropped instead of retried once the adjacent chunk resumed");
         }
         // 四、校准幽匿感测体走同一条路径（半径 16，同样距离 6 → 功率 10）。
         Simulator c(r); build(c, "calibrated_sculk_sensor");
+        c.setChunkState(0, 0, Simulator::ChunkState::blockTicking);
         c.setChunkState(0, -1, Simulator::ChunkState::loaded);  // 换一个方向的相邻区块
         c.advanceTo(8); expect(idle(c), "calibrated sensor ignored the adjacent chunk requirement");
         c.advanceTo(40); expect(idle(c), "calibrated sensor delivered later while the chunk was still stalled");
-        c.setChunkState(0, -1, Simulator::ChunkState::entityTicking);
+        c.setChunkState(0, -1, Simulator::ChunkState::blockTicking);
         c.advanceTo(41);
         expect(c.displayValue(pos) == 10, "calibrated sensor never delivered after the adjacent chunk resumed");
     });
@@ -957,6 +1004,7 @@ int main() {
             try { target.loadProject(broken); } catch (...) { threw = true; }
             return threw;
         };
+        expect(corrupt([](Json& e) { e = Json::array(); }), "snapshot accepted noncanonical empty container entity list");
         expect(corrupt([](Json& e) { e.at(0)["type"] = "minecart"; }), "snapshot with a non-container minecart accepted");
         expect(corrupt([&](Json& e) { e.at(0)["inventory"] = Json::array({stone(27, 1)}); }), "snapshot with an out-of-range cart slot accepted");
         expect(corrupt([&](Json& e) { e.at(0)["inventory"] = Json::array({stone(0, 65)}); }), "snapshot with an over-stacked cart slot accepted");

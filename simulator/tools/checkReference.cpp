@@ -56,6 +56,8 @@ int main(int argc, char** argv) {
                 // 随机源对照：两侧在第 0 刻设同一个种子，之后逐帧比较 48 位内部状态。
                 if (fixture.contains("randomSeed") && tick == 0) simulation.setRandomSeed(fixture.at("randomSeed").get<std::uint64_t>());
                 simulation.advanceTo(tick);
+                if (simulation.currentTick != tick || simulation.breakRequested || simulation.hasPendingActions())
+                    throw std::runtime_error("Replay stopped before completing observation tick " + std::to_string(tick));
                 simulation.markUpdateTrace(tick);
                 for (const auto& command : fixture.at("commands")) if (command.at("tick") == tick) {
                     const auto pos = absolute(command.at("pos"));
@@ -73,6 +75,8 @@ int main(int argc, char** argv) {
                     }
                     else simulation.stimulate(pos, command.at("stimulus"));
                 }
+                if (simulation.breakRequested || simulation.hasPendingActions())
+                    throw std::runtime_error("Replay requires explicit external-action feedback");
                 if (frame.contains("randomState") && !differs) {
                     const auto actual = static_cast<std::int64_t>(simulation.randomState());
                     if (frame.at("randomState").get<std::int64_t>() != actual) {

@@ -33,12 +33,15 @@
    - `BlockTicks::collect` / `nextTick` 带 `TickCheck` 谓词，跳过不可 ticking 的区块容器头，
      触发时刻与插入序号保持不变（与 `sortContainersToTick` 一致）；
    - 方块事件（阶段 1）在区块不可 blockTicking 时**改排到下一刻**；
-   - 方块实体与实体接触阶段（阶段 2、3）要求 `entityTicking`，否则同样顺延；
+   - 方块实体（阶段 2）要求 `blockTicking`；实体接触（阶段 3）要求 `entityTicking`，否则顺延；
+     原版 `LevelChunk.isTicking` 还要求实体数据已加载，当前显式状态输入假定该条件已满足，
+     不模拟实体数据异步加载窗口。之前把阶段 2 也要求 entityTicking 是错误的；
    - `updateComparatorNeighbors` 对 `unloaded` 位置跳过（对应 `hasChunkAt`）；
    - 写入 `unloaded` 区块直接报错，不静默成功。
 3. **倒计时冻结**。原版里方块实体的冷却是每次 tick 递减一次，区块不 tick 就不递减。
    内核把冷却存成绝对时刻，因此在区块恢复时把 `readyAt` / `firstTick` / `candidateTick`
-   整体后移「停摆时长」，等价于冻结。计划刻**不**后移：原版保留原触发时刻。
+   整体后移「停摆时长」，等价于冻结。恢复到 blockTicking 即恢复方块实体，
+   blockTicking 与 entityTicking 之间切换不冻结、不额外平移计时。计划刻**不**后移。
 4. **加载环不变量**。原版可 ticking 的区块，其周围八个区块的票据等级必然至少是已加载。
    `setChunkState` 把它作为输入约束强制执行：可 ticking 的区块旁边不能有 `unloaded`。
    因此 ticking 的逻辑永远读不到未加载的方块，**读路径不需要任何额外判断**。
@@ -49,6 +52,11 @@
    `profile.loadedRegionOnly` 仍为 true：世界不会自动加载区块。
 
 ## 原版差分
+
+2026-09-09 收尾补充：`java26_2BlockTicking`（`captureBlockTicking.py`）单独覆盖
+blockTicking=true、entityTicking=false 的中间状态。21 帧 / 2 点，漏斗在第 9 刻继续搬运，
+恢复实体 ticking 后第 17 刻再次搬运，严格 vanilla-only 捕获与内核匹配。
+这证实方块实体门禁不能使用 entityTicking。详见 [收尾审计](layeredAudit.md)。
 
 `captureChunkLifecycle.py` 用严格 vanilla-only 服务器在**选定的、按区块对齐的原点**上捕获
 （GameTest 自选随机原点，做不到这一点；这两个 fixture 因此带 `requiresAlignedOrigin`，
