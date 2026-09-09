@@ -32,29 +32,37 @@ runs `Containers.dropContents` for any reason with `shouldDestroy()`, and `dropI
 three `nextDouble()`s per slot **before** it tests emptiness, so discarding one empty chest boat
 would burn 27x6 = 162 level-random draws — capture machinery, not modelled behaviour.
 
-Geometry note (important, and the reason the push cases watch only the boat's cell).
-A chest boat's bounding box is 1.375 x 0.5625 x 1.375 and `setPos` puts its **feet** at the cell
-centre, so a boat declared in cell C really overlaps the 3x2x3 block of cells around it
-(`x-1..x+1`, `y..y+1`, `z-1..z+1`). Every cell of that block reports the boat to
-`getEntityContainer`. That is a property of the real entity, not of this protocol, and the kernel
-models a container entity as belonging to exactly one declared cell. To keep this fixture about the
-container rules rather than about box extents, every watched cell here is either the boat's own
-cell or far enough away that the box cannot reach it:
+Geometry note (important, and the reason the push cases watch only the boat's cell). **Measured**,
+see `ProbeEntityBoxN.java` and `probeBoatBoxN.py`. A chest boat's registered size is
+`sized(1.375F, 0.5625F)` and `setPos` puts its **feet** at the cell centre, so a boat declared in
+cell `(X, Y, Z)` has the box `[X-0.1875, X+1.1875] x [Y+0.5, Y+1.0625] x [Z-0.1875, Z+1.1875]` and
+really overlaps the 3x2x3 = 18 cells `x-1..x+1`, `y..y+1`, `z-1..z+1`. A live capture confirms it:
+every one of those eighteen cells reports the boat to the `getEntityContainer` query, and no
+nineteenth cell does. A container minecart, by contrast, reaches 1x2x1 = 2 cells. That is a
+property of the real entity, not of this protocol, and the kernel models a container entity as
+belonging to exactly one declared cell. To keep this fixture about the container rules rather than
+about box extents, every watched cell here is either the boat's own cell or far enough away that
+the box cannot reach it:
   * pull cases put the boat one cell **above** the hopper — the boat spans y..y+1 upward, so the
     hopper's own cell stays clear and the hopper's source cell is the boat's cell;
   * push cases put the boat one cell **below** the hopper, where the boat's box does poke 0.0625
     into the hopper's cell, so the hopper's cell is deliberately **not** watched. B instead proves
     that nothing moved by draining the hopper into a chest placed in the boat's old cell afterwards.
-The stand-alone consequence of the box extent is left to a separate probe; see agentN notes.
+The stand-alone consequence of the box extent is measured by `probeBoatBoxN.py`, which is a probe
+and not a fixture: this protocol has no way to express an entity that spans eighteen cells.
 
-Draw ledger (all draw ticks disjoint, so every `randomState` step is attributable):
+Draw ledger — **measured**, every tick below advances the level random by exactly one LCG step and
+no other tick advances it at all, so every step is attributable to one sub-scenario:
   A ticks 5, 13            nextInt(1), value unobservable, the pull moves one item each time
-  B ticks 17..27           nextInt(1) every tick, nothing moves at all
-  C ticks 29, 37, 45       nextInt(2), the choice is visible in which inventory loses an item
-  D ticks 53, 61, 69       nextInt(2), reversed spawn order
-  E ticks 77, 85           nextInt(1), the push succeeds
+  B ticks 17..27           nextInt(1) on all eleven ticks, nothing moves at all
+  C ticks 29, 37, 45       nextInt(2) -> 0, 1, 0 (minecart, boat, minecart)
+  D ticks 53, 61, 69       nextInt(2) -> 1, 0, 1 (minecart, boat, minecart) with the order reversed
+  E ticks 77, 85           nextInt(1), the push succeeds and sets the 8 gt cooldown
 Everything else is silent: an empty hopper never reaches `ejectItems`, and `getEntityContainer`
-returns null **without drawing** when the box holds no candidate.
+returns null **without drawing** when the box holds no candidate. B's tick 29 is silent for the
+same reason C's tick 29 is not: a block container short-circuits `getContainerAt` before the draw.
+`checkReference` reports `match` on this fixture; the four mutants in `mutateBoatN.py` are the
+negative controls showing the comparison can fail on each of the claims above.
 """
 from captureRedstone import state
 from captureVanillaScenario import runVanillaCapture
