@@ -375,7 +375,9 @@ void Simulator::loadProject(ProjectSource& source) {
             const bool stuck=sensor.current && sensor.remaining==0 && !candidate.adjacentChunksTicking(pos);
             if(sensor.remaining<0 || sensor.remaining>18 || sensor.candidateTick>candidate.currentTick || (sensor.candidate && sensor.current) || (!sensor.current && sensor.remaining!=0)
                 || (sensor.current && !stuck && (sensor.remaining==0 || sensor.remaining>=static_cast<int>(std::floor(sensor.current->distance))))
-                || (busy && (sensor.wakeAt<candidate.currentTick || sensor.wakeAt==UINT64_MAX || sensor.generation>=candidate.nextOrder)) || (!busy && sensor.wakeAt!=UINT64_MAX))throw std::invalid_argument("感测体传播与唤醒状态不一致");
+                // 停摆区块里最后一批事件被放回当刻、随后空闲推进跳到目标刻，wakeAt 因此
+                // 落在 currentTick 之前。与漏斗同样为这种状态开口子。
+                || (busy && ((sensor.wakeAt<candidate.currentTick && candidate.chunkBlockTicking(pos)) || sensor.wakeAt==UINT64_MAX || sensor.generation>=candidate.nextOrder)) || (!busy && sensor.wakeAt!=UINT64_MAX))throw std::invalid_argument("感测体传播与唤醒状态不一致");
             if(busy && !candidate.scheduledKeys.contains({pos,candidate.at(pos).type,2,sensor.generation}))throw std::invalid_argument("快照缺少感测体唤醒事件");
             if(!candidate.sensors.emplace(pos,sensor).second)throw std::invalid_argument("重复感测体运行数据");
         }
@@ -398,7 +400,8 @@ void Simulator::loadProject(ProjectSource& source) {
             const auto stack=candidate.stackAt({pos,0});
             if(player.song>=0 && (!stack.count || registry.item(stack.item).jukeboxSong!=player.song))throw std::invalid_argument("播放曲目与唱片不一致");
             const bool ticking=player.song>=0 && hasRecord;
-            if(ticking!=(player.wakeAt!=UINT64_MAX) || (ticking && (player.wakeAt<candidate.currentTick || player.wakeAt<player.firstTick || player.generation>=candidate.nextOrder || !candidate.scheduledKeys.contains({pos,candidate.at(pos).type,2,player.generation}))))throw std::invalid_argument("唱片机播放与队列不一致");
+            // 与漏斗、感测体同理：停摆区块里的唱片机 wakeAt 会落在 currentTick 之前。
+            if(ticking!=(player.wakeAt!=UINT64_MAX) || (ticking && ((player.wakeAt<candidate.currentTick && candidate.chunkBlockTicking(pos)) || player.wakeAt<player.firstTick || player.generation>=candidate.nextOrder || !candidate.scheduledKeys.contains({pos,candidate.at(pos).type,2,player.generation}))))throw std::invalid_argument("唱片机播放与队列不一致");
             if(!candidate.jukeboxes.emplace(pos,player).second)throw std::invalid_argument("重复唱片机数据");
         }
         auto jukeboxQueue=candidate.scheduled;
@@ -415,7 +418,10 @@ void Simulator::loadProject(ProjectSource& source) {
             if(event.phase!=2)continue;
             if(!candidate.runtime.contains(event.pos))throw std::invalid_argument("钟缺少运行数据");
             const auto& values=candidate.runtime.at(event.pos).values;
-            if(!values.value("ringing",false) || values.at("bellWakeAt")!=event.tick || values.at("bellGeneration")!=event.data || !queuedBells.insert(event.pos).second)throw std::invalid_argument("钟摆动与队列不一致");
+            // 停摆区块里事件被放回当刻，而 bellWakeAt 保持冻结的结束时刻，两者可以不等；
+            // 恢复后 finishBell 会按 bellWakeAt 重排，届时又必须相等。
+            const bool bellStalled=!candidate.chunkBlockTicking(event.pos);
+            if(!values.value("ringing",false) || (!bellStalled && values.at("bellWakeAt")!=event.tick) || values.at("bellGeneration")!=event.data || !queuedBells.insert(event.pos).second)throw std::invalid_argument("钟摆动与队列不一致");
         }
         candidate.world.forEachCell([&](Cell cell) { if(registry[cell.state].device==Device::bell) {
             if(!candidate.entityOrders.contains(cell.pos))throw std::invalid_argument("钟缺少方块实体顺序");

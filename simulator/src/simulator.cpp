@@ -116,6 +116,11 @@ void Simulator::shiftBlockEntityTimers(BlockPos chunk, Tick delta) {
     for (auto& [pos, hopper] : hoppers) if (inChunk(pos)) { shift(hopper.readyAt); shift(hopper.firstTick); }
     for (auto& [pos, player] : jukeboxes) if (inChunk(pos)) shift(player.firstTick);
     for (auto& [pos, sensor] : sensors) if (inChunk(pos)) shift(sensor.candidateTick);
+    // 钟的 bellWakeAt 是「摆动还剩多久」的倒计时，和漏斗冷却同类，停摆期间必须冻结。
+    // 它同时又是那个方块实体事件的触发时刻，因此恢复后由 finishBell 按新值重排。
+    for (auto& [pos, data] : runtime)
+        if (inChunk(pos) && data.values.contains("bellWakeAt"))
+            data.values["bellWakeAt"] = data.values.at("bellWakeAt").get<Tick>() + delta;
 }
 bool Simulator::runnable() const {
     if (blockTicks.hasBatch() || blockTicks.nextTick(blockTickCheck())) return true;

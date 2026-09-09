@@ -316,7 +316,7 @@ int main() {
         try { restored.loadProject(invalid); } catch (...) { threw = true; }
         expect(threw && before == restored.saveProject("before", true), "invalid batch import changed world");
     });
-    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers", "java26_2Hoppers", "java26_2Torches", "java26_2Rails", "java26_2TickBatches", "java26_2Tripwire", "java26_2Buttons", "java26_2Droppers", "java26_2Targets", "java26_2CopperChests", "java26_2Bookshelves", "java26_2Pots", "java26_2Vibrations", "java26_2DeviceVibrations", "java26_2Notes", "java26_2Bells", "java26_2Jukeboxes", "java26_2JukeboxHoppers", "java26_2Composters", "java26_2WireGeometry", "java26_2PistonPushability", "java26_2DaylightVibration", "java26_2StairShapes", "java26_2RailNotificationSource", "java26_2PistonRemovalCallback", "java26_2DiodeSupportBreak", "java26_2ObserverRemoval", "java26_2PistonLandingShape", "java26_2WireShapeToggle", "java26_2RemovalNotifySource", "java26_2RepeaterLockRefresh", "java26_2ItemFrameComparator", "java26_2UpdateTrace", "java26_2MachineMatrix", "java26_2SupportDirection", "java26_2FenceGateInWall", "java26_2UpdateSource", "java26_2HopperPickup", "java26_2ChunkLifecycle", "java26_2ChunkLifecycleNegative", "java26_2ScheduledQueue", "java26_2RandomState", "java26_2BlockEntityOrder", "java26_2EntityContainers", "java26_2BlockTicking"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
+    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers", "java26_2Hoppers", "java26_2Torches", "java26_2Rails", "java26_2TickBatches", "java26_2Tripwire", "java26_2Buttons", "java26_2Droppers", "java26_2Targets", "java26_2CopperChests", "java26_2Bookshelves", "java26_2Pots", "java26_2Vibrations", "java26_2DeviceVibrations", "java26_2Notes", "java26_2Bells", "java26_2Jukeboxes", "java26_2JukeboxHoppers", "java26_2Composters", "java26_2WireGeometry", "java26_2PistonPushability", "java26_2DaylightVibration", "java26_2StairShapes", "java26_2RailNotificationSource", "java26_2PistonRemovalCallback", "java26_2DiodeSupportBreak", "java26_2ObserverRemoval", "java26_2PistonLandingShape", "java26_2WireShapeToggle", "java26_2RemovalNotifySource", "java26_2RepeaterLockRefresh", "java26_2ItemFrameComparator", "java26_2UpdateTrace", "java26_2MachineMatrix", "java26_2SupportDirection", "java26_2FenceGateInWall", "java26_2UpdateSource", "java26_2HopperPickup", "java26_2ChunkLifecycle", "java26_2ChunkLifecycleNegative", "java26_2ScheduledQueue", "java26_2RandomState", "java26_2BlockEntityOrder", "java26_2EntityContainers", "java26_2BlockTicking", "java26_2SensorEdgeChunks", "java26_2SensorEdgeDiagonal", "java26_2SensorEdgeNegative"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
         std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/../tests/fixtures/" + fixtureName + ".json"); expect(static_cast<bool>(file), "missing vanilla reference fixture");
         const auto fixture = Json::parse(file); Simulator s(r);
         // 差分重放循环与 checkReference 工具共用 referenceReplay.hpp 里的同一份实现，
@@ -877,6 +877,40 @@ int main() {
         }
         expect(s.inventoryJson({2, 0, 6}, false) == restored.inventoryJson({2, 0, 6}, false),
                "hopper cooldown differs after restoring a stalled checkpoint");
+    });
+    test("唱片机、感测体与钟在停摆区块里也能存读，且钟的摆动计时同样冻结", [&] {
+        // 停摆时 `stepEvent` 把最后一批事件放回**当前刻**并停下，随后空闲推进把 currentTick
+        // 直接跳到目标刻，于是这些方块实体的 wakeAt 落在 currentTick 之前。漏斗的快照校验
+        // 为此开了口子，唱片机与感测体没有；钟则连 wakeAt 同步都没有。
+        // 另外 `bellWakeAt` 是「摆动还剩多久」的倒计时，停摆期间必须和漏斗冷却一样冻结。
+        Simulator s(r);
+        for (int x = 0; x < 8; ++x) for (int z = 0; z < 8; ++z) s.world.set({x, -1, z}, r.state("stone"));
+        s.place({1, 0, 1}, r.state("jukebox"));
+        s.stimulate({1, 0, 1}, {{"inventory", Json::array({{{"slot", 0}, {"item", "minecraft:music_disc_cat"}, {"count", 1}}})}});
+        s.place({1, 0, 4}, r.state("sculk_sensor"));
+        s.place({1, 0, 6}, r.state("bell"));
+        s.interact({1, 0, 6});
+        s.advanceTo(2);
+        s.stimulate({4, 0, 4}, {{"gameEvent", "minecraft:block_place"}});
+        s.advanceTo(3);
+        expect(s.inspect({1, 0, 6})["runtime"]["ringing"] == true, "bell was not ringing before the stall");
+        const auto elapsedBefore = s.inspect({1, 0, 1}).at("jukebox").at("elapsed");
+        s.setChunkState(0, 0, Simulator::ChunkState::loaded);
+        s.advanceTo(300);
+        expect(s.inspect({1, 0, 1}).at("jukebox").at("elapsed") == elapsedBefore, "jukebox kept counting while stalled");
+        expect(s.inspect({1, 0, 6})["runtime"]["ringing"] == true, "bell shake timer kept running while stalled");
+        // 停摆中存读：三种方块实体的快照都必须能原样加载。
+        auto saved = s.saveProject("stalledEntities", true);
+        Simulator restored(r); restored.loadProject(saved);
+        expect(restored.saveProject("stalledEntities", true) == saved, "stalled block entity checkpoint diverged");
+        // 恢复后钟还应当摆完剩下的刻数，而不是一恢复就停。
+        for (Simulator* world : {&s, &restored}) {
+            world->setChunkState(0, 0, Simulator::ChunkState::entityTicking);
+            world->advanceTo(301);
+            expect(world->inspect({1, 0, 6})["runtime"]["ringing"] == true, "bell stopped immediately after the chunk resumed");
+            world->advanceTo(360);
+            expect(world->inspect({1, 0, 6})["runtime"]["ringing"] == false, "bell never stopped after resuming");
+        }
         // 未加载区块拒绝写入；可 ticking 区块周围八格不能是未加载区块，
         // 因此要先把一圈降级成 loaded 才能卸载中心，正如原版票据等级形成的加载环。
         for (int dx = -1; dx <= 1; ++dx) for (int dz = -1; dz <= 1; ++dz) s.setChunkState(5 + dx, 5 + dz, Simulator::ChunkState::loaded);
