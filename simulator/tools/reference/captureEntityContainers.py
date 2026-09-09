@@ -94,7 +94,11 @@ watch += [[18, 1, 4], [18, 2, 4]]
 #    hopper together with a dropped item inside the suck volume: vanilla draws, takes the cart
 #    branch, finds nothing and returns without ever looking at the item. The cart is removed in
 #    that same tick, and at tick 4 the very same item is picked up, which proves it was reachable
-#    all along and only the cart was in the way.
+#    all along and only the cart was in the way. Withdrawing the cart uses the `CHANGED_DIMENSION`
+#    removal reason instead of `discard()`: destroying a container minecart runs
+#    `Containers.dropContents`, whose `dropItemStack` draws three `nextDouble()`s per slot before it
+#    tests emptiness — 162 level-random draws for an empty chest minecart. That is capture
+#    machinery, not modelled behaviour, and the first capture of this scenario tripped over it.
 floor(25, 4)
 put(0, (25, 1, 4), 'hopper', facing='down')
 carts(2, (25, 2, 4), [cart('chest_minecart')])
