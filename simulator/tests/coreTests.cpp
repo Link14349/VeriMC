@@ -876,6 +876,113 @@ int main() {
         s.place({3, 1, 0}, r.state("chest"));
         expect(rejects({3, 1, 0}, {{"groundItems", Json::array({{{"item", "minecraft:stone"}, {"count", 1}}})}}), "drops accepted on a chest");
     });
+    test("container entity declaration, replacement and snapshot round-trip", [&] {
+        Simulator s(r); floor(s);
+        const BlockPos cart{0, 2, 0};
+        auto declare = [&](const Json& entities) { s.stimulate(cart, {{"containerEntities", entities}}); };
+        auto stone = [](int slot, int count) { return Json{{"slot", slot}, {"item", "minecraft:stone"}, {"count", count}}; };
+        // 空气格上的声明：矿车通常停在空气或铁轨那一格里，不需要方块承载。
+        declare(Json::array({{{"type", "chest_minecart"}, {"inventory", Json::array({stone(0, 5), stone(26, 1)})}},
+                             {{"type", "hopper_minecart"}, {"inventory", Json::array({stone(4, 2)})}}}));
+        expect(s.world.get(cart) == 0, "declaring container entities placed a block");
+        expect(s.containerEntitiesJson(cart).size() == 2, "declared container entities were dropped");
+        expect(s.containerEntitiesJson(cart).at(0).at("inventory").size() == 2, "minecart inventory was not stored");
+        // 整体替换，不是合并。
+        declare(Json::array({{{"type", "hopper_minecart"}, {"inventory", Json::array()}}}));
+        expect(s.containerEntitiesJson(cart).size() == 1 && s.containerEntitiesJson(cart).at(0).at("type") == "hopper_minecart",
+               "container entity declaration was merged instead of replaced");
+        // 工程与运行快照都必须带上空气格里的声明。
+        declare(Json::array({{{"type", "chest_minecart"}, {"inventory", Json::array({stone(0, 3)})}}}));
+        for (bool checkpoint : {false, true}) {
+            auto saved = s.saveProject("carts", checkpoint); Simulator restored(r); restored.loadProject(saved);
+            expect(restored.containerEntitiesJson(cart) == s.containerEntitiesJson(cart),
+                   std::string(checkpoint ? "checkpoint" : "project") + " lost the container entity declaration");
+        }
+        auto snapshot = s.saveProject("carts", true);
+        auto corrupt = [&](const std::function<void(Json&)>& mutate) {
+            auto broken = snapshot;
+            for (auto& row : broken["blockData"]) if (row["values"].contains("containerEntities")) mutate(row["values"]["containerEntities"]);
+            Simulator target(r); bool threw = false;
+            try { target.loadProject(broken); } catch (...) { threw = true; }
+            return threw;
+        };
+        expect(corrupt([](Json& e) { e.at(0)["type"] = "minecart"; }), "snapshot with a non-container minecart accepted");
+        expect(corrupt([&](Json& e) { e.at(0)["inventory"] = Json::array({stone(27, 1)}); }), "snapshot with an out-of-range cart slot accepted");
+        expect(corrupt([&](Json& e) { e.at(0)["inventory"] = Json::array({stone(0, 65)}); }), "snapshot with an over-stacked cart slot accepted");
+        expect(corrupt([](Json& e) { e = Json::object(); }), "snapshot with a non-array cart list accepted");
+        // 空数组整体移除，空气格上不再留下器件数据行。
+        declare(Json::array());
+        expect(s.containerEntitiesJson(cart).empty(), "clearing the declaration left entities behind");
+        expect(s.saveProject("carts", true).at("blockData").empty(), "an empty declaration left a runtime row on air");
+        auto rejects = [&](BlockPos pos, const Json& input) {
+            bool threw = false; try { s.stimulate(pos, input); } catch (...) { threw = true; }
+            return threw;
+        };
+        expect(rejects(cart, {{"containerEntities", Json::array({{{"type", "minecart"}}})}}), "a non-container minecart was accepted");
+        expect(rejects(cart, {{"containerEntities", Json::array({{{"inventory", Json::array()}}})}}), "a container entity without a type was accepted");
+        expect(rejects(cart, {{"containerEntities", Json::array({{{"type", "chest_minecart"}, {"x", 1}}})}}), "an unknown container entity field was accepted");
+        expect(rejects(cart, {{"containerEntities", Json::array({{{"type", "hopper_minecart"}, {"inventory", Json::array({stone(5, 1)})}}})}}), "an out-of-range hopper minecart slot was accepted");
+        expect(rejects(cart, {{"containerEntities", Json::array({{{"type", "chest_minecart"}, {"inventory", Json::array({stone(0, 65)})}}})}}), "an over-stacked cart slot was accepted");
+        expect(rejects(cart, {{"containerEntities", Json::array({{{"type", "chest_minecart"}, {"inventory", Json::array({stone(1, 1), stone(1, 1)})}}})}}), "a duplicated cart slot was accepted");
+        expect(rejects(cart, {{"containerEntities", Json::object()}}), "a non-array container entity list was accepted");
+        expect(rejects(cart, {{"containerEntities", Json::array()}, {"viewers", 1}}), "a mixed container entity stimulus was accepted");
+        Json many = Json::array();
+        for (int i = 0; i < 17; ++i) many.push_back({{"type", "hopper_minecart"}, {"inventory", Json::array()}});
+        expect(rejects(cart, {{"containerEntities", many}}), "more container entities than the declared limit were accepted");
+        expect(s.containerEntitiesJson(cart).empty(), "a rejected declaration still changed the cell");
+    });
+    test("hoppers pull from and push into declared container minecarts", [&] {
+        auto stone = [](int slot, int count) { return Json{{"slot", slot}, {"item", "minecraft:stone"}, {"count", count}}; };
+        // 拉取：上方没有方块容器，改用实体容器；候选只有一个时原版仍然调用 nextInt(1)。
+        Simulator s(r); floor(s);
+        const BlockPos puller{0, 1, 0}, above{0, 2, 0};
+        s.place(puller, r.state("hopper", {{"facing", "down"}}));
+        s.stimulate(above, {{"containerEntities", Json::array({{{"type", "chest_minecart"}, {"inventory", Json::array({stone(0, 2)})}}})}});
+        const auto beforeDraw = s.randomState();
+        s.advanceTo(4);
+        expect(s.randomState() != beforeDraw, "getEntityContainer with one candidate consumed no random draw");
+        expect(s.inventoryJson(puller, false) == Json::array({{{"slot", 0}, {"item", "minecraft:stone"}, {"count", 1}}}),
+               "hopper did not pull a single item from the chest minecart: " + s.inventoryJson(puller, false).dump());
+        expect(s.containerEntitiesJson(above).at(0).at("inventory") == Json::array({stone(0, 1)}),
+               "the minecart slot was not decremented: " + s.containerEntitiesJson(above).dump());
+        s.advanceTo(20);
+        expect(s.containerEntitiesJson(above).at(0).at("inventory").empty(), "the second pull did not empty the minecart");
+        expect(s.inventoryJson(puller, false).at(0).at("count") == 2, "the hopper did not keep both pulled items");
+        // 原版 suckInItems：容器分支（含实体容器）一旦命中就直接返回，根本不看掉落物，
+        // 空的容器实体同样会把掉落物挡在外面。
+        Simulator both(r); floor(both);
+        both.place(puller, r.state("hopper", {{"facing", "down"}}));
+        both.stimulate(puller, {{"groundItems", Json::array({{{"item", "minecraft:dirt"}, {"count", 1}, {"y", 1.2}}})}});
+        both.stimulate(above, {{"containerEntities", Json::array({{{"type", "chest_minecart"}, {"inventory", Json::array({stone(0, 1)})}}})}});
+        both.advanceTo(4);
+        expect(both.inventoryJson(puller, false).at(0).at("item") == "minecraft:stone", "the hopper preferred the dropped item over the container entity");
+        both.advanceTo(40);
+        expect(both.suckableItems(puller).size() == 1, "an emptied container entity stopped shadowing the dropped item");
+        // 方块容器优先：同一格既有箱子又有声明的矿车时，只看箱子，也不消耗随机数。
+        Simulator shadowed(r); floor(shadowed);
+        shadowed.place(puller, r.state("hopper", {{"facing", "down"}}));
+        shadowed.place(above, r.state("chest"));
+        shadowed.stimulate(above, {{"inventory", Json::array({{{"slot", 0}, {"item", "minecraft:dirt"}, {"count", 1}}})}});
+        shadowed.stimulate(above, {{"containerEntities", Json::array({{{"type", "chest_minecart"}, {"inventory", Json::array({stone(0, 1)})}}})}});
+        const auto shadowedDraw = shadowed.randomState();
+        shadowed.advanceTo(4);
+        expect(shadowed.randomState() == shadowedDraw, "a block container above still consulted the entity container");
+        expect(shadowed.inventoryJson(puller, false).at(0).at("item") == "minecraft:dirt", "the hopper took from the shadowed minecart");
+        expect(shadowed.containerEntitiesJson(above).at(0).at("inventory") == Json::array({stone(0, 1)}), "the shadowed minecart was modified");
+        // 推出：朝向格没有方块容器时改用实体容器；矿车不是方块实体，写入不通知比较器。
+        Simulator push(r); floor(push);
+        const BlockPos pusher{0, 1, 0}, front{1, 1, 0};
+        push.place(pusher, r.state("hopper", {{"facing", "east"}}));
+        push.stimulate(front, {{"containerEntities", Json::array({{{"type", "hopper_minecart"}, {"inventory", Json::array()}}})}});
+        push.stimulate(pusher, {{"inventory", Json::array({stone(0, 1)})}});
+        push.advanceTo(4);
+        expect(push.inventoryJson(pusher, false).empty(), "the hopper kept the item instead of pushing it into the minecart");
+        expect(push.containerEntitiesJson(front).at(0).at("inventory") == Json::array({stone(0, 1)}),
+               "the hopper minecart did not receive the pushed item: " + push.containerEntitiesJson(front).dump());
+        auto saved = push.saveProject("push", true); Simulator restored(r); restored.loadProject(saved);
+        expect(restored.containerEntitiesJson(front) == push.containerEntitiesJson(front), "transferred cart inventory lost across checkpoint");
+        expect(restored.saveProject("push", true) == saved, "container entity checkpoint diverged");
+    });
     test("full 26.2 sine table and daylight index boundaries", [&] {
         std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/../tests/fixtures/java26_2SineTable.json");
         expect(static_cast<bool>(file), "missing vanilla sine table fixture");
