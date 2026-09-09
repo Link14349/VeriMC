@@ -346,7 +346,12 @@ public class CaptureRedstone extends TestFunctionLoader {
             // 速度清零、关闭重力，与掉落物、压力板、绊线的接触输入是同一个约定：不模拟运动轨迹。
             // 声明顺序就是生成顺序，也就是原版实体分区存储里的插入顺序。
             if (input.has("containerEntities")) {
-                for (var existing : occupants.getOrDefault(pos, List.of())) existing.discard();
+                // 撤走声明的矿车不能用 discard()：AbstractMinecartContainer.remove 在
+                // reason.shouldDestroy() 时调用 Containers.dropContents，而 dropItemStack
+                // **先抽三个 nextDouble 再判断槽位是否为空**，一辆空的运输矿车就要消耗
+                // 27×6=162 次世界随机。CHANGED_DIMENSION 是原版「实体不在这个世界里了」的
+                // 移除理由，走同一套分区/停止 tick 的清理，但不掉落内容物。
+                for (var existing : occupants.getOrDefault(pos, List.of())) existing.remove(Entity.RemovalReason.CHANGED_DIMENSION);
                 var spawned = new ArrayList<Entity>(); occupants.put(pos, spawned);
                 for (var value : input.getAsJsonArray("containerEntities")) {
                     var row = value.getAsJsonObject();

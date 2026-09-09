@@ -1,0 +1,6838 @@
+{
+  "endTick": 40,
+  "commands": [
+    {
+      "tick": 0,
+      "pos": [
+        3,
+        0,
+        3
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        3,
+        0,
+        4
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        3,
+        0,
+        5
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        4,
+        0,
+        3
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        4,
+        0,
+        4
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        4,
+        0,
+        5
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        5,
+        0,
+        3
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        5,
+        0,
+        4
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        5,
+        0,
+        5
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        4,
+        1,
+        4
+      ],
+      "stateId": 11313
+    },
+    {
+      "tick": 4,
+      "pos": [
+        4,
+        2,
+        4
+      ],
+      "stimulus": {
+        "containerEntities": [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 6
+              },
+              {
+                "slot": 26,
+                "item": "minecraft:dirt",
+                "count": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "tick": 0,
+      "pos": [
+        10,
+        0,
+        3
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        10,
+        0,
+        4
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        10,
+        0,
+        5
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        11,
+        0,
+        3
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        11,
+        0,
+        4
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        11,
+        0,
+        5
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        12,
+        0,
+        3
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        12,
+        0,
+        4
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        12,
+        0,
+        5
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        12,
+        0,
+        4
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        11,
+        1,
+        4
+      ],
+      "stateId": 11317
+    },
+    {
+      "tick": 0,
+      "pos": [
+        11,
+        1,
+        4
+      ],
+      "stimulus": {
+        "inventory": [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 3
+          }
+        ]
+      }
+    },
+    {
+      "tick": 0,
+      "pos": [
+        12,
+        1,
+        4
+      ],
+      "stimulus": {
+        "containerEntities": [
+          {
+            "type": "hopper_minecart",
+            "inventory": []
+          }
+        ]
+      }
+    },
+    {
+      "tick": 0,
+      "pos": [
+        17,
+        0,
+        3
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        17,
+        0,
+        4
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        17,
+        0,
+        5
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        18,
+        0,
+        3
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        18,
+        0,
+        4
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        18,
+        0,
+        5
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        19,
+        0,
+        3
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        19,
+        0,
+        4
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        19,
+        0,
+        5
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        18,
+        1,
+        4
+      ],
+      "stateId": 11313
+    },
+    {
+      "tick": 0,
+      "pos": [
+        18,
+        2,
+        4
+      ],
+      "stateId": 3988
+    },
+    {
+      "tick": 0,
+      "pos": [
+        18,
+        2,
+        4
+      ],
+      "stimulus": {
+        "inventory": [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 3
+          }
+        ]
+      }
+    },
+    {
+      "tick": 0,
+      "pos": [
+        18,
+        2,
+        4
+      ],
+      "stimulus": {
+        "containerEntities": [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 2
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "tick": 0,
+      "pos": [
+        24,
+        0,
+        3
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        24,
+        0,
+        4
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        24,
+        0,
+        5
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        25,
+        0,
+        3
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        25,
+        0,
+        4
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        25,
+        0,
+        5
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        26,
+        0,
+        3
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        26,
+        0,
+        4
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        26,
+        0,
+        5
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        25,
+        1,
+        4
+      ],
+      "stateId": 11313
+    },
+    {
+      "tick": 2,
+      "pos": [
+        25,
+        2,
+        4
+      ],
+      "stimulus": {
+        "containerEntities": [
+          {
+            "type": "chest_minecart",
+            "inventory": []
+          }
+        ]
+      }
+    },
+    {
+      "tick": 2,
+      "pos": [
+        25,
+        1,
+        4
+      ],
+      "stimulus": {
+        "groundItems": [
+          {
+            "item": "minecraft:dirt",
+            "count": 1,
+            "y": 1.05
+          }
+        ]
+      }
+    },
+    {
+      "tick": 3,
+      "pos": [
+        25,
+        2,
+        4
+      ],
+      "stimulus": {
+        "containerEntities": []
+      }
+    },
+    {
+      "tick": 0,
+      "pos": [
+        31,
+        0,
+        3
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        31,
+        0,
+        4
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        31,
+        0,
+        5
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        32,
+        0,
+        3
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        32,
+        0,
+        4
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        32,
+        0,
+        5
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        33,
+        0,
+        3
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        33,
+        0,
+        4
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        33,
+        0,
+        5
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        32,
+        1,
+        4
+      ],
+      "stateId": 11313
+    },
+    {
+      "tick": 5,
+      "pos": [
+        32,
+        2,
+        4
+      ],
+      "stimulus": {
+        "containerEntities": [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 8
+              }
+            ]
+          },
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 8
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "watch": [
+    [
+      4,
+      1,
+      4
+    ],
+    [
+      4,
+      2,
+      4
+    ],
+    [
+      11,
+      1,
+      4
+    ],
+    [
+      12,
+      1,
+      4
+    ],
+    [
+      18,
+      1,
+      4
+    ],
+    [
+      18,
+      2,
+      4
+    ],
+    [
+      25,
+      1,
+      4
+    ],
+    [
+      25,
+      2,
+      4
+    ],
+    [
+      32,
+      1,
+      4
+    ],
+    [
+      32,
+      2,
+      4
+    ]
+  ],
+  "randomSeed": 20260909,
+  "watchContainerEntities": true,
+  "watchGroundItems": true,
+  "reference": "Minecraft Java 26.2 GameTest, nonexperimental redstone",
+  "referenceEnvironment": {
+    "javaVersion": "25.0.4.1",
+    "randomTickSpeed": 0,
+    "featureFlags": [
+      "minecraft:trade_rebalance",
+      "minecraft:vanilla"
+    ],
+    "dataPacks": [
+      "file/simulator",
+      "minecart_improvements",
+      "redstone_experiments",
+      "trade_rebalance",
+      "vanilla"
+    ],
+    "gameTime": 9,
+    "clockTicks": 9
+  },
+  "origin": [
+    -8285789,
+    -58,
+    13434126
+  ],
+  "frames": [
+    {
+      "tick": 0,
+      "states": [
+        11313,
+        0,
+        11317,
+        0,
+        11313,
+        3988,
+        11313,
+        0,
+        11313,
+        0
+      ],
+      "analogs": [
+        0,
+        -1,
+        1,
+        -1,
+        0,
+        1,
+        0,
+        -1,
+        0,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 3
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 3
+          }
+        ],
+        [],
+        [],
+        [],
+        []
+      ],
+      "randomState": 25230429760,
+      "groundItems": [
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null
+      ],
+      "containerEntities": [
+        [],
+        [],
+        [],
+        [
+          {
+            "type": "hopper_minecart",
+            "inventory": []
+          }
+        ],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 2
+              }
+            ]
+          }
+        ],
+        [],
+        [],
+        [],
+        []
+      ]
+    },
+    {
+      "tick": 1,
+      "states": [
+        11313,
+        0,
+        11317,
+        0,
+        11313,
+        3988,
+        11313,
+        0,
+        11313,
+        0
+      ],
+      "analogs": [
+        0,
+        -1,
+        1,
+        -1,
+        1,
+        1,
+        0,
+        -1,
+        0,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [],
+        [],
+        []
+      ],
+      "randomState": 156696010445131,
+      "groundItems": [
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null
+      ],
+      "containerEntities": [
+        [],
+        [],
+        [],
+        [
+          {
+            "type": "hopper_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 1
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 2
+              }
+            ]
+          }
+        ],
+        [],
+        [],
+        [],
+        []
+      ]
+    },
+    {
+      "tick": 2,
+      "states": [
+        11313,
+        0,
+        11317,
+        0,
+        11313,
+        3988,
+        11313,
+        0,
+        11313,
+        0
+      ],
+      "analogs": [
+        0,
+        -1,
+        1,
+        -1,
+        1,
+        1,
+        0,
+        -1,
+        0,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [],
+        [],
+        []
+      ],
+      "randomState": 156696010445131,
+      "groundItems": [
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [
+          {
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        null,
+        [],
+        null
+      ],
+      "containerEntities": [
+        [],
+        [],
+        [],
+        [
+          {
+            "type": "hopper_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 1
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 2
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": []
+          }
+        ],
+        [],
+        []
+      ]
+    },
+    {
+      "tick": 3,
+      "states": [
+        11313,
+        0,
+        11317,
+        0,
+        11313,
+        3988,
+        11313,
+        0,
+        11313,
+        0
+      ],
+      "analogs": [
+        0,
+        -1,
+        1,
+        -1,
+        1,
+        1,
+        0,
+        -1,
+        0,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [],
+        [],
+        []
+      ],
+      "randomState": 242005277015802,
+      "groundItems": [
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [
+          {
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        null,
+        [],
+        null
+      ],
+      "containerEntities": [
+        [],
+        [],
+        [],
+        [
+          {
+            "type": "hopper_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 1
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 2
+              }
+            ]
+          }
+        ],
+        [],
+        [],
+        [],
+        []
+      ]
+    },
+    {
+      "tick": 4,
+      "states": [
+        11313,
+        0,
+        11317,
+        0,
+        11313,
+        3988,
+        11313,
+        0,
+        11313,
+        0
+      ],
+      "analogs": [
+        0,
+        -1,
+        1,
+        -1,
+        1,
+        1,
+        1,
+        -1,
+        0,
+        -1
+      ],
+      "inventories": [
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [],
+        [],
+        []
+      ],
+      "randomState": 242005277015802,
+      "groundItems": [
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null
+      ],
+      "containerEntities": [
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 6
+              },
+              {
+                "slot": 26,
+                "item": "minecraft:dirt",
+                "count": 1
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "hopper_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 1
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 2
+              }
+            ]
+          }
+        ],
+        [],
+        [],
+        [],
+        []
+      ]
+    },
+    {
+      "tick": 5,
+      "states": [
+        11313,
+        0,
+        11317,
+        0,
+        11313,
+        3988,
+        11313,
+        0,
+        11313,
+        0
+      ],
+      "analogs": [
+        1,
+        -1,
+        1,
+        -1,
+        1,
+        1,
+        1,
+        -1,
+        0,
+        -1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [],
+        [],
+        []
+      ],
+      "randomState": 158302456917117,
+      "groundItems": [
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null
+      ],
+      "containerEntities": [
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 5
+              },
+              {
+                "slot": 26,
+                "item": "minecraft:dirt",
+                "count": 1
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "hopper_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 1
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 2
+              }
+            ]
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 8
+              }
+            ]
+          },
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 8
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 6,
+      "states": [
+        11313,
+        0,
+        11317,
+        0,
+        11313,
+        3988,
+        11313,
+        0,
+        11313,
+        0
+      ],
+      "analogs": [
+        1,
+        -1,
+        1,
+        -1,
+        1,
+        1,
+        1,
+        -1,
+        1,
+        -1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        []
+      ],
+      "randomState": 255899919007556,
+      "groundItems": [
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null
+      ],
+      "containerEntities": [
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 5
+              },
+              {
+                "slot": 26,
+                "item": "minecraft:dirt",
+                "count": 1
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "hopper_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 1
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 2
+              }
+            ]
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 8
+              }
+            ]
+          },
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 7
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 7,
+      "states": [
+        11313,
+        0,
+        11317,
+        0,
+        11313,
+        3988,
+        11313,
+        0,
+        11313,
+        0
+      ],
+      "analogs": [
+        1,
+        -1,
+        1,
+        -1,
+        1,
+        1,
+        1,
+        -1,
+        1,
+        -1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        []
+      ],
+      "randomState": 255899919007556,
+      "groundItems": [
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null
+      ],
+      "containerEntities": [
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 5
+              },
+              {
+                "slot": 26,
+                "item": "minecraft:dirt",
+                "count": 1
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "hopper_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 1
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 2
+              }
+            ]
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 8
+              }
+            ]
+          },
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 7
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 8,
+      "states": [
+        11313,
+        0,
+        11317,
+        0,
+        11313,
+        3988,
+        11313,
+        0,
+        11313,
+        0
+      ],
+      "analogs": [
+        1,
+        -1,
+        1,
+        -1,
+        1,
+        1,
+        1,
+        -1,
+        1,
+        -1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        []
+      ],
+      "randomState": 255899919007556,
+      "groundItems": [
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null
+      ],
+      "containerEntities": [
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 5
+              },
+              {
+                "slot": 26,
+                "item": "minecraft:dirt",
+                "count": 1
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "hopper_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 1
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 2
+              }
+            ]
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 8
+              }
+            ]
+          },
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 7
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 9,
+      "states": [
+        11313,
+        0,
+        11317,
+        0,
+        11313,
+        3988,
+        11313,
+        0,
+        11313,
+        0
+      ],
+      "analogs": [
+        1,
+        -1,
+        1,
+        -1,
+        1,
+        1,
+        1,
+        -1,
+        1,
+        -1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        []
+      ],
+      "randomState": 114902731786239,
+      "groundItems": [
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null
+      ],
+      "containerEntities": [
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 5
+              },
+              {
+                "slot": 26,
+                "item": "minecraft:dirt",
+                "count": 1
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "hopper_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 2
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 2
+              }
+            ]
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 8
+              }
+            ]
+          },
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 7
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 10,
+      "states": [
+        11313,
+        0,
+        11317,
+        0,
+        11313,
+        3988,
+        11313,
+        0,
+        11313,
+        0
+      ],
+      "analogs": [
+        1,
+        -1,
+        1,
+        -1,
+        1,
+        1,
+        1,
+        -1,
+        1,
+        -1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        []
+      ],
+      "randomState": 114902731786239,
+      "groundItems": [
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null
+      ],
+      "containerEntities": [
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 5
+              },
+              {
+                "slot": 26,
+                "item": "minecraft:dirt",
+                "count": 1
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "hopper_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 2
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 2
+              }
+            ]
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 8
+              }
+            ]
+          },
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 7
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 11,
+      "states": [
+        11313,
+        0,
+        11317,
+        0,
+        11313,
+        3988,
+        11313,
+        0,
+        11313,
+        0
+      ],
+      "analogs": [
+        1,
+        -1,
+        1,
+        -1,
+        1,
+        1,
+        1,
+        -1,
+        1,
+        -1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        []
+      ],
+      "randomState": 114902731786239,
+      "groundItems": [
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null
+      ],
+      "containerEntities": [
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 5
+              },
+              {
+                "slot": 26,
+                "item": "minecraft:dirt",
+                "count": 1
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "hopper_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 2
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 2
+              }
+            ]
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 8
+              }
+            ]
+          },
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 7
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 12,
+      "states": [
+        11313,
+        0,
+        11317,
+        0,
+        11313,
+        3988,
+        11313,
+        0,
+        11313,
+        0
+      ],
+      "analogs": [
+        1,
+        -1,
+        1,
+        -1,
+        1,
+        1,
+        1,
+        -1,
+        1,
+        -1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        []
+      ],
+      "randomState": 114902731786239,
+      "groundItems": [
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null
+      ],
+      "containerEntities": [
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 5
+              },
+              {
+                "slot": 26,
+                "item": "minecraft:dirt",
+                "count": 1
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "hopper_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 2
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 2
+              }
+            ]
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 8
+              }
+            ]
+          },
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 7
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 13,
+      "states": [
+        11313,
+        0,
+        11317,
+        0,
+        11313,
+        3988,
+        11313,
+        0,
+        11313,
+        0
+      ],
+      "analogs": [
+        1,
+        -1,
+        1,
+        -1,
+        1,
+        1,
+        1,
+        -1,
+        1,
+        -1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        []
+      ],
+      "randomState": 11316467958174,
+      "groundItems": [
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null
+      ],
+      "containerEntities": [
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 4
+              },
+              {
+                "slot": 26,
+                "item": "minecraft:dirt",
+                "count": 1
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "hopper_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 2
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 2
+              }
+            ]
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 8
+              }
+            ]
+          },
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 7
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 14,
+      "states": [
+        11313,
+        0,
+        11317,
+        0,
+        11313,
+        3988,
+        11313,
+        0,
+        11313,
+        0
+      ],
+      "analogs": [
+        1,
+        -1,
+        1,
+        -1,
+        1,
+        1,
+        1,
+        -1,
+        1,
+        -1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        []
+      ],
+      "randomState": 138006222349393,
+      "groundItems": [
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null
+      ],
+      "containerEntities": [
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 4
+              },
+              {
+                "slot": 26,
+                "item": "minecraft:dirt",
+                "count": 1
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "hopper_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 2
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 2
+              }
+            ]
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 7
+              }
+            ]
+          },
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 7
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 15,
+      "states": [
+        11313,
+        0,
+        11317,
+        0,
+        11313,
+        3988,
+        11313,
+        0,
+        11313,
+        0
+      ],
+      "analogs": [
+        1,
+        -1,
+        1,
+        -1,
+        1,
+        1,
+        1,
+        -1,
+        1,
+        -1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        []
+      ],
+      "randomState": 138006222349393,
+      "groundItems": [
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null
+      ],
+      "containerEntities": [
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 4
+              },
+              {
+                "slot": 26,
+                "item": "minecraft:dirt",
+                "count": 1
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "hopper_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 2
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 2
+              }
+            ]
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 7
+              }
+            ]
+          },
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 7
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 16,
+      "states": [
+        11313,
+        0,
+        11317,
+        0,
+        11313,
+        3988,
+        11313,
+        0,
+        11313,
+        0
+      ],
+      "analogs": [
+        1,
+        -1,
+        1,
+        -1,
+        1,
+        1,
+        1,
+        -1,
+        1,
+        -1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        []
+      ],
+      "randomState": 138006222349393,
+      "groundItems": [
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null
+      ],
+      "containerEntities": [
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 4
+              },
+              {
+                "slot": 26,
+                "item": "minecraft:dirt",
+                "count": 1
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "hopper_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 2
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 2
+              }
+            ]
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 7
+              }
+            ]
+          },
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 7
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 17,
+      "states": [
+        11313,
+        0,
+        11317,
+        0,
+        11313,
+        3988,
+        11313,
+        0,
+        11313,
+        0
+      ],
+      "analogs": [
+        1,
+        -1,
+        0,
+        -1,
+        1,
+        0,
+        1,
+        -1,
+        1,
+        -1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 3
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        []
+      ],
+      "randomState": 7803788344456,
+      "groundItems": [
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null
+      ],
+      "containerEntities": [
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 4
+              },
+              {
+                "slot": 26,
+                "item": "minecraft:dirt",
+                "count": 1
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "hopper_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 3
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 2
+              }
+            ]
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 7
+              }
+            ]
+          },
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 7
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 18,
+      "states": [
+        11313,
+        0,
+        11317,
+        0,
+        11313,
+        3988,
+        11313,
+        0,
+        11313,
+        0
+      ],
+      "analogs": [
+        1,
+        -1,
+        0,
+        -1,
+        1,
+        0,
+        1,
+        -1,
+        1,
+        -1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 3
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        []
+      ],
+      "randomState": 7803788344456,
+      "groundItems": [
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null
+      ],
+      "containerEntities": [
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 4
+              },
+              {
+                "slot": 26,
+                "item": "minecraft:dirt",
+                "count": 1
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "hopper_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 3
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 2
+              }
+            ]
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 7
+              }
+            ]
+          },
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 7
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 19,
+      "states": [
+        11313,
+        0,
+        11317,
+        0,
+        11313,
+        3988,
+        11313,
+        0,
+        11313,
+        0
+      ],
+      "analogs": [
+        1,
+        -1,
+        0,
+        -1,
+        1,
+        0,
+        1,
+        -1,
+        1,
+        -1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 3
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        []
+      ],
+      "randomState": 7803788344456,
+      "groundItems": [
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null
+      ],
+      "containerEntities": [
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 4
+              },
+              {
+                "slot": 26,
+                "item": "minecraft:dirt",
+                "count": 1
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "hopper_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 3
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 2
+              }
+            ]
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 7
+              }
+            ]
+          },
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 7
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 20,
+      "states": [
+        11313,
+        0,
+        11317,
+        0,
+        11313,
+        3988,
+        11313,
+        0,
+        11313,
+        0
+      ],
+      "analogs": [
+        1,
+        -1,
+        0,
+        -1,
+        1,
+        0,
+        1,
+        -1,
+        1,
+        -1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 3
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        []
+      ],
+      "randomState": 7803788344456,
+      "groundItems": [
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null
+      ],
+      "containerEntities": [
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 4
+              },
+              {
+                "slot": 26,
+                "item": "minecraft:dirt",
+                "count": 1
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "hopper_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 3
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 2
+              }
+            ]
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 7
+              }
+            ]
+          },
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 7
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 21,
+      "states": [
+        11313,
+        0,
+        11317,
+        0,
+        11313,
+        3988,
+        11313,
+        0,
+        11313,
+        0
+      ],
+      "analogs": [
+        1,
+        -1,
+        0,
+        -1,
+        1,
+        0,
+        1,
+        -1,
+        1,
+        -1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 3
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 3
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        []
+      ],
+      "randomState": 164282050541043,
+      "groundItems": [
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null
+      ],
+      "containerEntities": [
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 3
+              },
+              {
+                "slot": 26,
+                "item": "minecraft:dirt",
+                "count": 1
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "hopper_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 3
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 2
+              }
+            ]
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 7
+              }
+            ]
+          },
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 7
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 22,
+      "states": [
+        11313,
+        0,
+        11317,
+        0,
+        11313,
+        3988,
+        11313,
+        0,
+        11313,
+        0
+      ],
+      "analogs": [
+        1,
+        -1,
+        0,
+        -1,
+        1,
+        0,
+        1,
+        -1,
+        1,
+        -1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 3
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 3
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 2
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        []
+      ],
+      "randomState": 239419242842754,
+      "groundItems": [
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null
+      ],
+      "containerEntities": [
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 3
+              },
+              {
+                "slot": 26,
+                "item": "minecraft:dirt",
+                "count": 1
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "hopper_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 3
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 2
+              }
+            ]
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 7
+              }
+            ]
+          },
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 6
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 23,
+      "states": [
+        11313,
+        0,
+        11317,
+        0,
+        11313,
+        3988,
+        11313,
+        0,
+        11313,
+        0
+      ],
+      "analogs": [
+        1,
+        -1,
+        0,
+        -1,
+        1,
+        0,
+        1,
+        -1,
+        1,
+        -1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 3
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 3
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 2
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        []
+      ],
+      "randomState": 239419242842754,
+      "groundItems": [
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null
+      ],
+      "containerEntities": [
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 3
+              },
+              {
+                "slot": 26,
+                "item": "minecraft:dirt",
+                "count": 1
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "hopper_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 3
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 2
+              }
+            ]
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 7
+              }
+            ]
+          },
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 6
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 24,
+      "states": [
+        11313,
+        0,
+        11317,
+        0,
+        11313,
+        3988,
+        11313,
+        0,
+        11313,
+        0
+      ],
+      "analogs": [
+        1,
+        -1,
+        0,
+        -1,
+        1,
+        0,
+        1,
+        -1,
+        1,
+        -1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 3
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 3
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 2
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        []
+      ],
+      "randomState": 239419242842754,
+      "groundItems": [
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null
+      ],
+      "containerEntities": [
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 3
+              },
+              {
+                "slot": 26,
+                "item": "minecraft:dirt",
+                "count": 1
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "hopper_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 3
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 2
+              }
+            ]
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 7
+              }
+            ]
+          },
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 6
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 25,
+      "states": [
+        11313,
+        0,
+        11317,
+        0,
+        11313,
+        3988,
+        11313,
+        0,
+        11313,
+        0
+      ],
+      "analogs": [
+        1,
+        -1,
+        0,
+        -1,
+        1,
+        0,
+        1,
+        -1,
+        1,
+        -1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 3
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 3
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 2
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        []
+      ],
+      "randomState": 239419242842754,
+      "groundItems": [
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null
+      ],
+      "containerEntities": [
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 3
+              },
+              {
+                "slot": 26,
+                "item": "minecraft:dirt",
+                "count": 1
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "hopper_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 3
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 2
+              }
+            ]
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 7
+              }
+            ]
+          },
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 6
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 26,
+      "states": [
+        11313,
+        0,
+        11317,
+        0,
+        11313,
+        3988,
+        11313,
+        0,
+        11313,
+        0
+      ],
+      "analogs": [
+        1,
+        -1,
+        0,
+        -1,
+        1,
+        0,
+        1,
+        -1,
+        1,
+        -1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 3
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 3
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 2
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        []
+      ],
+      "randomState": 239419242842754,
+      "groundItems": [
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null
+      ],
+      "containerEntities": [
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 3
+              },
+              {
+                "slot": 26,
+                "item": "minecraft:dirt",
+                "count": 1
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "hopper_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 3
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 2
+              }
+            ]
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 7
+              }
+            ]
+          },
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 6
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 27,
+      "states": [
+        11313,
+        0,
+        11317,
+        0,
+        11313,
+        3988,
+        11313,
+        0,
+        11313,
+        0
+      ],
+      "analogs": [
+        1,
+        -1,
+        0,
+        -1,
+        1,
+        0,
+        1,
+        -1,
+        1,
+        -1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 3
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 3
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 2
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        []
+      ],
+      "randomState": 239419242842754,
+      "groundItems": [
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null
+      ],
+      "containerEntities": [
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 3
+              },
+              {
+                "slot": 26,
+                "item": "minecraft:dirt",
+                "count": 1
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "hopper_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 3
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 2
+              }
+            ]
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 7
+              }
+            ]
+          },
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 6
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 28,
+      "states": [
+        11313,
+        0,
+        11317,
+        0,
+        11313,
+        3988,
+        11313,
+        0,
+        11313,
+        0
+      ],
+      "analogs": [
+        1,
+        -1,
+        0,
+        -1,
+        1,
+        0,
+        1,
+        -1,
+        1,
+        -1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 3
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 3
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 2
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        []
+      ],
+      "randomState": 239419242842754,
+      "groundItems": [
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null
+      ],
+      "containerEntities": [
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 3
+              },
+              {
+                "slot": 26,
+                "item": "minecraft:dirt",
+                "count": 1
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "hopper_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 3
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 2
+              }
+            ]
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 7
+              }
+            ]
+          },
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 6
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 29,
+      "states": [
+        11313,
+        0,
+        11317,
+        0,
+        11313,
+        3988,
+        11313,
+        0,
+        11313,
+        0
+      ],
+      "analogs": [
+        1,
+        -1,
+        0,
+        -1,
+        1,
+        0,
+        1,
+        -1,
+        1,
+        -1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 3
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 2
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        []
+      ],
+      "randomState": 120325048714597,
+      "groundItems": [
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null
+      ],
+      "containerEntities": [
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 2
+              },
+              {
+                "slot": 26,
+                "item": "minecraft:dirt",
+                "count": 1
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "hopper_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 3
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 2
+              }
+            ]
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 7
+              }
+            ]
+          },
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 6
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 30,
+      "states": [
+        11313,
+        0,
+        11317,
+        0,
+        11313,
+        3988,
+        11313,
+        0,
+        11313,
+        0
+      ],
+      "analogs": [
+        1,
+        -1,
+        0,
+        -1,
+        1,
+        0,
+        1,
+        -1,
+        1,
+        -1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 3
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 2
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        []
+      ],
+      "randomState": 43514329516556,
+      "groundItems": [
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null
+      ],
+      "containerEntities": [
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 2
+              },
+              {
+                "slot": 26,
+                "item": "minecraft:dirt",
+                "count": 1
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "hopper_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 3
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 2
+              }
+            ]
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 6
+              }
+            ]
+          },
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 6
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 31,
+      "states": [
+        11313,
+        0,
+        11317,
+        0,
+        11313,
+        3988,
+        11313,
+        0,
+        11313,
+        0
+      ],
+      "analogs": [
+        1,
+        -1,
+        0,
+        -1,
+        1,
+        0,
+        1,
+        -1,
+        1,
+        -1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 3
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 2
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        []
+      ],
+      "randomState": 43514329516556,
+      "groundItems": [
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null
+      ],
+      "containerEntities": [
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 2
+              },
+              {
+                "slot": 26,
+                "item": "minecraft:dirt",
+                "count": 1
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "hopper_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 3
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 2
+              }
+            ]
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 6
+              }
+            ]
+          },
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 6
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 32,
+      "states": [
+        11313,
+        0,
+        11317,
+        0,
+        11313,
+        3988,
+        11313,
+        0,
+        11313,
+        0
+      ],
+      "analogs": [
+        1,
+        -1,
+        0,
+        -1,
+        1,
+        0,
+        1,
+        -1,
+        1,
+        -1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 3
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 2
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        []
+      ],
+      "randomState": 43514329516556,
+      "groundItems": [
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null
+      ],
+      "containerEntities": [
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 2
+              },
+              {
+                "slot": 26,
+                "item": "minecraft:dirt",
+                "count": 1
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "hopper_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 3
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 2
+              }
+            ]
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 6
+              }
+            ]
+          },
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 6
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 33,
+      "states": [
+        11313,
+        0,
+        11317,
+        0,
+        11313,
+        3988,
+        11313,
+        0,
+        11313,
+        0
+      ],
+      "analogs": [
+        1,
+        -1,
+        0,
+        -1,
+        1,
+        0,
+        1,
+        -1,
+        1,
+        -1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 3
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 2
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        []
+      ],
+      "randomState": 43514329516556,
+      "groundItems": [
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null
+      ],
+      "containerEntities": [
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 2
+              },
+              {
+                "slot": 26,
+                "item": "minecraft:dirt",
+                "count": 1
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "hopper_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 3
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 2
+              }
+            ]
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 6
+              }
+            ]
+          },
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 6
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 34,
+      "states": [
+        11313,
+        0,
+        11317,
+        0,
+        11313,
+        3988,
+        11313,
+        0,
+        11313,
+        0
+      ],
+      "analogs": [
+        1,
+        -1,
+        0,
+        -1,
+        1,
+        0,
+        1,
+        -1,
+        1,
+        -1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 3
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 2
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        []
+      ],
+      "randomState": 43514329516556,
+      "groundItems": [
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null
+      ],
+      "containerEntities": [
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 2
+              },
+              {
+                "slot": 26,
+                "item": "minecraft:dirt",
+                "count": 1
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "hopper_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 3
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 2
+              }
+            ]
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 6
+              }
+            ]
+          },
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 6
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 35,
+      "states": [
+        11313,
+        0,
+        11317,
+        0,
+        11313,
+        3988,
+        11313,
+        0,
+        11313,
+        0
+      ],
+      "analogs": [
+        1,
+        -1,
+        0,
+        -1,
+        1,
+        0,
+        1,
+        -1,
+        1,
+        -1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 3
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 2
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        []
+      ],
+      "randomState": 43514329516556,
+      "groundItems": [
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null
+      ],
+      "containerEntities": [
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 2
+              },
+              {
+                "slot": 26,
+                "item": "minecraft:dirt",
+                "count": 1
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "hopper_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 3
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 2
+              }
+            ]
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 6
+              }
+            ]
+          },
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 6
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 36,
+      "states": [
+        11313,
+        0,
+        11317,
+        0,
+        11313,
+        3988,
+        11313,
+        0,
+        11313,
+        0
+      ],
+      "analogs": [
+        1,
+        -1,
+        0,
+        -1,
+        1,
+        0,
+        1,
+        -1,
+        1,
+        -1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 4
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 3
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 2
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        []
+      ],
+      "randomState": 43514329516556,
+      "groundItems": [
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null
+      ],
+      "containerEntities": [
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 2
+              },
+              {
+                "slot": 26,
+                "item": "minecraft:dirt",
+                "count": 1
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "hopper_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 3
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 2
+              }
+            ]
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 6
+              }
+            ]
+          },
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 6
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 37,
+      "states": [
+        11313,
+        0,
+        11317,
+        0,
+        11313,
+        3988,
+        11313,
+        0,
+        11313,
+        0
+      ],
+      "analogs": [
+        1,
+        -1,
+        0,
+        -1,
+        1,
+        0,
+        1,
+        -1,
+        1,
+        -1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 5
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 3
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 2
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        []
+      ],
+      "randomState": 176369079242535,
+      "groundItems": [
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null
+      ],
+      "containerEntities": [
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 1
+              },
+              {
+                "slot": 26,
+                "item": "minecraft:dirt",
+                "count": 1
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "hopper_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 3
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 2
+              }
+            ]
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 6
+              }
+            ]
+          },
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 6
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 38,
+      "states": [
+        11313,
+        0,
+        11317,
+        0,
+        11313,
+        3988,
+        11313,
+        0,
+        11313,
+        0
+      ],
+      "analogs": [
+        1,
+        -1,
+        0,
+        -1,
+        1,
+        0,
+        1,
+        -1,
+        1,
+        -1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 5
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 3
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 3
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        []
+      ],
+      "randomState": 196514512092582,
+      "groundItems": [
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null
+      ],
+      "containerEntities": [
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 1
+              },
+              {
+                "slot": 26,
+                "item": "minecraft:dirt",
+                "count": 1
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "hopper_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 3
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 2
+              }
+            ]
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 6
+              }
+            ]
+          },
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 5
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 39,
+      "states": [
+        11313,
+        0,
+        11317,
+        0,
+        11313,
+        3988,
+        11313,
+        0,
+        11313,
+        0
+      ],
+      "analogs": [
+        1,
+        -1,
+        0,
+        -1,
+        1,
+        0,
+        1,
+        -1,
+        1,
+        -1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 5
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 3
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 3
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        []
+      ],
+      "randomState": 196514512092582,
+      "groundItems": [
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null
+      ],
+      "containerEntities": [
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 1
+              },
+              {
+                "slot": 26,
+                "item": "minecraft:dirt",
+                "count": 1
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "hopper_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 3
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 2
+              }
+            ]
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 6
+              }
+            ]
+          },
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 5
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 40,
+      "states": [
+        11313,
+        0,
+        11317,
+        0,
+        11313,
+        3988,
+        11313,
+        0,
+        11313,
+        0
+      ],
+      "analogs": [
+        1,
+        -1,
+        0,
+        -1,
+        1,
+        0,
+        1,
+        -1,
+        1,
+        -1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 5
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 3
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 3
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 2
+          }
+        ],
+        []
+      ],
+      "randomState": 196514512092582,
+      "groundItems": [
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null,
+        [],
+        null
+      ],
+      "containerEntities": [
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 1
+              },
+              {
+                "slot": 26,
+                "item": "minecraft:dirt",
+                "count": 1
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "hopper_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 3
+              }
+            ]
+          }
+        ],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 2
+              }
+            ]
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:stone",
+                "count": 6
+              }
+            ]
+          },
+          {
+            "type": "chest_minecart",
+            "inventory": [
+              {
+                "slot": 0,
+                "item": "minecraft:dirt",
+                "count": 5
+              }
+            ]
+          }
+        ]
+      ]
+    }
+  ]
+}
