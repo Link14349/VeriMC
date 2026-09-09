@@ -52,10 +52,16 @@ struct RailConnection {
     StateId state;
     bool straight;
     std::vector<BlockPos> connections;
-    RailConnection(Simulator& simulator, BlockPos position) : sim(simulator), pos(position), state(sim.world.get(pos)), straight(sim.at(pos).device != Device::rail) {
+    // 原版 `RailState(level, pos, state)` 的第三个参数是**调用方给的状态**，不是世界里的方块：
+    // `this.state`、`this.block`、`this.isStraight` 与初始 `updateConnections` 全部由它决定
+    // （RailState.java:20-28）。`getRail()` 那条路径传的确实是 `level.getBlockState(pos)`，
+    // 但 `updateDir(level, pos, state, …)` 传的是 `neighborChanged` 收到的快照。
+    RailConnection(Simulator& simulator, BlockPos position, StateId seed)
+        : sim(simulator), pos(position), state(seed), straight(sim.registry[seed].device != Device::rail) {
         auto ends = railConnections(pos, railShape(sim, state));
         connections.assign(ends.begin(), ends.end());
     }
+    RailConnection(Simulator& simulator, BlockPos position) : RailConnection(simulator, position, simulator.world.get(position)) {}
     bool connects(BlockPos other) const {
         return std::any_of(connections.begin(), connections.end(), [other](BlockPos p) { return p.x == other.x && p.z == other.z; });
     }
@@ -190,7 +196,9 @@ void Simulator::updateRail(BlockPos pos, StateId state, StateId source) {
     if (registry[state].device == Device::rail) {
         if (!registry[registry.type(source).defaultState].signalSource) return;
         int count = 0; for (auto d : horizontal) if (railAt(*this, pos.relative(d))) ++count;
-        if (count == 3) RailConnection(*this, pos).place(bestSignal(pos) > 0, false);
+        // 原版 RailBlock.updateState 走 `this.updateDir(level, pos, state, false)`，
+        // 里面是 `new RailState(level, pos, state)`——同样以**快照**为准，而不是重读世界。
+        if (count == 3) RailConnection(*this, pos, state).place(bestSignal(pos) > 0, false);
     } else if (registry[state].device == Device::poweredRail || registry[state].device == Device::activatorRail) {
         bool powered = bestSignal(pos) > 0 || poweredRailPath(pos, state, true, 0) || poweredRailPath(pos, state, false, 0);
         if (powered != registry[state].powered) {
