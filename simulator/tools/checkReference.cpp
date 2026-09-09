@@ -49,7 +49,7 @@ int main(int argc, char** argv) {
                 const auto& frame = frames.at(frameIndex);
                 const Tick tick = frame.at("tick");
                 if (tick != expectedTick++) throw std::runtime_error("Capture frames must be contiguous from tick zero");
-                for (const char* field : {"states", "analogs", "inventories", "bells", "jukeboxes"}) {
+                for (const char* field : {"states", "analogs", "inventories", "bells", "jukeboxes", "containerEntities"}) {
                     if (frame.contains(field) && (!frame.at(field).is_array() || frame.at(field).size() != fixture.at("watch").size()))
                         throw std::runtime_error("Observation array length differs from watch list");
                 }
@@ -130,6 +130,9 @@ int main(int argc, char** argv) {
                                 Json{{"blockTicking", simulation.chunkBlockTicking(pos)}, {"entityTicking", simulation.chunkEntityTicking(pos)}, {"loaded", simulation.chunkLoaded(pos)}});
                     if (frame.contains("groundItems") && !frame.at("groundItems").at(index).is_null())
                         compare("groundItems", frame.at("groundItems").at(index), simulation.suckableItems(pos));
+                    // 容器实体：原版按 getContainerAt 的查询顺序报告这一格里的矿车与它们的库存。
+                    if (frame.contains("containerEntities"))
+                        compare("containerEntities", frame.at("containerEntities").at(index), simulation.containerEntitiesJson(pos));
                     if (frame.contains("bells")) compare("bells", frame.at("bells").at(index), simulation.inspect(pos)["runtime"].value("ringing", false));
                     if (frame.contains("jukeboxes") && !frame.at("jukeboxes").at(index).is_null()) {
                         const auto actual = simulation.inspect(pos).at("jukebox");

@@ -172,6 +172,36 @@ public class CaptureRedstone extends TestFunctionLoader {
         }
         return result;
     }
+    /**
+     * The container entities standing in one cell, in `level.getEntities` order. The query is the
+     * one `HopperBlockEntity.getContainerAt` itself performs: an AABB of half extent 0.5 around the
+     * block centre, filtered by `EntitySelector.CONTAINER_ENTITY_SELECTOR`. Reporting the vanilla
+     * order matters because `getEntityContainer` indexes into exactly this list with `nextInt`.
+     * Positions are deliberately not reported: they are an input, not an observation.
+     */
+    static JsonArray containerEntities(Level level, BlockPos pos) {
+        double x = pos.getX() + 0.5, y = pos.getY() + 0.5, z = pos.getZ() + 0.5;
+        JsonArray result = new JsonArray();
+        for (var entity : level.getEntities((Entity)null, new net.minecraft.world.phys.AABB(x - 0.5, y - 0.5, z - 0.5, x + 0.5, y + 0.5, z + 0.5),
+                                            net.minecraft.world.entity.EntitySelector.CONTAINER_ENTITY_SELECTOR)) {
+            var row = new JsonObject();
+            row.addProperty("type", BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()).getPath());
+            JsonArray inventory = new JsonArray();
+            var container = (Container)entity;
+            for (int slot = 0; slot < container.getContainerSize(); ++slot) {
+                var stack = container.getItem(slot);
+                if (stack.isEmpty()) continue;
+                var item = new JsonObject();
+                item.addProperty("slot", slot);
+                item.addProperty("item", BuiltInRegistries.ITEM.getKey(stack.getItem()).toString());
+                item.addProperty("count", stack.getCount());
+                inventory.add(item);
+            }
+            row.add("inventory", inventory);
+            result.add(row);
+        }
+        return result;
+    }
     static int remainingInBurst = 0;
     static void recordTraceEntry(BlockPos pos) {
         // forEachUpdatedPos fires once per peek for every kind except the multi update, which
@@ -309,6 +339,30 @@ public class CaptureRedstone extends TestFunctionLoader {
                     drop.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
                     drop.setNoGravity(true);
                     level.addFreshEntity(drop); spawned.add(drop);
+                }
+                return;
+            }
+            // 器件层实体容器输入：在这一格的**格中心**生成真实的运输矿车/漏斗矿车。
+            // 速度清零、关闭重力，与掉落物、压力板、绊线的接触输入是同一个约定：不模拟运动轨迹。
+            // 声明顺序就是生成顺序，也就是原版实体分区存储里的插入顺序。
+            if (input.has("containerEntities")) {
+                for (var existing : occupants.getOrDefault(pos, List.of())) existing.discard();
+                var spawned = new ArrayList<Entity>(); occupants.put(pos, spawned);
+                for (var value : input.getAsJsonArray("containerEntities")) {
+                    var row = value.getAsJsonObject();
+                    var entityType = BuiltInRegistries.ENTITY_TYPE.getValue(Identifier.withDefaultNamespace(row.get("type").getAsString()));
+                    var entity = entityType.create(level, EntitySpawnReason.COMMAND);
+                    if (!(entity instanceof Container container))
+                        throw new IllegalArgumentException("Reference container entity is not a Container");
+                    entity.setPos(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
+                    entity.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+                    entity.setNoGravity(true);
+                    for (var item : row.getAsJsonArray("inventory")) {
+                        var slot = item.getAsJsonObject(); int count = slot.get("count").getAsInt();
+                        container.setItem(slot.get("slot").getAsInt(), count == 0 ? ItemStack.EMPTY
+                            : new ItemStack(BuiltInRegistries.ITEM.getValue(Identifier.parse(slot.get("item").getAsString())), count));
+                    }
+                    level.addFreshEntity(entity); spawned.add(entity);
                 }
                 return;
             }
@@ -635,6 +689,12 @@ public class CaptureRedstone extends TestFunctionLoader {
                         } else ground.add(JsonNull.INSTANCE);
                     }
                     frame.add("groundItems", ground);
+                }
+                if (scenario.has("watchContainerEntities")) {
+                    JsonArray carts = new JsonArray();
+                    for (var value : scenario.getAsJsonArray("watch"))
+                        carts.add(containerEntities(level, origin.offset(pos(value.getAsJsonArray()))));
+                    frame.add("containerEntities", carts);
                 }
                 if(scenario.has("watchBells"))frame.add("bells",bells);
                 if(scenario.has("watchJukeboxes"))frame.add("jukeboxes",jukeboxes);
