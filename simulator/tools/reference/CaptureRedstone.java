@@ -250,6 +250,74 @@ public class CaptureRedstone extends TestFunctionLoader {
     }
     static Map<BlockPos, List<Entity>> occupants = new HashMap<>();
     static Map<BlockPos, List<Player>> viewers = new HashMap<>();
+    // ---- 真实抛出的掉落物：在实体**生成的那一刻**记录初值（scenario 的 watchEjections）----
+    // 投掷器在方块刻阶段抛出，同一个服务器刻的实体阶段紧接着就把这个掉落物移动了一次，
+    // 所以在刻末读到的位置和速度**已经不是初值**。这里用反射把
+    // PersistentEntitySectionManager.callbacks 换成一个只转发的代理，在 onCreated 那一刻
+    // 读原版自己刚写进实体的位置与速度。除了记录以外不改变任何游戏行为，也不改游戏代码。
+    static JsonArray ejections = new JsonArray();
+    static List<BlockPos> ejectors = new ArrayList<>();
+    static boolean recordingSpawns = false;   // 命令自己声明出来的实体不是「抛出」
+    static int spawnTick = 0;
+    static BlockPos spawnOrigin = BlockPos.ZERO;
+    static JsonArray vector(double x, double y, double z) { var a = new JsonArray(); a.add(x); a.add(y); a.add(z); return a; }
+    static JsonArray vectorBits(double x, double y, double z) {
+        var a = new JsonArray();
+        for (double value : new double[]{x, y, z}) a.add(Long.toUnsignedString(Double.doubleToRawLongBits(value), 16));
+        return a;
+    }
+    static void recordEjection(ItemEntity item) {
+        BlockPos source = null; double best = Double.MAX_VALUE;
+        for (var candidate : ejectors) {
+            double distance = item.position().distanceToSqr(candidate.getX() + 0.5, candidate.getY() + 0.5, candidate.getZ() + 0.5);
+            if (distance < best) { best = distance; source = candidate; }
+        }
+        // 归属只用来填 source。抛出点离抛出器方块中心是水平 0.7 加上竖直 0.125/0.15625，
+        // 最远约 0.72，声明的抛出器互相离开一格以上时归属唯一。找不到就直接失败，不做猜测；
+        // 归属错了内核那边的逐字段比对也会立刻报出来。
+        if (source == null || best > 1.0) throw new IllegalStateException("Ejected item has no declared source: " + item.position());
+        int order = 0;
+        for (var previous : ejections) if (previous.getAsJsonObject().get("tick").getAsInt() == spawnTick) ++order;
+        var row = new JsonObject();
+        row.addProperty("kind", "itemEjected");
+        row.addProperty("index", ejections.size());
+        row.addProperty("order", order);
+        row.addProperty("tick", spawnTick);
+        row.add("source", coordinates(source.subtract(spawnOrigin)));
+        row.addProperty("item", BuiltInRegistries.ITEM.getKey(item.getItem().getItem()).toString());
+        row.addProperty("count", item.getItem().getCount());
+        row.add("position", vector(item.getX(), item.getY(), item.getZ()));
+        row.add("positionBits", vectorBits(item.getX(), item.getY(), item.getZ()));
+        var velocity = item.getDeltaMovement();
+        row.add("velocity", vector(velocity.x, velocity.y, velocity.z));
+        row.add("velocityBits", vectorBits(velocity.x, velocity.y, velocity.z));
+        ejections.add(row);
+    }
+    /** 只转发的 LevelCallback 代理，除了记录抛出以外行为与原来的回调完全一致。 */
+    record SpawnRecorder(net.minecraft.world.level.entity.LevelCallback<Entity> inner)
+        implements net.minecraft.world.level.entity.LevelCallback<Entity> {
+        @Override public void onCreated(Entity entity) {
+            if (recordingSpawns && entity instanceof ItemEntity item) recordEjection(item);
+            inner.onCreated(entity);
+        }
+        @Override public void onDestroyed(Entity entity) { inner.onDestroyed(entity); }
+        @Override public void onTickingStart(Entity entity) { inner.onTickingStart(entity); }
+        @Override public void onTickingEnd(Entity entity) { inner.onTickingEnd(entity); }
+        @Override public void onTrackingStart(Entity entity) { inner.onTrackingStart(entity); }
+        @Override public void onTrackingEnd(Entity entity) { inner.onTrackingEnd(entity); }
+        @Override public void onSectionChange(Entity entity) { inner.onSectionChange(entity); }
+    }
+    @SuppressWarnings("unchecked")
+    static void installSpawnRecorder(net.minecraft.server.level.ServerLevel level) {
+        try {
+            var manager = field(level, "entityManager");
+            var declared = manager.getClass().getDeclaredField("callbacks");
+            declared.setAccessible(true);
+            var inner = (net.minecraft.world.level.entity.LevelCallback<Entity>) declared.get(manager);
+            if (inner instanceof SpawnRecorder) return;
+            declared.set(manager, new SpawnRecorder(inner));
+        } catch (ReflectiveOperationException e) { throw new RuntimeException(e); }
+    }
     static BlockPos pos(JsonArray p) { return new BlockPos(p.get(0).getAsInt(), p.get(1).getAsInt(), p.get(2).getAsInt()); }
     static JsonArray coordinates(BlockPos p) { JsonArray a = new JsonArray(); a.add(p.getX()); a.add(p.getY()); a.add(p.getZ()); return a; }
     /** Same anonymous player GameTestHelper.makeMockPlayer builds, so both harnesses interact identically. */
@@ -351,6 +419,17 @@ public class CaptureRedstone extends TestFunctionLoader {
             // 速度清零、关闭重力，这与压力板/绊线的接触输入是同一个约定：不模拟运动轨迹。
             if (input.has("groundItems")) {
                 for (var existing : occupants.getOrDefault(pos, List.of())) existing.discard();
+                // 这条刺激是**这一格可见掉落物集合的全量声明**。原版侧可能已经有一个靠真实
+                // 物品运动飞进吸取范围的掉落物（例如投掷器朝空气抛出的那一个）；内核不建模
+                // 物品运动，只认这条声明。若不撤走它，原版就会比内核凭空多出一个实体。
+                // 撤走范围是漏斗自己这一格加上面两格，也就是完整包住
+                // Hopper.SUCK_AABB = Block.column(16, 11, 32) 的那三格立方；比吸取体积略大，
+                // 好让交接可以发生在掉落物**还没进入吸取体积**的那几刻。
+                // 对既有捕获这一步是空操作：那些场景里这三格中的掉落物全部来自上一次声明，
+                // 已经在上一行按 occupants 撤走了。
+                var column = new net.minecraft.world.phys.AABB(
+                    pos.getX(), pos.getY(), pos.getZ(), pos.getX() + 1.0, pos.getY() + 3.0, pos.getZ() + 1.0);
+                for (var stray : level.getEntitiesOfClass(ItemEntity.class, column)) stray.discard();
                 var spawned = new ArrayList<Entity>(); occupants.put(pos, spawned);
                 for (var value : input.getAsJsonArray("groundItems")) {
                     var row = value.getAsJsonObject();
@@ -626,10 +705,18 @@ public class CaptureRedstone extends TestFunctionLoader {
         traceTruncated = false; traceEntries = new JsonArray();
         snapshotWitness = scenario.has("snapshotWitness") && scenario.get("snapshotWitness").getAsBoolean();
         snapshotMismatches = new JsonArray();
+        if (scenario.has("watchEjections")) {
+            ejections = new JsonArray(); ejectors = new ArrayList<>(); spawnOrigin = origin; recordingSpawns = false;
+            for (var value : scenario.getAsJsonArray("watchEjections")) ejectors.add(origin.offset(pos(value.getAsJsonArray())));
+            installSpawnRecorder(level);
+        }
         int end = scenario.get("endTick").getAsInt();
         for (int t = 0; t <= end; ++t) {
             final int tick = t;
             hook.at(t, () -> {
+                // 命令自己声明出来的掉落物不是抛出；只有 hook 之外、也就是服务器刻里
+                // 原版自己生成的掉落物才记录，并归到下一个观测刻。
+                recordingSpawns = false;
                 if (tick == 0) {
                     // Sampled at the first timeline tick, not at setup: an independent harness can
                     // only line up daylight and the 20 gt detector phase if it knows both clocks.
@@ -723,6 +810,27 @@ public class CaptureRedstone extends TestFunctionLoader {
                     }
                     frame.add("groundItems", ground);
                 }
+                // 掉落物的逐刻轨迹。**内核不比较这一项**：内核完全没有物品运动，这里纯粹是
+                // 把原版的真实飞行轨迹记下来当原始观测。坐标相对捕获原点，速度与原点无关。
+                if (scenario.has("watchItemEntities")) {
+                    var bounds = net.minecraft.world.phys.AABB.encapsulatingFullBlocks(origin.offset(-4, -4, -4), origin.offset(52, 10, 52));
+                    var drops = new ArrayList<>(level.getEntitiesOfClass(ItemEntity.class, bounds));
+                    drops.sort(Comparator.comparingInt(Entity::getId));
+                    JsonArray rows = new JsonArray();
+                    for (var drop : drops) {
+                        var row = new JsonObject();
+                        row.addProperty("id", drop.getId());
+                        row.addProperty("item", BuiltInRegistries.ITEM.getKey(drop.getItem().getItem()).toString());
+                        row.addProperty("count", drop.getItem().getCount());
+                        row.add("position", vector(drop.getX() - origin.getX(), drop.getY() - origin.getY(), drop.getZ() - origin.getZ()));
+                        var velocity = drop.getDeltaMovement();
+                        row.add("velocity", vector(velocity.x, velocity.y, velocity.z));
+                        row.add("velocityBits", vectorBits(velocity.x, velocity.y, velocity.z));
+                        row.addProperty("onGround", drop.onGround());
+                        rows.add(row);
+                    }
+                    frame.add("itemEntities", rows);
+                }
                 if (scenario.has("watchContainerEntities")) {
                     JsonArray carts = new JsonArray();
                     for (var value : scenario.getAsJsonArray("watch"))
@@ -732,6 +840,7 @@ public class CaptureRedstone extends TestFunctionLoader {
                 if(scenario.has("watchBells"))frame.add("bells",bells);
                 if(scenario.has("watchJukeboxes"))frame.add("jukeboxes",jukeboxes);
                 if (tick == end) {
+                    if (scenario.has("watchEjections")) result.add("expectedActions", ejections);
                     if (traceLimit > 0) {
                         result.addProperty("updateTraceLimit", traceLimit);
                         result.addProperty("updateTraceTruncated", traceTruncated);
@@ -742,6 +851,8 @@ public class CaptureRedstone extends TestFunctionLoader {
                     catch (Exception e) { throw new RuntimeException(e); }
                     onFinished.run();
                 }
+                // 从这里到下一个 hook 之间正好是一个服务器刻，它产生的抛出属于下一个观测刻。
+                recordingSpawns = true; spawnTick = tick + 1;
             });
         }
     }
