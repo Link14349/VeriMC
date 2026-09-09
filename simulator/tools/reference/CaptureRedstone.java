@@ -203,11 +203,35 @@ public class CaptureRedstone extends TestFunctionLoader {
         return result;
     }
     static int remainingInBurst = 0;
+    // Opt-in R13 diagnostic: at every peek of a FullNeighborUpdate, compare the carried snapshot
+    // with what the world holds at that position right now. A non-empty result is a reachable
+    // witness that the snapshot form and a live re-read cannot be the same rule. Off by default,
+    // so every existing fixture keeps its byte-identical shape; nothing is written back to the game.
+    static boolean snapshotWitness = false;
+    static JsonArray snapshotMismatches = new JsonArray();
+    static net.minecraft.server.level.ServerLevel traceLevel;
+    static int witnessTick = 0;
     static void recordTraceEntry(BlockPos pos) {
         // forEachUpdatedPos fires once per peek for every kind except the multi update, which
         // reports each of its non-skipped neighbours. Only the first call of a burst is an event.
         if (remainingInBurst > 0) { --remainingInBurst; return; }
         Object update = traceStack.peek();
+        if (snapshotWitness && update.getClass().getSimpleName().equals("FullNeighborUpdate")) {
+            var target = (BlockPos)field(update, "pos");
+            var snapshot = (BlockState)field(update, "state");
+            var live = traceLevel.getBlockState(target);
+            if (live != snapshot) {
+                JsonObject row = new JsonObject();
+                row.addProperty("tick", witnessTick);
+                JsonArray where = new JsonArray(); addRelative(where, target); row.add("pos", where);
+                row.addProperty("snapshot", Block.getId(snapshot));
+                row.addProperty("snapshotName", snapshot.toString());
+                row.addProperty("live", Block.getId(live));
+                row.addProperty("liveName", live.toString());
+                row.addProperty("source", blockName(field(update, "block")));
+                snapshotMismatches.add(row);
+            }
+        }
         appendTrace(describeUpdate(update));
         remainingInBurst = update.getClass().getSimpleName().equals("MultiNeighborUpdate")
             ? (field(update, "skipDirection") == null ? 6 : 5) - 1 : 0;
@@ -600,6 +624,8 @@ public class CaptureRedstone extends TestFunctionLoader {
         for (int x = 0; x < 48; ++x) for (int y = 0; y < 6; ++y) for (int z = 0; z < 48; ++z) level.setBlock(origin.offset(x,y,z), Block.stateById(0), 18);
         traceLimit = scenario.has("updateTraceLimit") ? scenario.get("updateTraceLimit").getAsInt() : 0;
         traceTruncated = false; traceEntries = new JsonArray();
+        snapshotWitness = scenario.has("snapshotWitness") && scenario.get("snapshotWitness").getAsBoolean();
+        snapshotMismatches = new JsonArray();
         int end = scenario.get("endTick").getAsInt();
         for (int t = 0; t <= end; ++t) {
             final int tick = t;
@@ -618,6 +644,8 @@ public class CaptureRedstone extends TestFunctionLoader {
                     traceOrigin = origin;
                     var updater = neighborUpdaterOf(level);
                     traceStack = stackOf(updater);
+                    traceLevel = level;
+                    witnessTick = tick;
                     remainingInBurst = 0;
                     updater.setDebugListener(CaptureRedstone::recordTraceEntry);
                     appendTrace(new JsonPrimitive(tick));
@@ -709,6 +737,7 @@ public class CaptureRedstone extends TestFunctionLoader {
                         result.addProperty("updateTraceTruncated", traceTruncated);
                         result.add("updateTrace", traceEntries);
                     }
+                    if (snapshotWitness) result.add("fullSnapshotMismatch", snapshotMismatches);
                     try { Files.writeString(output, new GsonBuilder().setPrettyPrinting().create().toJson(result)); }
                     catch (Exception e) { throw new RuntimeException(e); }
                     onFinished.run();
