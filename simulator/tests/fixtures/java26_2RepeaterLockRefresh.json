@@ -1098,13 +1098,13 @@
       "trade_rebalance",
       "vanilla"
     ],
-    "gameTime": 5,
-    "clockTicks": 5
+    "gameTime": 11,
+    "clockTicks": 11
   },
   "origin": [
-    -11672368,
+    11083907,
     -58,
-    14344060
+    -730087
   ],
   "frames": [
     {

@@ -40,6 +40,8 @@ public:
     World world;
     Tick currentTick{};
     void setRandomSeed(std::uint64_t seed) { randomSeed = seed; worldRandom.setSeed(seed); }
+    // 世界随机源的 48 位内部状态，用于与原版逐帧对照消耗次数。
+    std::uint64_t randomState() const { return worldRandom.state(); }
     bool hasPendingActions() const { return !pendingActionIds.empty(); }
     Json pendingActionsJson() const;
     const std::deque<Json>& actionHistory() const { return environmentActions; }

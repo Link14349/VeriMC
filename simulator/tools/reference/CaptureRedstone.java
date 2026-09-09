@@ -137,6 +137,15 @@ public class CaptureRedstone extends TestFunctionLoader {
         }
         return result;
     }
+    /**
+     * The raw 48 bit state of the level's random source. `Level.random` is a `LegacyRandomSource`,
+     * whose seed field is private, so it is read reflectively; nothing is written back except the
+     * one explicit `setSeed` the scenario asks for. Comparing this value every frame checks that
+     * both sides consumed exactly the same number of draws, not just that outputs agreed.
+     */
+    static long randomState(Level level) {
+        return ((java.util.concurrent.atomic.AtomicLong)field(level.getRandom(), "seed")).get();
+    }
     static int remainingInBurst = 0;
     static void recordTraceEntry(BlockPos pos) {
         // forEachUpdatedPos fires once per peek for every kind except the multi update, which
@@ -467,6 +476,19 @@ public class CaptureRedstone extends TestFunctionLoader {
         // Match referenceVersion.json: natural random ticks are external to this
         // loaded-region circuit model. Explicit randomTick stimuli still execute.
         level.getGameRules().set(net.minecraft.world.level.gamerules.GameRules.RANDOM_TICK_SPEED, 0, level.getServer());
+        if (scenario.has("randomSeed")) {
+            // Isolating device randomness: mob spawning and the weather cycle draw from the same
+            // level random every tick, and neither is modelled. They are switched off for the
+            // scenarios that compare the random state, and nowhere else.
+            for (var rule : java.util.List.of(net.minecraft.world.level.gamerules.GameRules.SPAWN_MOBS,
+                                             net.minecraft.world.level.gamerules.GameRules.SPAWN_MONSTERS,
+                                             net.minecraft.world.level.gamerules.GameRules.SPAWN_PATROLS,
+                                             net.minecraft.world.level.gamerules.GameRules.SPAWN_PHANTOMS,
+                                             net.minecraft.world.level.gamerules.GameRules.SPAWN_WANDERING_TRADERS,
+                                             net.minecraft.world.level.gamerules.GameRules.SPAWN_WARDENS,
+                                             net.minecraft.world.level.gamerules.GameRules.ADVANCE_WEATHER))
+                level.getGameRules().set(rule, false, level.getServer());
+        }
         JsonObject result = scenario.deepCopy();
         result.addProperty("reference", referenceLabel);
         // Record the actual harness environment, not just our intended profile.
@@ -544,6 +566,10 @@ public class CaptureRedstone extends TestFunctionLoader {
                     inventories.add(inventory);
                 }
                 frame.add("states", states); frame.add("analogs", analogs); frame.add("inventories", inventories); frames.add(frame);
+                if (scenario.has("randomSeed")) {
+                    if (tick == 0) level.getRandom().setSeed(scenario.get("randomSeed").getAsLong());
+                    frame.addProperty("randomState", randomState(level));
+                }
                 if (scenario.has("watchScheduled")) {
                     // 队列坐标同样相对捕获原点，traceOrigin 在这里复用。
                     traceOrigin = origin;

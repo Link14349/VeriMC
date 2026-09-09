@@ -53,6 +53,8 @@ int main(int argc, char** argv) {
                     if (frame.contains(field) && (!frame.at(field).is_array() || frame.at(field).size() != fixture.at("watch").size()))
                         throw std::runtime_error("Observation array length differs from watch list");
                 }
+                // 随机源对照：两侧在第 0 刻设同一个种子，之后逐帧比较 48 位内部状态。
+                if (fixture.contains("randomSeed") && tick == 0) simulation.setRandomSeed(fixture.at("randomSeed").get<std::uint64_t>());
                 simulation.advanceTo(tick);
                 simulation.markUpdateTrace(tick);
                 for (const auto& command : fixture.at("commands")) if (command.at("tick") == tick) {
@@ -70,6 +72,15 @@ int main(int argc, char** argv) {
                         else simulation.interact(pos, facing);
                     }
                     else simulation.stimulate(pos, command.at("stimulus"));
+                }
+                if (frame.contains("randomState") && !differs) {
+                    const auto actual = static_cast<std::int64_t>(simulation.randomState());
+                    if (frame.at("randomState").get<std::int64_t>() != actual) {
+                        differs = true;
+                        result["status"] = "difference";
+                        result["firstDifference"] = {{"tick", tick}, {"field", "randomState"},
+                                                     {"expected", frame.at("randomState")}, {"actual", actual}};
+                    }
                 }
                 // 待执行队列是整帧一份，不按观测位置分组。坐标换算成相对原点后逐项比较。
                 if (frame.contains("blockTicks") && !differs) {
