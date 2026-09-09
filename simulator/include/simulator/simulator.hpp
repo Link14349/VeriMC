@@ -119,6 +119,17 @@ public:
     bool chunkBlockTicking(BlockPos pos) const { return chunkStates.empty() || chunkState(pos) >= ChunkState::blockTicking; }
     bool chunkEntityTicking(BlockPos pos) const { return chunkStates.empty() || chunkState(pos) == ChunkState::entityTicking; }
     bool chunkLoaded(BlockPos pos) const { return chunkStates.empty() || chunkState(pos) != ChunkState::unloaded; }
+    // 原版 VibrationSystem.Ticker.areAdjacentChunksTicking：监听者所在区块的 3×3 全部要
+    // shouldTickBlocksAt 且 getChunkNow 非空。本模型里 blockTicking 已蕴含已加载，
+    // 因此一个 chunkBlockTicking 判断即可。幽匿感测体（含校准）的 VibrationUser
+    // requiresAdjacentChunksToBeTicking 返回 true，投递振动前必须先过这一关。
+    bool adjacentChunksTicking(BlockPos listener) const {
+        if (chunkStates.empty()) return true;  // 缺省整图 entityTicking，热路径零额外开销
+        const auto chunk = chunkOf(listener);
+        for (int dx = -1; dx <= 1; ++dx) for (int dz = -1; dz <= 1; ++dz)
+            if (!chunkBlockTicking({(chunk.x + dx) * 16, 0, (chunk.z + dz) * 16})) return false;
+        return true;
+    }
     void updateNeighbors(BlockPos pos, int skip = -1, StateId source = UINT32_MAX);
     void neighborChanged(BlockPos pos, StateId source = 0);
     // 原版 FullNeighborUpdate：带入队时的目标状态快照，执行时不再重新读世界。

@@ -848,6 +848,53 @@ int main() {
         threw = false; try { s.setChunkState(6, 5, Simulator::ChunkState::entityTicking); } catch (...) { threw = true; }
         expect(threw, "a ticking chunk was allowed next to an unloaded one");
     });
+    test("vibration delivery needs the 3x3 chunks around the listener to be block ticking", [&] {
+        // 原版 VibrationSystem.Ticker.receiveVibration 第一句就是
+        // requiresAdjacentChunksToBeTicking && !areAdjacentChunksTicking -> return false，
+        // 而 SculkSensorBlockEntity.VibrationUser 返回 true（校准感测体继承它）。
+        // 返回 false 时既不投递也不清 currentVibration，于是每刻重试而不是丢弃。
+        const BlockPos pos{8, 0, 8};      // 区块 (0,0)
+        const BlockPos source{2, 0, 8};   // 同区块，距离 6 → 传播 6 刻
+        auto build = [&](Simulator& world, const char* block) {
+            world.place(pos, r.state(block));
+            world.advanceTo(1);
+            world.stimulate(source, {{"gameEvent", "step"}});
+        };
+        // 一、缺省（不声明任何区块状态）行为必须完全不变：第 1+6=7 刻照常投递。
+        Simulator base(r); build(base, "sculk_sensor");
+        base.advanceTo(6); expect(base.displayValue(pos) == 0, "default vibration arrived early");
+        base.advanceTo(7); expect(base.displayValue(pos) == 4, "default vibration delivery changed");
+        // 二、感测体所在区块保持 entityTicking，只把**相邻**区块降到 loaded（加载环允许）。
+        // 感测体一旦被激活就会先 active 再 cooldown 最后回到 inactive，所以要在这三段之内
+        // 直接看 sculk_sensor_phase，光看功率会漏掉「已经响过又冷却完了」。
+        Simulator s(r); build(s, "sculk_sensor");
+        s.setChunkState(1, 0, Simulator::ChunkState::loaded);
+        auto idle = [&](const Simulator& world) {
+            return world.displayValue(pos) == 0 && r.property(world.world.get(pos), "sculk_sensor_phase") == "inactive";
+        };
+        s.advanceTo(8); expect(idle(s), "vibration was delivered while an adjacent chunk was not block ticking");
+        s.advanceTo(40); expect(idle(s), "blocked vibration was delivered later while the chunk was still stalled");
+        expect(s.pendingEvents() == 1, "blocked vibration stopped retrying instead of waking every tick");
+        // 三、停摆中保存/读取：未投递的振动（current 仍在、remaining 已减到 0）原样恢复。
+        auto saved = s.saveProject("stuck", true);
+        expect(saved["sensors"].size() == 1 && saved["sensors"][0].contains("current") && saved["sensors"][0]["remaining"] == 0,
+               "blocked vibration was not kept as a travelling-but-undelivered state");
+        Simulator restored(r); restored.loadProject(saved);
+        expect(restored.saveProject("stuck", true) == saved, "blocked vibration checkpoint changed across a reload");
+        for (Simulator* world : {&s, &restored}) {
+            world->setChunkState(1, 0, Simulator::ChunkState::entityTicking);
+            world->advanceTo(41);
+            expect(world->displayValue(pos) == 4, "vibration was dropped instead of retried once the adjacent chunk resumed");
+        }
+        // 四、校准幽匿感测体走同一条路径（半径 16，同样距离 6 → 功率 10）。
+        Simulator c(r); build(c, "calibrated_sculk_sensor");
+        c.setChunkState(0, -1, Simulator::ChunkState::loaded);  // 换一个方向的相邻区块
+        c.advanceTo(8); expect(idle(c), "calibrated sensor ignored the adjacent chunk requirement");
+        c.advanceTo(40); expect(idle(c), "calibrated sensor delivered later while the chunk was still stalled");
+        c.setChunkState(0, -1, Simulator::ChunkState::entityTicking);
+        c.advanceTo(41);
+        expect(c.displayValue(pos) == 10, "calibrated sensor never delivered after the adjacent chunk resumed");
+    });
     test("hopper ground item input validation, range and checkpoint", [&] {
         Simulator s(r); floor(s);
         const BlockPos hopper{0, 1, 0};

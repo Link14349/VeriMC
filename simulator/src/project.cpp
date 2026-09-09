@@ -370,8 +370,11 @@ void Simulator::loadProject(ProjectSource& source) {
                     || (value.context.affectedState!=UINT32_MAX && registry.type(value.context.affectedState).dampensVibrations))throw std::invalid_argument("无效感测体待接收事件");
             }
             const bool busy=sensor.candidate.has_value() || sensor.current.has_value();
+            // 相邻区块不全 ticking 时原版 receiveVibration 直接返回 false：current 保留，
+            // travelTime 已减到 0 并每刻重试。这种「卡住待投递」状态下 remaining==0 合法。
+            const bool stuck=sensor.current && sensor.remaining==0 && !candidate.adjacentChunksTicking(pos);
             if(sensor.remaining<0 || sensor.remaining>18 || sensor.candidateTick>candidate.currentTick || (sensor.candidate && sensor.current) || (!sensor.current && sensor.remaining!=0)
-                || (sensor.current && (sensor.remaining==0 || sensor.remaining>=static_cast<int>(std::floor(sensor.current->distance))))
+                || (sensor.current && !stuck && (sensor.remaining==0 || sensor.remaining>=static_cast<int>(std::floor(sensor.current->distance))))
                 || (busy && (sensor.wakeAt<candidate.currentTick || sensor.wakeAt==UINT64_MAX || sensor.generation>=candidate.nextOrder)) || (!busy && sensor.wakeAt!=UINT64_MAX))throw std::invalid_argument("感测体传播与唤醒状态不一致");
             if(busy && !candidate.scheduledKeys.contains({pos,candidate.at(pos).type,2,sensor.generation}))throw std::invalid_argument("快照缺少感测体唤醒事件");
             if(!candidate.sensors.emplace(pos,sensor).second)throw std::invalid_argument("重复感测体运行数据");

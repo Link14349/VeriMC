@@ -135,6 +135,14 @@ void Simulator::tickVibration(const ScheduledEvent& event) {
     found=sensors.find(event.pos);if(found==sensors.end() || found->second.generation!=event.data || !found->second.current)return;
     const auto vibration=*found->second.current;found->second.remaining=std::max(0,found->second.remaining-1);
     if(found->second.remaining==0) {
+        // 原版 receiveVibration 开头：requiresAdjacentChunksToBeTicking（幽匿感测体与校准
+        // 幽匿感测体都返回 true）且 3×3 区块不全 ticking 时直接 return false —— 既不投递也不
+        // 清 currentVibration，hasChanged 保持 false 因此连 onDataChanged 都不触发。
+        // travelTime 已经减到 0，下一刻 decrementTravelTime 仍是 0，于是每刻重试到区块恢复。
+        if(!adjacentChunksTicking(event.pos)) {
+            found->second.wakeAt=currentTick+1;schedulePhase(event.pos,currentTick+1,2,event.data);
+            return;
+        }
         activateSensor(event.pos,vibration);
         found=sensors.find(event.pos);if(found==sensors.end() || found->second.generation!=event.data)return;
         found->second.current.reset();

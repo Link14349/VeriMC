@@ -96,6 +96,24 @@
 - **不做自动加载**。写入未加载区块报错，而不是像原版那样把区块加载进来。
 - **随机刻**仍然关闭（见参考验证说明），本模型不改变这一点。
 - 漏斗冷却、唱片机播放计时、幽匿感测体倒计时、**运动中的活塞进度**都有原版差分。
-- `SculkShriekerBlock.requiresAdjacentChunksToBeTicking` 这类跨区块条件未实现。
+- `requiresAdjacentChunksToBeTicking` 已实现，见下节；先前把它只归给未实现的幽匿尖啸体是**错的**，
+  `SculkSensorBlockEntity.VibrationUser`（含校准感测体继承的那个）同样返回 `true`。
+  仍未实现的是尖啸体本身这个器件。
+
+## 已实现：振动投递要求相邻区块 ticking
+
+`VibrationSystem.Ticker.receiveVibration` 第一句就是
+`if (user.requiresAdjacentChunksToBeTicking() && !areAdjacentChunksTicking(level, destination)) return false;`
+（`VibrationSystem.java:347`），而 `SculkSensorBlockEntity.java:136` 返回 `true`。
+`areAdjacentChunksTicking`（`VibrationSystem.java:363`）要求监听者所在区块的 **3×3 全部**
+`shouldTickBlocksAt` 且已加载——是 **blockTicking**，不是 entityTicking。
+
+返回 `false` 时原版**既不投递也不清 `currentVibration`**，`hasChanged` 保持 `false` 因此
+连 `onDataChanged` 都不触发；`travelTime` 已经减到 0，下一刻 `decrementTravelTime`
+仍是 0，于是**每刻重试**直到相邻区块恢复。内核 `tickVibration` 在
+`remaining==0` 的投递点做同样的判断：不投递、不清 `current`、把自己排到下一刻。
+`chunkStates` 为空（缺省整图 entityTicking）时 `adjacentChunksTicking` 直接返回 true，
+热路径没有额外开销。卡住期间 `current` 存在而 `remaining==0`，运行快照的
+感测体一致性校验为这一种状态开了口子。
 - 编辑器界面尚未显示区块状态；目前只能通过工程文件与接口设置，用户在 UI 上看不到
   「电路为什么停住」。这一条仍然开着。
