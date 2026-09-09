@@ -15,17 +15,17 @@ the block-side logic, not minecart motion. Their positions are an input and are 
 the observation is `{type, inventory}` per cell, listed in the vanilla `level.getEntities` order,
 because that is the list `nextInt` indexes into.
 
-Timing note. Every sub-scenario is arranged so that a hopper which has an entity-container
-candidate either transfers successfully or has no candidate at all. A hopper that keeps *failing*
-against a present cart draws once per tick forever in vanilla, and the kernel — which stops
-scheduling a hopper after a fruitless tick — does not; that gap is real and is reported separately
-rather than papered over here. Sub-scenario D therefore keeps exactly one failing tick and then
-removes the cart in the same tick, which is the shortest form that still shows the
-`container != null -> return false` shadowing of a dropped item.
+Timing. `tryMoveItems` sets a cooldown only when something actually moved, so a hopper that keeps
+*failing* against a present cart runs again on the very next tick and draws again — for as long as
+the cart stands there. Sub-scenario G holds exactly that steady state on both the push and the pull
+side for seventeen ticks, with a cooldown window in the middle where the draws must stop.
 
-Draw ticks are kept disjoint between sub-scenarios (B 1/9/17, D 3, A 5/13/21/29/37,
-F 6/14/22/30/38) so the value each `nextInt` receives never depends on the block entity order
-within a tick; only the two-cart selection in F consumes a draw whose value is observable.
+Draw ticks are kept disjoint between sub-scenarios: B 1/9/17, D 3, A 5/13/21/29/37, F 6/14/22/30/38,
+then G alone from tick 40 to the end. A and F are switched off with a redstone block at tick 39 so
+that nothing else can draw inside G's window. Disjointness matters because the state comparison only
+pins down the *number* of draws per tick; the one draw whose *value* is observable is F's
+`nextInt(2)` cart choice, and letting a second device draw in the same tick would make that value
+depend on the block entity order instead of on the device under test.
 """
 from captureRedstone import runCapture, state
 
@@ -115,6 +115,34 @@ carts(5, (32, 2, 4), [cart('chest_minecart', (0, 'minecraft:stone', 8)),
                       cart('chest_minecart', (0, 'minecraft:dirt', 8))])
 watch += [[32, 1, 4], [32, 2, 4]]
 
+# G. The steady state: a hopper that can see a cart but can never move anything into or out of it.
+#    Vanilla leaves the cooldown untouched on a failed `tryMoveItems`, so `pushItemsTick` walks
+#    straight back into `getContainerAt` on the next tick and draws again, every tick, forever.
+#    Both directions are held at once from tick 40 to the end of the run:
+#      * pull side (39): an empty chest minecart above the hopper. Its first slot holds one item,
+#        so tick 40 is a *successful* pull that sets the 8 gt cooldown — ticks 41..47 must draw
+#        nothing at all, because `isOnCooldown` returns before `getEntityContainer` is reached.
+#        From tick 48 the cart is empty and every tick draws again.
+#      * push side (44): the hopper holds one item and faces a hopper minecart whose five slots
+#        are all full stacks. `getAttachedContainer` draws first and `isFullContainer` refuses
+#        afterwards, so every tick from 40 on draws exactly once and moves nothing.
+#    Expected draw counts: tick 40 -> 2, ticks 41..47 -> 1, ticks 48..56 -> 2.
+#    A and F are disabled one tick earlier so their next scheduled transfers (45 and 46) cannot
+#    land inside this window; a powered hopper leaves `tryMoveItems` before any container lookup.
+put(39, (3, 1, 4), 'redstone_block')
+put(39, (31, 1, 4), 'redstone_block')
+
+floor(39, 4)
+put(0, (39, 1, 4), 'hopper', facing='down')
+carts(39, (39, 2, 4), [cart('chest_minecart', (0, 'minecraft:stone', 1))])
+watch += [[39, 1, 4], [39, 2, 4]]
+
+floor(44, 4)
+put(0, (44, 1, 4), 'hopper', facing='east')
+inventory(39, (44, 1, 4), [{'slot': 0, 'item': 'minecraft:stone', 'count': 1}])
+carts(39, (45, 1, 4), [cart('hopper_minecart', *((slot, 'minecraft:stone', 64) for slot in range(5)))])
+watch += [[44, 1, 4], [45, 1, 4]]
+
 if __name__ == '__main__':
-    runCapture(commands, watch, 40, 'java26_2EntityContainers',
+    runCapture(commands, watch, 56, 'java26_2EntityContainers',
                randomSeed=SEED, watchContainerEntities=True, watchGroundItems=True)
