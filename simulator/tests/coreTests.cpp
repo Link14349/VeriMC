@@ -163,6 +163,129 @@ int main() {
             expect(s.inventoryJson(pos)[0]["count"]==row.at("remaining") && action["count"]==row.at("count"),"emission inventory differs");
         }
     });
+    // 显式动作闭环：投掷器抛出 → 外部环境反馈（声明落点）→ 漏斗按既有原版路径再吸收。
+    // 抛出的初始位置与速度直接取自既有原版实测 java26_2DropperMotion.json（facing=east、
+    // seedBits=0 那一例，逐位比较）；落点的声明形式与既有原版实测 java26_2HopperPickup.json
+    // 里的 groundItems 外部刺激完全一致，漏斗吸取走的是同一条已经与原版对照过的路径。
+    // **抛出点到落点之间那一段（物品在空中飞行）是外部输入，不是本内核实现的物品运动**：
+    // 内核既不模拟也不推断实体运动，落点由 fixture 显式声明。
+    // 「投掷器→空气→落点→漏斗」这个组合场景本身还缺一次原版捕获（本轮不跑捕获）。
+    auto vanillaEject = [&] {
+        std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/../tests/fixtures/java26_2DropperMotion.json");
+        expect(static_cast<bool>(file), "missing vanilla dropper motion fixture");
+        const auto fixture = Json::parse(file);
+        for (const auto& row : fixture.at("cases")) if (row.at("facing") == "east" && row.at("seedBits") == "0") return row;
+        throw std::runtime_error("missing vanilla dropper motion case");
+    };
+    // extraDropper：第二台投掷器晚一刻再抛一次，用来构造「fixture 未声明的动作」。
+    // stock：投掷器初始物品数，1 表示抛出后容器变空（比较器输出 1→0）。
+    auto ejectClosure = [&](const Json& motion, bool extraDropper, int stock) {
+        const auto origin = motion.at("source").get<BlockPos>();
+        const auto dropper = r.state("dropper", {{"facing", "east"}});
+        const auto triggered = r.state("dropper", {{"facing", "east"}, {"triggered", "true"}});
+        const auto hopper = r.state("hopper", {{"facing", "down"}});
+        auto command = [](Tick tick, Json pos, const char* key, Json value) {
+            Json result = Json::object(); result["tick"] = tick; result["pos"] = pos; result[key] = value; return result;
+        };
+        Json inventory = Json::object();
+        inventory["inventory"] = Json::array({Json{{"slot", 0}, {"item", "stone"}, {"count", stock}}});
+        Json landing = Json::object();
+        landing["groundItems"] = Json::array({Json{{"item", "minecraft:stone"}, {"count", 1}, {"y", 0.72}}});
+        Json commands = Json::array();
+        commands.push_back(command(0, Json::array({0, 0, 0}), "stateId", dropper));
+        commands.push_back(command(0, Json::array({0, 0, 0}), "stimulus", inventory));
+        commands.push_back(command(0, Json::array({3, 0, 0}), "stateId", hopper));
+        commands.push_back(command(0, Json::array({-1, 0, 0}), "stateId", r.state("redstone_block")));
+        if (extraDropper) {
+            commands.push_back(command(0, Json::array({0, 0, 4}), "stateId", dropper));
+            commands.push_back(command(0, Json::array({0, 0, 4}), "stimulus", inventory));
+            commands.push_back(command(1, Json::array({-1, 0, 4}), "stateId", r.state("redstone_block")));
+        }
+        // 外部环境反馈：落点是显式输入，出现在漏斗的吸取体积里。
+        commands.push_back(command(8, Json::array({3, 0, 0}), "stimulus", landing));
+        Json declaration = Json::object();
+        declaration["index"] = 0; declaration["tick"] = 4; declaration["order"] = 0; declaration["kind"] = "itemEjected";
+        declaration["source"] = Json::array({0, 0, 0}); declaration["item"] = "minecraft:stone"; declaration["count"] = 1;
+        declaration["position"] = motion.at("position"); declaration["positionBits"] = motion.at("positionBits");
+        declaration["velocity"] = motion.at("velocity"); declaration["velocityBits"] = motion.at("velocityBits");
+        Json frames = Json::array();
+        for (Tick tick = 0; tick <= 20; ++tick) {
+            Json frame = Json::object();
+            frame["tick"] = tick;
+            frame["states"] = Json::array({triggered, hopper});
+            frame["analogs"] = Json::array({-1, -1});
+            // 第 8 刻声明的落点必须真的落在吸取体积里，第 20 刻必须已经被吸走。
+            if (tick == 8) frame["groundItems"] = Json::array({nullptr, Json::array({Json{{"item", "minecraft:stone"}, {"count", 1}}})});
+            if (tick == 20) {
+                frame["groundItems"] = Json::array({nullptr, Json::array()});
+                frame["inventories"] = Json::array({stock > 1 ? Json::array({Json{{"slot", 0}, {"item", "minecraft:stone"}, {"count", stock - 1}}}) : Json::array(),
+                                                    Json::array({Json{{"slot", 0}, {"item", "minecraft:stone"}, {"count", 1}}})});
+            }
+            frames.push_back(frame);
+        }
+        Json fixture = Json::object();
+        fixture["origin"] = origin;
+        fixture["watch"] = Json::array({Json::array({0, 0, 0}), Json::array({3, 0, 0})});
+        fixture["randomSeed"] = 0; fixture["endTick"] = 20;
+        fixture["commands"] = commands; fixture["frames"] = frames;
+        fixture["expectedActions"] = Json::array({declaration});
+        return fixture;
+    };
+    test("dropper ejection, declared landing and hopper pickup close the loop", [&] {
+        const auto motion = vanillaEject();
+        const auto fixture = ejectClosure(motion, false, 2);
+        Simulator s(r);
+        const auto outcome = replayReferenceFixture(s, fixture);
+        expect(outcome.at("status") == "match", "闭环重放未通过：" + outcome.dump());
+        const auto origin = fixture.at("origin").get<BlockPos>();
+        const BlockPos hopper{origin.x + 3, origin.y, origin.z};
+        expect(s.actionHistory().size() == 1 && s.actionHistory().front().at("resolved") == true && !s.hasPendingActions(),
+               "抛出动作没有按记录顺序逐条确认");
+        expect(s.suckableItems(hopper).empty() && s.inventoryJson(hopper, false).size() == 1,
+               "漏斗没有吸走外部声明的落点物品");
+        expect(s.saveProject("eject", true)["randomSource"]["state"] == motion.at("randomState"),
+               "抛出消耗的世界随机数与原版实测不一致");
+    });
+    test("declared external actions reject undeclared, mismatched and unrelated pauses", [&] {
+        const auto motion = vanillaEject();
+        auto replay = [&](const Json& fixture, const std::function<void(Simulator&)>& prepare) {
+            Simulator s(r);
+            if (prepare) prepare(s);
+            try {
+                const auto outcome = replayReferenceFixture(s, fixture);
+                return outcome.at("status") == "match" ? std::string() : "difference " + outcome.dump();
+            } catch (const std::exception& error) { return std::string(error.what()); }
+        };
+        auto mustFail = [&](const Json& fixture, const std::string& fragment, const std::string& what,
+                            const std::function<void(Simulator&)>& prepare = {}) {
+            const auto message = replay(fixture, prepare);
+            expect(message.find(fragment) != std::string::npos, what + "；实际：" + (message.empty() ? std::string("match") : message));
+        };
+        const auto base = ejectClosure(motion, false, 2);
+        auto edited = [&](const std::function<void(Json&)>& change) { Json copy = base; change(copy); return copy; };
+        // 未声明任何外部动作：不允许把暂停当成成功。
+        mustFail(edited([](Json& f) { f.erase("expectedActions"); }), "requires explicit external-action feedback", "没有声明也让重放通过了");
+        mustFail(edited([](Json& f) { f["expectedActions"] = Json::array(); }), "Undeclared external action", "空声明没有拦住实际抛出");
+        // 实际多抛了一次，而 fixture 只声明了一次。
+        mustFail(ejectClosure(motion, true, 2), "Undeclared external action", "多出来的抛出被吞掉了");
+        // 序列 / 数量 / 初值。
+        mustFail(edited([](Json& f) { f["expectedActions"][0]["tick"] = 5; }), "differs in tick", "游戏刻不符仍然通过");
+        mustFail(edited([](Json& f) { f["expectedActions"][0]["index"] = 1; }), "differs in index", "序号不符仍然通过");
+        mustFail(edited([](Json& f) { f["expectedActions"][0]["order"] = 1; }), "differs in same-tick order", "同刻顺序不符仍然通过");
+        mustFail(edited([](Json& f) { f["expectedActions"][0]["source"] = Json::array({1, 0, 0}); }), "differs in source", "源坐标不符仍然通过");
+        mustFail(edited([](Json& f) { f["expectedActions"][0]["item"] = "minecraft:dirt"; }), "differs in item", "物品不符仍然通过");
+        mustFail(edited([](Json& f) { f["expectedActions"][0]["count"] = 2; }), "differs in count", "数量不符仍然通过");
+        mustFail(edited([](Json& f) { f["expectedActions"][0]["position"][1] = 0.0; }), "differs in position", "初始位置不符仍然通过");
+        mustFail(edited([](Json& f) { f["expectedActions"][0]["velocity"][0] = 0.0; }), "differs in velocity", "初始速度不符仍然通过");
+        mustFail(edited([](Json& f) { f["expectedActions"][0]["velocityBits"][2] = "bfa310e3c7dabeb2"; }), "differs in velocityBits[2]", "速度末位不符仍然通过");
+        mustFail(edited([](Json& f) { f["expectedActions"][0].erase("velocity"); f["expectedActions"][0].erase("velocityBits"); }), "must state its velocity", "没有声明初速度也算通过");
+        // 声明了却始终没有发生。
+        mustFail(edited([](Json& f) { auto extra = f["expectedActions"][0]; extra["index"] = 1; extra["tick"] = 12; f["expectedActions"].push_back(extra); }),
+                 "never happened", "声明了却没发生的抛出被放过");
+        // 其他原因的暂停：探针断点与抛出发生在同一刻，确认外部动作不得把它一并清掉。
+        mustFail(ejectClosure(motion, false, 1), "paused for a reason other than external actions", "探针断点被外部动作确认顺手清掉了",
+                 [&](Simulator& s) { s.configureProbe(s.addProbe(motion.at("source").get<BlockPos>(), "eject", "analog"), Json{{"trigger", "falling"}}); });
+    });
     test("block tick cap defers backlog and zero delay waits for next collection", [&] {
         BlockTicks ticks;
         for (std::uint64_t i = 0; i < 65537; ++i) ticks.schedule({1, 0, i, {static_cast<int>(i), 0, 0}, 1});

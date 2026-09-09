@@ -154,7 +154,11 @@ inline Json replayReferenceFixture(Simulator& simulation, const Json& fixture, c
             simulation.advanceTo(tick);
             if (!actions.settle(simulation)) break;
         }
-        if (simulation.currentTick != tick || simulation.breakRequested || simulation.hasPendingActions())
+        if (simulation.hasPendingActions())
+            throw std::runtime_error("Replay requires explicit external-action feedback");
+        if (simulation.breakRequested)
+            throw std::runtime_error("Replay paused for a reason other than external actions: " + simulation.pauseReason);
+        if (simulation.currentTick != tick)
             throw std::runtime_error("Replay stopped before completing observation tick " + std::to_string(tick));
         simulation.markUpdateTrace(tick);
         for (const auto& command : fixture.at("commands")) if (command.at("tick") == tick) {
@@ -174,8 +178,10 @@ inline Json replayReferenceFixture(Simulator& simulation, const Json& fixture, c
             else simulation.stimulate(pos, command.at("stimulus"));
         }
         while (actions.settle(simulation)) {}
-        if (simulation.breakRequested || simulation.hasPendingActions())
+        if (simulation.hasPendingActions())
             throw std::runtime_error("Replay requires explicit external-action feedback");
+        if (simulation.breakRequested)
+            throw std::runtime_error("Replay paused for a reason other than external actions: " + simulation.pauseReason);
         if (frame.contains("randomState") && !differs) {
             const auto actual = static_cast<std::int64_t>(simulation.randomState());
             if (frame.at("randomState").get<std::int64_t>() != actual) {
