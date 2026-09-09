@@ -129,6 +129,17 @@ bool Simulator::runnable() const {
     }
     return false;
 }
+Json Simulator::blockEntityOrderJson() const {
+    std::vector<std::pair<std::uint64_t, BlockPos>> rows;
+    for (const auto& [pos, rank] : entityOrders) if (world.get(pos) != 0) rows.push_back({rank, pos});
+    std::sort(rows.begin(), rows.end());
+    Json result = Json::array();
+    for (const auto& [rank, pos] : rows) {
+        (void)rank;
+        result.push_back(Json::array({pos.x, pos.y, pos.z, registry.type(world.get(pos)).name}));
+    }
+    return result;
+}
 Json Simulator::pendingBlockTicksJson() const {
     auto events = blockTicks.queuedEvents();
     Json result = Json::array();

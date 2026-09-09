@@ -82,6 +82,16 @@ int main(int argc, char** argv) {
                                                      {"expected", frame.at("randomState")}, {"actual", actual}};
                     }
                 }
+                if (frame.contains("blockEntityOrder") && !differs) {
+                    Json actual = simulation.blockEntityOrderJson();
+                    for (auto& row : actual) { row[0] = row[0].get<int>() - origin.x; row[1] = row[1].get<int>() - origin.y; row[2] = row[2].get<int>() - origin.z; }
+                    if (frame.at("blockEntityOrder") != actual) {
+                        differs = true;
+                        result["status"] = "difference";
+                        result["firstDifference"] = {{"tick", tick}, {"field", "blockEntityOrder"},
+                                                     {"expected", frame.at("blockEntityOrder")}, {"actual", actual}};
+                    }
+                }
                 // 待执行队列是整帧一份，不按观测位置分组。坐标换算成相对原点后逐项比较。
                 if (frame.contains("blockTicks") && !differs) {
                     const auto relative = [&](Json rows) {

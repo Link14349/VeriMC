@@ -2990,13 +2990,13 @@
       "trade_rebalance",
       "vanilla"
     ],
-    "gameTime": 5,
-    "clockTicks": 5
+    "gameTime": 9,
+    "clockTicks": 9
   },
   "origin": [
-    -6716785,
+    10079138,
     -58,
-    3784199
+    13697556
   ],
   "frames": [
     {
@@ -5168,6 +5168,22 @@
         [
           29,
           1,
+          9,
+          "minecraft:repeater",
+          2,
+          -2
+        ],
+        [
+          29,
+          1,
+          8,
+          "minecraft:repeater",
+          2,
+          -2
+        ],
+        [
+          29,
+          1,
           11,
           "minecraft:repeater",
           2,
@@ -5184,23 +5200,7 @@
         [
           29,
           1,
-          9,
-          "minecraft:repeater",
-          2,
-          -2
-        ],
-        [
-          29,
-          1,
           10,
-          "minecraft:repeater",
-          2,
-          -2
-        ],
-        [
-          29,
-          1,
-          8,
           "minecraft:repeater",
           2,
           -2
@@ -5335,6 +5335,22 @@
         [
           29,
           1,
+          9,
+          "minecraft:repeater",
+          1,
+          -2
+        ],
+        [
+          29,
+          1,
+          8,
+          "minecraft:repeater",
+          1,
+          -2
+        ],
+        [
+          29,
+          1,
           11,
           "minecraft:repeater",
           1,
@@ -5351,23 +5367,7 @@
         [
           29,
           1,
-          9,
-          "minecraft:repeater",
-          1,
-          -2
-        ],
-        [
-          29,
-          1,
           10,
-          "minecraft:repeater",
-          1,
-          -2
-        ],
-        [
-          29,
-          1,
-          8,
           "minecraft:repeater",
           1,
           -2

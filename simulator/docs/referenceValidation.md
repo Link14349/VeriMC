@@ -85,6 +85,8 @@
 
 `captureMachineMatrix.py` 增加准连接机器矩阵组：14 刻 / 88 点，同一台机器 22 份，覆盖四个 x 偏移 × 四个 z 偏移的位置相关桶序、活塞六个朝向与两种放置顺序，另逐条对照 31,740 条更新轨迹；实测捕获原点 x、z 均为负值。
 
+`captureBlockEntityOrder.py` → `java26_2BlockEntityOrder`：18 刻 / 9 点，逐帧比较原版 `Level.blockEntityTickers` 的列表顺序（即 `tickBlockEntities` 的执行顺序）与内核的注册序号。覆盖放置顺序、稍后追加、移除后重新放置回到末尾、同格换类型、同刻放置两个，以及「空唱片机没有 ticker 所以不入列」这一反例。该场景不能放阳光探测器：它的读数取决于世界时钟，每次捕获不同。
+
 `captureRandomState.py` → `java26_2RandomState`：20 刻 / 7 点，两侧在第 0 刻设同一个种子后逐帧比较 `Level.random` 的 48 位内部状态（时间线上变化 7 次），从而检验随机**消耗次数**一致。只在这类场景里关掉六条生成规则与 `advance_weather`，把器件随机与世界随机分开。投掷器必须朝向容器：向空气抛出会产生外部动作，重放无法继续。
 
 `captureScheduledQueue.py` → `java26_2ScheduledQueue`：24 刻 / 21 点，逐帧比较原版 `LevelTicks` 里**整份待执行的方块计划刻队列**（按 `ScheduledTick.DRAIN_ORDER` 排序的坐标、方块、相对触发刻、优先级，共 108 条）与 `ServerLevel.blockEvents`。原版侧只读地反射容器，不修改游戏代码；子刻序号本身不记录，只记录它产生的顺序。

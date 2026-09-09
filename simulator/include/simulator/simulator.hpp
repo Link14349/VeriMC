@@ -99,6 +99,8 @@ public:
     Json chunkStatesJson() const;
     // 待执行的方块计划刻与方块事件，按原版 DRAIN_ORDER / 插入顺序排列，
     // 用于与原版队列逐项对照。坐标是绝对坐标，比较时再换算成相对。
+    // 方块实体的执行顺序：按注册序号排列，对应原版 Level.blockEntityTickers 的列表顺序。
+    Json blockEntityOrderJson() const;
     Json pendingBlockTicksJson() const;
     Json pendingBlockEventsJson() const;
     // 是否还有可以执行的事件；只剩不可 ticking 区块里的事件时返回 false。

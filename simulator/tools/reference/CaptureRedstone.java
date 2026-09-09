@@ -49,12 +49,17 @@ public class CaptureRedstone extends TestFunctionLoader {
         target.add(pos.getY() - traceOrigin.getY());
         target.add(pos.getZ() - traceOrigin.getZ());
     }
+    /** Reads a declared field, walking up the hierarchy: several of these live on base classes. */
     static Object field(Object owner, String name) {
-        try {
-            var declared = owner.getClass().getDeclaredField(name);
-            declared.setAccessible(true);
-            return declared.get(owner);
-        } catch (ReflectiveOperationException e) { throw new RuntimeException(e); }
+        for (Class<?> type = owner.getClass(); type != null; type = type.getSuperclass()) {
+            try {
+                var declared = type.getDeclaredField(name);
+                declared.setAccessible(true);
+                return declared.get(owner);
+            } catch (NoSuchFieldException ignored) {
+            } catch (ReflectiveOperationException e) { throw new RuntimeException(e); }
+        }
+        throw new RuntimeException(new NoSuchFieldException(name + " on " + owner.getClass()));
     }
     static String blockName(Object block) {
         return BuiltInRegistries.BLOCK.getKey((net.minecraft.world.level.block.Block)block).toString();
@@ -145,6 +150,27 @@ public class CaptureRedstone extends TestFunctionLoader {
      */
     static long randomState(Level level) {
         return ((java.util.concurrent.atomic.AtomicLong)field(level.getRandom(), "seed")).get();
+    }
+    /**
+     * The block entity tick order, read off `Level.blockEntityTickers` in list order. That list is
+     * what `tickBlockEntities` iterates, so its order is the execution order. Removed entries are
+     * dropped, matching the filter the game applies while iterating.
+     */
+    @SuppressWarnings("unchecked")
+    static JsonArray blockEntityOrder(Level level, BlockPos origin) {
+        var tickers = (java.util.List<net.minecraft.world.level.block.entity.TickingBlockEntity>)field(level, "blockEntityTickers");
+        JsonArray result = new JsonArray();
+        for (var ticker : tickers) {
+            if (ticker.isRemoved()) continue;
+            var pos = ticker.getPos();
+            if (pos.getX() < origin.getX() || pos.getX() >= origin.getX() + 48
+                || pos.getZ() < origin.getZ() || pos.getZ() >= origin.getZ() + 48) continue;
+            JsonArray row = new JsonArray();
+            addRelative(row, pos);
+            row.add(blockName(level.getBlockState(pos).getBlock()));
+            result.add(row);
+        }
+        return result;
     }
     static int remainingInBurst = 0;
     static void recordTraceEntry(BlockPos pos) {
@@ -569,6 +595,10 @@ public class CaptureRedstone extends TestFunctionLoader {
                 if (scenario.has("randomSeed")) {
                     if (tick == 0) level.getRandom().setSeed(scenario.get("randomSeed").getAsLong());
                     frame.addProperty("randomState", randomState(level));
+                }
+                if (scenario.has("watchBlockEntityOrder")) {
+                    traceOrigin = origin;
+                    frame.add("blockEntityOrder", blockEntityOrder(level, origin));
                 }
                 if (scenario.has("watchScheduled")) {
                     // 队列坐标同样相对捕获原点，traceOrigin 在这里复用。
