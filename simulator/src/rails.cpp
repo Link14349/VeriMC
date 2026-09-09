@@ -190,6 +190,12 @@ bool Simulator::poweredRailPath(BlockPos pos, StateId state, bool forward, int d
 // 整个快照写回：`setBlock(pos, state.setValue(POWERED, shouldPower), 3)`。
 // 因此同一层里铁轨形状被改掉时，这条更新会把**旧形状**连同新的通电状态一起写回去。
 void Simulator::updateRail(BlockPos pos, StateId state, StateId source) {
+    // 原版 BaseRailBlock.neighborChanged 的第一句是
+    // `if (!level.isClientSide() && level.getBlockState(pos).is(this))`（BaseRailBlock.java:83）：
+    // 快照说这里是某种铁轨，但世界里已经不是**同一个方块**时直接返回。
+    // 快照形式让入队时的状态可能比世界旧，没有这道闸就会对已经不是铁轨的格子
+    // `setBlock(pos, 0)`，或者把铁轨状态凭空写回去。
+    if (at(pos).type != registry[state].type) return;
     auto shape = railShape(*this, state);
     auto slope = slopeDirection(shape);
     if (!survives(pos, state) || (slope && (at(pos.relative(*slope)).rigidMask & 2u) == 0)) { setBlock(pos, 0); return; }

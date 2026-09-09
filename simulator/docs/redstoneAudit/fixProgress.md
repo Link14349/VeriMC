@@ -321,6 +321,25 @@ R15 到此为**已排除**，不是假设。
 普通 `rail` 分支也已按原版用传入快照构造连接计算（`e851685`），
 但这个场景不隔离它；仍需第二个原版见证，不能把不回归当成该分支的直接证据。
 
+**已实测确认它确实没有见证**（2026-09-10，主协调者做的对照实验）：
+把 `rails.cpp` 那一行临时退回 `RailConnection(*this, pos)`（重读世界）后重新构建，
+`java26_2FullUpdateSnapshot` 依然 **match**。也就是说这个 fixture 在几何上会执行到
+普通 `rail` 分支，却**区分不出**快照与重读的差别——该分支目前**只有源码推理，没有任何见证**。
+「52 个时间线全过」不能用来关闭这一项。
+
+### 快照更新缺少原版的方块身份守卫（2026-09-10 修复）
+
+独立审计（固定在 `2e940ea`）指出：原版 `BaseRailBlock.neighborChanged` 的第一句是
+`if (!level.isClientSide() && level.getBlockState(pos).is(this))`（`BaseRailBlock.java:83`），
+而内核 `executeNeighbor` 直接按**快照**的 device 派发，从不校验世界里还是不是同一个方块。
+快照形式让入队状态可能比世界旧，这个缺口的暴露面因此被显著扩大。
+
+已在 `updateRail` 开头补上 `at(pos).type != registry[state].type` 就返回。
+**反向验证**：去掉这道闸后新增用例报
+`stale powered_rail snapshot rewrote a cell that is no longer that block: minecraft:powered_rail[powered=true,shape=north_south]`
+——一格石头被过期快照凭空写成了通电铁轨。恢复后 134 个核心用例全过、52 个时间线全部 match。
+这一条是**从原版源码推出并由内核反向验证**的，尚无专门的原版差分场景。
+
 补充：随机搜索（25 个随机电路 × 12 轮，含铁轨/活塞/红石粉）**零命中**——
 本轮随机搜索未命中，定向构造成功；不能据此断言模糊测试不可能命中。
 

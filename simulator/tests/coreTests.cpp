@@ -892,6 +892,28 @@ int main() {
         expect(s.inventoryJson({2, 0, 6}, false) == restored.inventoryJson({2, 0, 6}, false),
                "hopper cooldown differs after restoring a stalled checkpoint");
     });
+    test("过期快照的铁轨更新遇到已被替换的方块时什么也不做", [&] {
+        // 原版 BaseRailBlock.neighborChanged 第一句就是
+        // `if (!level.isClientSide() && level.getBlockState(pos).is(this))`（BaseRailBlock.java:83）。
+        // FullNeighborUpdate 带的是入队时的快照，那一格完全可能已经被换掉；
+        // 没有这道闸，内核会把铁轨状态凭空写回去，或者对非铁轨方块调用 setBlock(pos, 0)。
+        const BlockPos rail{1, 1, 0}, driver{0, 1, 0};
+        for (auto* which : {"powered_rail", "rail"}) {
+            Simulator s(r); floor(s);
+            s.place(rail, r.state(which, {{"shape", "north_south"}}));
+            const auto snapshot = s.world.get(rail);
+            const auto sourceId = r.state("redstone_block");
+            // 把那一格换成完全不同的方块，再拿**过期的铁轨快照**投递一次邻居更新。
+            s.setBlock(rail, r.state("stone"));
+            const auto beforeCell = s.world.get(rail);
+            s.place(driver, sourceId);
+            s.neighborChangedSnapshot(rail, snapshot, sourceId);
+            s.advanceTo(s.currentTick + 4);
+            expect(s.world.get(rail) == beforeCell,
+                   std::string("stale ") + which + " snapshot rewrote a cell that is no longer that block: "
+                   + r.describe(s.world.get(rail)).dump());
+        }
+    });
     test("实体接触按掉落物自己所在的区块判定，而不是漏斗所在的区块", [&] {
         // 原版有两条吸取路径，判据不同：`suckInItems` 是漏斗自己的方块实体 tick，
         // 用 AABB 查实体，**不关心物品所在区块**；`entityInside` 由掉落物自己的 tick 驱动，
