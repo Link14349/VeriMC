@@ -73,9 +73,10 @@ GameTest 那边天然有这段间隔（结构先放置，若干刻后测试函�
 3. 对带轨迹的 fixture 再跑一次**关掉轨迹**的同原点同时钟同开关捕获，
    验证调试监听器不改变执行语义。
 
-`vanillaAll3` 一轮的结论记在 [vanillaReplayResults.json](vanillaOnlyReplayResults.json)：
-38/38 与 GameTest 捕获逐字段一致，38/38 通过 `checkReference`，
-带轨迹的 fixture 在关掉轨迹后帧序列完全相同且原点相同。
+最新一轮（`vanillaAll4`，轨迹已补上更新类型与来源）的结论记在
+[vanillaOnlyReplayResults.json](vanillaOnlyReplayResults.json)：
+**39/39** 与 GameTest 捕获逐字段一致（含刻内更新轨迹），39/39 通过 `checkReference`，
+4 个带轨迹的场景在关掉轨迹后帧序列完全相同且原点相同。
 
 ## 这一轮**没有**证明什么
 

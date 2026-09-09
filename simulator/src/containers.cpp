@@ -190,6 +190,11 @@ void Simulator::setInventory(BlockPos pos, const Json& values, bool combined, bo
         auto& inventory = runtime[slot.pos].inventory;
         inventory.resize(inventorySize(world.get(slot.pos)));
         inventory[slot.index] = stack;
+        // 原版 BaseContainerBlockEntity.setItem 自己就调用 setChanged，因此每写一格都会通知
+        // 一次比较器，而且只通知被写入的那一半箱子。漏斗重写了 setItem 且不调用 setChanged，
+        // 饰纹陶罐走 ContainerSingleItem.setItem，同样不调用，两者只有末尾那一次通知。
+        const auto written = world.get(slot.pos);
+        if (notify && at(slot.pos).device != Device::hopper && !isDecoratedPot(written)) runtimeChanged(slot.pos);
     }
     if (notify) {
         // A combined chest's Container.setChanged notifies both physical halves.

@@ -192,7 +192,7 @@ int main() {
         try { restored.loadProject(invalid); } catch (...) { threw = true; }
         expect(threw && before == restored.saveProject("before", true), "invalid batch import changed world");
     });
-    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers", "java26_2Hoppers", "java26_2Torches", "java26_2Rails", "java26_2TickBatches", "java26_2Tripwire", "java26_2Buttons", "java26_2Droppers", "java26_2Targets", "java26_2CopperChests", "java26_2Bookshelves", "java26_2Pots", "java26_2Vibrations", "java26_2DeviceVibrations", "java26_2Notes", "java26_2Bells", "java26_2Jukeboxes", "java26_2JukeboxHoppers", "java26_2Composters", "java26_2WireGeometry", "java26_2PistonPushability", "java26_2DaylightVibration", "java26_2StairShapes", "java26_2RailNotificationSource", "java26_2PistonRemovalCallback", "java26_2DiodeSupportBreak", "java26_2ObserverRemoval", "java26_2PistonLandingShape", "java26_2WireShapeToggle", "java26_2RemovalNotifySource", "java26_2RepeaterLockRefresh", "java26_2ItemFrameComparator", "java26_2UpdateTrace", "java26_2MachineMatrix", "java26_2SupportDirection", "java26_2FenceGateInWall"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
+    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers", "java26_2Hoppers", "java26_2Torches", "java26_2Rails", "java26_2TickBatches", "java26_2Tripwire", "java26_2Buttons", "java26_2Droppers", "java26_2Targets", "java26_2CopperChests", "java26_2Bookshelves", "java26_2Pots", "java26_2Vibrations", "java26_2DeviceVibrations", "java26_2Notes", "java26_2Bells", "java26_2Jukeboxes", "java26_2JukeboxHoppers", "java26_2Composters", "java26_2WireGeometry", "java26_2PistonPushability", "java26_2DaylightVibration", "java26_2StairShapes", "java26_2RailNotificationSource", "java26_2PistonRemovalCallback", "java26_2DiodeSupportBreak", "java26_2ObserverRemoval", "java26_2PistonLandingShape", "java26_2WireShapeToggle", "java26_2RemovalNotifySource", "java26_2RepeaterLockRefresh", "java26_2ItemFrameComparator", "java26_2UpdateTrace", "java26_2MachineMatrix", "java26_2SupportDirection", "java26_2FenceGateInWall", "java26_2UpdateSource"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
         std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/../tests/fixtures/" + fixtureName + ".json"); expect(static_cast<bool>(file), "missing vanilla reference fixture");
         auto fixture = Json::parse(file); auto origin = fixture["origin"].get<BlockPos>(); Simulator s(r);
         const bool tracing = fixture.contains("updateTrace");
@@ -230,8 +230,15 @@ int main() {
             Json actual = Json::array();
             for (const auto& entry : s.updateTrace) {
                 if (!entry.is_array()) { actual.push_back(entry); continue; }
-                auto pos = entry.get<BlockPos>();
-                actual.push_back(Json(BlockPos{pos.x - origin.x, pos.y - origin.y, pos.z - origin.z}));
+                Json converted = entry;
+                const std::size_t groups = entry.at(0).get<std::string>() == "s" ? 2 : 1;
+                for (std::size_t group = 0; group < groups; ++group) {
+                    const std::size_t base = 1 + group * 3;
+                    converted[base] = entry[base].get<int>() - origin.x;
+                    converted[base + 1] = entry[base + 1].get<int>() - origin.y;
+                    converted[base + 2] = entry[base + 2].get<int>() - origin.z;
+                }
+                actual.push_back(std::move(converted));
             }
             const auto& expected = fixture["updateTrace"];
             expect(actual.size() == expected.size(), "update trace length " + std::to_string(actual.size()) + " expected " + std::to_string(expected.size()));

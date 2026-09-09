@@ -75,11 +75,40 @@ void Simulator::appendUpdateTrace(Json entry) {
     if (updateTrace.size() >= updateTraceLimit) { updateTraceTruncated = true; return; }
     updateTrace.push_back(std::move(entry));
 }
-// 与原版 NeighborUpdates.forEachUpdatedPos 一致：多向更新列出除跳过方向外的六个邻居，
-// 其余种类只列出目标坐标本身。
+// 每次“取栈顶”记一条，描述原版即将执行的是哪一种更新以及它来自哪里：
+// "m" 多向更新（来源格、跳过方向、已推进下标、来源方块），
+// "s" 形状更新（目标格、邻居格、方向、标志），
+// "n" 简单邻居更新（目标格、来源方块），
+// "f" 带状态快照的邻居更新（另记快照 stateId 与 movedByPiston）。
+// 坐标写绝对值，checkReference 按种类换算成相对坐标再比较。
 void Simulator::recordUpdateTrace(const Update& update) {
-    if (update.kind != UpdateKind::multi) { appendUpdateTrace(Json(update.pos)); return; }
-    for (auto d : updateOrder) if (static_cast<int>(d) != update.skip) appendUpdateTrace(Json(update.pos.relative(d)));
+    Json entry = Json::array();
+    const auto addPos = [&](BlockPos p) { entry.push_back(p.x); entry.push_back(p.y); entry.push_back(p.z); };
+    switch (update.kind) {
+    case UpdateKind::multi:
+        entry.push_back("m"); addPos(update.pos);
+        if (update.skip < 0) entry.push_back(nullptr); else entry.push_back(directionNames[static_cast<unsigned>(update.skip)]);
+        entry.push_back(update.index);
+        entry.push_back(registry.type(update.neighborState).name);
+        break;
+    case UpdateKind::shape:
+        entry.push_back("s"); addPos(update.pos); addPos(update.pos.relative(update.direction));
+        entry.push_back(directionNames[static_cast<unsigned>(update.direction)]);
+        entry.push_back(update.flags);
+        break;
+    default:
+        if (update.snapshot == noSnapshot) {
+            entry.push_back("n"); addPos(update.pos);
+            entry.push_back(registry.type(update.neighborState).name);
+        } else {
+            entry.push_back("f"); addPos(update.pos);
+            entry.push_back(registry.type(update.neighborState).name);
+            entry.push_back(update.snapshot);
+            entry.push_back(update.movedByPiston);
+        }
+        break;
+    }
+    appendUpdateTrace(std::move(entry));
 }
 void Simulator::enqueue(Update update) {
     if (++updateCount > updateBudget) {
@@ -110,7 +139,7 @@ void Simulator::enqueue(Update update) {
                 if (exhausted) { updateStack.pop_back(); peeked = false; }
             } else {
                 updateStack.pop_back(); peeked = false;
-                if (current.kind == UpdateKind::shape) executeShape(current); else executeNeighbor(current.pos, current.neighborState);
+                if (current.kind == UpdateKind::shape) executeShape(current); else executeNeighbor(current.pos, current.neighborState, current.snapshot);
             }
             ++statistics.updates;
         }
@@ -128,6 +157,10 @@ void Simulator::updateNeighbors(BlockPos p, int skip, StateId source) {
     enqueue(u);
 }
 void Simulator::neighborChanged(BlockPos p, StateId source) { Update u{UpdateKind::neighbor, p}; u.neighborState = source; enqueue(u); }
+// 原版 Level.neighborChanged(BlockState, ...) 走 FullNeighborUpdate：入队时就固定目标状态。
+void Simulator::neighborChangedSnapshot(BlockPos p, StateId snapshot, StateId source, bool movedByPiston) {
+    Update u{UpdateKind::neighbor, p}; u.neighborState = source; u.snapshot = snapshot; u.movedByPiston = movedByPiston; enqueue(u);
+}
 void Simulator::notifyFront(BlockPos p, Direction facing, StateId source) {
     auto out = p.relative(opposite(facing)); auto block = source == UINT32_MAX ? world.get(p) : source;
     neighborChanged(out, block); updateNeighbors(out, static_cast<int>(facing), block);
@@ -489,8 +522,9 @@ void Simulator::refreshComparator(BlockPos p) {
         ++sequence; sampleAffected(p); changes[p] = world.get(p); notifyFront(p, s.facing);
     }
 }
-void Simulator::executeNeighbor(BlockPos p, StateId source) {
-    const auto id = world.get(p);
+void Simulator::executeNeighbor(BlockPos p, StateId source, StateId snapshot) {
+    // 快照形式使用入队时记下的状态；简单形式在这里才读世界。
+    const auto id = snapshot == noSnapshot ? world.get(p) : snapshot;
     // These classes have no neighborChanged behavior. Their shape updates
     // still run separately, and enqueue still counts every notification.
     // Keep this common path outside the large reactive handler's stack frame.
@@ -547,7 +581,9 @@ void Simulator::executeReactiveNeighbor(BlockPos p, StateId id, StateId source) 
     case Device::bell: {bool powered=bestSignal(p)>0;if(powered!=s.powered){if(powered)ringBell(p,s.facing);setBlock(p,registry.withBool(id,"powered",powered));}break;}
     case Device::noteBlock: {bool powered=bestSignal(p)>0;if(powered!=s.powered){if(powered)playNote(p,id);setBlock(p,registry.withBool(id,"powered",powered));}break;}
     case Device::piston: checkPiston(p); break;
-    case Device::pistonHead: if (survives(p, id)) neighborChanged(p.relative(opposite(s.facing))); break;
+    // 原版 PistonHeadBlock.neighborChanged 把**收到的来源方块**原样转发给活塞本体，
+    // 不是用空气或活塞头自己。
+    case Device::pistonHead: if (survives(p, id)) neighborChanged(p.relative(opposite(s.facing)), source); break;
     case Device::rail: case Device::poweredRail: case Device::activatorRail: case Device::detectorRail: updateRail(p, source); break;
     case Device::hopper: {
         bool enabled = bestSignal(p) == 0;

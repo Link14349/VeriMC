@@ -141,7 +141,10 @@ struct RailConnection {
 
 void Simulator::placeRail(BlockPos pos) {
     RailConnection(*this, pos).place(bestSignal(pos) > 0, true);
-    if (isRail(at(pos).device) && at(pos).device != Device::rail) neighborChanged(pos, world.get(pos));
+    // 原版 BaseRailBlock.updateState 只为“直线型”铁轨发通知，而且走 FullNeighborUpdate：
+    // 带上刚算好的自身状态快照。可弯折的 rail 不发。
+    if (isRail(at(pos).device) && at(pos).device != Device::rail)
+        neighborChangedSnapshot(pos, world.get(pos), world.get(pos));
     if (at(pos).device == Device::detectorRail) updateDetectorRail(pos);
 }
 
@@ -195,7 +198,9 @@ void Simulator::updateDetectorRail(BlockPos pos) {
     if (occupied != registry[state].powered) {
         auto next = registry.withBool(state, "powered", occupied);
         setBlock(pos, next);
-        for (auto connection : railConnections(pos, railShape(*this, next))) neighborChanged(connection, world.get(connection));
+        // 原版 DetectorRailBlock.updatePowerToConnected 同样是带快照的通知。
+        for (auto connection : railConnections(pos, railShape(*this, next)))
+            neighborChangedSnapshot(connection, world.get(connection), world.get(connection));
         updateNeighbors(pos, -1, state); updateNeighbors(pos.relative(Direction::down), -1, state);
     }
     if (occupied) schedule(pos, 20);

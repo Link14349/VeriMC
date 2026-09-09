@@ -23,10 +23,46 @@ GameTest 功能开关 `minecraft:vanilla` + `minecraft:trade_rebalance`，`rando
 但单一 Java 字段引用检索并未穷尽数据包、按名称查询及资源加载路径，
 因此只能作为当前电路不受该开关影响的静态支持证据，**不能证明整个环境行为等价**。
 
-**仍然没有做的部分**：`GameTestServer.ENABLED_FEATURES` 是 `private static final`，
-本次没有改写该字段，也没有建立严格 vanilla-only 专用服务器捕获链路。
-静态字段修饰符本身并不证明其他测试接入方式都不可行。本次**没有**完成严格专服复跑，
-因此所有捕获仍然标注为 vanilla + trade_rebalance，不冒称严格 vanilla-only 专服验证。
+**后续已补做**：不改写那个字段，而是另建 `CaptureRedstoneVanilla`——
+自己继承 `MinecraftServer`，用与 `GameTestServer.create` 相同的公开 `WorldLoader` 路径建世界，
+只把 `WorldDataConfiguration` 换成 `(DataPackConfig(["vanilla"]), FeatureFlags.VANILLA_SET)`。
+在每个 fixture 记录的**绝对原点与时钟**上复跑同一条时间线，逐字段对照 GameTest 捕获。
+结果是 38/38 一致、38/38 通过 `checkReference`。
+这同时暴露了源码检索看不出来的一点：GameTest 会启用**全部可用数据包**，
+包括 `minecart_improvements` 与 `redstone_experiments` 两个内置包（只是功能开关关着）。
+详见 [严格 vanilla-only 参考服务器](vanillaOnlyReference.md)。
+结论只覆盖这些场景的观测字段，不是全局环境等价证明。
+
+## 刻内轨迹补足更新类型与来源后找到的四处差异（issue #14 第二条）
+
+轨迹原先只记坐标。补上「更新种类 / 来源方块 / 形状更新方向与标志 / 多向更新下标 /
+带快照更新的快照状态」之后，同一批场景立刻报出四处真实差异：
+
+1. **活塞头转发通知丢了来源方块**。原版 `PistonHeadBlock.neighborChanged` 把收到的
+   来源方块原样转发给活塞本体；内核用了默认空气。
+   反证：`java26_2MachineMatrix` 轨迹第 5730 条期望
+   `["n", 7,2,4, "minecraft:piston_head"]`，实得 `["n", 7,2,4, "minecraft:air"]`。
+2. **比较器输出通知应当是带快照的形式**。`Level.updateNeighbourForOutputSignal` 发的是
+   `FullNeighborUpdate`，快照是入队那一刻的比较器状态；内核发的是简单形式。
+   展示框路径原版传的 `changedBlock` 是 `Blocks.AIR`，内核传的是挂靠方块。
+3. **直线型铁轨的放置通知**。`BaseRailBlock.updateState` 只对
+   `powered_rail`/`detector_rail`/`activator_rail` 发通知且带快照，可弯折的 `rail` 不发；
+   `DetectorRailBlock.updatePowerToConnected` 同样带快照。
+4. **`setItem` 是否自带 `setChanged` 因方块实体类而异**。
+   `BaseContainerBlockEntity.setItem` 自己调用 `setChanged`（每写一格通知一次比较器），
+   `HopperBlockEntity` 重写后不调用，饰纹陶罐走 `ContainerSingleItem.setItem` 也不调用。
+
+**改动**：`Update` 增加 `snapshot`/`movedByPiston`；新增 `neighborChangedSnapshot`，
+`executeNeighbor` 在有快照时不再重读世界；活塞头转发来源、比较器输出通知、
+两处铁轨通知、容器逐格通知按上表对齐。
+
+**原版证据**：新增 `captureUpdateSource.py` → `java26_2UpdateSource`，14 刻 / 19 点、
+轨迹 3,831 条（其中 18 条带快照）。覆盖箱子/漏斗/饰纹陶罐的直接相邻与隔一格导体两条命中路径、
+四种铁轨放置（`rail` 是不发通知的对照）、矿车到达探测铁轨时对相连铁轨的通知。
+
+**边界**：第 2 条修正的是**更新形式**。目前没有构造出「入队后目标比较器被替换」的可达历史，
+因此快照与非快照在**观测状态**上的差别仍未被反例证明，这仍属 R13 未排除的那一类；
+轨迹现在能把两者区分开，是让它可检测，不是已经证伪。
 
 ## 随机差分找到的新差异：支撑丢失的检查方向（issue #14 第三条）
 

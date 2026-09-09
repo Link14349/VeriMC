@@ -77,16 +77,20 @@ void Simulator::stimulateItemFrames(BlockPos pos, const Json& input) {
     if (stored.empty()) values.erase("itemFrames"); else values["itemFrames"] = std::move(stored);
     if (values.empty()) runtime.erase(pos); else runtimeChanged(pos, false);
     // 原版 ItemFrame.setItem / setRotation 从展示框自身所在格发出 updateNeighbourForOutputSignal。
-    for (auto facing : touched) updateComparatorNeighbors(pos.relative(facing));
+    // 原版 ItemFrame 传的 changedBlock 是 Blocks.AIR，不是展示框挂靠的方块。
+    for (auto facing : touched) updateComparatorNeighbors(pos.relative(facing), 0);
 }
 
-void Simulator::updateComparatorNeighbors(BlockPos pos) {
+// 原版 Level.updateNeighbourForOutputSignal 对每个命中的比较器发 FullNeighborUpdate，
+// 目标状态是**入队那一刻**的比较器状态；来源方块由调用方给出，默认是变化格自己的方块。
+void Simulator::updateComparatorNeighbors(BlockPos pos, StateId source) {
+    const auto changed = source == noSnapshot ? world.get(pos) : source;
     for (auto direction : horizontal) {
         auto neighbor = pos.relative(direction);
-        if (at(neighbor).device == Device::comparator) neighborChanged(neighbor, world.get(pos));
+        if (at(neighbor).device == Device::comparator) neighborChangedSnapshot(neighbor, world.get(neighbor), changed);
         else if (at(neighbor).conductor) {
             neighbor = neighbor.relative(direction);
-            if (at(neighbor).device == Device::comparator) neighborChanged(neighbor, world.get(pos));
+            if (at(neighbor).device == Device::comparator) neighborChangedSnapshot(neighbor, world.get(neighbor), changed);
         }
     }
 }

@@ -89,11 +89,20 @@ int main(int argc, char** argv) {
                     throw std::runtime_error("Update trace truncated; raise the capacity or shorten the scenario");
                 const auto& expectedTrace = fixture.at("updateTrace");
                 // 原版侧记录的是相对坐标；内核记录绝对坐标，这里换算回相对再比较。
+                // 条目形如 ["m",x,y,z,...] / ["s",x,y,z,nx,ny,nz,...] / ["n"|"f",x,y,z,...]，
+                // 形状更新有两组坐标，其余只有一组；刻标记是裸整数。
                 Json actualTrace = Json::array();
                 for (const auto& entry : simulation.updateTrace) {
                     if (!entry.is_array()) { actualTrace.push_back(entry); continue; }
-                    const auto pos = entry.get<BlockPos>();
-                    actualTrace.push_back(Json(BlockPos{pos.x - origin.x, pos.y - origin.y, pos.z - origin.z}));
+                    Json converted = entry;
+                    const std::size_t groups = entry.at(0).get<std::string>() == "s" ? 2 : 1;
+                    for (std::size_t group = 0; group < groups; ++group) {
+                        const std::size_t base = 1 + group * 3;
+                        converted[base] = entry[base].get<int>() - origin.x;
+                        converted[base + 1] = entry[base + 1].get<int>() - origin.y;
+                        converted[base + 2] = entry[base + 2].get<int>() - origin.z;
+                    }
+                    actualTrace.push_back(std::move(converted));
                 }
                 const auto shared = std::min(expectedTrace.size(), actualTrace.size());
                 for (std::size_t i = 0; i < shared; ++i) if (expectedTrace[i] != actualTrace[i]) {

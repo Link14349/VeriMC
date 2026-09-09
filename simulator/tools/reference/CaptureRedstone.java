@@ -44,13 +44,75 @@ public class CaptureRedstone extends TestFunctionLoader {
         if (traceEntries.size() >= traceLimit) { traceTruncated = true; return; }
         traceEntries.add(entry);
     }
-    static void recordTraceEntry(BlockPos pos) {
-        JsonArray relative = new JsonArray();
-        relative.add(pos.getX() - traceOrigin.getX());
-        relative.add(pos.getY() - traceOrigin.getY());
-        relative.add(pos.getZ() - traceOrigin.getZ());
-        appendTrace(relative);
+    static void addRelative(JsonArray target, BlockPos pos) {
+        target.add(pos.getX() - traceOrigin.getX());
+        target.add(pos.getY() - traceOrigin.getY());
+        target.add(pos.getZ() - traceOrigin.getZ());
     }
+    static Object field(Object owner, String name) {
+        try {
+            var declared = owner.getClass().getDeclaredField(name);
+            declared.setAccessible(true);
+            return declared.get(owner);
+        } catch (ReflectiveOperationException e) { throw new RuntimeException(e); }
+    }
+    static String blockName(Object block) {
+        return BuiltInRegistries.BLOCK.getKey((net.minecraft.world.level.block.Block)block).toString();
+    }
+    /**
+     * One entry per stack peek, describing what kind of update vanilla is about to run and where it
+     * came from. `forEachUpdatedPos` only reports coordinates, so the enclosing update object is read
+     * off `CollectingNeighborUpdater.stack` instead. This is an observation, not a change: nothing is
+     * written back, and the tracing on/off control run proves the timeline is unaffected.
+     */
+    static JsonArray describeUpdate(Object update) {
+        JsonArray entry = new JsonArray();
+        String kind = update.getClass().getSimpleName();
+        switch (kind) {
+        case "MultiNeighborUpdate" -> {
+            var skip = (Direction)field(update, "skipDirection");
+            entry.add("m"); addRelative(entry, (BlockPos)field(update, "sourcePos"));
+            if (skip == null) entry.add(JsonNull.INSTANCE); else entry.add(skip.getName());
+            entry.add((Integer)field(update, "idx"));
+            entry.add(blockName(field(update, "sourceBlock")));
+        }
+        case "ShapeUpdate" -> {
+            entry.add("s"); addRelative(entry, (BlockPos)field(update, "pos"));
+            addRelative(entry, (BlockPos)field(update, "neighborPos"));
+            entry.add(((Direction)field(update, "direction")).getName());
+            entry.add((Integer)field(update, "updateFlags"));
+        }
+        case "SimpleNeighborUpdate" -> {
+            entry.add("n"); addRelative(entry, (BlockPos)field(update, "pos"));
+            entry.add(blockName(field(update, "block")));
+        }
+        // The full form carries a block state snapshot taken when the update was queued, so a later
+        // replacement of the target does not change what handleNeighborChanged sees.
+        case "FullNeighborUpdate" -> {
+            entry.add("f"); addRelative(entry, (BlockPos)field(update, "pos"));
+            entry.add(blockName(field(update, "block")));
+            entry.add(Block.getId((BlockState)field(update, "state")));
+            entry.add((Boolean)field(update, "movedByPiston"));
+        }
+        default -> throw new IllegalStateException("Unknown neighbour update kind " + kind);
+        }
+        return entry;
+    }
+    static int remainingInBurst = 0;
+    static void recordTraceEntry(BlockPos pos) {
+        // forEachUpdatedPos fires once per peek for every kind except the multi update, which
+        // reports each of its non-skipped neighbours. Only the first call of a burst is an event.
+        if (remainingInBurst > 0) { --remainingInBurst; return; }
+        Object update = traceStack.peek();
+        appendTrace(describeUpdate(update));
+        remainingInBurst = update.getClass().getSimpleName().equals("MultiNeighborUpdate")
+            ? (field(update, "skipDirection") == null ? 6 : 5) - 1 : 0;
+    }
+    @SuppressWarnings("unchecked")
+    static java.util.ArrayDeque<Object> stackOf(net.minecraft.world.level.redstone.CollectingNeighborUpdater updater) {
+        return (java.util.ArrayDeque<Object>)field(updater, "stack");
+    }
+    static java.util.ArrayDeque<Object> traceStack;
     static net.minecraft.world.level.redstone.CollectingNeighborUpdater neighborUpdaterOf(Level level) {
         try {
             var field = Level.class.getDeclaredField("neighborUpdater");
@@ -376,7 +438,10 @@ public class CaptureRedstone extends TestFunctionLoader {
                     // ServerLevel.tick clears the listener every tick when nothing subscribes,
                     // so reinstall it here; it then covers the next server tick and these commands.
                     traceOrigin = origin;
-                    neighborUpdaterOf(level).setDebugListener(CaptureRedstone::recordTraceEntry);
+                    var updater = neighborUpdaterOf(level);
+                    traceStack = stackOf(updater);
+                    remainingInBurst = 0;
+                    updater.setDebugListener(CaptureRedstone::recordTraceEntry);
                     appendTrace(new JsonPrimitive(tick));
                 }
                 for (var value : scenario.getAsJsonArray("commands")) {

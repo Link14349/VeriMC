@@ -87,6 +87,8 @@ public:
     }
     void updateNeighbors(BlockPos pos, int skip = -1, StateId source = UINT32_MAX);
     void neighborChanged(BlockPos pos, StateId source = 0);
+    // 原版 FullNeighborUpdate：带入队时的目标状态快照，执行时不再重新读世界。
+    void neighborChangedSnapshot(BlockPos pos, StateId snapshot, StateId source, bool movedByPiston = false);
     // type 默认取世界当前方块；活塞落地路径必须显式传入被移动方块的类型。
     void schedule(BlockPos pos, Tick delay, int priority = 0, std::uint16_t type = 0xFFFFu);
     bool hasScheduled(BlockPos pos) const;
@@ -166,7 +168,10 @@ private:
     void loadActions(const Json& data);
     std::size_t advance(Tick target, std::size_t eventBudget, std::chrono::microseconds wallBudget, bool fillIdle);
     enum class UpdateKind { neighbor, shape, multi };
-    struct Update { UpdateKind kind; BlockPos pos; Direction direction{Direction::down}; StateId neighborState{}; int index{}, skip{-1}, depth{512}; unsigned flags{2}; };
+    // 原版把邻居更新分成两种：SimpleNeighborUpdate 执行时才读目标状态，
+    // FullNeighborUpdate 带入队时的状态快照。snapshot == noSnapshot 表示前者。
+    static constexpr StateId noSnapshot = static_cast<StateId>(-1);
+    struct Update { UpdateKind kind; BlockPos pos; Direction direction{Direction::down}; StateId neighborState{}; int index{}, skip{-1}, depth{512}; unsigned flags{2}; StateId snapshot{noSnapshot}; bool movedByPiston{}; };
     void updateBellShape(const Update& update);
     void appendUpdateTrace(Json entry);
     void recordUpdateTrace(const Update& update);
@@ -195,7 +200,7 @@ private:
     std::uint8_t currentPhase{4};
     bool beforeBlockEntities() const { return currentPhase < 2 || currentPhase == 3; }
     void enqueue(Update update);
-    void executeNeighbor(BlockPos pos, StateId source = 0);
+    void executeNeighbor(BlockPos pos, StateId source = 0, StateId snapshot = noSnapshot);
     void executeReactiveNeighbor(BlockPos pos, StateId state, StateId source);
     void executeShape(const Update& update);
     bool supportChecked(StateId state, Direction direction) const;
@@ -242,7 +247,7 @@ private:
     void schedulePhase(BlockPos pos, Tick when, std::uint8_t phase, std::uint64_t data);
     std::uint64_t registerEntity(BlockPos pos);
     void pruneEvents();
-    void updateComparatorNeighbors(BlockPos pos);
+    void updateComparatorNeighbors(BlockPos pos, StateId source = noSnapshot);
     void runtimeChanged(BlockPos pos, bool notifyComparators = true);
     void updatePressurePlate(BlockPos pos);
     void updateButton(BlockPos pos);
