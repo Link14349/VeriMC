@@ -7,7 +7,7 @@ from pathlib import Path
 import captureBoatContainers as scenario
 from captureVanillaScenario import runVanillaCapture
 
-outputDir = Path(__file__).resolve().parents[2] / 'testResults/claudeIssueClosure/layered-20260909-183541-agentN'
+outputDir = Path(__file__).resolve().parents[2] / 'testResults/boatContainersProbeN'
 
 if __name__ == '__main__':
     outputDir.mkdir(parents=True, exist_ok=True)
