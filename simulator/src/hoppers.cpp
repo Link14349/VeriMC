@@ -51,6 +51,18 @@ bool Simulator::inventoryFull(BlockPos pos) const {
 }
 
 void Simulator::writeStack(const InventorySlot& slot, ItemStack stack, bool notify) {
+    if (slot.entity >= 0) {
+        // 实体容器的库存按 JSON 存放，与探测铁轨的矿车输入同一种表示。
+        // 原版 AbstractMinecartContainer.setChanged 不发比较器通知，因此这里也不通知。
+        auto& inventory = runtime.at(slot.pos).values.at("containerEntities").at(static_cast<std::size_t>(slot.entity)).at("inventory");
+        for (auto it = inventory.begin(); it != inventory.end();) {
+            if (it->at("slot").get<std::size_t>() == slot.index) it = inventory.erase(it); else ++it;
+        }
+        if (stack.count) inventory.push_back({{"slot", slot.index}, {"item", registry.item(stack.item).name}, {"count", stack.count}});
+        std::sort(inventory.begin(), inventory.end(), [](const Json& a, const Json& b) { return a.at("slot") < b.at("slot"); });
+        runtimeChanged(slot.pos, false);
+        return;
+    }
     const auto id=world.get(slot.pos);
     const bool bookshelf=isBookshelf(id), occupied=bookshelf && stackAt(slot).count>0;
     auto& inventory = runtime[slot.pos].inventory;
@@ -74,8 +86,24 @@ void Simulator::containerChanged(BlockPos pos) {
 
 bool Simulator::transferItem(BlockPos from, BlockPos to, bool pulling) {
     if(at(from).device==Device::composter || at(to).device==Device::composter)return transferComposter(from,to,pulling);
-    auto sourceSlots = containerSlots(from), targetSlots = containerSlots(to);
-    if (sourceSlots.empty() || targetSlots.empty() || (!pulling && inventoryFull(to))) return false;
+    return transferSlots(containerSlots(from), containerSlots(to), from, to, pulling);
+}
+// 原版 getContainerAt 先看方块容器，没有才看实体容器；后者在候选里随机选一个并消耗随机数。
+// 这里把「哪一侧是实体容器」交给调用方决定，转移规则本身完全一致。
+bool Simulator::transferSlots(const std::vector<InventorySlot>& sourceSlots, const std::vector<InventorySlot>& targetSlots,
+                              BlockPos from, BlockPos to, bool pulling) {
+    const auto slotsFull = [&](const std::vector<InventorySlot>& slots) {
+        for (const auto& slot : slots) {
+            const auto stack = stackAt(slot);
+            if (!stack.count || stack.count < registry.item(stack.item).maxStack) return false;
+        }
+        return true;
+    };
+    const auto slotsEmpty = [&](const std::vector<InventorySlot>& slots) {
+        for (const auto& slot : slots) if (stackAt(slot).count) return false;
+        return true;
+    };
+    if (sourceSlots.empty() || targetSlots.empty() || (!pulling && slotsFull(targetSlots))) return false;
     for (const auto& source : sourceSlots) {
         auto original = stackAt(source);
         if (!original.count) continue;
@@ -83,21 +111,22 @@ bool Simulator::transferItem(BlockPos from, BlockPos to, bool pulling) {
         auto remaining = original;
         --remaining.count;
         writeStack(source, remaining);
-        bool targetWasEmpty = inventoryEmpty(to);
+        bool targetWasEmpty = slotsEmpty(targetSlots);
         for (const auto& target : targetSlots) {
             if(!canInsertStack(target,original)) continue;
             auto stack = stackAt(target);
             if (stack.count && (stack.item != original.item || stack.count >= registry.item(stack.item).maxStack)) continue;
             writeStack(target, {original.item, static_cast<std::uint16_t>(stack.count + 1)}, stack.count == 0);
-            if (targetWasEmpty && at(to).device == Device::hopper) {
+            if (targetWasEmpty && at(to).device == Device::hopper && target.entity < 0) {
                 // All transfers here run during the block entity phase. An
                 // empty recipient becomes eligible seven ticks later whether
                 // it already ticked (cooldown 7) or ticks later today (8 -> 7).
                 auto& hopper = hoppers.at(to);
                 hopper.readyAt = currentTick + (currentPhase == 2 ? 7 : 8);
             }
-            containerChanged(to);
-            if (pulling) containerChanged(from);
+            // 实体容器不是方块实体，setChanged 不会通知比较器。
+            if (target.entity < 0) containerChanged(to);
+            if (pulling && source.entity < 0) containerChanged(from);
             return true;
         }
         // Failed extraction restores the original stack, including vanilla's

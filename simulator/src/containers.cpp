@@ -125,7 +125,43 @@ std::vector<Simulator::InventorySlot> Simulator::containerSlots(BlockPos pos, bo
     return result;
 }
 
+namespace {
+constexpr std::size_t chestMinecartSlots = 27, hopperMinecartSlots = 5;
+}
+std::size_t Simulator::containerEntityCount(BlockPos pos) const {
+    auto found = runtime.find(pos);
+    if (found == runtime.end()) return 0;
+    auto entities = found->second.values.find("containerEntities");
+    return entities == found->second.values.end() ? 0 : entities->size();
+}
+std::vector<Simulator::InventorySlot> Simulator::entityContainerSlots(BlockPos pos, int entity) const {
+    if (entity < 0 || static_cast<std::size_t>(entity) >= containerEntityCount(pos)) return {};
+    const auto& row = runtime.at(pos).values.at("containerEntities").at(static_cast<std::size_t>(entity));
+    const std::size_t size = row.at("type") == "chest_minecart" ? chestMinecartSlots : hopperMinecartSlots;
+    std::vector<InventorySlot> result;
+    result.reserve(size);
+    for (std::size_t i = 0; i < size; ++i) result.push_back({pos, i, entity});
+    return result;
+}
+// 原版 getEntityContainer：候选非空时用 level.random.nextInt(size) 选一个，**总是**消耗一次随机数。
+std::optional<int> Simulator::chooseContainerEntity(BlockPos pos) {
+    const auto count = containerEntityCount(pos);
+    if (!count) return std::nullopt;
+    return static_cast<int>(worldRandom.nextInt(static_cast<int>(count)));
+}
+Json Simulator::containerEntitiesJson(BlockPos pos) const {
+    auto found = runtime.find(pos);
+    if (found == runtime.end() || !found->second.values.contains("containerEntities")) return Json::array();
+    return found->second.values.at("containerEntities");
+}
 ItemStack Simulator::stackAt(const InventorySlot& slot) const {
+    if (slot.entity >= 0) {
+        const auto& inventory = runtime.at(slot.pos).values.at("containerEntities").at(static_cast<std::size_t>(slot.entity)).at("inventory");
+        for (const auto& row : inventory)
+            if (row.at("slot").get<std::size_t>() == slot.index)
+                return {registry.itemId(row.at("item")), static_cast<std::uint16_t>(row.at("count").get<int>())};
+        return {};
+    }
     auto data = runtime.find(slot.pos);
     if (data == runtime.end() || slot.index >= data->second.inventory.size()) return {};
     return data->second.inventory[slot.index];

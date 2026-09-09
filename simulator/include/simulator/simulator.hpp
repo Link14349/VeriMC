@@ -303,7 +303,10 @@ private:
     bool interactDevice(BlockPos pos, std::optional<Direction> playerFacing = std::nullopt);
     bool stimulateDevice(BlockPos pos, const Json& stimulus);
     void validateRuntime(BlockPos pos) const;
-    struct InventorySlot { BlockPos pos; std::size_t index; };
+    // entity >= 0 表示这一格里第 entity 个**声明的容器实体**（运输/漏斗矿车）的槽位，
+    // 它的库存存在 runtime[pos].values["containerEntities"][entity]["inventory"] 里；
+    // -1 表示方块自身的库存。
+    struct InventorySlot { BlockPos pos; std::size_t index; int entity = -1; };
     std::size_t inventorySize(StateId state) const;
     bool isBookshelf(StateId state) const;
     bool isDecoratedPot(StateId state) const;
@@ -311,6 +314,13 @@ private:
     bool canExtractStack(const InventorySlot& slot, BlockPos into) const;
     void updateBookshelfSlot(const InventorySlot& slot);
     std::vector<InventorySlot> containerSlots(BlockPos pos, bool ignoreBlockage = true) const;
+    // 器件层实体容器（issue #12）：声明在某一格里的运输/漏斗矿车。
+    // 原版 getEntityContainer 在候选里用 level.random.nextInt(size) 随机选一个，会消耗随机数。
+    void stimulateContainerEntities(BlockPos pos, const Json& input);
+    std::size_t containerEntityCount(BlockPos pos) const;
+    std::vector<InventorySlot> entityContainerSlots(BlockPos pos, int entity) const;
+    std::optional<int> chooseContainerEntity(BlockPos pos);
+    Json containerEntitiesJson(BlockPos pos) const;
     Direction chestConnection(StateId state) const;
     bool isCopperChest(StateId state) const;
     bool chestsConnect(StateId first, StateId second) const;
@@ -326,6 +336,8 @@ private:
     bool inventoryEmpty(BlockPos pos) const;
     bool inventoryFull(BlockPos pos) const;
     bool transferItem(BlockPos from, BlockPos to, bool pulling = false);
+    bool transferSlots(const std::vector<InventorySlot>& sourceSlots, const std::vector<InventorySlot>& targetSlots,
+                       BlockPos from, BlockPos to, bool pulling);
     void wakeHopper(BlockPos pos);
     void wakeHoppers(BlockPos changed);
     void tickHopper(const ScheduledEvent& event);
