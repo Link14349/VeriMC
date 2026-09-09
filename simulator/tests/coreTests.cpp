@@ -1570,6 +1570,154 @@ int main() {
                "a hopper minecart loaded from a circuit never started sucking: "
                + reopened.containerEntitiesJson(cart).dump());
     });
+    test("container entities are seen from every cell their bounding box touches", [&] {
+        // ---- 跨格实体身份（issue #12）----
+        // 容器实体**不属于**它被声明的那一格。声明格只决定位置（协议：停在格中心、
+        // 脚 y = 格底 + 0.5），能不能被看见完全由包围盒与查询盒是否相交决定。
+        //
+        // 26.2 反编译源码核实（simulator/.cache/reference/sources）：
+        //   * `world/entity/EntityTypes.java:284-286` / `:525-527`：运输矿车与漏斗矿车
+        //     都是 `.sized(0.98F, 0.7F)`；`:157-164`（ACACIA_CHEST_BOAT）等十个运输船/竹筏
+        //     EntityType 与 `:192-199` BAMBOO_CHEST_RAFT 都是 `.sized(1.375F, 0.5625F)`。
+        //   * `world/entity/EntityDimensions.java:19-23`：`float w = width/2` 之后
+        //     `new AABB(x-w, y, z-w, x+w, y+h, z+w)`——**y 是脚**，盒子从脚往上长 height。
+        //   * `world/entity/Entity.java:477-487`：`setPos` 把位置写进去后重算包围盒。
+        //   * `world/phys/AABB.java:245-247`：六个方向全是**严格**不等号，相切不算相交。
+        //   * `world/level/block/entity/HopperBlockEntity.java:393-398` `getEntityContainer`：
+        //     查询盒是 `new AABB(x-0.5, y-0.5, z-0.5, x+0.5, y+0.5, z+0.5)`，边长 1；
+        //     `:350-352 → :363-365`（推出＝朝向格格心）与 `:354-356 + :403-415`
+        //     （吸取＝ getLevelY()+1.0，方块漏斗就是上一格格心）代进去正好是**那一格**。
+        //
+        // 于是：矿车盒 [X+0.01,X+0.99]×[Y+0.5,Y+1.2]×[Z+0.01,Z+0.99] 覆盖 **2** 格；
+        // 船盒 [X-0.1875,X+1.1875]×[Y+0.5,Y+1.0625]×[Z-0.1875,Z+1.1875] 覆盖 **3×2×3=18** 格。
+        //
+        // **实测旁证（上一轮 reference-builder，真实服务器）**：用同一条 getEntityContainer
+        // 查询扫 5×3×5 邻域，船在 18 格上报、第 19 格没有；矿车 2 格，且当时的内核在
+        // 矿车正上方那一格报空。本轮**没有跑原版捕获**（资源被另一个 agent 独占），
+        // 下面全部是内核回归，几何本身按上面的源码行号核实过。
+        auto stone = [](int slot, int count) { return Json{{"slot", slot}, {"item", "minecraft:stone"}, {"count", count}}; };
+        auto draws = [](const Simulator& world) {
+            return std::stoull(world.saveProject("draws", true).at("randomSource").at("draws").get<std::string>());
+        };
+        auto declare = [&](const std::string& type, const Json& inventory) {
+            return Json{{"containerEntities", Json::array({{{"type", type}, {"inventory", inventory}}})}};
+        };
+        // 探针：在 C 正下方放一个**空**漏斗。空漏斗不走 ejectItems（tickHopper 里
+        // `!inventoryEmpty` 才推出），只走 suckInItems，而它的查询盒正好是 C。
+        // 「这一刻抽了随机数」＝「C 这一格看得见容器实体」，与原版探针同一个判据。
+        const BlockPos declared{5, 5, 0};
+        auto sees = [&](const std::string& type, BlockPos cell) {
+            Simulator s(r); floor(s);
+            s.place({cell.x, cell.y - 1, cell.z}, r.state("hopper", {{"facing", "down"}}));
+            s.stimulate(declared, declare(type, Json::array()));
+            const auto before = s.randomState();
+            s.advanceTo(1);
+            return s.randomState() != before;
+        };
+        for (const auto& [type, boat] : std::vector<std::pair<std::string, bool>>{{"chest_minecart", false}, {"oak_chest_boat", true}}) {
+            int reported = 0;
+            for (int dx = -2; dx <= 2; ++dx) for (int dy = -1; dy <= 1; ++dy) for (int dz = -2; dz <= 2; ++dz) {
+                const BlockPos cell{declared.x + dx, declared.y + dy, declared.z + dz};
+                const bool expected = (dy == 0 || dy == 1) && (boat ? (dx >= -1 && dx <= 1 && dz >= -1 && dz <= 1) : (dx == 0 && dz == 0));
+                const bool actual = sees(type, cell);
+                reported += actual ? 1 : 0;
+                expect(actual == expected, type + (expected ? " was not reported at " : " was wrongly reported at ")
+                       + std::to_string(dx) + "," + std::to_string(dy) + "," + std::to_string(dz));
+            }
+            expect(reported == (boat ? 18 : 2), type + " covered " + std::to_string(reported) + " cells");
+        }
+        // 逐条钉住最要紧的两格：矿车**正上方**那一格看得见（这一条原版实测过、旧内核报空），
+        // 矿车**正下方**那一格看不见（盒子的脚在格中心，向下不出格）。
+        expect(sees("chest_minecart", {declared.x, declared.y + 1, declared.z}), "the cell directly above a minecart did not report it");
+        expect(!sees("chest_minecart", {declared.x, declared.y - 1, declared.z}), "the cell directly below a minecart reported it");
+        expect(!sees("oak_chest_boat", {declared.x, declared.y - 1, declared.z}), "the cell directly below a chest boat reported it");
+
+        // 端到端：矿车正上方那一格的漏斗真的能把东西掏出来，不只是「看得见」。
+        Simulator above(r); floor(above);
+        above.place(declared, r.state("hopper", {{"facing", "down"}}));
+        above.stimulate(declared, declare("chest_minecart", Json::array({stone(0, 1)})));
+        above.advanceTo(2);
+        expect(above.inventoryJson(declared, false) == Json::array({{{"slot", 0}, {"item", "minecraft:stone"}, {"count", 1}}}),
+               "a hopper did not pull through the 0.2 block the minecart pokes into the cell above it: "
+               + above.inventoryJson(declared, false).dump());
+
+        // 声明格里空无一物、只有邻格的船探进来：候选表从**空**变成 1，于是这个漏斗
+        // 从「一次也不抽」变成「每刻抽一次」——随机源的消耗本身就是可观测的分歧。
+        const BlockPos probe{5, 4, 0}, queried{5, 5, 0};
+        Simulator reach(r); floor(reach);
+        reach.place(probe, r.state("hopper", {{"facing", "down"}}));
+        reach.stimulate({queried.x + 1, queried.y, queried.z}, declare("oak_chest_boat", Json::array()));
+        reach.advanceTo(10); const auto reachTen = draws(reach);
+        reach.advanceTo(20);
+        expect(draws(reach) - reachTen == 10, "a chest boat one cell away was not a candidate: "
+               + std::to_string(draws(reach) - reachTen) + " draws over 10 ticks");
+        expect(reach.containerEntitiesJson(queried).empty(), "the queried cell grew a declaration of its own");
+        // 对照：隔两格就够不着了，一次也不抽。
+        Simulator far(r); floor(far);
+        far.place(probe, r.state("hopper", {{"facing", "down"}}));
+        far.stimulate({queried.x + 2, queried.y, queried.z}, declare("oak_chest_boat", Json::array()));
+        const auto farStart = draws(far);
+        far.advanceTo(20);
+        expect(draws(far) == farStart, "a chest boat two cells away became a candidate: "
+               + std::to_string(draws(far) - farStart) + " draws");
+
+        // 两条隔一格声明的船进**同一张**候选表：nextInt 的参数是 2，不是各自那一格的 1。
+        // nextInt(1) 与 nextInt(2) 消耗的随机数一样多（都只取一次 next(31)，
+        // legacyRandom.hpp:23），所以「候选数」只能从**选中了谁**看出来。
+        const std::uint64_t seed = 20260910;
+        LegacyRandom expectedPick(seed);
+        const int picked = expectedPick.nextInt(2);
+        auto twoBoats = [&](const char* low, const char* high) {
+            auto world = std::make_unique<Simulator>(r); floor(*world); world->setRandomSeed(seed);
+            world->place(probe, r.state("hopper", {{"facing", "down"}}));
+            world->stimulate(queried, declare("oak_chest_boat", Json::array({{{"slot", 0}, {"item", low}, {"count", 1}}})));
+            world->stimulate({queried.x + 1, queried.y, queried.z},
+                             declare("bamboo_chest_raft", Json::array({{{"slot", 0}, {"item", high}, {"count", 1}}})));
+            return world;
+        };
+        auto pair = twoBoats("minecraft:stone", "minecraft:dirt");
+        pair->advanceTo(1);
+        expect(draws(*pair) == 1, "one getEntityContainer call did not draw exactly once: " + std::to_string(draws(*pair)));
+        // 候选顺序是显式约定：先按 (x, z, y) 排声明格，再按格内声明顺序。
+        // 原版跨分区那一层的顺序确实是 x→z→y（EntitySectionStorage.java:37-61 +
+        // SectionPos.java:217-222），但**同一个 16³ 分区内部**是生成顺序
+        // （EntitySection.java:30-37），器件层协议不建模生成顺序，给不出来。
+        // 这一条只影响 nextInt 选中了谁，不影响候选个数，因此不改变随机源的消耗。
+        const std::string first = pair->inventoryJson(probe, false).at(0).at("item");
+        expect(first == (picked == 0 ? "minecraft:stone" : "minecraft:dirt"),
+               "the cross-cell candidate order changed: nextInt picked " + std::to_string(picked) + " but the hopper got " + first);
+        auto swapped = twoBoats("minecraft:dirt", "minecraft:stone");
+        swapped->advanceTo(1);
+        expect(swapped->inventoryJson(probe, false).at(0).at("item") == (picked == 0 ? "minecraft:dirt" : "minecraft:stone"),
+               "the candidate order followed the contents instead of the cell order");
+        // 跑久一点：两条船最后都会被掏空，证明它们确实在同一张表里轮换。
+        pair->advanceTo(400);
+        expect(pair->containerEntitiesJson(queried).at(0).at("inventory").empty(), "the declared cell's boat kept its item");
+        expect(pair->containerEntitiesJson({queried.x + 1, queried.y, queried.z}).at(0).at("inventory").empty(),
+               "the neighbouring boat never became a candidate: "
+               + pair->containerEntitiesJson({queried.x + 1, queried.y, queried.z}).dump());
+
+        // 快照往返：跨格候选索引不进文件，靠 rebuildEntityCells 从 containerEntities 重建，
+        // 因此旧工程与旧快照原样可读，续跑也必须逐条一致。
+        auto live = twoBoats("minecraft:stone", "minecraft:dirt");
+        live->advanceTo(3);
+        auto saved = live->saveProject("crossCell", true);
+        Simulator restored(r); restored.loadProject(saved);
+        expect(restored.saveProject("crossCell", true) == saved, "a cross-cell checkpoint diverged");
+        live->advanceTo(60); restored.advanceTo(60);
+        expect(restored.randomState() == live->randomState(), "a restored cross-cell candidate table drew differently");
+        expect(restored.inventoryJson(probe, false) == live->inventoryJson(probe, false), "a restored cross-cell hopper moved different items");
+        for (BlockPos cell : {queried, BlockPos{queried.x + 1, queried.y, queried.z}})
+            expect(restored.containerEntitiesJson(cell) == live->containerEntitiesJson(cell),
+                   "a restored cross-cell boat diverged at " + std::to_string(cell.x));
+        // 电路工程（不带运行队列）重开之后跨格可见性同样成立。
+        auto circuit = twoBoats("minecraft:stone", "minecraft:dirt");
+        Simulator reopened(r); reopened.setRandomSeed(seed); reopened.loadProject(circuit->saveProject("crossCellCircuit", false));
+        reopened.advanceTo(400);
+        expect(reopened.containerEntitiesJson({queried.x + 1, queried.y, queried.z}).at(0).at("inventory").empty(),
+               "a circuit reload lost the cross-cell candidate: "
+               + reopened.containerEntitiesJson({queried.x + 1, queried.y, queried.z}).dump());
+    });
     test("full 26.2 sine table and daylight index boundaries", [&] {
         std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/../tests/fixtures/java26_2SineTable.json");
         expect(static_cast<bool>(file), "missing vanilla sine table fixture");
