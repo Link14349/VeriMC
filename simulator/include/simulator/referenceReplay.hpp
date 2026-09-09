@@ -117,6 +117,34 @@ private:
     }
 };
 
+// 刻内更新轨迹的逐条对照。语义与以前内联在 replayReferenceFixture 里的那段完全一致：
+// 任何一边被截断都直接失败，逐项相等且长度相同才算通过。
+inline void compareUpdateTraces(const Json& fixture, const Simulator& simulation, const Json& actualTrace, Json& result, bool& differs) {
+    // 截断的轨迹不能判为通过：两侧任何一边耗尽容量都直接失败。
+    if (fixture.value("updateTraceTruncated", false) || simulation.updateTraceTruncated)
+        throw std::runtime_error("Update trace truncated; raise the capacity or shorten the scenario");
+    const auto& expectedTrace = fixture.at("updateTrace");
+    const auto shared = std::min(expectedTrace.size(), actualTrace.size());
+    for (std::size_t i = 0; i < shared; ++i) if (expectedTrace[i] != actualTrace[i]) {
+        result["status"] = "difference";
+        Json context = Json::object();
+        const auto from = i > 6 ? i - 6 : 0;
+        context["expected"] = Json::array(); context["actual"] = Json::array();
+        for (std::size_t j = from; j < std::min(shared, i + 4); ++j) {
+            context["expected"].push_back(expectedTrace[j]);
+            context["actual"].push_back(actualTrace[j]);
+        }
+        result["firstTraceDifference"] = {{"index", i}, {"expected", expectedTrace[i]}, {"actual", actualTrace[i]}, {"context", context}};
+        differs = true;
+        break;
+    }
+    if (!differs && expectedTrace.size() != actualTrace.size()) {
+        result["status"] = "difference";
+        result["firstTraceDifference"] = {{"index", shared}, {"expectedLength", expectedTrace.size()}, {"actualLength", actualTrace.size()}};
+        differs = true;
+    }
+}
+
 // 用外部捕获的原版观测逐刻对照本内核。返回 {"status": "match"|"difference", ...}；
 // 结构性问题（重放没能走到观测刻、缺少外部反馈声明等）以异常报出。
 inline Json replayReferenceFixture(Simulator& simulation, const Json& fixture, const std::string& traceOut = {}) {
@@ -256,11 +284,7 @@ inline Json replayReferenceFixture(Simulator& simulation, const Json& fixture, c
         // 声明了却始终没有发生的外部动作同样是失败。
         actions.finish();
     }
-    if (tracing && !differs) {
-        // 截断的轨迹不能判为通过：两侧任何一边耗尽容量都直接失败。
-        if (fixture.value("updateTraceTruncated", false) || simulation.updateTraceTruncated)
-            throw std::runtime_error("Update trace truncated; raise the capacity or shorten the scenario");
-        const auto& expectedTrace = fixture.at("updateTrace");
+    if (tracing) {
         // 原版侧记录的是相对坐标；内核记录绝对坐标，这里换算回相对再比较。
         // 条目形如 ["m",x,y,z,...] / ["s",x,y,z,nx,ny,nz,...] / ["n"|"f",x,y,z,...]，
         // 形状更新有两组坐标，其余只有一组；刻标记是裸整数。
@@ -277,27 +301,10 @@ inline Json replayReferenceFixture(Simulator& simulation, const Json& fixture, c
             }
             actualTrace.push_back(std::move(converted));
         }
-        const auto shared = std::min(expectedTrace.size(), actualTrace.size());
-        for (std::size_t i = 0; i < shared; ++i) if (expectedTrace[i] != actualTrace[i]) {
-            result["status"] = "difference";
-            Json context = Json::object();
-            const auto from = i > 6 ? i - 6 : 0;
-            context["expected"] = Json::array(); context["actual"] = Json::array();
-            for (std::size_t j = from; j < std::min(shared, i + 4); ++j) {
-                context["expected"].push_back(expectedTrace[j]);
-                context["actual"].push_back(actualTrace[j]);
-            }
-            result["firstTraceDifference"] = {{"index", i}, {"expected", expectedTrace[i]}, {"actual", actualTrace[i]}, {"context", context}};
-            differs = true;
-            break;
-        }
-        if (!differs && expectedTrace.size() != actualTrace.size()) {
-            result["status"] = "difference";
-            result["firstTraceDifference"] = {{"index", shared}, {"expectedLength", expectedTrace.size()}, {"actualLength", actualTrace.size()}};
-            differs = true;
-        }
-        result["traceEntries"] = actualTrace.size();
+        // 诊断用途：无论比较结果如何都可以落盘内核轨迹。落盘**不改变**任何判定。
         if (!traceOut.empty()) { std::ofstream dump(traceOut); dump << actualTrace.dump(); }
+        result["traceEntries"] = actualTrace.size();
+        if (!differs) compareUpdateTraces(fixture, simulation, actualTrace, result, differs);
     }
     result["origin"] = fixture.at("origin");
     result["frames"] = fixture.at("frames").size();

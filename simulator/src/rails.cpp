@@ -140,11 +140,18 @@ struct RailConnection {
 }
 
 void Simulator::placeRail(BlockPos pos) {
-    RailConnection(*this, pos).place(bestSignal(pos) > 0, true);
+    RailConnection rail(*this, pos);
+    rail.place(bestSignal(pos) > 0, true);
     // 原版 BaseRailBlock.updateState 只为“直线型”铁轨发通知，而且走 FullNeighborUpdate：
-    // 带上刚算好的自身状态快照。可弯折的 rail 不发。
+    //   state = this.updateDir(level, pos, state, true);
+    //   if (this.isStraight) level.neighborChanged(state, pos, this, null, movedByPiston);
+    // 带的快照是 `updateDir` 的**返回值**，也就是 `RailState.getState()`——RailState 自己
+    // 在 `place()` 里算出来并写进世界的那一份（RailState.java:331-333、:349）。
+    // RailState 之后**不再重读世界**：`place()` 里对相邻铁轨的 `connectTo` 级联会继续改世界，
+    // 但 `this.state` 保持不变。所以这里必须用 `rail.state`，不能用 `world.get(pos)`：
+    // 级联可能已经把本格改成别的形状/通电状态，那样快照就提前变“新”了。
     if (isRail(at(pos).device) && at(pos).device != Device::rail)
-        neighborChangedSnapshot(pos, world.get(pos), world.get(pos));
+        neighborChangedSnapshot(pos, rail.state, world.get(pos));
     if (at(pos).device == Device::detectorRail) updateDetectorRail(pos);
 }
 
