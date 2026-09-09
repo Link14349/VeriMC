@@ -82,6 +82,8 @@ public:
     bool bellRinging(BlockPos pos) const { auto found=runtime.find(pos);return found!=runtime.end() && found->second.values.value("ringing",false); }
     // 漏斗吸取范围内、按声明顺序排列的掉落物；与原版 getItemsAtAndAbove 的结果对照。
     Json suckableItems(BlockPos pos) const;
+    // 声明在某一格里的容器实体（运输/漏斗矿车）及其库存，按声明顺序排列。
+    Json containerEntitiesJson(BlockPos pos) const;
     bool jukeboxPlaying(BlockPos pos) const { auto found=jukeboxes.find(pos);return found!=jukeboxes.end() && found->second.song>=0; }
     std::size_t cartCount(BlockPos pos) const {
         auto found = runtime.find(pos);
@@ -316,11 +318,16 @@ private:
     std::vector<InventorySlot> containerSlots(BlockPos pos, bool ignoreBlockage = true) const;
     // 器件层实体容器（issue #12）：声明在某一格里的运输/漏斗矿车。
     // 原版 getEntityContainer 在候选里用 level.random.nextInt(size) 随机选一个，会消耗随机数。
+    static constexpr std::size_t containerEntityLimit = 16;
     void stimulateContainerEntities(BlockPos pos, const Json& input);
+    void validateContainerEntities(const Json& entities) const;
+    static std::size_t containerEntitySize(const std::string& type);
     std::size_t containerEntityCount(BlockPos pos) const;
     std::vector<InventorySlot> entityContainerSlots(BlockPos pos, int entity) const;
     std::optional<int> chooseContainerEntity(BlockPos pos);
-    Json containerEntitiesJson(BlockPos pos) const;
+    // 原版 getContainerAt 先看 getBlockContainer；这里为真表示该格有方块容器，
+    // 实体容器只在为假时才会被查询。堆肥桶是 WorldlyContainerHolder，也算方块容器。
+    bool hasBlockContainer(BlockPos pos) const;
     Direction chestConnection(StateId state) const;
     bool isCopperChest(StateId state) const;
     bool chestsConnect(StateId first, StateId second) const;
@@ -338,6 +345,8 @@ private:
     bool transferItem(BlockPos from, BlockPos to, bool pulling = false);
     bool transferSlots(const std::vector<InventorySlot>& sourceSlots, const std::vector<InventorySlot>& targetSlots,
                        BlockPos from, BlockPos to, bool pulling);
+    // 原版 ejectItems：先 getAttachedContainer（方块容器优先、实体容器兜底），再推出一件。
+    bool hopperEject(BlockPos pos);
     void wakeHopper(BlockPos pos);
     void wakeHoppers(BlockPos changed);
     void tickHopper(const ScheduledEvent& event);

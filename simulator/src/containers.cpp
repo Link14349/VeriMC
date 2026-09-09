@@ -30,11 +30,14 @@ bool Simulator::isDecoratedPot(StateId state) const {
     return registry[state].device==Device::analog && registry.type(state).className=="DecoratedPotBlock";
 }
 bool Simulator::canInsertStack(const InventorySlot& slot, ItemStack stack) const {
+    // 矿车容器没有重写 canPlaceItem/canTakeItem，也不是 WorldlyContainer：任何物品都能进出。
+    if(slot.entity>=0)return true;
     if(at(slot.pos).device==Device::jukebox)return registry.item(stack.item).jukeboxSong>=0 && !stackAt(slot).count;
     if(isBookshelf(world.get(slot.pos))) return registry.item(stack.item).bookshelfBook && !stackAt(slot).count;
     return true;
 }
 bool Simulator::canExtractStack(const InventorySlot& slot, BlockPos into) const {
+    if(slot.entity>=0)return true;
     if(at(slot.pos).device==Device::jukebox){for(const auto& target:containerSlots(into))if(!stackAt(target).count)return true;return false;}
     if(!isBookshelf(world.get(slot.pos))) return true;
     const auto source=stackAt(slot);
@@ -128,6 +131,53 @@ std::vector<Simulator::InventorySlot> Simulator::containerSlots(BlockPos pos, bo
 namespace {
 constexpr std::size_t chestMinecartSlots = 27, hopperMinecartSlots = 5;
 }
+// MinecartChest.getContainerSize()=27、MinecartHopper.getContainerSize()=5。
+// 只有这两种矿车实现 Container，因此只有它们满足 CONTAINER_ENTITY_SELECTOR。
+std::size_t Simulator::containerEntitySize(const std::string& type) {
+    if (type == "chest_minecart") return chestMinecartSlots;
+    if (type == "hopper_minecart") return hopperMinecartSlots;
+    throw std::invalid_argument("容器实体只支持运输矿车与漏斗矿车");
+}
+// 器件层实体容器输入：整体替换这一格声明的容器实体集合，空数组表示全部移除。
+// 不建模矿车的运动、碰撞与拾取，只声明「哪一格里有哪些容器实体、各装了什么」。
+// 允许声明在空气格上：矿车通常停在空气或铁轨那一格里。
+void Simulator::stimulateContainerEntities(BlockPos pos, const Json& input) {
+    if (input.size() != 1) throw std::invalid_argument("容器实体输入不能与其他刺激字段混用");
+    const auto& entities = input.at("containerEntities");
+    if (!entities.is_array() || entities.size() > containerEntityLimit) throw std::invalid_argument("容器实体最多 16 个");
+    Json stored = Json::array();
+    for (const auto& entry : entities) {
+        if (!entry.is_object()) throw std::invalid_argument("每个容器实体必须是对象");
+        for (const auto& field : entry.items())
+            if (field.key() != "type" && field.key() != "inventory") throw std::invalid_argument("容器实体只接受 type 与 inventory");
+        if (!entry.contains("type") || !entry.at("type").is_string()) throw std::invalid_argument("容器实体需要字符串 type");
+        auto type = entry.at("type").get<std::string>();
+        Json row{{"type", type}, {"inventory", Json::array()}};
+        for (const auto& [slot, stack] : parseInventory(entry.value("inventory", Json::array()), containerEntitySize(type)))
+            if (stack.count) row["inventory"].push_back({{"slot", slot}, {"item", registry.item(stack.item).name}, {"count", stack.count}});
+        stored.push_back(std::move(row));
+    }
+    auto& values = runtime[pos].values;
+    if (stored.empty()) values.erase("containerEntities"); else values["containerEntities"] = std::move(stored);
+    // 空气格上的空声明不留下运行时记录，否则工程里会多出一行没有内容的器件数据。
+    const auto& data = runtime.at(pos);
+    if (data.values.empty() && data.inventory.empty() && data.output == 0 && world.get(pos) == 0) runtime.erase(pos);
+    // 矿车出现或消失不是方块实体变化，不通知比较器；runtimeChanged 仍会唤醒
+    // 这一格下方的漏斗和朝这一格的漏斗，正是可能读到它的两条路径。
+    runtimeChanged(pos, false);
+}
+void Simulator::validateContainerEntities(const Json& entities) const {
+    if (!entities.is_array() || entities.size() > containerEntityLimit) throw std::invalid_argument("无效容器实体列表");
+    for (const auto& entry : entities) {
+        if (!entry.is_object() || entry.size() != 2 || !entry.contains("type") || !entry.contains("inventory") || !entry.at("type").is_string())
+            throw std::invalid_argument("无效容器实体记录");
+        const auto& inventory = entry.at("inventory");
+        parseInventory(inventory, containerEntitySize(entry.at("type").get<std::string>()));
+        if (!inventory.is_array()) throw std::invalid_argument("无效容器实体库存");
+        for (const auto& item : inventory)
+            if (!item.is_object() || item.size() != 3 || item.at("count").get<std::int64_t>() < 1) throw std::invalid_argument("无效容器实体库存");
+    }
+}
 std::size_t Simulator::containerEntityCount(BlockPos pos) const {
     auto found = runtime.find(pos);
     if (found == runtime.end()) return 0;
@@ -137,7 +187,7 @@ std::size_t Simulator::containerEntityCount(BlockPos pos) const {
 std::vector<Simulator::InventorySlot> Simulator::entityContainerSlots(BlockPos pos, int entity) const {
     if (entity < 0 || static_cast<std::size_t>(entity) >= containerEntityCount(pos)) return {};
     const auto& row = runtime.at(pos).values.at("containerEntities").at(static_cast<std::size_t>(entity));
-    const std::size_t size = row.at("type") == "chest_minecart" ? chestMinecartSlots : hopperMinecartSlots;
+    const std::size_t size = containerEntitySize(row.at("type").get<std::string>());
     std::vector<InventorySlot> result;
     result.reserve(size);
     for (std::size_t i = 0; i < size; ++i) result.push_back({pos, i, entity});

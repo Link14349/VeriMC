@@ -280,7 +280,11 @@ void Simulator::loadProject(ProjectSource& source) {
     }
     for (const auto& row : source.rows("blockData")) {
         auto p = row.at("pos").get<BlockPos>();
-        if (candidate.world.get(p) == 0) throw std::invalid_argument("器件数据对应位置没有方块");
+        // 容器实体（运输/漏斗矿车）是声明在格子里的实体，通常停在空气格上，
+        // 因此只含 containerEntities 的记录允许没有方块；其余器件数据仍必须有方块承载。
+        bool entitiesOnly = row.at("values").is_object() && row.at("values").contains("containerEntities")
+            && row.at("values").size() == 1 && !row.contains("inventory") && (!row.contains("output") || row.at("output") == 0);
+        if (candidate.world.get(p) == 0 && !entitiesOnly) throw std::invalid_argument("器件数据对应位置没有方块");
         auto& state = candidate.runtime[p]; state.values = row.at("values");
         if (checkpoint) {
             state.output = row.at("output");

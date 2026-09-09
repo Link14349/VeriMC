@@ -219,6 +219,8 @@ bool Simulator::interactDevice(BlockPos pos, std::optional<Direction> playerFaci
 
 bool Simulator::stimulateDevice(BlockPos pos, const Json& stimulus) {
     if (!stimulus.is_object()) throw std::invalid_argument("环境输入必须是对象");
+    // 容器实体声明与这一格是什么方块无关，空气格也接受，所以放在器件分派之前。
+    if (stimulus.contains("containerEntities")) { stimulateContainerEntities(pos, stimulus); return true; }
     auto id = world.get(pos);
     const auto& state = registry[id];
     if (state.device == Device::button) {
@@ -352,6 +354,7 @@ void Simulator::validateRuntime(BlockPos pos) const {
         if(!last.is_number_integer() || last < -1 || last > 5) throw std::invalid_argument("无效雕纹书架最后操作槽位");
     }
     if (device == Device::detectorRail) normalizeCarts(data.values.value("carts", Json::array()));
+    if (data.values.contains("containerEntities")) validateContainerEntities(data.values.at("containerEntities"));
     if (data.values.contains("groundItems")) {
         if (device != Device::hopper) throw std::invalid_argument("只有漏斗可以持有掉落物输入");
         const auto& items = data.values.at("groundItems");

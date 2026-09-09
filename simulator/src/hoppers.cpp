@@ -84,6 +84,22 @@ void Simulator::containerChanged(BlockPos pos) {
         if (visited.insert(slot.pos).second) runtimeChanged(slot.pos);
 }
 
+// 原版 getBlockContainer：WorldlyContainerHolder（堆肥桶）或「有方块实体且它是 Container」。
+// 双箱走 ChestBlock.getContainer(..., override=true)，因此上方的实体方块不算遮挡。
+bool Simulator::hasBlockContainer(BlockPos pos) const {
+    return at(pos).device == Device::composter || !containerSlots(pos).empty();
+}
+
+// 原版 ejectItems 一开始就调用 getAttachedContainer，方块容器为空才查实体容器；
+// 后者只要该格有候选就消耗一次 nextInt，与本次推出是否成功无关。
+bool Simulator::hopperEject(BlockPos pos) {
+    const auto target = pos.relative(at(pos).facing);
+    if (hasBlockContainer(target)) return transferItem(pos, target);
+    const auto entity = chooseContainerEntity(target);
+    if (!entity) return false;
+    return transferSlots(containerSlots(pos), entityContainerSlots(target, *entity), pos, target, false);
+}
+
 bool Simulator::transferItem(BlockPos from, BlockPos to, bool pulling) {
     if(at(from).device==Device::composter || at(to).device==Device::composter)return transferComposter(from,to,pulling);
     return transferSlots(containerSlots(from), containerSlots(to), from, to, pulling);
@@ -260,7 +276,7 @@ void Simulator::hopperEntityContact(BlockPos pos) {
         const Json entry = runtime.at(pos).values.at("groundItems").at(index);
         if (!itemInsideHopperBlock(pos, entry) || !itemInSuckRange(pos, entry)) continue;
         bool changed = false;
-        if (!inventoryEmpty(pos)) changed = transferItem(pos, pos.relative(at(pos).facing));
+        if (!inventoryEmpty(pos)) changed = hopperEject(pos);
         if (!inventoryFull(pos)) {
             const int before = entry.at("count").get<int>();
             ItemStack remaining{registry.itemId(entry.at("item")), static_cast<std::uint16_t>(before)};
@@ -305,16 +321,22 @@ void Simulator::tickHopper(const ScheduledEvent& event) {
     }
     if (registry.property(world.get(event.pos), "enabled") != "true") return;
     bool moved = false;
-    if (!inventoryEmpty(event.pos)) moved = transferItem(event.pos, event.pos.relative(at(event.pos).facing));
+    if (!inventoryEmpty(event.pos)) moved = hopperEject(event.pos);
     bool retryExtraction = false;
     if (!inventoryFull(event.pos)) {
         auto source = event.pos.relative(Direction::up);
         // 原版 suckInItems 先找上方的容器；找不到容器才看掉落物，
         // 而且此时完整碰撞方块会挡住吸取，除非它在 DOES_NOT_BLOCK_HOPPERS 里。
-        if (containerSlots(source).empty() && at(source).device != Device::composter) {
-            const auto aboveId = world.get(source);
-            const bool blocked = registry[aboveId].fullCube && !registry.type(aboveId).doesNotBlockHoppers;
-            if (!blocked) moved = suckItemEntities(event.pos) || moved;
+        if (!hasBlockContainer(source)) {
+            // getSourceContainer 的实体分支：容器实体优先于掉落物，选中一个就只从它拉取，
+            // 拉不到也不会退回去吸掉落物（原版 container != null 分支直接 return false）。
+            if (const auto entity = chooseContainerEntity(source))
+                moved = transferSlots(entityContainerSlots(source, *entity), containerSlots(event.pos), source, event.pos, true) || moved;
+            else {
+                const auto aboveId = world.get(source);
+                const bool blocked = registry[aboveId].fullCube && !registry.type(aboveId).doesNotBlockHoppers;
+                if (!blocked) moved = suckItemEntities(event.pos) || moved;
+            }
         } else {
             bool pulled = transferItem(source, event.pos, true);
             // Failed extraction from ordinary containers can still issue comparator
