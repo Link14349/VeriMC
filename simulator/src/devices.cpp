@@ -87,9 +87,12 @@ void Simulator::updateComparatorNeighbors(BlockPos pos, StateId source) {
     const auto changed = source == noSnapshot ? world.get(pos) : source;
     for (auto direction : horizontal) {
         auto neighbor = pos.relative(direction);
+        // 原版这里有 hasChunkAt 守卫：未加载的位置直接跳过。
+        if (!chunkLoaded(neighbor)) continue;
         if (at(neighbor).device == Device::comparator) neighborChangedSnapshot(neighbor, world.get(neighbor), changed);
         else if (at(neighbor).conductor) {
             neighbor = neighbor.relative(direction);
+            if (!chunkLoaded(neighbor)) continue;
             if (at(neighbor).device == Device::comparator) neighborChangedSnapshot(neighbor, world.get(neighbor), changed);
         }
     }

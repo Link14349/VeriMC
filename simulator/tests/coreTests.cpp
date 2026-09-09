@@ -16,6 +16,13 @@ void tripwireLine(Simulator& s) {
     s.advanceTo(20);
 }
 }
+simulator::Simulator::ChunkState parseChunkState(const std::string& name) {
+    if (name == "unloaded") return simulator::Simulator::ChunkState::unloaded;
+    if (name == "loaded") return simulator::Simulator::ChunkState::loaded;
+    if (name == "blockTicking") return simulator::Simulator::ChunkState::blockTicking;
+    if (name == "entityTicking") return simulator::Simulator::ChunkState::entityTicking;
+    throw std::invalid_argument("unknown chunk state " + name);
+}
 int main() {
     BlockRegistry r; int passed = 0, failed = 0;
     auto test = [&](const std::string& name, const std::function<void()>& run) { try { run(); ++passed; std::cout << "PASS " << name << '\n'; } catch (const std::exception& e) { ++failed; std::cerr << "FAIL " << name << ": " << e.what() << '\n'; } };
@@ -73,7 +80,7 @@ int main() {
         auto read = [](const Json& row) { return ScheduledEvent{row.at("tick"), row.at("priority"), row.at("order"), row.at("pos").get<BlockPos>(), row.at("type")}; };
         for (const auto& row : fixture.at("initial")) ticks.schedule(read(row));
         for (const auto& run : fixture.at("runs")) {
-            ticks.collect(run.at("tick"), run.at("limit"));
+            ticks.collect(run.at("tick"), {}, run.at("limit"));
             std::size_t index = 0;
             while (ticks.hasBatch()) {
                 const auto event = ticks.pop();
@@ -192,17 +199,20 @@ int main() {
         try { restored.loadProject(invalid); } catch (...) { threw = true; }
         expect(threw && before == restored.saveProject("before", true), "invalid batch import changed world");
     });
-    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers", "java26_2Hoppers", "java26_2Torches", "java26_2Rails", "java26_2TickBatches", "java26_2Tripwire", "java26_2Buttons", "java26_2Droppers", "java26_2Targets", "java26_2CopperChests", "java26_2Bookshelves", "java26_2Pots", "java26_2Vibrations", "java26_2DeviceVibrations", "java26_2Notes", "java26_2Bells", "java26_2Jukeboxes", "java26_2JukeboxHoppers", "java26_2Composters", "java26_2WireGeometry", "java26_2PistonPushability", "java26_2DaylightVibration", "java26_2StairShapes", "java26_2RailNotificationSource", "java26_2PistonRemovalCallback", "java26_2DiodeSupportBreak", "java26_2ObserverRemoval", "java26_2PistonLandingShape", "java26_2WireShapeToggle", "java26_2RemovalNotifySource", "java26_2RepeaterLockRefresh", "java26_2ItemFrameComparator", "java26_2UpdateTrace", "java26_2MachineMatrix", "java26_2SupportDirection", "java26_2FenceGateInWall", "java26_2UpdateSource", "java26_2HopperPickup"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
+    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers", "java26_2Hoppers", "java26_2Torches", "java26_2Rails", "java26_2TickBatches", "java26_2Tripwire", "java26_2Buttons", "java26_2Droppers", "java26_2Targets", "java26_2CopperChests", "java26_2Bookshelves", "java26_2Pots", "java26_2Vibrations", "java26_2DeviceVibrations", "java26_2Notes", "java26_2Bells", "java26_2Jukeboxes", "java26_2JukeboxHoppers", "java26_2Composters", "java26_2WireGeometry", "java26_2PistonPushability", "java26_2DaylightVibration", "java26_2StairShapes", "java26_2RailNotificationSource", "java26_2PistonRemovalCallback", "java26_2DiodeSupportBreak", "java26_2ObserverRemoval", "java26_2PistonLandingShape", "java26_2WireShapeToggle", "java26_2RemovalNotifySource", "java26_2RepeaterLockRefresh", "java26_2ItemFrameComparator", "java26_2UpdateTrace", "java26_2MachineMatrix", "java26_2SupportDirection", "java26_2FenceGateInWall", "java26_2UpdateSource", "java26_2HopperPickup", "java26_2ChunkLifecycle", "java26_2ChunkLifecycleNegative"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
         std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/../tests/fixtures/" + fixtureName + ".json"); expect(static_cast<bool>(file), "missing vanilla reference fixture");
         auto fixture = Json::parse(file); auto origin = fixture["origin"].get<BlockPos>(); Simulator s(r);
         const bool tracing = fixture.contains("updateTrace");
         if (tracing) s.updateTraceLimit = fixture["updateTraceLimit"].get<std::size_t>();
         auto absolute = [&](const Json& p) { auto pos = p.get<BlockPos>(); return BlockPos{origin.x + pos.x, origin.y + pos.y, origin.z + pos.z}; };
-        for (const auto& frame : fixture["frames"]) {
+        for (std::size_t frameIndex = 0; frameIndex < fixture["frames"].size(); ++frameIndex) {
+            const auto& frame = fixture["frames"][frameIndex];
             Tick tick = frame["tick"]; s.advanceTo(tick); s.markUpdateTrace(tick);
             for (const auto& command : fixture["commands"]) if (command["tick"] == tick) {
                 auto p = absolute(command["pos"]);
-                if (command.contains("placedBy") || command.contains("playerPlace")) s.place(p, command["stateId"]);
+                if (command.contains("chunkState")) s.setChunkState(p.x >> 4, p.z >> 4, parseChunkState(command["chunkState"]));
+                else if (command.contains("chunkForced")) {}
+                else if (command.contains("placedBy") || command.contains("playerPlace")) s.place(p, command["stateId"]);
                 else if (command.contains("stateId")) s.setBlock(p, command["stateId"]);
                 else if (command.contains("interact")) {
                     std::optional<Direction> facing;
@@ -216,6 +226,12 @@ int main() {
                 auto p = absolute(fixture["watch"][i]); auto expected = frame["states"][i].get<StateId>();
                 expect(s.world.get(p) == expected, "tick " + std::to_string(tick) + " position " + fixture["watch"][i].dump() + " expected " + r.describe(expected).dump() + " got " + r.describe(s.world.get(p)).dump());
                 if (frame["analogs"][i] != -1) expect(s.analogOutput(p) == frame["analogs"][i].get<int>(), "analog mismatch at " + std::to_string(tick) + " " + fixture["watch"][i].dump());
+                if(frame.contains("chunkStates") && frameIndex + 1 < fixture["frames"].size()) {
+                    // 区块状态是输入：本帧命令生效后的状态，对应原版下一帧报告的派生标志。
+                    const auto& expectedChunk = fixture["frames"][frameIndex + 1]["chunkStates"][i];
+                    Json actualChunk{{"blockTicking", s.chunkBlockTicking(p)}, {"entityTicking", s.chunkEntityTicking(p)}, {"loaded", s.chunkLoaded(p)}};
+                    expect(actualChunk==expectedChunk,"chunk state differs at "+std::to_string(tick)+" "+fixture["watch"][i].dump()+" expected "+expectedChunk.dump()+" got "+actualChunk.dump());
+                }
                 if(frame.contains("groundItems") && !frame["groundItems"][i].is_null())
                     expect(s.suckableItems(p)==frame["groundItems"][i],"ground items differ at "+std::to_string(tick)+" "+fixture["watch"][i].dump()+" expected "+frame["groundItems"][i].dump()+" got "+s.suckableItems(p).dump());
                 if(frame.contains("bells"))expect(s.inspect(p)["runtime"].value("ringing",false)==frame["bells"][i].get<bool>(),"bell shaking differs at "+std::to_string(tick)+" "+fixture["watch"][i].dump());
@@ -764,6 +780,51 @@ int main() {
         expect(rejects({{"itemFrames", Json::array()}, {"viewers", 1}}), "mixed stimulus accepted");
         bool threw = false; try { s.stimulate({5, 1, 0}, {{"itemFrames", Json::array({{{"facing", "east"}, {"rotation", 0}, {"hasItem", false}}})}}); } catch (...) { threw = true; }
         expect(threw, "item frame accepted on an empty cell");
+    });
+    test("chunk lifecycle: stalled ticks, deferred block events and frozen block entities", [&] {
+        Simulator s(r);
+        // 一格里放中继器链、活塞和漏斗；把它所在的区块从 entityTicking 降到 loaded，
+        // 三类待办都应当停住，恢复后继续。
+        for (int x = 0; x < 8; ++x) for (int z = 0; z < 8; ++z) s.world.set({x, -1, z}, r.state("stone"));
+        s.place({1, 0, 1}, r.state("repeater", {{"facing", "west"}, {"delay", "4"}}));
+        s.place({2, 0, 1}, r.state("redstone_lamp"));
+        s.place({1, 0, 4}, r.state("piston", {{"facing", "east"}}));
+        s.place({2, 0, 4}, r.state("stone"));
+        s.place({1, 0, 6}, r.state("hopper", {{"facing", "east"}}));
+        s.place({2, 0, 6}, r.state("chest"));
+        s.stimulate({1, 0, 6}, {{"inventory", Json::array({{{"slot", 0}, {"item", "minecraft:stone"}, {"count", 5}}})}});
+        s.advanceTo(2);
+        expect(s.inventoryJson({2, 0, 6}, false).size() == 1, "hopper did not start transferring before the stall");
+        // 先停摆，再在停摆的区块里加电源：邻居更新照常立即发生，但由此排下的计划刻与
+        // 方块事件都必须等到区块恢复。
+        s.setChunkState(0, 0, Simulator::ChunkState::loaded);
+        s.place({0, 0, 1}, r.state("redstone_block"));
+        s.place({0, 0, 4}, r.state("redstone_block"));
+        const auto stalledLamp = s.world.get({2, 0, 1});
+        const auto stalledPiston = s.world.get({1, 0, 4});
+        s.advanceTo(60);
+        expect(s.world.get({2, 0, 1}) == stalledLamp && s.world.get({1, 0, 4}) == stalledPiston,
+               "stalled chunk kept running scheduled ticks or block events");
+        expect(s.inventoryJson({2, 0, 6}, false).size() == 1, "stalled chunk kept ticking the hopper");
+        // 停摆期间保存/读取，冻结的倒计时必须原样恢复。
+        auto saved = s.saveProject("chunks", true); Simulator restored(r); restored.loadProject(saved);
+        expect(restored.chunkState({0, 0, 0}) == Simulator::ChunkState::loaded, "chunk state lost across checkpoint");
+        for (Simulator* world : {&s, &restored}) {
+            world->setChunkState(0, 0, Simulator::ChunkState::entityTicking);
+            world->advanceTo(80);
+            expect(world->world.get({1, 0, 4}) != stalledPiston, "piston block event was dropped instead of deferred");
+            expect(world->world.get({2, 0, 1}) != stalledLamp, "overdue scheduled ticks were dropped");
+        }
+        expect(s.inventoryJson({2, 0, 6}, false) == restored.inventoryJson({2, 0, 6}, false),
+               "hopper cooldown differs after restoring a stalled checkpoint");
+        // 未加载区块拒绝写入；可 ticking 区块周围八格不能是未加载区块，
+        // 因此要先把一圈降级成 loaded 才能卸载中心，正如原版票据等级形成的加载环。
+        for (int dx = -1; dx <= 1; ++dx) for (int dz = -1; dz <= 1; ++dz) s.setChunkState(5 + dx, 5 + dz, Simulator::ChunkState::loaded);
+        s.setChunkState(5, 5, Simulator::ChunkState::unloaded);
+        bool threw = false; try { s.setBlock({80, 0, 80}, r.state("stone")); } catch (...) { threw = true; }
+        expect(threw && s.world.get({80, 0, 80}) == 0, "wrote into an unloaded chunk");
+        threw = false; try { s.setChunkState(6, 5, Simulator::ChunkState::entityTicking); } catch (...) { threw = true; }
+        expect(threw, "a ticking chunk was allowed next to an unloaded one");
     });
     test("hopper ground item input validation, range and checkpoint", [&] {
         Simulator s(r); floor(s);

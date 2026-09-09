@@ -87,6 +87,28 @@ public:
         auto carts = found->second.values.find("carts");
         return carts == found->second.values.end() ? 0 : carts->size();
     }
+    // 区块生命周期（issue #14 第五条）。原版的判据是票据等级；本项目**不模拟票据传播**，
+    // 区块状态是显式输入。默认整张图 entityTicking，与历史行为完全一致。
+    enum class ChunkState : std::uint8_t { unloaded, loaded, blockTicking, entityTicking };
+    static BlockPos chunkOf(BlockPos pos);
+    ChunkState chunkState(BlockPos pos) const;
+    // stalledSince 只在从工程文件恢复时显式给出；正常调用由当前刻自动记录。
+    void setChunkState(int chunkX, int chunkZ, ChunkState state, std::optional<Tick> stalledSince = std::nullopt);
+    Json chunkStatesJson() const;
+    // 是否还有可以执行的事件；只剩不可 ticking 区块里的事件时返回 false。
+    bool runnable() const;
+    // 区块不 ticking 时方块实体根本不执行，它们的倒计时也不会递减。事件被延后一刻时
+    // 把「绝对唤醒时刻」一起后移，等价于原版的冷却与计时在停摆期间冻结。
+    void shiftBlockEntityTimers(BlockPos chunk, Tick delta);
+    TickCheck blockTickCheck() const {
+        if (chunkStates.empty()) return {};
+        return {[](const void* owner, BlockPos chunk) {
+            return static_cast<const Simulator*>(owner)->chunkBlockTicking({chunk.x * 16, 0, chunk.z * 16});
+        }, this};  // chunk 是区块坐标，乘 16 回到方块坐标
+    }
+    bool chunkBlockTicking(BlockPos pos) const { return chunkStates.empty() || chunkState(pos) >= ChunkState::blockTicking; }
+    bool chunkEntityTicking(BlockPos pos) const { return chunkStates.empty() || chunkState(pos) == ChunkState::entityTicking; }
+    bool chunkLoaded(BlockPos pos) const { return chunkStates.empty() || chunkState(pos) != ChunkState::unloaded; }
     void updateNeighbors(BlockPos pos, int skip = -1, StateId source = UINT32_MAX);
     void neighborChanged(BlockPos pos, StateId source = 0);
     // 原版 FullNeighborUpdate：带入队时的目标状态快照，执行时不再重新读世界。
@@ -183,6 +205,10 @@ private:
     BlockTicks blockTicks;
     std::priority_queue<ScheduledEvent, std::vector<ScheduledEvent>, EventLater> scheduled;
     std::unordered_set<EventKey, EventKeyHash> scheduledKeys;
+    // 缺省不建条目：空表示整张图 entityTicking，热路径只多一次 empty() 判断。
+    // stalledSince 记录该区块停止执行方块实体的时刻，恢复时用它把冻结的倒计时补回去。
+    struct ChunkRecord { ChunkState state{ChunkState::entityTicking}; Tick stalledSince{}; };
+    std::unordered_map<BlockPos, ChunkRecord, PosHash> chunkStates;
     std::unordered_map<BlockPos, RuntimeData, PosHash> runtime;
     std::deque<TorchToggle> recentTorchToggles;
     std::unordered_map<BlockPos, unsigned, PosHash> torchToggleCounts;

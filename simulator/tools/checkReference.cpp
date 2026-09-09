@@ -5,6 +5,16 @@
 
 using namespace simulator;
 
+namespace {
+simulator::Simulator::ChunkState parseChunkState(const std::string& name) {
+    if (name == "unloaded") return simulator::Simulator::ChunkState::unloaded;
+    if (name == "loaded") return simulator::Simulator::ChunkState::loaded;
+    if (name == "blockTicking") return simulator::Simulator::ChunkState::blockTicking;
+    if (name == "entityTicking") return simulator::Simulator::ChunkState::entityTicking;
+    throw std::invalid_argument("unknown chunk state " + name);
+}
+}
+
 // Compare externally captured vanilla observations at their actual coordinates.
 // Unlike checkWorldReplay, this checks vanilla values, not two C++ snapshots.
 int main(int argc, char** argv) {
@@ -34,7 +44,9 @@ int main(int argc, char** argv) {
             };
             bool differs = false;
             Tick expectedTick = 0;
-            for (const auto& frame : fixture.at("frames")) {
+            const auto& frames = fixture.at("frames");
+            for (std::size_t frameIndex = 0; frameIndex < frames.size(); ++frameIndex) {
+                const auto& frame = frames.at(frameIndex);
                 const Tick tick = frame.at("tick");
                 if (tick != expectedTick++) throw std::runtime_error("Capture frames must be contiguous from tick zero");
                 for (const char* field : {"states", "analogs", "inventories", "bells", "jukeboxes"}) {
@@ -45,7 +57,10 @@ int main(int argc, char** argv) {
                 simulation.markUpdateTrace(tick);
                 for (const auto& command : fixture.at("commands")) if (command.at("tick") == tick) {
                     const auto pos = absolute(command.at("pos"));
-                    if (command.contains("placedBy") || command.contains("playerPlace")) simulation.place(pos, command.at("stateId"));
+                    // 区块状态是显式输入；原版侧对应的是真实票据，捕获里逐帧记录了它的派生标志。
+                    if (command.contains("chunkState")) simulation.setChunkState(pos.x >> 4, pos.z >> 4, parseChunkState(command.at("chunkState")));
+                    else if (command.contains("chunkForced")) {}
+                    else if (command.contains("placedBy") || command.contains("playerPlace")) simulation.place(pos, command.at("stateId"));
                     else if (command.contains("stateId")) simulation.setBlock(pos, command.at("stateId"));
                     else if (command.contains("interact")) {
                         std::optional<Direction> facing;
@@ -72,6 +87,10 @@ int main(int argc, char** argv) {
                     compare("states", frame.at("states").at(index), simulation.world.get(pos));
                     if (frame.at("analogs").at(index) != -1) compare("analogs", frame.at("analogs").at(index), simulation.analogOutput(pos));
                     if (frame.contains("inventories")) compare("inventories", frame.at("inventories").at(index), simulation.inventoryJson(pos, false));
+                    // 区块状态是输入：本帧命令生效后的状态，对应原版**下一帧**报告的派生标志。
+                    if (frame.contains("chunkStates") && frameIndex + 1 < frames.size())
+                        compare("chunkStates", frames.at(frameIndex + 1).at("chunkStates").at(index),
+                                Json{{"blockTicking", simulation.chunkBlockTicking(pos)}, {"entityTicking", simulation.chunkEntityTicking(pos)}, {"loaded", simulation.chunkLoaded(pos)}});
                     if (frame.contains("groundItems") && !frame.at("groundItems").at(index).is_null())
                         compare("groundItems", frame.at("groundItems").at(index), simulation.suckableItems(pos));
                     if (frame.contains("bells")) compare("bells", frame.at("bells").at(index), simulation.inspect(pos)["runtime"].value("ringing", false));

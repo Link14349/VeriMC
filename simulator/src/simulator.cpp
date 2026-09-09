@@ -71,6 +71,76 @@ int Simulator::displayValue(BlockPos pos) const {
     int value = 0; for (auto d : directions) value = std::max(value, signal(pos, d));
     return value;
 }
+BlockPos Simulator::chunkOf(BlockPos pos) { return BlockTicks::chunkAt(pos); }
+Simulator::ChunkState Simulator::chunkState(BlockPos pos) const {
+    auto found = chunkStates.find(chunkOf(pos));
+    return found == chunkStates.end() ? ChunkState::entityTicking : found->second.state;
+}
+// 原版可 ticking 的区块，其周围八个区块的票据等级必然至少是已加载，因此 ticking 区块的
+// 逻辑永远读不到未加载的方块。这里把它作为**输入约束**强制执行，读路径因此不需要额外判断。
+void Simulator::setChunkState(int chunkX, int chunkZ, ChunkState state, std::optional<Tick> stalledSince) {
+    if (faulted) throw std::runtime_error("当前执行已中止，请从有效快照恢复");
+    const BlockPos chunk{chunkX, 0, chunkZ};
+    auto previous = chunkStates;
+    const bool wasTicking = chunkState({chunkX * 16, 0, chunkZ * 16}) == ChunkState::entityTicking;
+    const Tick previousStall = wasTicking ? currentTick : previous.at(chunk).stalledSince;
+    if (state == ChunkState::entityTicking && !stalledSince) chunkStates.erase(chunk);
+    else chunkStates[chunk] = {state, stalledSince.value_or(wasTicking ? currentTick : previousStall)};
+    auto level = [&](BlockPos c) {
+        auto found = chunkStates.find(c);
+        return found == chunkStates.end() ? ChunkState::entityTicking : found->second.state;
+    };
+    auto valid = [&](BlockPos c) {
+        if (level(c) < ChunkState::blockTicking) return true;
+        for (int dx = -1; dx <= 1; ++dx) for (int dz = -1; dz <= 1; ++dz)
+            if (level({c.x + dx, 0, c.z + dz}) == ChunkState::unloaded) return false;
+        return true;
+    };
+    for (int dx = -1; dx <= 1; ++dx) for (int dz = -1; dz <= 1; ++dz)
+        if (!valid({chunkX + dx, 0, chunkZ + dz})) {
+            chunkStates = std::move(previous);
+            throw std::invalid_argument("可 ticking 的区块周围八格不能是未加载区块");
+        }
+    // 恢复执行时，把停摆期间本该递减却没有递减的倒计时整体后移，等价于原版
+    // 「区块不 ticking 时方块实体根本不 tick」。方块计划刻不移动：原版保留原触发时刻，
+    // 恢复后把过期的一并执行。
+    if (!wasTicking && state == ChunkState::entityTicking && !stalledSince && currentTick > previousStall)
+        shiftBlockEntityTimers(chunk, currentTick - previousStall);
+    ++revision;
+}
+// 只移动「倒计时/进度」类的时刻。wakeAt 与被延后的事件保持同步，由事件处理器在恢复后
+// 按新的 readyAt 重新排期，因此这里不动它。
+void Simulator::shiftBlockEntityTimers(BlockPos chunk, Tick delta) {
+    const auto inChunk = [&](BlockPos pos) { return chunkOf(pos) == chunk; };
+    const auto shift = [&](Tick& value) { if (value != UINT64_MAX) value += delta; };
+    for (auto& [pos, hopper] : hoppers) if (inChunk(pos)) { shift(hopper.readyAt); shift(hopper.firstTick); }
+    for (auto& [pos, player] : jukeboxes) if (inChunk(pos)) shift(player.firstTick);
+    for (auto& [pos, sensor] : sensors) if (inChunk(pos)) shift(sensor.candidateTick);
+}
+bool Simulator::runnable() const {
+    if (blockTicks.hasBatch() || blockTicks.nextTick(blockTickCheck())) return true;
+    if (chunkStates.empty()) return !scheduledKeys.empty();
+    auto queue = scheduled;
+    while (!queue.empty()) {
+        const auto event = queue.top(); queue.pop();
+        if (!scheduledKeys.contains({event.pos, event.type, event.phase, event.data})) continue;
+        const bool needsEntities = event.phase == 2 || event.phase == 3;
+        if (event.phase == 0 || (needsEntities ? chunkEntityTicking(event.pos) : chunkBlockTicking(event.pos))) return true;
+    }
+    return false;
+}
+Json Simulator::chunkStatesJson() const {
+    static constexpr const char* names[]{"unloaded", "loaded", "blockTicking", "entityTicking"};
+    std::vector<std::pair<BlockPos, ChunkRecord>> rows(chunkStates.begin(), chunkStates.end());
+    std::sort(rows.begin(), rows.end(), [](const auto& a, const auto& b) {
+        return std::pair(a.first.x, a.first.z) < std::pair(b.first.x, b.first.z);
+    });
+    Json result = Json::array();
+    for (const auto& [chunk, record] : rows)
+        result.push_back({{"chunk", Json::array({chunk.x, chunk.z})}, {"state", names[static_cast<unsigned>(record.state)]},
+                          {"stalledSince", record.stalledSince}});
+    return result;
+}
 void Simulator::appendUpdateTrace(Json entry) {
     if (updateTrace.size() >= updateTraceLimit) { updateTraceTruncated = true; return; }
     updateTrace.push_back(std::move(entry));
@@ -171,6 +241,8 @@ void Simulator::notifyAttached(BlockPos p, Direction connected, StateId source) 
 }
 void Simulator::setBlock(BlockPos p, StateId id, unsigned flags, int depth) {
     if (faulted) throw std::runtime_error("当前执行已中止，请撤销、加载快照或新建电路");
+    // 原版对未加载区块的写入会先把区块加载进来；本项目不做自动加载，明确报错而不是静默成功。
+    if (!chunkStates.empty() && !chunkLoaded(p)) throw std::invalid_argument("不能修改未加载区块内的方块");
     const auto old = world.get(p);
     if (old == id) return;
     const auto& state = registry[id]; const auto& oldState = registry[old];
@@ -651,15 +723,39 @@ bool Simulator::stepEvent() {
     pruneEvents();
     if (pendingEvents() == 0 || breakRequested) return false;
     ScheduledEvent event;
-    auto nextBlockTick = blockTicks.nextTick();
+    const auto tickable = blockTickCheck();
+    auto nextBlockTick = blockTicks.nextTick(tickable);
+    // 只剩下不可 ticking 区块里的计划刻时没有任何可执行事件，直接停在这里而不是空转。
+    if (!nextBlockTick && scheduled.empty()) return false;
     if (nextBlockTick && (scheduled.empty() || *nextBlockTick <= scheduled.top().tick)) {
-        if (!blockTicks.hasBatch()) blockTicks.collect(std::max(currentTick, *nextBlockTick));
+        if (!blockTicks.hasBatch()) blockTicks.collect(std::max(currentTick, *nextBlockTick), tickable);
         currentTick = blockTicks.batchTick();
         event = blockTicks.pop();
     } else {
         event = scheduled.top(); scheduled.pop(); scheduledKeys.erase({event.pos, event.type, event.phase, event.data});
         currentTick = std::max(currentTick, event.tick);
-        blockTicks.finishThrough(currentTick);
+        blockTicks.finishThrough(currentTick, tickable);
+    }
+    // 原版 runBlockEvents 在区块不可 ticking 时把方块事件**改排到下一刻**而不是丢弃；
+    // 方块实体与实体阶段则等区块恢复后照常执行。两者都不是「丢事件继续」。
+    if (!chunkStates.empty() && event.phase != 0) {
+        const bool needsEntities = event.phase == 2 || event.phase == 3;
+        if (needsEntities ? !chunkEntityTicking(event.pos) : !chunkBlockTicking(event.pos)) {
+            // 还有别的事件可跑时逐刻顺延，对应原版 runBlockEvents 的重排；
+            // 剩下的全都停摆时就放回**当前刻**并停下，避免逐刻空转，
+            // 由调用方的空闲推进直接跳到目标刻。事件永远不会落到过去。
+            const bool anyRunnable = runnable();
+            auto deferred = event; deferred.tick = anyRunnable ? currentTick + 1 : currentTick;
+            // 方块实体的唤醒时刻要跟着走，否则快照校验会看到队列与状态不一致。
+            if (event.phase == 2) {
+                if (auto found = hoppers.find(event.pos); found != hoppers.end() && found->second.generation == event.data) found->second.wakeAt = deferred.tick;
+                if (auto found = jukeboxes.find(event.pos); found != jukeboxes.end() && found->second.generation == event.data) found->second.wakeAt = deferred.tick;
+                if (auto found = sensors.find(event.pos); found != sensors.end() && found->second.generation == event.data) found->second.wakeAt = deferred.tick;
+            }
+            scheduled.push(deferred);
+            scheduledKeys.insert({deferred.pos, deferred.type, deferred.phase, deferred.data});
+            return anyRunnable;
+        }
     }
     ++sequence;
     currentPhase = event.phase;
@@ -688,7 +784,7 @@ bool Simulator::stepEvent() {
 }
 Tick Simulator::nextTick() {
     pruneEvents();
-    auto blockTick = blockTicks.nextTick();
+    auto blockTick = blockTicks.nextTick(blockTickCheck());
     if (scheduled.empty()) return blockTick.value_or(currentTick);
     return std::max(currentTick, blockTick ? std::min(*blockTick, scheduled.top().tick) : scheduled.top().tick);
 }
@@ -714,9 +810,12 @@ std::size_t Simulator::advance(Tick target, std::size_t eventBudget, std::chrono
     pruneEvents();
     while (pendingEvents() != 0 && nextTick() <= target && !breakRequested && count < eventBudget) {
         if ((count & 63u) == 0 && std::chrono::steady_clock::now() - start >= wallBudget) break;
-        stepEvent(); ++count; pruneEvents();
+        if (!stepEvent()) break;
+        ++count; pruneEvents();
     }
-    if (fillIdle && !breakRequested && (pendingEvents() == 0 || nextTick() > target)) { currentTick = target; blockTicks.finishThrough(target); }
+    // 只剩不可 ticking 区块里的事件时同样属于「本刻无事可做」，时间照常推进。
+    const bool idle = pendingEvents() == 0 || nextTick() > target || !runnable();
+    if (fillIdle && !breakRequested && idle) { currentTick = target; blockTicks.finishThrough(target, blockTickCheck()); }
     statistics.simulationMicros += static_cast<std::uint64_t>(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - start).count());
     return count;
 }
@@ -766,7 +865,7 @@ void Simulator::clear() {
     environmentActions.clear(); pendingActionIds.clear(); nextActionId = 1; actionsDropped = 0;
     recentTorchToggles.clear(); torchToggleCounts.clear();
     sensors.clear();sensorSections.clear();jukeboxes.clear();
-    world.clear(); runtime.clear(); motions.clear(); hoppers.clear(); entityOrders.clear(); nextEntityOrder = 0; scheduled = {}; scheduledKeys.clear(); blockTicks = {}; changes.clear(); currentTick = 0; nextOrder = 0; sequence = 0; currentPhase = 4;
+    world.clear(); runtime.clear(); motions.clear(); chunkStates.clear(); hoppers.clear(); entityOrders.clear(); nextEntityOrder = 0; scheduled = {}; scheduledKeys.clear(); blockTicks = {}; changes.clear(); currentTick = 0; nextOrder = 0; sequence = 0; currentPhase = 4;
     probes.clear(); probeDependencies.clear(); nextProbeId = 1; trace.clear(); traceDropped = 0; statistics = {}; breakRequested = false; faulted = false; pauseReason.clear(); ++revision;
     updateTrace = Json::array(); updateTraceTruncated = false;
     if (retainedTrace) retainedTrace = 0;

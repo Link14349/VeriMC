@@ -2,9 +2,9 @@
   {
     "fixture": "java26_2Bells",
     "origin": [
-      7290352,
+      1361938,
       -58,
-      -4393426
+      10122803
     ],
     "gameTestEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -20,8 +20,8 @@
         "trade_rebalance",
         "vanilla"
       ],
-      "gameTime": 5,
-      "clockTicks": 5
+      "gameTime": 21,
+      "clockTicks": 21
     },
     "vanillaEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -32,21 +32,21 @@
       "dataPacks": [
         "vanilla"
       ],
-      "gameTime": 5,
-      "clockTicks": 5
+      "gameTime": 21,
+      "clockTicks": 21
     },
     "clockAligned": true,
     "firstDifferenceAgainstGameTest": null,
-    "sha256": "7a5b0a0f13ff23249d3b846142d425eb876eaa4f947939cfa55bc074651ccf4d",
+    "sha256": "a2213ab68fd7653f3dfc3ee126b757e6f9efcdb01ed546a023dedbb1938e3e89",
     "checkerExitCode": 0,
     "checkerStatus": "match"
   },
   {
     "fixture": "java26_2Bookshelves",
     "origin": [
-      -4580413,
+      13316735,
       -58,
-      9129971
+      11385218
     ],
     "gameTestEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -62,8 +62,8 @@
         "trade_rebalance",
         "vanilla"
       ],
-      "gameTime": 11,
-      "clockTicks": 11
+      "gameTime": 5,
+      "clockTicks": 5
     },
     "vanillaEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -74,21 +74,21 @@
       "dataPacks": [
         "vanilla"
       ],
-      "gameTime": 11,
-      "clockTicks": 11
+      "gameTime": 5,
+      "clockTicks": 5
     },
     "clockAligned": true,
     "firstDifferenceAgainstGameTest": null,
-    "sha256": "85e6390447b24788b998e14681366ded0325e5140d468c03815ccd0f8b67492b",
+    "sha256": "fc3a411ed56fd717c6754425276dce2086025ae65200b41ccd5a468e21103b15",
     "checkerExitCode": 0,
     "checkerStatus": "match"
   },
   {
     "fixture": "java26_2Buttons",
     "origin": [
-      -2831139,
+      -3647244,
       -58,
-      -55540
+      3560801
     ],
     "gameTestEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -104,8 +104,8 @@
         "trade_rebalance",
         "vanilla"
       ],
-      "gameTime": 15,
-      "clockTicks": 15
+      "gameTime": 10,
+      "clockTicks": 10
     },
     "vanillaEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -116,21 +116,95 @@
       "dataPacks": [
         "vanilla"
       ],
-      "gameTime": 15,
-      "clockTicks": 15
+      "gameTime": 10,
+      "clockTicks": 10
     },
     "clockAligned": true,
     "firstDifferenceAgainstGameTest": null,
-    "sha256": "4583ceeaadd2540862b4d9717aa82e61e67e47e063a9d132913283dcd5968e89",
+    "sha256": "b6dbab809193b0f5cedc97cb79f29a3e00533680418a200078cc48db073cb0f1",
+    "checkerExitCode": 0,
+    "checkerStatus": "match"
+  },
+  {
+    "fixture": "java26_2ChunkLifecycle",
+    "origin": [
+      16,
+      -59,
+      32
+    ],
+    "gameTestEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "vanilla"
+      ],
+      "gameTime": 22,
+      "clockTicks": 22
+    },
+    "vanillaEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "vanilla"
+      ],
+      "gameTime": 22,
+      "clockTicks": 22
+    },
+    "clockAligned": true,
+    "firstDifferenceAgainstGameTest": null,
+    "sha256": "7e076019fe219bed20eadae8d1fba31e27fe53141aa984e6db722dd4b461f3f1",
+    "checkerExitCode": 0,
+    "checkerStatus": "match"
+  },
+  {
+    "fixture": "java26_2ChunkLifecycleNegative",
+    "origin": [
+      -64,
+      -59,
+      -80
+    ],
+    "gameTestEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "vanilla"
+      ],
+      "gameTime": 22,
+      "clockTicks": 22
+    },
+    "vanillaEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "vanilla"
+      ],
+      "gameTime": 22,
+      "clockTicks": 22
+    },
+    "clockAligned": true,
+    "firstDifferenceAgainstGameTest": null,
+    "sha256": "561d49f42f1219d9f96fd778d7f788ec510660719a8fde746960ca30b280b4e4",
     "checkerExitCode": 0,
     "checkerStatus": "match"
   },
   {
     "fixture": "java26_2Composters",
     "origin": [
-      -7093722,
+      -5583576,
       -58,
-      2092199
+      -7118755
     ],
     "gameTestEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -163,16 +237,16 @@
     },
     "clockAligned": true,
     "firstDifferenceAgainstGameTest": null,
-    "sha256": "5ef98a787caaa21ebc8c71864350c44b07b82c87f647964f0438a8b543e4c82e",
+    "sha256": "d3e7fa6f0c0a76ee466e8c89cf54707d3f736caf7b81cab9dd012b8b70f02ee2",
     "checkerExitCode": 0,
     "checkerStatus": "match"
   },
   {
     "fixture": "java26_2Containers",
     "origin": [
-      -985847,
+      5349648,
       -58,
-      -5234396
+      -7737813
     ],
     "gameTestEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -205,16 +279,16 @@
     },
     "clockAligned": true,
     "firstDifferenceAgainstGameTest": null,
-    "sha256": "2351191b38aad76072413f65ffbd8a27a6eb80eea15f5455430fccf15357f695",
+    "sha256": "841170442000e76fbb2a47fa9ec5f1dc5bd3e0713fce3e466395a522541915b7",
     "checkerExitCode": 0,
     "checkerStatus": "match"
   },
   {
     "fixture": "java26_2CopperChests",
     "origin": [
-      -4900889,
+      2516412,
       -58,
-      289869
+      -4681624
     ],
     "gameTestEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -230,8 +304,8 @@
         "trade_rebalance",
         "vanilla"
       ],
-      "gameTime": 8,
-      "clockTicks": 8
+      "gameTime": 11,
+      "clockTicks": 11
     },
     "vanillaEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -242,21 +316,21 @@
       "dataPacks": [
         "vanilla"
       ],
-      "gameTime": 8,
-      "clockTicks": 8
+      "gameTime": 11,
+      "clockTicks": 11
     },
     "clockAligned": true,
     "firstDifferenceAgainstGameTest": null,
-    "sha256": "457ccea21d45ceda7baed2589f3b47a71b453097ff0b5440bf0158121f03a0a0",
+    "sha256": "78d9fc8aa8d8b545e824bf86155dc7b77e7478bff8f1039517cf3ebed7b15c7f",
     "checkerExitCode": 0,
     "checkerStatus": "match"
   },
   {
     "fixture": "java26_2DaylightVibration",
     "origin": [
-      -10676884,
+      -410961,
       -58,
-      7301945
+      10281262
     ],
     "gameTestEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -272,8 +346,8 @@
         "trade_rebalance",
         "vanilla"
       ],
-      "gameTime": 8,
-      "clockTicks": 8
+      "gameTime": 5,
+      "clockTicks": 5
     },
     "vanillaEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -284,21 +358,21 @@
       "dataPacks": [
         "vanilla"
       ],
-      "gameTime": 8,
-      "clockTicks": 8
+      "gameTime": 5,
+      "clockTicks": 5
     },
     "clockAligned": true,
     "firstDifferenceAgainstGameTest": null,
-    "sha256": "7629007a4c66a4cda6ed7d1e2cdeb7ce772dbe2b1f10af0a51a394ba2043e6e6",
+    "sha256": "003df8d789d1d813d7bed614a07461fa5c56fef25d67e66782a4bc4bbaac2453",
     "checkerExitCode": 0,
     "checkerStatus": "match"
   },
   {
     "fixture": "java26_2DeviceVibrations",
     "origin": [
-      -7098988,
+      -13562758,
       -58,
-      -12517557
+      -5094967
     ],
     "gameTestEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -314,8 +388,8 @@
         "trade_rebalance",
         "vanilla"
       ],
-      "gameTime": 5,
-      "clockTicks": 5
+      "gameTime": 10,
+      "clockTicks": 10
     },
     "vanillaEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -326,21 +400,21 @@
       "dataPacks": [
         "vanilla"
       ],
-      "gameTime": 5,
-      "clockTicks": 5
+      "gameTime": 10,
+      "clockTicks": 10
     },
     "clockAligned": true,
     "firstDifferenceAgainstGameTest": null,
-    "sha256": "4aa99692afb0766e0ce0240f8c321d698f87ac6749012f938e07decc51f78782",
+    "sha256": "68172a8c164245f104383125f7eddb24c3e66b8fb41b116fe191e3ecad64bc1a",
     "checkerExitCode": 0,
     "checkerStatus": "match"
   },
   {
     "fixture": "java26_2Devices",
     "origin": [
-      -11148123,
+      -375098,
       -58,
-      6188070
+      11362812
     ],
     "gameTestEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -356,8 +430,8 @@
         "trade_rebalance",
         "vanilla"
       ],
-      "gameTime": 12,
-      "clockTicks": 12
+      "gameTime": 11,
+      "clockTicks": 11
     },
     "vanillaEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -368,21 +442,21 @@
       "dataPacks": [
         "vanilla"
       ],
-      "gameTime": 12,
-      "clockTicks": 12
+      "gameTime": 11,
+      "clockTicks": 11
     },
     "clockAligned": true,
     "firstDifferenceAgainstGameTest": null,
-    "sha256": "74e7fd0d4a4e69aed944843dfa8a5d9cfbc0fc56253b54a0d358b2f55ccea94e",
+    "sha256": "0a49960cd5d59324545387932a14c05ba6a9dcc951747418ae409fa5148755ed",
     "checkerExitCode": 0,
     "checkerStatus": "match"
   },
   {
     "fixture": "java26_2DiodeSupportBreak",
     "origin": [
-      5555883,
+      -3772708,
       -58,
-      -1878985
+      -7464196
     ],
     "gameTestEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -398,8 +472,8 @@
         "trade_rebalance",
         "vanilla"
       ],
-      "gameTime": 7,
-      "clockTicks": 7
+      "gameTime": 9,
+      "clockTicks": 9
     },
     "vanillaEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -410,21 +484,21 @@
       "dataPacks": [
         "vanilla"
       ],
-      "gameTime": 7,
-      "clockTicks": 7
+      "gameTime": 9,
+      "clockTicks": 9
     },
     "clockAligned": true,
     "firstDifferenceAgainstGameTest": null,
-    "sha256": "2f5f0edbb3b6811dd91114048498497e6a11a81387a864a80e9fea88bd8b20da",
+    "sha256": "81347bdbbf3b7e991f7149dc3a1da7daa4ffcc834204f382b1bbc2d46235ed0a",
     "checkerExitCode": 0,
     "checkerStatus": "match"
   },
   {
     "fixture": "java26_2Droppers",
     "origin": [
-      -5796240,
+      13569991,
       -58,
-      8821190
+      -4951011
     ],
     "gameTestEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -440,8 +514,8 @@
         "trade_rebalance",
         "vanilla"
       ],
-      "gameTime": 7,
-      "clockTicks": 7
+      "gameTime": 12,
+      "clockTicks": 12
     },
     "vanillaEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -452,21 +526,21 @@
       "dataPacks": [
         "vanilla"
       ],
-      "gameTime": 7,
-      "clockTicks": 7
+      "gameTime": 12,
+      "clockTicks": 12
     },
     "clockAligned": true,
     "firstDifferenceAgainstGameTest": null,
-    "sha256": "4511591ce942c06a57f138a3e6207efdb0c5ace23622924cfc933ec193a1ed40",
+    "sha256": "a2e8dcb5d384956c5d3f03d67b3ef717a60eaf4a5f0985fe878e8bbd554948d2",
     "checkerExitCode": 0,
     "checkerStatus": "match"
   },
   {
     "fixture": "java26_2FenceGateInWall",
     "origin": [
-      -14277037,
+      -8937461,
       -58,
-      5523363
+      12192548
     ],
     "gameTestEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -482,8 +556,8 @@
         "trade_rebalance",
         "vanilla"
       ],
-      "gameTime": 8,
-      "clockTicks": 8
+      "gameTime": 7,
+      "clockTicks": 7
     },
     "vanillaEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -494,21 +568,21 @@
       "dataPacks": [
         "vanilla"
       ],
-      "gameTime": 8,
-      "clockTicks": 8
+      "gameTime": 7,
+      "clockTicks": 7
     },
     "clockAligned": true,
     "firstDifferenceAgainstGameTest": null,
-    "sha256": "56a33d3c42345b95b6784635e57db326dc597046691373ef3711bdb0cda17deb",
+    "sha256": "c83a96b996e907f7359574fbe6558b96d1e5bee5e1c5efe604a683843927f45b",
     "checkerExitCode": 0,
     "checkerStatus": "match"
   },
   {
     "fixture": "java26_2HopperPickup",
     "origin": [
-      -14772082,
+      -1894343,
       -58,
-      -378330
+      -10939348
     ],
     "gameTestEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -541,16 +615,16 @@
     },
     "clockAligned": true,
     "firstDifferenceAgainstGameTest": null,
-    "sha256": "cb1c3693d40342669eb9e31e35977bb28c063bd340fcb9c86e10864f8e178d05",
+    "sha256": "8df80b45161777e2ad045a50d5a3c9dd35af6001f5bc23a3acd8ec5b709c1d09",
     "checkerExitCode": 0,
     "checkerStatus": "match"
   },
   {
     "fixture": "java26_2Hoppers",
     "origin": [
-      1395798,
+      -2233529,
       -58,
-      -13250346
+      10824451
     ],
     "gameTestEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -566,8 +640,8 @@
         "trade_rebalance",
         "vanilla"
       ],
-      "gameTime": 6,
-      "clockTicks": 6
+      "gameTime": 7,
+      "clockTicks": 7
     },
     "vanillaEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -578,21 +652,21 @@
       "dataPacks": [
         "vanilla"
       ],
-      "gameTime": 6,
-      "clockTicks": 6
+      "gameTime": 7,
+      "clockTicks": 7
     },
     "clockAligned": true,
     "firstDifferenceAgainstGameTest": null,
-    "sha256": "ef67ec31ceed6c93f91cb6be50f8539c8226cb2cacd3272f2951cef0771ab746",
+    "sha256": "0dad2391d5ea363226e52a0ab2b6f9e446c216600f5ec29736051f365fea5583",
     "checkerExitCode": 0,
     "checkerStatus": "match"
   },
   {
     "fixture": "java26_2ItemFrameComparator",
     "origin": [
-      2044047,
+      12452488,
       -58,
-      1219029
+      12963420
     ],
     "gameTestEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -608,8 +682,8 @@
         "trade_rebalance",
         "vanilla"
       ],
-      "gameTime": 6,
-      "clockTicks": 6
+      "gameTime": 70,
+      "clockTicks": 70
     },
     "vanillaEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -620,21 +694,21 @@
       "dataPacks": [
         "vanilla"
       ],
-      "gameTime": 6,
-      "clockTicks": 6
+      "gameTime": 70,
+      "clockTicks": 70
     },
     "clockAligned": true,
     "firstDifferenceAgainstGameTest": null,
-    "sha256": "1d11e741314788569c852b040c1f50a17bb42fd0580e63593a7a8ace1888f363",
+    "sha256": "82c00aacc9f3969ee5ff6d57916d1bbaaa34b85ec7584d3923e8000657da0d12",
     "checkerExitCode": 0,
     "checkerStatus": "match"
   },
   {
     "fixture": "java26_2JukeboxHoppers",
     "origin": [
-      618643,
+      -3585119,
       -58,
-      6614668
+      2892422
     ],
     "gameTestEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -667,16 +741,16 @@
     },
     "clockAligned": true,
     "firstDifferenceAgainstGameTest": null,
-    "sha256": "c498622b46f8575c36273276f1a8230304a681f419d161f27fae536d6768d654",
+    "sha256": "7ea5356a8262042b3409249addeba01b8ddc8e52ff6ca1601b6c12f1d95982d0",
     "checkerExitCode": 0,
     "checkerStatus": "match"
   },
   {
     "fixture": "java26_2Jukeboxes",
     "origin": [
-      11548756,
+      5951528,
       -58,
-      6501854
+      -10663918
     ],
     "gameTestEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -692,8 +766,8 @@
         "trade_rebalance",
         "vanilla"
       ],
-      "gameTime": 11,
-      "clockTicks": 11
+      "gameTime": 7,
+      "clockTicks": 7
     },
     "vanillaEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -704,21 +778,21 @@
       "dataPacks": [
         "vanilla"
       ],
-      "gameTime": 11,
-      "clockTicks": 11
+      "gameTime": 7,
+      "clockTicks": 7
     },
     "clockAligned": true,
     "firstDifferenceAgainstGameTest": null,
-    "sha256": "4fe9c8bdce22aeff89601b1d236346567a935b64f93eb06fe351c997aed7d11d",
+    "sha256": "762552e6babba04d9856b11df0d0e7ee960e7fa1289629c830a52e1494bd746a",
     "checkerExitCode": 0,
     "checkerStatus": "match"
   },
   {
     "fixture": "java26_2MachineMatrix",
     "origin": [
-      -14054968,
+      -14988735,
       -58,
-      798143
+      -9297487
     ],
     "gameTestEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -734,8 +808,8 @@
         "trade_rebalance",
         "vanilla"
       ],
-      "gameTime": 11,
-      "clockTicks": 11
+      "gameTime": 12,
+      "clockTicks": 12
     },
     "vanillaEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -746,12 +820,12 @@
       "dataPacks": [
         "vanilla"
       ],
-      "gameTime": 11,
-      "clockTicks": 11
+      "gameTime": 12,
+      "clockTicks": 12
     },
     "clockAligned": true,
     "firstDifferenceAgainstGameTest": null,
-    "sha256": "dbca2f5ec9d2e9f7a0c62144a1fa1a02bb30e8e8001bc5d235d49d89056a7c1a",
+    "sha256": "3b957c728ab502dd2f34f16f68b240af17dddb603a7d7c0cc7a057224016f027",
     "checkerExitCode": 0,
     "checkerStatus": "match",
     "traceFreeRerunDifference": null,
@@ -760,9 +834,9 @@
   {
     "fixture": "java26_2Notes",
     "origin": [
-      14403612,
+      -5863760,
       -58,
-      3967312
+      9437365
     ],
     "gameTestEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -795,16 +869,16 @@
     },
     "clockAligned": true,
     "firstDifferenceAgainstGameTest": null,
-    "sha256": "45b5cb08ad3c31daeb49e97336d4cc6e07cf8df4aab72578ee4535631532b593",
+    "sha256": "d371b9826c1fae00b970c7c15900510b8f1b3944c9eab053ddbe08436ffbd70a",
     "checkerExitCode": 0,
     "checkerStatus": "match"
   },
   {
     "fixture": "java26_2ObserverRemoval",
     "origin": [
-      -14582929,
+      3917673,
       -58,
-      -13136450
+      4714124
     ],
     "gameTestEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -820,8 +894,8 @@
         "trade_rebalance",
         "vanilla"
       ],
-      "gameTime": 12,
-      "clockTicks": 12
+      "gameTime": 11,
+      "clockTicks": 11
     },
     "vanillaEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -832,21 +906,21 @@
       "dataPacks": [
         "vanilla"
       ],
-      "gameTime": 12,
-      "clockTicks": 12
+      "gameTime": 11,
+      "clockTicks": 11
     },
     "clockAligned": true,
     "firstDifferenceAgainstGameTest": null,
-    "sha256": "532ecebefa4fe511d6a1c87e42ea3bfc583bcdc618787c0a4426ccb152c9fab2",
+    "sha256": "a11ceff9abdc62da1501ab30f1cd2c8fe0488183188a8d14d6ecba359f65716b",
     "checkerExitCode": 0,
     "checkerStatus": "match"
   },
   {
     "fixture": "java26_2PistonLandingShape",
     "origin": [
-      -1082827,
+      10126723,
       -58,
-      4282381
+      -4127906
     ],
     "gameTestEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -862,8 +936,8 @@
         "trade_rebalance",
         "vanilla"
       ],
-      "gameTime": 7,
-      "clockTicks": 7
+      "gameTime": 6,
+      "clockTicks": 6
     },
     "vanillaEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -874,21 +948,21 @@
       "dataPacks": [
         "vanilla"
       ],
-      "gameTime": 7,
-      "clockTicks": 7
+      "gameTime": 6,
+      "clockTicks": 6
     },
     "clockAligned": true,
     "firstDifferenceAgainstGameTest": null,
-    "sha256": "020739610efbcdac0f592a274ce00f36949b218c61b09af5d3501c0a5718a8ef",
+    "sha256": "db3809270dbf6740afd16fe54cfb777ebcc777f8e83f0a19782589de76c6f68a",
     "checkerExitCode": 0,
     "checkerStatus": "match"
   },
   {
     "fixture": "java26_2PistonPushability",
     "origin": [
-      5315536,
+      5148333,
       -58,
-      -13621409
+      -11535496
     ],
     "gameTestEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -904,8 +978,8 @@
         "trade_rebalance",
         "vanilla"
       ],
-      "gameTime": 4,
-      "clockTicks": 4
+      "gameTime": 9,
+      "clockTicks": 9
     },
     "vanillaEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -916,21 +990,21 @@
       "dataPacks": [
         "vanilla"
       ],
-      "gameTime": 4,
-      "clockTicks": 4
+      "gameTime": 9,
+      "clockTicks": 9
     },
     "clockAligned": true,
     "firstDifferenceAgainstGameTest": null,
-    "sha256": "33f6d5aca2b5c3b94587a24b738bd2875afea18ffa0fb538b60497c530056535",
+    "sha256": "e08178d1eb1810df3250ba7f4f290bbe6d00c432c4a569ecad892d4620532966",
     "checkerExitCode": 0,
     "checkerStatus": "match"
   },
   {
     "fixture": "java26_2PistonRemovalCallback",
     "origin": [
-      12224907,
+      -11651629,
       -58,
-      3874594
+      2132008
     ],
     "gameTestEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -946,8 +1020,8 @@
         "trade_rebalance",
         "vanilla"
       ],
-      "gameTime": 5,
-      "clockTicks": 5
+      "gameTime": 12,
+      "clockTicks": 12
     },
     "vanillaEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -958,21 +1032,21 @@
       "dataPacks": [
         "vanilla"
       ],
-      "gameTime": 5,
-      "clockTicks": 5
+      "gameTime": 12,
+      "clockTicks": 12
     },
     "clockAligned": true,
     "firstDifferenceAgainstGameTest": null,
-    "sha256": "8ac100751e672592a28bc06d00ffccceda6515a54305ca48cb41302c8aec1f16",
+    "sha256": "3498afd29da38472c0d7fb63a3cba0e890dc9cef84f3d323978500ceb25eaa7e",
     "checkerExitCode": 0,
     "checkerStatus": "match"
   },
   {
     "fixture": "java26_2Pots",
     "origin": [
-      3747576,
+      14332468,
       -58,
-      6317258
+      5210710
     ],
     "gameTestEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -1005,16 +1079,16 @@
     },
     "clockAligned": true,
     "firstDifferenceAgainstGameTest": null,
-    "sha256": "8e16879b090d638d6848c7f7061b2b4bce466bc70127b298333f8a78ea0ab3d1",
+    "sha256": "0925a7f3ba1e6395374aed74b55b1214b69ae3f605bd134a656424e8bc9dc4a1",
     "checkerExitCode": 0,
     "checkerStatus": "match"
   },
   {
     "fixture": "java26_2RailNotificationSource",
     "origin": [
-      -9055412,
+      -2286809,
       -58,
-      1940097
+      -2883712
     ],
     "gameTestEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -1030,8 +1104,8 @@
         "trade_rebalance",
         "vanilla"
       ],
-      "gameTime": 7,
-      "clockTicks": 7
+      "gameTime": 5,
+      "clockTicks": 5
     },
     "vanillaEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -1042,21 +1116,21 @@
       "dataPacks": [
         "vanilla"
       ],
-      "gameTime": 7,
-      "clockTicks": 7
+      "gameTime": 5,
+      "clockTicks": 5
     },
     "clockAligned": true,
     "firstDifferenceAgainstGameTest": null,
-    "sha256": "f9d53735b5c137ec93f6595468290dbfd2edb0f244eb88653863878111e29a19",
+    "sha256": "7a1ddc792db28db35157a462b1a44f74940f95f7e2d4e7bbfa15aaebab8f0749",
     "checkerExitCode": 0,
     "checkerStatus": "match"
   },
   {
     "fixture": "java26_2Rails",
     "origin": [
-      762577,
+      14451196,
       -58,
-      -9496297
+      -9540035
     ],
     "gameTestEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -1072,8 +1146,8 @@
         "trade_rebalance",
         "vanilla"
       ],
-      "gameTime": 123,
-      "clockTicks": 123
+      "gameTime": 7,
+      "clockTicks": 7
     },
     "vanillaEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -1084,21 +1158,21 @@
       "dataPacks": [
         "vanilla"
       ],
-      "gameTime": 123,
-      "clockTicks": 123
+      "gameTime": 7,
+      "clockTicks": 7
     },
     "clockAligned": true,
     "firstDifferenceAgainstGameTest": null,
-    "sha256": "ace3165550ded923516706899d5cfac4b2263399401c2e5d487ac90d27340cf0",
+    "sha256": "3c7738ba32c44784eba61228d1ad8531bf587a49770b2385624154a54bb16821",
     "checkerExitCode": 0,
     "checkerStatus": "match"
   },
   {
     "fixture": "java26_2Redstone",
     "origin": [
-      3214125,
+      -13216258,
       -58,
-      12452312
+      4259559
     ],
     "gameTestEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -1114,8 +1188,8 @@
         "trade_rebalance",
         "vanilla"
       ],
-      "gameTime": 11,
-      "clockTicks": 11
+      "gameTime": 9,
+      "clockTicks": 9
     },
     "vanillaEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -1126,21 +1200,21 @@
       "dataPacks": [
         "vanilla"
       ],
-      "gameTime": 11,
-      "clockTicks": 11
+      "gameTime": 9,
+      "clockTicks": 9
     },
     "clockAligned": true,
     "firstDifferenceAgainstGameTest": null,
-    "sha256": "fac3e55e73c669ef6959da8ecc53db787a61e232a738062a3117c0ac6571cd3c",
+    "sha256": "9118144b9c19e6c618a08dcb004e6ddd1f76337806d3ab63c9a74bc367e031e7",
     "checkerExitCode": 0,
     "checkerStatus": "match"
   },
   {
     "fixture": "java26_2RemovalNotifySource",
     "origin": [
-      -8027864,
+      -12007783,
       -58,
-      -10199230
+      9606321
     ],
     "gameTestEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -1156,8 +1230,8 @@
         "trade_rebalance",
         "vanilla"
       ],
-      "gameTime": 7,
-      "clockTicks": 7
+      "gameTime": 5,
+      "clockTicks": 5
     },
     "vanillaEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -1168,21 +1242,21 @@
       "dataPacks": [
         "vanilla"
       ],
-      "gameTime": 7,
-      "clockTicks": 7
+      "gameTime": 5,
+      "clockTicks": 5
     },
     "clockAligned": true,
     "firstDifferenceAgainstGameTest": null,
-    "sha256": "b41e482dd29fbd5f3b62cc24b47b669643f28785bf286b96188212857e5e0b67",
+    "sha256": "4290527a258db3f2d5f427d51b054ced68bc659cba0c0b4db0d7e5348b5d8dfa",
     "checkerExitCode": 0,
     "checkerStatus": "match"
   },
   {
     "fixture": "java26_2RepeaterLockRefresh",
     "origin": [
-      -4637547,
+      7442207,
       -58,
-      4548800
+      -8545382
     ],
     "gameTestEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -1198,8 +1272,8 @@
         "trade_rebalance",
         "vanilla"
       ],
-      "gameTime": 5,
-      "clockTicks": 5
+      "gameTime": 12,
+      "clockTicks": 12
     },
     "vanillaEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -1210,21 +1284,21 @@
       "dataPacks": [
         "vanilla"
       ],
-      "gameTime": 5,
-      "clockTicks": 5
+      "gameTime": 12,
+      "clockTicks": 12
     },
     "clockAligned": true,
     "firstDifferenceAgainstGameTest": null,
-    "sha256": "309316968f0f6b8e5d906ba99f441aeb861284eb7687065e6bbf20105710e65f",
+    "sha256": "7eef1512a4c2059a896af3f2feb2218dadde5430f60473c70789a13857fe5a71",
     "checkerExitCode": 0,
     "checkerStatus": "match"
   },
   {
     "fixture": "java26_2StairShapes",
     "origin": [
-      1612489,
+      6349915,
       -58,
-      11857115
+      11571517
     ],
     "gameTestEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -1240,8 +1314,8 @@
         "trade_rebalance",
         "vanilla"
       ],
-      "gameTime": 9,
-      "clockTicks": 9
+      "gameTime": 6,
+      "clockTicks": 6
     },
     "vanillaEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -1252,21 +1326,21 @@
       "dataPacks": [
         "vanilla"
       ],
-      "gameTime": 9,
-      "clockTicks": 9
+      "gameTime": 6,
+      "clockTicks": 6
     },
     "clockAligned": true,
     "firstDifferenceAgainstGameTest": null,
-    "sha256": "911f2e442ad32696f886d8b25215f83c6ba285fc803472fd1f7096a2c5e3cbd2",
+    "sha256": "7813f96bc601ba879f7d19aa4a16834c29944172dea7dd3c27bf6fc64d201794",
     "checkerExitCode": 0,
     "checkerStatus": "match"
   },
   {
     "fixture": "java26_2SupportDirection",
     "origin": [
-      -940846,
+      -14717965,
       -58,
-      10135389
+      12661676
     ],
     "gameTestEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -1282,8 +1356,8 @@
         "trade_rebalance",
         "vanilla"
       ],
-      "gameTime": 6,
-      "clockTicks": 6
+      "gameTime": 10,
+      "clockTicks": 10
     },
     "vanillaEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -1294,12 +1368,12 @@
       "dataPacks": [
         "vanilla"
       ],
-      "gameTime": 6,
-      "clockTicks": 6
+      "gameTime": 10,
+      "clockTicks": 10
     },
     "clockAligned": true,
     "firstDifferenceAgainstGameTest": null,
-    "sha256": "19dc46ce8c4bed5a3d9864800b6bfa221bd9fc31483adcea3a18e1e6625fc167",
+    "sha256": "a932466c6c86bb4627a875f66774ef736a1e152ec9fa4830dd133819be3fd75e",
     "checkerExitCode": 0,
     "checkerStatus": "match",
     "traceFreeRerunDifference": null,
@@ -1308,9 +1382,9 @@
   {
     "fixture": "java26_2Targets",
     "origin": [
-      -11567234,
+      -12012170,
       -58,
-      -6160864
+      -14643673
     ],
     "gameTestEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -1326,8 +1400,8 @@
         "trade_rebalance",
         "vanilla"
       ],
-      "gameTime": 5,
-      "clockTicks": 5
+      "gameTime": 12,
+      "clockTicks": 12
     },
     "vanillaEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -1338,21 +1412,21 @@
       "dataPacks": [
         "vanilla"
       ],
-      "gameTime": 5,
-      "clockTicks": 5
+      "gameTime": 12,
+      "clockTicks": 12
     },
     "clockAligned": true,
     "firstDifferenceAgainstGameTest": null,
-    "sha256": "ed446a41541cdcc521ff3b77e0e6ac70946002ced3dff4043fd6c721b18b309c",
+    "sha256": "6a61767e40fd2830141c0b25bf2cb341ef2174abde0ce3053784ba448e0ed0a9",
     "checkerExitCode": 0,
     "checkerStatus": "match"
   },
   {
     "fixture": "java26_2TickBatches",
     "origin": [
-      14500152,
+      1865056,
       -58,
-      -1483849
+      -12918106
     ],
     "gameTestEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -1368,8 +1442,8 @@
         "trade_rebalance",
         "vanilla"
       ],
-      "gameTime": 11,
-      "clockTicks": 11
+      "gameTime": 5,
+      "clockTicks": 5
     },
     "vanillaEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -1380,21 +1454,21 @@
       "dataPacks": [
         "vanilla"
       ],
-      "gameTime": 11,
-      "clockTicks": 11
+      "gameTime": 5,
+      "clockTicks": 5
     },
     "clockAligned": true,
     "firstDifferenceAgainstGameTest": null,
-    "sha256": "42d0a3b07b5791531e78d4963305810563b7c12f0cb1f6a93061bbc85198bf46",
+    "sha256": "958e4323f79609aead5838f83af399f9f1486d68d8b10799c84cc2a6efa37773",
     "checkerExitCode": 0,
     "checkerStatus": "match"
   },
   {
     "fixture": "java26_2Torches",
     "origin": [
-      -4335953,
+      5701434,
       -58,
-      -12671183
+      -10214568
     ],
     "gameTestEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -1410,8 +1484,8 @@
         "trade_rebalance",
         "vanilla"
       ],
-      "gameTime": 4,
-      "clockTicks": 4
+      "gameTime": 7,
+      "clockTicks": 7
     },
     "vanillaEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -1422,21 +1496,21 @@
       "dataPacks": [
         "vanilla"
       ],
-      "gameTime": 4,
-      "clockTicks": 4
+      "gameTime": 7,
+      "clockTicks": 7
     },
     "clockAligned": true,
     "firstDifferenceAgainstGameTest": null,
-    "sha256": "8d05ff6887374a54bb0b911248420f2ed645f9ab8079896b00994564a1ac466a",
+    "sha256": "45a971d7b18ce4a7fd1981bbd72d5f6f675114e072ebd6e410961a4dc303f542",
     "checkerExitCode": 0,
     "checkerStatus": "match"
   },
   {
     "fixture": "java26_2Tripwire",
     "origin": [
-      -2607942,
+      9977965,
       -58,
-      6367359
+      11893498
     ],
     "gameTestEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -1452,8 +1526,8 @@
         "trade_rebalance",
         "vanilla"
       ],
-      "gameTime": 5,
-      "clockTicks": 5
+      "gameTime": 11,
+      "clockTicks": 11
     },
     "vanillaEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -1464,21 +1538,21 @@
       "dataPacks": [
         "vanilla"
       ],
-      "gameTime": 5,
-      "clockTicks": 5
+      "gameTime": 11,
+      "clockTicks": 11
     },
     "clockAligned": true,
     "firstDifferenceAgainstGameTest": null,
-    "sha256": "61a82c850379f24eb815d6815c49bdbe145bc84bde75988d11651c8011b91088",
+    "sha256": "d994adef55ec501f0ef0b0d5212e0efeb4bac1d8f5c65a5e1fe97c1fee351bd0",
     "checkerExitCode": 0,
     "checkerStatus": "match"
   },
   {
     "fixture": "java26_2UpdateSource",
     "origin": [
-      -11377621,
+      904103,
       -58,
-      -11268046
+      -13366918
     ],
     "gameTestEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -1494,8 +1568,8 @@
         "trade_rebalance",
         "vanilla"
       ],
-      "gameTime": 7,
-      "clockTicks": 7
+      "gameTime": 11,
+      "clockTicks": 11
     },
     "vanillaEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -1506,12 +1580,12 @@
       "dataPacks": [
         "vanilla"
       ],
-      "gameTime": 7,
-      "clockTicks": 7
+      "gameTime": 11,
+      "clockTicks": 11
     },
     "clockAligned": true,
     "firstDifferenceAgainstGameTest": null,
-    "sha256": "dcce99ace54c3c4178c8edfe109c58ef936a52d90948266d027e5df3c8b8eac0",
+    "sha256": "21eb2bd449d117169880d83b1e42efef936da827436ae25cd6f613fff0f54a85",
     "checkerExitCode": 0,
     "checkerStatus": "match",
     "traceFreeRerunDifference": null,
@@ -1520,9 +1594,9 @@
   {
     "fixture": "java26_2UpdateTrace",
     "origin": [
-      7314407,
+      -4637311,
       -58,
-      -2705617
+      8902688
     ],
     "gameTestEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -1538,8 +1612,8 @@
         "trade_rebalance",
         "vanilla"
       ],
-      "gameTime": 5,
-      "clockTicks": 5
+      "gameTime": 6,
+      "clockTicks": 6
     },
     "vanillaEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -1550,12 +1624,12 @@
       "dataPacks": [
         "vanilla"
       ],
-      "gameTime": 5,
-      "clockTicks": 5
+      "gameTime": 6,
+      "clockTicks": 6
     },
     "clockAligned": true,
     "firstDifferenceAgainstGameTest": null,
-    "sha256": "a97dff35946c8743278a7a1400f23f9251cf36563dcae27b0fc5d5dcfdb2e0a8",
+    "sha256": "ec08d791b6964d742126b3df1388e447ba7cf519bd48f43ff6630d654f21cf17",
     "checkerExitCode": 0,
     "checkerStatus": "match",
     "traceFreeRerunDifference": null,
@@ -1564,9 +1638,9 @@
   {
     "fixture": "java26_2Vibrations",
     "origin": [
-      14724205,
+      6363378,
       -58,
-      2962194
+      -4638309
     ],
     "gameTestEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -1599,16 +1673,16 @@
     },
     "clockAligned": true,
     "firstDifferenceAgainstGameTest": null,
-    "sha256": "976a05cca42637955d03f4185f8bb096410b7cdc3634655c46882f538442a380",
+    "sha256": "094440cef85876539a6457e00d1e2b1c96594e28ec3f26c151a04d25358202f7",
     "checkerExitCode": 0,
     "checkerStatus": "match"
   },
   {
     "fixture": "java26_2WireGeometry",
     "origin": [
-      -14284304,
+      -2015056,
       -58,
-      -9374281
+      8982754
     ],
     "gameTestEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -1624,8 +1698,8 @@
         "trade_rebalance",
         "vanilla"
       ],
-      "gameTime": 5,
-      "clockTicks": 5
+      "gameTime": 7,
+      "clockTicks": 7
     },
     "vanillaEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -1636,21 +1710,21 @@
       "dataPacks": [
         "vanilla"
       ],
-      "gameTime": 5,
-      "clockTicks": 5
+      "gameTime": 7,
+      "clockTicks": 7
     },
     "clockAligned": true,
     "firstDifferenceAgainstGameTest": null,
-    "sha256": "1c1e8d453f00b3db706ef43d5d89ea4e51cccfb71c377bf3fe41ceef0dbc3490",
+    "sha256": "95a3374a4d3d013468e93932a09035113452b09b3ced8db5e2b24ee76a56e616",
     "checkerExitCode": 0,
     "checkerStatus": "match"
   },
   {
     "fixture": "java26_2WireShapeToggle",
     "origin": [
-      -13998509,
+      -11769289,
       -58,
-      -12317084
+      10692884
     ],
     "gameTestEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -1666,8 +1740,8 @@
         "trade_rebalance",
         "vanilla"
       ],
-      "gameTime": 8,
-      "clockTicks": 8
+      "gameTime": 5470,
+      "clockTicks": 5470
     },
     "vanillaEnvironment": {
       "javaVersion": "25.0.4.1",
@@ -1678,12 +1752,12 @@
       "dataPacks": [
         "vanilla"
       ],
-      "gameTime": 8,
-      "clockTicks": 8
+      "gameTime": 5470,
+      "clockTicks": 5470
     },
     "clockAligned": true,
     "firstDifferenceAgainstGameTest": null,
-    "sha256": "8812fe1d4fcdb9a13c56373dd32b052953336d8c357f4452ddfbd8a71de16052",
+    "sha256": "4b66a9d15ed5aedc9c92c0de76abc2eec0aef2f4c2ef662dab9859853413f872",
     "checkerExitCode": 0,
     "checkerStatus": "match"
   }

@@ -86,6 +86,11 @@ def main():
         baseline = json.loads(source.read_text())
         if not {'commands', 'watch', 'frames', 'endTick'} <= baseline.keys():
             continue
+        # Some fixtures need a chunk-aligned origin, which GameTest cannot provide because it
+        # draws its own. Those are captured and re-checked through `captureVanillaScenario.py`.
+        if baseline.get('requiresAlignedOrigin'):
+            print(source.name, 'skipped: needs a chosen origin', flush=True)
+            continue
         scenarioDir = output / source.stem
         scenarioDir.mkdir()
         scenario = {key: value for key, value in baseline.items()

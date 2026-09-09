@@ -132,6 +132,14 @@ public class CaptureRedstone extends TestFunctionLoader {
         };
     }
     static void applyCommand(net.minecraft.server.level.ServerLevel level, BlockPos pos, JsonObject command) {
+        // Chunk ticket control. The kernel does not model ticket propagation, so the scenario
+        // declares the chunk state directly; here the real ticket is added or removed and the
+        // resulting ticking flags are recorded per frame, which is what the two sides compare.
+        if (command.has("chunkForced")) {
+            level.setChunkForced(pos.getX() >> 4, pos.getZ() >> 4, command.get("chunkForced").getAsBoolean());
+            return;
+        }
+        if (command.has("chunkState")) return;
         if (command.has("stateId")) {
             var placed = Block.stateById(command.get("stateId").getAsInt());
             if (command.has("playerPlace")) {
@@ -497,6 +505,18 @@ public class CaptureRedstone extends TestFunctionLoader {
                     inventories.add(inventory);
                 }
                 frame.add("states", states); frame.add("analogs", analogs); frame.add("inventories", inventories); frames.add(frame);
+                if (scenario.has("watchChunkState")) {
+                    JsonArray chunkRows = new JsonArray();
+                    for (var value : scenario.getAsJsonArray("watch")) {
+                        var absolute = origin.offset(pos(value.getAsJsonArray()));
+                        var row = new JsonObject();
+                        row.addProperty("blockTicking", level.shouldTickBlocksAt(new net.minecraft.world.level.ChunkPos(absolute.getX() >> 4, absolute.getZ() >> 4).pack()));
+                        row.addProperty("entityTicking", level.isPositionEntityTicking(absolute));
+                        row.addProperty("loaded", level.hasChunkAt(absolute));
+                        chunkRows.add(row);
+                    }
+                    frame.add("chunkStates", chunkRows);
+                }
                 if (scenario.has("watchGroundItems")) {
                     // 直接调用原版 HopperBlockEntity.getItemsAtAndAbove，吸取范围判据不是我们自己写的。
                     JsonArray ground = new JsonArray();

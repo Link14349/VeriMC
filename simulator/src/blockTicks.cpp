@@ -24,20 +24,23 @@ bool BlockTicks::willTick(BlockPos pos, std::uint16_t type) const {
         for (const auto& event : batch) batchKeys.insert({event.pos, event.type});
     return batchKeys.contains({pos, type});
 }
-std::optional<Tick> BlockTicks::nextTick() const {
+std::optional<Tick> BlockTicks::nextTick(TickCheck tickable) const {
     if (!batch.empty()) return batchTick();
-    if (heads.empty()) return std::nullopt;
-    return std::max(earliestCollection, heads.begin()->tick);
+    for (const auto& head : heads) if (tickable(chunkAt(head.pos))) return std::max(earliestCollection, head.tick);
+    return std::nullopt;
 }
-void BlockTicks::collect(Tick tick, std::size_t limit) {
+void BlockTicks::collect(Tick tick, TickCheck tickable, std::size_t limit) {
     if (!batch.empty() || tick < earliestCollection || tick == std::numeric_limits<Tick>::max())
         throw std::invalid_argument("方块计划刻收集阶段无效");
     earliestCollection = tick + 1;
     auto later = [](const ScheduledEvent& a, const ScheduledEvent& b) { return a.drainKey() > b.drainKey(); };
     std::priority_queue<ScheduledEvent, std::vector<ScheduledEvent>, decltype(later)> ready(later);
-    while (!heads.empty() && heads.begin()->tick <= tick) {
-        ready.push(*heads.begin());
-        heads.erase(heads.begin());
+    // 不可 ticking 的区块保持在 heads 里，触发时间与插入序号不变，等区块恢复后一并收集，
+    // 与原版 sortContainersToTick 对 tickCheck 为假的容器不做任何处理一致。
+    for (auto it = heads.begin(); it != heads.end() && it->tick <= tick;) {
+        if (!tickable(chunkAt(it->pos))) { ++it; continue; }
+        ready.push(*it);
+        it = heads.erase(it);
     }
     // Each chunk keeps trigger-time ordering. Among due chunk heads, the game
     // compares only priority and insertion order, including overdue ticks.
@@ -60,8 +63,8 @@ ScheduledEvent BlockTicks::pop() {
     batchKeys.erase({event.pos, event.type});
     return event;
 }
-void BlockTicks::finishThrough(Tick tick) {
-    if (!batch.empty() || (nextTick() && *nextTick() <= tick))
+void BlockTicks::finishThrough(Tick tick, TickCheck tickable) {
+    if (!batch.empty() || (nextTick(tickable) && *nextTick(tickable) <= tick))
         throw std::logic_error("尚有待执行的方块计划刻");
     if (tick == std::numeric_limits<Tick>::max()) throw std::invalid_argument("仿真时间超出范围");
     earliestCollection = std::max(earliestCollection, tick + 1);

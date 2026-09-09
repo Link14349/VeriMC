@@ -1,56 +1,92 @@
-# 区块生命周期模型设计（未实现）
+# 区块生命周期模型（已实现，判据为显式输入）
 
-本文件是**设计说明**，不是实现记录。当前内核把整个世界当作永远加载、永远可 ticking 的
-单一区域；任何依赖区块加载/卸载或 ticking 边界的机器目前**不受支持**，
-也不能因为普通电路通过就宣称支持。
+本文件原先只是设计说明。区块状态、ticking 判据与队列持久化现已实现并有原版差分，
+下面区分**已实现**与**明确不实现**两部分。
+
+默认行为完全没变：不声明任何区块状态时，整张图等价于 `entityTicking`，
+热路径只多一次 `chunkStates.empty()` 判断。
 
 ## 原版里真正决定行为的判据
 
 | 机制 | 26.2 判据 | 位置 |
 |---|---|---|
-| 方块计划刻是否执行 | `LevelTicks` 的 `tickCheck` = `ServerLevel::isPositionTickingWithEntitiesLoaded`，即 `areEntitiesLoaded(chunk) && chunkSource.isPositionTicking(chunk)` | `ServerLevel.java:209`、`:1799` |
-| 计划刻的存储 | 每个区块一个 `LevelChunkTicks`，随区块加载/卸载 `addContainer` / `removeContainer`，并随区块存档持久化 | `LevelTicks.java:50`、`:61` |
+| 方块计划刻是否执行 | `LevelTicks` 的 `tickCheck` = `ServerLevel::isPositionTickingWithEntitiesLoaded` | `ServerLevel.java:209`、`:1799` |
+| 计划刻的存储 | 每个区块一个 `LevelChunkTicks`，随区块加载/卸载 `addContainer` / `removeContainer` | `LevelTicks.java:50`、`:61` |
 | 方块事件（活塞等） | `runBlockEvents` 只在 `shouldTickBlocksAt(pos)` 时执行，否则**改排到下一刻**而不是丢弃 | `ServerLevel.java:1254-1276` |
 | `shouldTickBlocksAt` | `chunkMap.getDistanceManager().inBlockTickingRange(chunkPos)` | `ServerLevel.java:470` |
 | 实体阶段 | `isPositionEntityTicking` 另有 `inEntityTickingRange` 判据 | `ServerLevel.java:1803` |
-| 随机刻 | 只在可 ticking 的区块内发生（本项目已把自然随机刻关掉，见参考验证说明） | — |
-| 跨区块读取 | `Level.updateNeighbourForOutputSignal` 用 `hasChunkAt` 守卫；未加载区块的 `getBlockState` 返回 void air | `Level.java:1004-1020` |
+| 跨区块读取 | `Level.updateNeighbourForOutputSignal` 用 `hasChunkAt` 守卫 | `Level.java:1004-1020` |
 
-要点：**方块事件是重排而不是丢弃**，而**计划刻是留在容器里等区块重新可 ticking**。
-两者都不是“丢事件继续”，这一点与项目既有的 R11 约定不冲突。
+要点：**方块事件是重排而不是丢弃**，**计划刻是留在容器里等区块重新可 ticking**。
+两者都不是「丢事件继续」，与 R11 的约定不冲突。
 
-## 建议的模型
+`LevelTicks.sortContainersToTick` 对 `tickCheck` 为假的容器**什么都不做**：既不取出也不清理，
+下一刻再试。因此恢复后所有过期的计划刻会按原有触发时刻与插入序号一次收齐。
 
-1. **显式区域状态**。为每个区块坐标记录一个状态：
-   `unloaded` / `loaded`（可读写但不 ticking）/ `blockTicking` / `entityTicking`，
-   由工程文件显式给出，不做自动加载。默认整张图 `entityTicking`，与当前行为一致。
-2. **判据接入点**（与上表一一对应）：
-   - `BlockTicks::collect` 只收集处于 `blockTicking` 及以上的区块容器；
-   - 方块事件阶段对不满足 `blockTicking` 的事件**改排到下一刻**；
-   - 方块实体/运动阶段要求 `entityTicking`；
+## 已实现
+
+1. **显式区块状态**。每个区块一个状态：
+   `unloaded` / `loaded`（可读写但不 ticking）/ `blockTicking` / `entityTicking`。
+   由工程文件或 `setChunkState` 显式给出，**不做自动加载，也不模拟票据传播时序**。
+   映射到原版的记录里另存 `stalledSince`，即该区块停止执行方块实体的时刻。
+2. **判据接入点**：
+   - `BlockTicks::collect` / `nextTick` 带 `TickCheck` 谓词，跳过不可 ticking 的区块容器头，
+     触发时刻与插入序号保持不变（与 `sortContainersToTick` 一致）；
+   - 方块事件（阶段 1）在区块不可 blockTicking 时**改排到下一刻**；
+   - 方块实体与实体接触阶段（阶段 2、3）要求 `entityTicking`，否则同样顺延；
    - `updateComparatorNeighbors` 对 `unloaded` 位置跳过（对应 `hasChunkAt`）；
-   - 读取 `unloaded` 区块的方块一律返回空气，写入直接拒绝并报错，不静默成功。
-3. **队列持久化**。计划刻已经按区块分桶（`src/blockTicks.cpp` 的 `chunks`），
-   卸载时把该桶序列化进工程文件、从活动结构里移除；加载时反序列化并合并。
-   `scheduledKeys`、`heads` 需要同步维护，`nextOrder` 保持全局单调。
-4. **存档格式**。`.vmcb` 需要新增区块状态表与按区块的计划刻表，属于
-   `checkpointAbi` 变更，必须走显式迁移，不能沿用旧文件。
-5. **界面与文档**。区域状态必须在编辑器里可见，否则用户无法解释为什么电路停住。
+   - 写入 `unloaded` 区块直接报错，不静默成功。
+3. **倒计时冻结**。原版里方块实体的冷却是每次 tick 递减一次，区块不 tick 就不递减。
+   内核把冷却存成绝对时刻，因此在区块恢复时把 `readyAt` / `firstTick` / `candidateTick`
+   整体后移「停摆时长」，等价于冻结。计划刻**不**后移：原版保留原触发时刻。
+4. **加载环不变量**。原版可 ticking 的区块，其周围八个区块的票据等级必然至少是已加载。
+   `setChunkState` 把它作为输入约束强制执行：可 ticking 的区块旁边不能有 `unloaded`。
+   因此 ticking 的逻辑永远读不到未加载的方块，**读路径不需要任何额外判断**。
+   代价是要卸载一个区块必须先把它周围一圈降级成 `loaded`，这正对应原版的加载环。
+5. **队列持久化**。计划刻本来就按区块分桶且随工程文件保存；
+   区块状态与 `stalledSince` 作为可选的 `chunkStates` 表写入，
+   默认（无非默认区块）时**完全不写**，旧工程文件逐字节不变。
+   `profile.loadedRegionOnly` 仍为 true：世界不会自动加载区块。
 
-## 未实现之前的表述要求
+## 原版差分
 
-- 现状必须写成「单一永远加载区域」，不能说“支持区块边界”。
-- 依赖区块卸载的机器（例如利用卸载暂停计划刻的电路）标为**未支持**，
-  不能用永远加载的世界跑出来的结果冒充通过。
-- 本文件本身不构成实现承诺；实现前需要重新评估范围与验收。
+`captureChunkLifecycle.py` 用严格 vanilla-only 服务器在**选定的、按区块对齐的原点**上捕获
+（GameTest 自选随机原点，做不到这一点；这两个 fixture 因此带 `requiresAlignedOrigin`，
+`auditReference.py` 会跳过它们）。
 
-## 实现后的验收条件（供将来分单）
+每个区块里同时放三类待办：中继器链（方块计划刻）、活塞（方块事件）、漏斗接箱子（方块实体）。
+第一个区块及其区内邻居的票据在 6 gt 撤掉，使它离最近的强加载区块有两格——
+**已加载但既不 block ticking 也不 entity ticking**；40 gt 再还回去。
+第三个区块全程保留票据作为对照。
 
-1. 最小加载/卸载场景：一个跨区块的电路，卸载一侧后计划刻停住、方块事件改排，
-   重新加载后从原状态继续；与原版逐刻对照。
-2. 队列持久化：卸载→存档→读档→加载，计划刻的时间、优先级与插入序号完全恢复。
-3. ticking 边界：`blockTicking` 与 `entityTicking` 两档分别验证，
-   覆盖活塞方块事件、方块实体、运动实体三类。
-4. `SculkShriekerBlock.requiresAdjacentChunksToBeTicking` 这类跨区块条件单独验证。
-5. 负坐标与区块边界（`x = -1`、`x = 15` 两侧）都要覆盖，
-   负坐标整除已经在 `BlockTicks::chunkAt` 显式向下取整。
+捕获逐帧记录原版自己的 `shouldTickBlocksAt`、`isPositionEntityTicking` 与 `hasChunkAt`，
+检查器把它们与内核的区块状态按**一帧偏移**比较（帧 T 的命令决定推进到帧 T+1 的那一刻，
+也正是原版报告状态变化的那一刻）。因此「状态是输入」不等于「随便填」：填错会同时被
+状态比较和行为比较抓住。
+
+`java26_2ChunkLifecycle`（原点 `[16,-59,32]`）与
+`java26_2ChunkLifecycleNegative`（原点 `[-64,-59,-80]`，负区块下标覆盖
+`BlockTicks::chunkAt` 的向下取整）两个场景，60 刻 / 18 点，全部逐帧一致。
+
+实测到的原版行为，内核现在逐项复现：
+
+- 停摆期间中继器链、活塞、漏斗全部不动；
+- 恢复后过期的计划刻按原触发顺序一次跑完（先前排下的通电与断电两次都保留）；
+- 漏斗的 8 gt 冷却在停摆期间**冻结**：停摆时剩 3 gt，恢复后第 3 刻才搬运，
+  而不是恢复当刻立即搬运。
+
+核心测试另有「停摆中保存/读取后冷却原样恢复」「未加载区块拒绝写入」
+「可 ticking 区块旁不能有未加载区块」三项。
+
+## 明确不实现
+
+- **不模拟票据传播时序**。区块状态是显式输入；本轮 fixture 里的切换时刻是从原版实测读出来的，
+  不是内核算出来的。依赖「什么时候会卸载」的机器仍然不受支持。
+- **不做自动加载**。写入未加载区块报错，而不是像原版那样把区块加载进来。
+- **随机刻**仍然关闭（见参考验证说明），本模型不改变这一点。
+- 除漏斗冷却外，其他方块实体计时（唱片机播放进度、感测体传播延迟、活塞运动进度）
+  的冻结**没有单独的原版差分**：它们由「事件顺延」这一条统一处理，
+  `shiftBlockEntityTimers` 只移动 `firstTick` / `candidateTick`，尚未逐项验证。
+- `SculkShriekerBlock.requiresAdjacentChunksToBeTicking` 这类跨区块条件未实现。
+- 编辑器界面尚未显示区块状态；目前只能通过工程文件与接口设置，用户在 UI 上看不到
+  「电路为什么停住」。这一条仍然开着。
