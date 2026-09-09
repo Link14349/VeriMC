@@ -327,8 +327,9 @@ private:
     bool canExtractStack(const InventorySlot& slot, BlockPos into) const;
     void updateBookshelfSlot(const InventorySlot& slot);
     std::vector<InventorySlot> containerSlots(BlockPos pos, bool ignoreBlockage = true) const;
-    // 器件层实体容器（issue #12）：声明在某一格里的运输/漏斗矿车。
+    // 器件层实体容器（issue #12）：声明在某一格里的运输/漏斗矿车、运输船/运输竹筏。
     // 原版 getEntityContainer 在候选里用 level.random.nextInt(size) 随机选一个，会消耗随机数。
+    // 运输船/竹筏分支目前**只有单元回归，尚无原版差分**。
     static constexpr std::size_t containerEntityLimit = 16;
     void stimulateContainerEntities(BlockPos pos, const Json& input);
     void validateContainerEntities(const Json& entities) const;

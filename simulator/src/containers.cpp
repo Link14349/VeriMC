@@ -1,5 +1,6 @@
 #include "simulator/simulator.hpp"
 #include <algorithm>
+#include <array>
 #include <cmath>
 #include <set>
 
@@ -129,14 +130,28 @@ std::vector<Simulator::InventorySlot> Simulator::containerSlots(BlockPos pos, bo
 }
 
 namespace {
-constexpr std::size_t chestMinecartSlots = 27, hopperMinecartSlots = 5;
+constexpr std::size_t chestMinecartSlots = 27, hopperMinecartSlots = 5, chestBoatSlots = 27;
+// 26.2 里满足 EntitySelector.CONTAINER_ENTITY_SELECTOR（`entity instanceof Container`）的实体
+// 只有两条继承线：AbstractMinecartContainer（MinecartChest / MinecartHopper）与
+// AbstractChestBoat（ChestBoat / ChestRaft）。木头种类各自是**独立的 EntityType**，
+// 共用同一个 Java 类，因此槽位数一致、注册 ID 不同，这里逐个列全。
+// Player / CopperGolem 实现的是 ContainerUser，AbstractHorse 只实现 HasCustomInventoryScreen，
+// 都不是 Container，故不是候选。
+const std::array<const char*, 10> chestBoatTypes{{
+    "oak_chest_boat", "spruce_chest_boat", "birch_chest_boat", "jungle_chest_boat", "acacia_chest_boat",
+    "dark_oak_chest_boat", "mangrove_chest_boat", "cherry_chest_boat", "pale_oak_chest_boat",
+    "bamboo_chest_raft"}};
 }
-// MinecartChest.getContainerSize()=27、MinecartHopper.getContainerSize()=5。
-// 当前协议只支持这两种矿车。原版选择器也接受运输船/运输竹筏，尚未建模。
+// MinecartChest.getContainerSize()=27、MinecartHopper.getContainerSize()=5、
+// AbstractChestBoat.getContainerSize()=27（ChestBoat 与 ChestRaft 都不覆写）。
+// 注意：运输船/竹筏这一支目前**只有单元回归，尚无原版差分**——既有的
+// java26_2EntityContainers 捕获里只出现矿车，船的分支需要一次新的捕获才算实测验证。
+// 与矿车同一个约定：船的运动、浮力、乘骑一律不建模，位置是输入，视作停在格中心。
 std::size_t Simulator::containerEntitySize(const std::string& type) {
     if (type == "chest_minecart") return chestMinecartSlots;
     if (type == "hopper_minecart") return hopperMinecartSlots;
-    throw std::invalid_argument("容器实体只支持运输矿车与漏斗矿车");
+    for (const auto* boat : chestBoatTypes) if (type == boat) return chestBoatSlots;
+    throw std::invalid_argument("容器实体只支持运输矿车、漏斗矿车与运输船/运输竹筏");
 }
 // 器件层实体容器输入：整体替换这一格声明的容器实体集合，空数组表示全部移除。
 // 不建模矿车的运动、碰撞与拾取，只声明「哪一格里有哪些容器实体、各装了什么」。

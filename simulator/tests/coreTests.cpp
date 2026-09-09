@@ -1095,6 +1095,125 @@ int main() {
         expect(rejects(cart, {{"containerEntities", many}}), "more container entities than the declared limit were accepted");
         expect(s.containerEntitiesJson(cart).empty(), "a rejected declaration still changed the cell");
     });
+    test("chest boats and rafts are container entities too", [&] {
+        // 26.2 的 EntitySelector.CONTAINER_ENTITY_SELECTOR 是 `entity instanceof Container && isAlive()`。
+        // 满足它的只有两条继承线：AbstractMinecartContainer（MinecartChest 27 槽 / MinecartHopper 5 槽）
+        // 与 AbstractChestBoat（ChestBoat / ChestRaft，getContainerSize()=27，两个子类都不覆写）。
+        // 木头种类各自是独立的 EntityType（EntityTypeIds.*_CHEST_BOAT / BAMBOO_CHEST_RAFT），共 10 个 ID。
+        // 注意：**船这一支尚无原版差分**，下面全是内核内部一致性回归。
+        // 船的运动/浮力/乘骑一律不建模，与矿车同一个约定：位置是输入，停在格中心。
+        auto stone = [](int slot, int count) { return Json{{"slot", slot}, {"item", "minecraft:stone"}, {"count", count}}; };
+        Simulator s(r); floor(s);
+        const BlockPos cell{0, 2, 0};
+        auto rejects = [&](BlockPos pos, const Json& input) {
+            bool threw = false; try { s.stimulate(pos, input); } catch (...) { threw = true; }
+            return threw;
+        };
+        auto declares = [&](const std::string& type, int slot) {
+            return Json{{"containerEntities", Json::array({{{"type", type}, {"inventory", Json::array({stone(slot, 1)})}}})}};
+        };
+        // 槽位数逐个断言：最后一格可用、再往后一格拒绝，这样就不必把私有的
+        // containerEntitySize 暴露出来也能钉死每个类型的 getContainerSize()。
+        const std::vector<std::pair<std::string, int>> sizes{
+            {"chest_minecart", 27}, {"hopper_minecart", 5},
+            {"oak_chest_boat", 27}, {"spruce_chest_boat", 27}, {"birch_chest_boat", 27}, {"jungle_chest_boat", 27},
+            {"acacia_chest_boat", 27}, {"dark_oak_chest_boat", 27}, {"mangrove_chest_boat", 27},
+            {"cherry_chest_boat", 27}, {"pale_oak_chest_boat", 27}, {"bamboo_chest_raft", 27}};
+        for (const auto& [type, size] : sizes) {
+            s.stimulate(cell, declares(type, size - 1));
+            expect(s.containerEntitiesJson(cell).at(0).at("inventory") == Json::array({stone(size - 1, 1)}),
+                   type + " lost its last slot");
+            expect(rejects(cell, declares(type, size)), type + " accepted a slot past " + std::to_string(size - 1));
+            expect(s.containerEntitiesJson(cell).at(0).at("type") == type, "a rejected declaration changed " + type);
+        }
+        // 拒绝路径保持严格：普通船/竹筏不带箱子（不是 Container），驴/骡/羊驼只有
+        // HasCustomInventoryScreen，玩家与铜傀儡实现的是 ContainerUser。类名不是注册 ID，也拒。
+        for (const char* bad : {"oak_boat", "bamboo_raft", "donkey", "mule", "llama", "player", "copper_golem",
+                                "minecart", "furnace_minecart", "tnt_minecart", "chest_boat", "chest_raft",
+                                "minecraft:oak_chest_boat", "warped_chest_boat", ""})
+            expect(rejects(cell, {{"containerEntities", Json::array({{{"type", bad}, {"inventory", Json::array()}}})}}),
+                   std::string("a non-container entity type was accepted: ") + bad);
+        s.stimulate(cell, {{"containerEntities", Json::array({{{"type", "bamboo_chest_raft"}, {"inventory", Json::array({stone(26, 1)})}}})}});
+        // 快照往返：工程与检查点都要带上船的声明，破坏后的快照要被拒。
+        s.stimulate(cell, {{"containerEntities", Json::array({{{"type", "cherry_chest_boat"}, {"inventory", Json::array({stone(0, 3), stone(26, 1)})}}})}});
+        for (bool checkpoint : {false, true}) {
+            auto saved = s.saveProject("boats", checkpoint); Simulator restored(r); restored.loadProject(saved);
+            expect(restored.containerEntitiesJson(cell) == s.containerEntitiesJson(cell),
+                   std::string(checkpoint ? "checkpoint" : "project") + " lost the chest boat declaration");
+        }
+        auto broken = s.saveProject("boats", true);
+        for (auto& row : broken["blockData"]) if (row["values"].contains("containerEntities")) row["values"]["containerEntities"].at(0)["type"] = "oak_boat";
+        Simulator target(r); bool threw = false;
+        try { target.loadProject(broken); } catch (...) { threw = true; }
+        expect(threw, "a snapshot with a non-container boat was accepted");
+
+        // 漏斗从运输船拉取，与从运输矿车拉取逐条一致（同一条 getEntityContainer 路径）。
+        Simulator pull(r); floor(pull);
+        const BlockPos puller{0, 1, 0}, above{0, 2, 0};
+        pull.place(puller, r.state("hopper", {{"facing", "down"}}));
+        pull.stimulate(above, {{"containerEntities", Json::array({{{"type", "oak_chest_boat"}, {"inventory", Json::array({stone(0, 2)})}}})}});
+        const auto beforeDraw = pull.randomState();
+        pull.advanceTo(4);
+        expect(pull.randomState() != beforeDraw, "a single chest boat candidate consumed no random draw");
+        expect(pull.inventoryJson(puller, false) == Json::array({{{"slot", 0}, {"item", "minecraft:stone"}, {"count", 1}}}),
+               "the hopper did not pull from the chest boat: " + pull.inventoryJson(puller, false).dump());
+        expect(pull.containerEntitiesJson(above).at(0).at("inventory") == Json::array({stone(0, 1)}),
+               "the chest boat slot was not decremented");
+        pull.advanceTo(20);
+        expect(pull.containerEntitiesJson(above).at(0).at("inventory").empty(), "the second pull did not empty the chest boat");
+        // 向运输船推入：船不是方块实体，写入不通知比较器；27 槽从 slot 0 起填。
+        Simulator push(r); floor(push);
+        const BlockPos pusher{0, 1, 0}, front{1, 1, 0};
+        push.place(pusher, r.state("hopper", {{"facing", "east"}}));
+        push.stimulate(front, {{"containerEntities", Json::array({{{"type", "bamboo_chest_raft"}, {"inventory", Json::array()}}})}});
+        push.stimulate(pusher, {{"inventory", Json::array({stone(0, 1)})}});
+        push.advanceTo(4);
+        expect(push.inventoryJson(pusher, false).empty(), "the hopper kept the item instead of pushing it into the raft");
+        expect(push.containerEntitiesJson(front).at(0).at("inventory") == Json::array({stone(0, 1)}),
+               "the chest raft did not receive the pushed item: " + push.containerEntitiesJson(front).dump());
+        // 船装满 27 槽时推不进去，但候选非空仍然每刻抽一次（tryMoveItems 失败不设冷却）。
+        auto draws = [](const Simulator& world) {
+            return std::stoull(world.saveProject("draws", true).at("randomSource").at("draws").get<std::string>());
+        };
+        Simulator blocked(r); floor(blocked);
+        blocked.place(pusher, r.state("hopper", {{"facing", "east"}}));
+        Json full = Json::array();
+        for (int slot = 0; slot < 27; ++slot) full.push_back(stone(slot, 64));
+        blocked.stimulate(front, {{"containerEntities", Json::array({{{"type", "spruce_chest_boat"}, {"inventory", full}}})}});
+        blocked.stimulate(pusher, {{"inventory", Json::array({{{"slot", 0}, {"item", "minecraft:dirt"}, {"count", 1}}})}});
+        blocked.advanceTo(10); const auto atTen = draws(blocked);
+        blocked.advanceTo(20);
+        expect(draws(blocked) - atTen == 10, "a hopper blocked by a full chest boat stopped drawing: "
+               + std::to_string(draws(blocked) - atTen) + " draws over 10 ticks");
+        expect(blocked.containerEntitiesJson(front).at(0).at("inventory").size() == 27, "the full chest boat changed");
+        // 船与矿车混放：候选集合按声明顺序，nextInt(2) 决定这一刻搬谁；
+        // 同一格里的两个候选与「两辆矿车」那组走完全同一条代码路径。
+        Simulator mixed(r); floor(mixed);
+        mixed.place(puller, r.state("hopper", {{"facing", "down"}}));
+        mixed.stimulate(above, {{"containerEntities", Json::array({
+            {{"type", "chest_minecart"}, {"inventory", Json::array({stone(0, 1)})}},
+            {{"type", "oak_chest_boat"}, {"inventory", Json::array({{{"slot", 0}, {"item", "minecraft:dirt"}, {"count", 1}}})}}})}});
+        expect(mixed.containerEntitiesJson(above).size() == 2, "the mixed cart/boat declaration was not stored");
+        // 与不带船的两候选场景相比，抽取序列与搬运结果必须逐刻完全一致。
+        Simulator carts(r); floor(carts);
+        carts.place(puller, r.state("hopper", {{"facing", "down"}}));
+        carts.stimulate(above, {{"containerEntities", Json::array({
+            {{"type", "chest_minecart"}, {"inventory", Json::array({stone(0, 1)})}},
+            {{"type", "chest_minecart"}, {"inventory", Json::array({{{"slot", 0}, {"item", "minecraft:dirt"}, {"count", 1}}})}}})}});
+        for (int tick = 1; tick <= 40; ++tick) {
+            mixed.advanceTo(static_cast<Tick>(tick));
+            carts.advanceTo(static_cast<Tick>(tick));
+            expect(mixed.randomState() == carts.randomState(),
+                   "a chest boat candidate drew differently from a chest minecart at tick " + std::to_string(tick));
+            expect(mixed.inventoryJson(puller, false) == carts.inventoryJson(puller, false),
+                   "a chest boat candidate transferred differently at tick " + std::to_string(tick));
+        }
+        expect(mixed.inventoryJson(puller, false).size() == 2, "the mixed candidates were not both drained: "
+               + mixed.inventoryJson(puller, false).dump());
+        for (int entity = 0; entity < 2; ++entity)
+            expect(mixed.containerEntitiesJson(above).at(static_cast<std::size_t>(entity)).at("inventory").empty(),
+                   "candidate " + std::to_string(entity) + " kept its item");
+    });
     test("hoppers pull from and push into declared container minecarts", [&] {
         auto stone = [](int slot, int count) { return Json{{"slot", slot}, {"item", "minecraft:stone"}, {"count", count}}; };
         // 拉取：上方没有方块容器，改用实体容器；候选只有一个时原版仍然调用 nextInt(1)。
