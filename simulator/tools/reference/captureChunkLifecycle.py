@@ -13,7 +13,10 @@ Each chunk holds the three kinds of pending work the acceptance asks for:
 
 - a repeater chain (block scheduled ticks),
 - a piston (block events),
-- a hopper feeding a chest (block entities).
+- a hopper feeding a chest (block entities),
+
+plus two more pistons whose *movement* is still running when the chunk freezes, so the frozen thing
+is the `moving_piston` block entity's progress counter rather than a queue entry.
 
 The kernel does not model ticket propagation, so the scenario declares the chunk state as explicit
 input. The declaration is not assumed: the capture records vanilla's own `shouldTickBlocksAt`,
@@ -79,6 +82,34 @@ def group(bx, bz):
     commands.append({'tick': 4, 'pos': [bx + 12, 1, bz + 8],
                      'stimulus': {'gameEvent': 'minecraft:block_place'}})
     watch.extend([[bx + 8, 1, bz + 8], [bx + 9, 1, bz + 8]])
+    # Two pistons that are still *in motion* when the chunk stops ticking. The block event has
+    # already run, so what is left pending is the `moving_piston` block entity's own progress,
+    # which advances 0.5 per block entity tick and resolves on the tick after it reaches 1.
+    # Driving at 4 gt leaves progress at 1.0 when the chunk freezes, driving at 5 gt leaves it at
+    # 0.5, so the two resolve one tick apart once the chunk resumes.
+    movingPiston(bx, bz, 1, 'east', 1, 4)
+    movingPiston(bx, bz, 14, 'west', -1, 5)
+
+
+def movingPiston(bx, bz, x, facing, step, driveTick):
+    """A piston pushing a redstone block into a cell next to a lamp, driven at `driveTick`.
+
+    `moving_piston` conducts nothing, so the lamp only lights when the movement actually finishes:
+    the lit tick is a direct readout of when the progress counter reached its end. `step` is the
+    push direction along x (+1 east, -1 west); the piston sits at `x`, the pushed redstone block at
+    `x + step`, the destination cell at `x + 2 * step` and the lamp at `x + 3 * step`.
+
+    Row z + 1 is chosen so every piston base — the position vanilla emits BLOCK_ACTIVATE at when it
+    extends — is more than 8 blocks from the sculk sensor at (8, 1, 8) and cannot disturb it.
+    """
+    put(0, (bx + x, 1, bz + 1), 'piston', facing=facing)
+    put(0, (bx + x + step, 1, bz + 1), 'redstone_block')
+    put(0, (bx + x + 3 * step, 1, bz + 1), 'redstone_lamp')
+    # The driver sits behind the piston, outside the stone floor, and is never taken away: the only
+    # thing this piston still owes after the block event is the movement itself.
+    put(driveTick, (bx + x - step, 1, bz + 1), 'redstone_block')
+    watch.extend([[bx + x, 1, bz + 1], [bx + x + step, 1, bz + 1],
+                  [bx + x + 2 * step, 1, bz + 1], [bx + x + 3 * step, 1, bz + 1]])
 
 
 def drive(bx, bz, tick, on):
