@@ -34,5 +34,9 @@
     "minecraft:sulfur_wall",
     "minecraft:tuff_brick_wall",
     "minecraft:tuff_wall"
+  ],
+  "does_not_block_hoppers": [
+    "minecraft:bee_nest",
+    "minecraft:beehive"
   ]
 }

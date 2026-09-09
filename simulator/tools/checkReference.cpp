@@ -72,6 +72,8 @@ int main(int argc, char** argv) {
                     compare("states", frame.at("states").at(index), simulation.world.get(pos));
                     if (frame.at("analogs").at(index) != -1) compare("analogs", frame.at("analogs").at(index), simulation.analogOutput(pos));
                     if (frame.contains("inventories")) compare("inventories", frame.at("inventories").at(index), simulation.inventoryJson(pos, false));
+                    if (frame.contains("groundItems") && !frame.at("groundItems").at(index).is_null())
+                        compare("groundItems", frame.at("groundItems").at(index), simulation.suckableItems(pos));
                     if (frame.contains("bells")) compare("bells", frame.at("bells").at(index), simulation.inspect(pos)["runtime"].value("ringing", false));
                     if (frame.contains("jukeboxes") && !frame.at("jukeboxes").at(index).is_null()) {
                         const auto actual = simulation.inspect(pos).at("jukebox");

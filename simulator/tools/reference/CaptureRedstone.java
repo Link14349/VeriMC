@@ -211,6 +211,25 @@ public class CaptureRedstone extends TestFunctionLoader {
                 for (var direction : touched) level.updateNeighbourForOutputSignal(pos.relative(direction), Blocks.AIR);
                 return;
             }
+            // 器件层实体物品输入：在漏斗吸取范围里放置真实的掉落物实体。
+            // 速度清零、关闭重力，这与压力板/绊线的接触输入是同一个约定：不模拟运动轨迹。
+            if (input.has("groundItems")) {
+                for (var existing : occupants.getOrDefault(pos, List.of())) existing.discard();
+                var spawned = new ArrayList<Entity>(); occupants.put(pos, spawned);
+                for (var value : input.getAsJsonArray("groundItems")) {
+                    var row = value.getAsJsonObject();
+                    var item = BuiltInRegistries.ITEM.getValue(Identifier.parse(row.get("item").getAsString()));
+                    var stack = new ItemStack(item, row.get("count").getAsInt());
+                    double x = row.has("x") ? row.get("x").getAsDouble() : 0.5;
+                    double y = row.has("y") ? row.get("y").getAsDouble() : 1.0;
+                    double z = row.has("z") ? row.get("z").getAsDouble() : 0.5;
+                    var drop = new ItemEntity(level, pos.getX() + x, pos.getY() + y, pos.getZ() + z, stack);
+                    drop.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+                    drop.setNoGravity(true);
+                    level.addFreshEntity(drop); spawned.add(drop);
+                }
+                return;
+            }
             if(input.has("compostItem")) {
                 var item=BuiltInRegistries.ITEM.get(Identifier.parse(input.get("compostItem").getAsString())).orElseThrow().value();
                 ComposterBlock.insertItem(null,state,level,new ItemStack(item),pos);return;
@@ -473,6 +492,24 @@ public class CaptureRedstone extends TestFunctionLoader {
                     inventories.add(inventory);
                 }
                 frame.add("states", states); frame.add("analogs", analogs); frame.add("inventories", inventories); frames.add(frame);
+                if (scenario.has("watchGroundItems")) {
+                    // 直接调用原版 HopperBlockEntity.getItemsAtAndAbove，吸取范围判据不是我们自己写的。
+                    JsonArray ground = new JsonArray();
+                    for (var value : scenario.getAsJsonArray("watch")) {
+                        var absolute = origin.offset(pos(value.getAsJsonArray()));
+                        if (level.getBlockEntity(absolute) instanceof net.minecraft.world.level.block.entity.HopperBlockEntity hopper) {
+                            JsonArray drops = new JsonArray();
+                            for (var drop : net.minecraft.world.level.block.entity.HopperBlockEntity.getItemsAtAndAbove(level, hopper)) {
+                                var row = new JsonObject();
+                                row.addProperty("item", BuiltInRegistries.ITEM.getKey(drop.getItem().getItem()).toString());
+                                row.addProperty("count", drop.getItem().getCount());
+                                drops.add(row);
+                            }
+                            ground.add(drops);
+                        } else ground.add(JsonNull.INSTANCE);
+                    }
+                    frame.add("groundItems", ground);
+                }
                 if(scenario.has("watchBells"))frame.add("bells",bells);
                 if(scenario.has("watchJukeboxes"))frame.add("jukeboxes",jukeboxes);
                 if (tick == end) {

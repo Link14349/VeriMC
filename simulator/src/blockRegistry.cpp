@@ -76,8 +76,9 @@ BlockRegistry::BlockRegistry(const std::string& path) {
     if (!tagFile) throw std::runtime_error("找不到方块标签 blockTags.json");
     const auto tagData = Json::parse(tagFile);
     if (tagData.at("version") != "26.2") throw std::runtime_error("Block tag registry version mismatch");
-    std::unordered_set<std::string> wallNames;
+    std::unordered_set<std::string> wallNames, hopperTransparentNames;
     for (const auto& name : tagData.at("walls")) wallNames.insert(name.get<std::string>());
+    for (const auto& name : tagData.at("does_not_block_hoppers")) hopperTransparentNames.insert(name.get<std::string>());
     const Json data = Json::parse(file);
     std::ifstream noteFile(std::filesystem::path(path).parent_path()/"noteRules.json");
     if(!noteFile)throw std::runtime_error("找不到音符盒规则 noteRules.json");
@@ -92,6 +93,7 @@ BlockRegistry::BlockRegistry(const std::string& path) {
         typeInfo.defaultState = b.at("defaultState"); typeInfo.firstState = b.at("states")[0].at("id");
         typeInfo.stairs = b.at("stairs");
         typeInfo.wall = wallNames.contains(typeInfo.name);
+        typeInfo.doesNotBlockHoppers = hopperTransparentNames.contains(typeInfo.name);
         typeInfo.device = classify(typeInfo.name, typeInfo.className);
         typeInfo.instrument=instrumentId(noteData.at("blocks").at(typeInfo.name));
         for(const auto& name:vibrationData.at("occludes_vibration_signals")) if(name==typeInfo.name) typeInfo.occludesVibrations=true;

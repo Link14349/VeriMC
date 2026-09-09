@@ -192,7 +192,7 @@ int main() {
         try { restored.loadProject(invalid); } catch (...) { threw = true; }
         expect(threw && before == restored.saveProject("before", true), "invalid batch import changed world");
     });
-    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers", "java26_2Hoppers", "java26_2Torches", "java26_2Rails", "java26_2TickBatches", "java26_2Tripwire", "java26_2Buttons", "java26_2Droppers", "java26_2Targets", "java26_2CopperChests", "java26_2Bookshelves", "java26_2Pots", "java26_2Vibrations", "java26_2DeviceVibrations", "java26_2Notes", "java26_2Bells", "java26_2Jukeboxes", "java26_2JukeboxHoppers", "java26_2Composters", "java26_2WireGeometry", "java26_2PistonPushability", "java26_2DaylightVibration", "java26_2StairShapes", "java26_2RailNotificationSource", "java26_2PistonRemovalCallback", "java26_2DiodeSupportBreak", "java26_2ObserverRemoval", "java26_2PistonLandingShape", "java26_2WireShapeToggle", "java26_2RemovalNotifySource", "java26_2RepeaterLockRefresh", "java26_2ItemFrameComparator", "java26_2UpdateTrace", "java26_2MachineMatrix", "java26_2SupportDirection", "java26_2FenceGateInWall", "java26_2UpdateSource"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
+    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers", "java26_2Hoppers", "java26_2Torches", "java26_2Rails", "java26_2TickBatches", "java26_2Tripwire", "java26_2Buttons", "java26_2Droppers", "java26_2Targets", "java26_2CopperChests", "java26_2Bookshelves", "java26_2Pots", "java26_2Vibrations", "java26_2DeviceVibrations", "java26_2Notes", "java26_2Bells", "java26_2Jukeboxes", "java26_2JukeboxHoppers", "java26_2Composters", "java26_2WireGeometry", "java26_2PistonPushability", "java26_2DaylightVibration", "java26_2StairShapes", "java26_2RailNotificationSource", "java26_2PistonRemovalCallback", "java26_2DiodeSupportBreak", "java26_2ObserverRemoval", "java26_2PistonLandingShape", "java26_2WireShapeToggle", "java26_2RemovalNotifySource", "java26_2RepeaterLockRefresh", "java26_2ItemFrameComparator", "java26_2UpdateTrace", "java26_2MachineMatrix", "java26_2SupportDirection", "java26_2FenceGateInWall", "java26_2UpdateSource", "java26_2HopperPickup"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
         std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/../tests/fixtures/" + fixtureName + ".json"); expect(static_cast<bool>(file), "missing vanilla reference fixture");
         auto fixture = Json::parse(file); auto origin = fixture["origin"].get<BlockPos>(); Simulator s(r);
         const bool tracing = fixture.contains("updateTrace");
@@ -216,6 +216,8 @@ int main() {
                 auto p = absolute(fixture["watch"][i]); auto expected = frame["states"][i].get<StateId>();
                 expect(s.world.get(p) == expected, "tick " + std::to_string(tick) + " position " + fixture["watch"][i].dump() + " expected " + r.describe(expected).dump() + " got " + r.describe(s.world.get(p)).dump());
                 if (frame["analogs"][i] != -1) expect(s.analogOutput(p) == frame["analogs"][i].get<int>(), "analog mismatch at " + std::to_string(tick) + " " + fixture["watch"][i].dump());
+                if(frame.contains("groundItems") && !frame["groundItems"][i].is_null())
+                    expect(s.suckableItems(p)==frame["groundItems"][i],"ground items differ at "+std::to_string(tick)+" "+fixture["watch"][i].dump()+" expected "+frame["groundItems"][i].dump()+" got "+s.suckableItems(p).dump());
                 if(frame.contains("bells"))expect(s.inspect(p)["runtime"].value("ringing",false)==frame["bells"][i].get<bool>(),"bell shaking differs at "+std::to_string(tick)+" "+fixture["watch"][i].dump());
                 if(frame.contains("jukeboxes") && !frame["jukeboxes"][i].is_null()) {
                     auto player=s.inspect(p)["jukebox"];const auto& expectedPlayer=frame["jukeboxes"][i];
@@ -762,6 +764,34 @@ int main() {
         expect(rejects({{"itemFrames", Json::array()}, {"viewers", 1}}), "mixed stimulus accepted");
         bool threw = false; try { s.stimulate({5, 1, 0}, {{"itemFrames", Json::array({{{"facing", "east"}, {"rotation", 0}, {"hasItem", false}}})}}); } catch (...) { threw = true; }
         expect(threw, "item frame accepted on an empty cell");
+    });
+    test("hopper ground item input validation, range and checkpoint", [&] {
+        Simulator s(r); floor(s);
+        const BlockPos hopper{0, 1, 0};
+        s.place(hopper, r.state("hopper", {{"facing", "down"}}));
+        // 在吸取体积里、但不与漏斗自己那一格重叠：只走方块实体阶段的 suckInItems。
+        s.stimulate(hopper, {{"groundItems", Json::array({{{"item", "minecraft:stone"}, {"count", 3}, {"y", 1.2}}})}});
+        expect(s.suckableItems(hopper).size() == 1, "declared item is not in the suck volume");
+        s.advanceTo(4);
+        expect(s.inventoryJson(hopper, false).size() == 1 && s.suckableItems(hopper).empty(), "hopper did not take the dropped stack");
+        auto saved = s.saveProject("drops", true); Simulator restored(r); restored.loadProject(saved);
+        expect(restored.inventoryJson(hopper, false) == s.inventoryJson(hopper, false), "hopper inventory lost across checkpoint");
+        // 声明集合整体替换，坐标超出体积的条目不参与吸取但仍然保留在输入里。
+        s.stimulate(hopper, {{"groundItems", Json::array({{{"item", "minecraft:dirt"}, {"count", 1}, {"y", 2.5}}})}});
+        expect(s.suckableItems(hopper).empty(), "an item above the suck volume was reported as suckable");
+        auto savedOut = s.saveProject("drops", true); Simulator keptOut(r); keptOut.loadProject(savedOut);
+        expect(keptOut.suckableItems(hopper).empty(), "out-of-range declaration changed across checkpoint");
+        auto rejects = [&](BlockPos pos, const Json& input) {
+            bool threw = false; try { s.stimulate(pos, input); } catch (...) { threw = true; }
+            return threw;
+        };
+        expect(rejects(hopper, {{"groundItems", Json::array({{{"item", "minecraft:stone"}, {"count", 0}}})}}), "zero count accepted");
+        expect(rejects(hopper, {{"groundItems", Json::array({{{"item", "minecraft:stone"}, {"count", 65}}})}}), "over-stack count accepted");
+        expect(rejects(hopper, {{"groundItems", Json::array({{{"item", "minecraft:stone"}, {"count", 1}, {"w", 1}}})}}), "unknown drop field accepted");
+        expect(rejects(hopper, {{"groundItems", Json::array({{{"item", "minecraft:stone"}, {"count", 1}, {"y", 9.0}}})}}), "far away coordinate accepted");
+        expect(rejects(hopper, {{"groundItems", Json::array()}, {"viewers", 1}}), "mixed drop stimulus accepted");
+        s.place({3, 1, 0}, r.state("chest"));
+        expect(rejects({3, 1, 0}, {{"groundItems", Json::array({{{"item", "minecraft:stone"}, {"count", 1}}})}}), "drops accepted on a chest");
     });
     test("full 26.2 sine table and daylight index boundaries", [&] {
         std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/../tests/fixtures/java26_2SineTable.json");

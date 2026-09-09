@@ -964,13 +964,13 @@
       "trade_rebalance",
       "vanilla"
     ],
-    "gameTime": 7,
-    "clockTicks": 7
+    "gameTime": 11,
+    "clockTicks": 11
   },
   "origin": [
-    -8784425,
+    -4988226,
     -58,
-    -11344238
+    -14248980
   ],
   "frames": [
     {
@@ -9363,6 +9363,60 @@
     [
       "m",
       6,
+      3,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      6,
+      2,
+      5,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      5,
+      2,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      6,
+      1,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      6,
+      2,
+      7,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      7,
+      2,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      6,
       2,
       6,
       null,
@@ -9434,33 +9488,6 @@
       6,
       "down",
       2
-    ],
-    [
-      "m",
-      7,
-      3,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      7,
-      2,
-      5,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      6,
-      2,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
     ],
     [
       "m",
@@ -9563,6 +9590,33 @@
       6,
       "down",
       2
+    ],
+    [
+      "m",
+      8,
+      1,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      8,
+      2,
+      7,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      9,
+      2,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
     ],
     [
       "m",
@@ -9642,6 +9696,15 @@
     [
       "m",
       9,
+      2,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      9,
       3,
       6,
       null,
@@ -9695,15 +9758,6 @@
     ],
     [
       "m",
-      9,
-      2,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
       8,
       2,
       6,
@@ -9740,33 +9794,6 @@
     ],
     [
       "m",
-      8,
-      1,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      8,
-      2,
-      7,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      9,
-      2,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
       7,
       2,
       6,
@@ -9776,16 +9803,7 @@
     ],
     [
       "m",
-      6,
-      2,
-      6,
-      null,
-      2,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      6,
+      7,
       3,
       6,
       null,
@@ -9794,7 +9812,7 @@
     ],
     [
       "m",
-      6,
+      7,
       2,
       5,
       null,
@@ -9803,7 +9821,7 @@
     ],
     [
       "m",
-      5,
+      6,
       2,
       6,
       null,
@@ -9813,28 +9831,10 @@
     [
       "m",
       6,
-      1,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      6,
-      2,
-      7,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      7,
       2,
       6,
       null,
-      0,
+      2,
       "minecraft:redstone_wire"
     ],
     [
@@ -10007,33 +10007,6 @@
     [
       "m",
       11,
-      3,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      11,
-      2,
-      5,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      10,
-      2,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      11,
       1,
       6,
       null,
@@ -10061,6 +10034,33 @@
     [
       "m",
       11,
+      2,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      11,
+      3,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      11,
+      2,
+      5,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      10,
       2,
       6,
       null,
@@ -10323,219 +10323,6 @@
     [
       "m",
       6,
-      2,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "s",
-      6,
-      2,
-      6,
-      7,
-      2,
-      6,
-      "east",
-      2
-    ],
-    [
-      "s",
-      8,
-      2,
-      6,
-      7,
-      2,
-      6,
-      "west",
-      2
-    ],
-    [
-      "s",
-      7,
-      2,
-      5,
-      7,
-      2,
-      6,
-      "south",
-      2
-    ],
-    [
-      "s",
-      7,
-      2,
-      7,
-      7,
-      2,
-      6,
-      "north",
-      2
-    ],
-    [
-      "s",
-      7,
-      1,
-      6,
-      7,
-      2,
-      6,
-      "up",
-      2
-    ],
-    [
-      "s",
-      7,
-      3,
-      6,
-      7,
-      2,
-      6,
-      "down",
-      2
-    ],
-    [
-      "m",
-      7,
-      3,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      7,
-      2,
-      5,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      6,
-      2,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      7,
-      1,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      7,
-      2,
-      7,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      8,
-      2,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      7,
-      2,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "s",
-      5,
-      2,
-      6,
-      6,
-      2,
-      6,
-      "east",
-      2
-    ],
-    [
-      "s",
-      7,
-      2,
-      6,
-      6,
-      2,
-      6,
-      "west",
-      2
-    ],
-    [
-      "s",
-      6,
-      2,
-      5,
-      6,
-      2,
-      6,
-      "south",
-      2
-    ],
-    [
-      "s",
-      6,
-      2,
-      7,
-      6,
-      2,
-      6,
-      "north",
-      2
-    ],
-    [
-      "s",
-      6,
-      1,
-      6,
-      6,
-      2,
-      6,
-      "up",
-      2
-    ],
-    [
-      "s",
-      6,
-      3,
-      6,
-      6,
-      2,
-      6,
-      "down",
-      2
-    ],
-    [
-      "m",
-      6,
-      2,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      6,
       3,
       6,
       null,
@@ -10586,636 +10373,6 @@
       null,
       0,
       "minecraft:redstone_wire"
-    ],
-    [
-      "s",
-      7,
-      2,
-      6,
-      8,
-      2,
-      6,
-      "east",
-      2
-    ],
-    [
-      "s",
-      9,
-      2,
-      6,
-      8,
-      2,
-      6,
-      "west",
-      2
-    ],
-    [
-      "s",
-      8,
-      2,
-      5,
-      8,
-      2,
-      6,
-      "south",
-      2
-    ],
-    [
-      "s",
-      8,
-      2,
-      7,
-      8,
-      2,
-      6,
-      "north",
-      2
-    ],
-    [
-      "s",
-      8,
-      1,
-      6,
-      8,
-      2,
-      6,
-      "up",
-      2
-    ],
-    [
-      "s",
-      8,
-      3,
-      6,
-      8,
-      2,
-      6,
-      "down",
-      2
-    ],
-    [
-      "m",
-      8,
-      2,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "s",
-      6,
-      2,
-      6,
-      7,
-      2,
-      6,
-      "east",
-      2
-    ],
-    [
-      "s",
-      8,
-      2,
-      6,
-      7,
-      2,
-      6,
-      "west",
-      2
-    ],
-    [
-      "s",
-      7,
-      2,
-      5,
-      7,
-      2,
-      6,
-      "south",
-      2
-    ],
-    [
-      "s",
-      7,
-      2,
-      7,
-      7,
-      2,
-      6,
-      "north",
-      2
-    ],
-    [
-      "s",
-      7,
-      1,
-      6,
-      7,
-      2,
-      6,
-      "up",
-      2
-    ],
-    [
-      "s",
-      7,
-      3,
-      6,
-      7,
-      2,
-      6,
-      "down",
-      2
-    ],
-    [
-      "m",
-      7,
-      3,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      7,
-      2,
-      5,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      6,
-      2,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      7,
-      1,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      7,
-      2,
-      7,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      8,
-      2,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "s",
-      8,
-      2,
-      6,
-      9,
-      2,
-      6,
-      "east",
-      2
-    ],
-    [
-      "s",
-      10,
-      2,
-      6,
-      9,
-      2,
-      6,
-      "west",
-      2
-    ],
-    [
-      "s",
-      9,
-      2,
-      5,
-      9,
-      2,
-      6,
-      "south",
-      2
-    ],
-    [
-      "s",
-      9,
-      2,
-      7,
-      9,
-      2,
-      6,
-      "north",
-      2
-    ],
-    [
-      "s",
-      9,
-      1,
-      6,
-      9,
-      2,
-      6,
-      "up",
-      2
-    ],
-    [
-      "s",
-      9,
-      3,
-      6,
-      9,
-      2,
-      6,
-      "down",
-      2
-    ],
-    [
-      "m",
-      9,
-      3,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      9,
-      2,
-      5,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      8,
-      2,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      9,
-      1,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      9,
-      2,
-      7,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      10,
-      2,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      9,
-      2,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "s",
-      7,
-      2,
-      6,
-      8,
-      2,
-      6,
-      "east",
-      2
-    ],
-    [
-      "s",
-      9,
-      2,
-      6,
-      8,
-      2,
-      6,
-      "west",
-      2
-    ],
-    [
-      "s",
-      8,
-      2,
-      5,
-      8,
-      2,
-      6,
-      "south",
-      2
-    ],
-    [
-      "s",
-      8,
-      2,
-      7,
-      8,
-      2,
-      6,
-      "north",
-      2
-    ],
-    [
-      "s",
-      8,
-      1,
-      6,
-      8,
-      2,
-      6,
-      "up",
-      2
-    ],
-    [
-      "s",
-      8,
-      3,
-      6,
-      8,
-      2,
-      6,
-      "down",
-      2
-    ],
-    [
-      "m",
-      8,
-      2,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "s",
-      8,
-      2,
-      6,
-      9,
-      2,
-      6,
-      "east",
-      2
-    ],
-    [
-      "s",
-      10,
-      2,
-      6,
-      9,
-      2,
-      6,
-      "west",
-      2
-    ],
-    [
-      "s",
-      9,
-      2,
-      5,
-      9,
-      2,
-      6,
-      "south",
-      2
-    ],
-    [
-      "s",
-      9,
-      2,
-      7,
-      9,
-      2,
-      6,
-      "north",
-      2
-    ],
-    [
-      "s",
-      9,
-      1,
-      6,
-      9,
-      2,
-      6,
-      "up",
-      2
-    ],
-    [
-      "s",
-      9,
-      3,
-      6,
-      9,
-      2,
-      6,
-      "down",
-      2
-    ],
-    [
-      "m",
-      9,
-      3,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      9,
-      2,
-      5,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      8,
-      2,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      9,
-      1,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      9,
-      2,
-      7,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      10,
-      2,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      9,
-      2,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      8,
-      2,
-      6,
-      null,
-      2,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      8,
-      3,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      8,
-      2,
-      5,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      7,
-      2,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "s",
-      5,
-      2,
-      6,
-      6,
-      2,
-      6,
-      "east",
-      2
-    ],
-    [
-      "s",
-      7,
-      2,
-      6,
-      6,
-      2,
-      6,
-      "west",
-      2
-    ],
-    [
-      "s",
-      6,
-      2,
-      5,
-      6,
-      2,
-      6,
-      "south",
-      2
-    ],
-    [
-      "s",
-      6,
-      2,
-      7,
-      6,
-      2,
-      6,
-      "north",
-      2
-    ],
-    [
-      "s",
-      6,
-      1,
-      6,
-      6,
-      2,
-      6,
-      "up",
-      2
-    ],
-    [
-      "s",
-      6,
-      3,
-      6,
-      6,
-      2,
-      6,
-      "down",
-      2
     ],
     [
       "m",
@@ -11291,33 +10448,6 @@
       6,
       "down",
       2
-    ],
-    [
-      "m",
-      7,
-      3,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      7,
-      2,
-      5,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      6,
-      2,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
     ],
     [
       "m",
@@ -11420,15 +10550,6 @@
       6,
       "down",
       2
-    ],
-    [
-      "m",
-      6,
-      2,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
     ],
     [
       "m",
@@ -11553,6 +10674,33 @@
     [
       "m",
       8,
+      1,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      8,
+      2,
+      7,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      9,
+      2,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      8,
       2,
       6,
       null,
@@ -11624,33 +10772,6 @@
       6,
       "down",
       2
-    ],
-    [
-      "m",
-      7,
-      3,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      7,
-      2,
-      5,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      6,
-      2,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
     ],
     [
       "m",
@@ -11748,60 +10869,6 @@
     [
       "m",
       9,
-      3,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      9,
-      2,
-      5,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      8,
-      2,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      9,
-      1,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      9,
-      2,
-      7,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      10,
-      2,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      9,
       2,
       6,
       null,
@@ -11873,6 +10940,33 @@
       6,
       "down",
       2
+    ],
+    [
+      "m",
+      8,
+      1,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      8,
+      2,
+      7,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      9,
+      2,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
     ],
     [
       "m",
@@ -11952,6 +11046,15 @@
     [
       "m",
       9,
+      2,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      9,
       3,
       6,
       null,
@@ -12005,6 +11108,477 @@
     ],
     [
       "m",
+      8,
+      2,
+      6,
+      null,
+      2,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      8,
+      3,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      8,
+      2,
+      5,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      7,
+      2,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "s",
+      5,
+      2,
+      6,
+      6,
+      2,
+      6,
+      "east",
+      2
+    ],
+    [
+      "s",
+      7,
+      2,
+      6,
+      6,
+      2,
+      6,
+      "west",
+      2
+    ],
+    [
+      "s",
+      6,
+      2,
+      5,
+      6,
+      2,
+      6,
+      "south",
+      2
+    ],
+    [
+      "s",
+      6,
+      2,
+      7,
+      6,
+      2,
+      6,
+      "north",
+      2
+    ],
+    [
+      "s",
+      6,
+      1,
+      6,
+      6,
+      2,
+      6,
+      "up",
+      2
+    ],
+    [
+      "s",
+      6,
+      3,
+      6,
+      6,
+      2,
+      6,
+      "down",
+      2
+    ],
+    [
+      "m",
+      6,
+      3,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      6,
+      2,
+      5,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      5,
+      2,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      6,
+      1,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      6,
+      2,
+      7,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      7,
+      2,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      6,
+      2,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "s",
+      6,
+      2,
+      6,
+      7,
+      2,
+      6,
+      "east",
+      2
+    ],
+    [
+      "s",
+      8,
+      2,
+      6,
+      7,
+      2,
+      6,
+      "west",
+      2
+    ],
+    [
+      "s",
+      7,
+      2,
+      5,
+      7,
+      2,
+      6,
+      "south",
+      2
+    ],
+    [
+      "s",
+      7,
+      2,
+      7,
+      7,
+      2,
+      6,
+      "north",
+      2
+    ],
+    [
+      "s",
+      7,
+      1,
+      6,
+      7,
+      2,
+      6,
+      "up",
+      2
+    ],
+    [
+      "s",
+      7,
+      3,
+      6,
+      7,
+      2,
+      6,
+      "down",
+      2
+    ],
+    [
+      "m",
+      7,
+      1,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      7,
+      2,
+      7,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      8,
+      2,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      7,
+      2,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "s",
+      5,
+      2,
+      6,
+      6,
+      2,
+      6,
+      "east",
+      2
+    ],
+    [
+      "s",
+      7,
+      2,
+      6,
+      6,
+      2,
+      6,
+      "west",
+      2
+    ],
+    [
+      "s",
+      6,
+      2,
+      5,
+      6,
+      2,
+      6,
+      "south",
+      2
+    ],
+    [
+      "s",
+      6,
+      2,
+      7,
+      6,
+      2,
+      6,
+      "north",
+      2
+    ],
+    [
+      "s",
+      6,
+      1,
+      6,
+      6,
+      2,
+      6,
+      "up",
+      2
+    ],
+    [
+      "s",
+      6,
+      3,
+      6,
+      6,
+      2,
+      6,
+      "down",
+      2
+    ],
+    [
+      "m",
+      6,
+      3,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      6,
+      2,
+      5,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      5,
+      2,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      6,
+      1,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      6,
+      2,
+      7,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      7,
+      2,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "s",
+      7,
+      2,
+      6,
+      8,
+      2,
+      6,
+      "east",
+      2
+    ],
+    [
+      "s",
+      9,
+      2,
+      6,
+      8,
+      2,
+      6,
+      "west",
+      2
+    ],
+    [
+      "s",
+      8,
+      2,
+      5,
+      8,
+      2,
+      6,
+      "south",
+      2
+    ],
+    [
+      "s",
+      8,
+      2,
+      7,
+      8,
+      2,
+      6,
+      "north",
+      2
+    ],
+    [
+      "s",
+      8,
+      1,
+      6,
+      8,
+      2,
+      6,
+      "up",
+      2
+    ],
+    [
+      "s",
+      8,
+      3,
+      6,
+      8,
+      2,
+      6,
+      "down",
+      2
+    ],
+    [
+      "m",
+      8,
+      1,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      8,
+      2,
+      7,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
       9,
       2,
       6,
@@ -12018,108 +11592,6 @@
       2,
       6,
       null,
-      2,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      8,
-      3,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      8,
-      2,
-      5,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      7,
-      2,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "s",
-      5,
-      2,
-      6,
-      6,
-      2,
-      6,
-      "east",
-      2
-    ],
-    [
-      "s",
-      7,
-      2,
-      6,
-      6,
-      2,
-      6,
-      "west",
-      2
-    ],
-    [
-      "s",
-      6,
-      2,
-      5,
-      6,
-      2,
-      6,
-      "south",
-      2
-    ],
-    [
-      "s",
-      6,
-      2,
-      7,
-      6,
-      2,
-      6,
-      "north",
-      2
-    ],
-    [
-      "s",
-      6,
-      1,
-      6,
-      6,
-      2,
-      6,
-      "up",
-      2
-    ],
-    [
-      "s",
-      6,
-      3,
-      6,
-      6,
-      2,
-      6,
-      "down",
-      2
-    ],
-    [
-      "m",
-      6,
-      2,
-      6,
-      null,
       0,
       "minecraft:redstone_wire"
     ],
@@ -12188,366 +11660,6 @@
       6,
       "down",
       2
-    ],
-    [
-      "m",
-      7,
-      3,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      7,
-      2,
-      5,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      6,
-      2,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      7,
-      1,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      7,
-      2,
-      7,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      8,
-      2,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      7,
-      2,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "s",
-      5,
-      2,
-      6,
-      6,
-      2,
-      6,
-      "east",
-      2
-    ],
-    [
-      "s",
-      7,
-      2,
-      6,
-      6,
-      2,
-      6,
-      "west",
-      2
-    ],
-    [
-      "s",
-      6,
-      2,
-      5,
-      6,
-      2,
-      6,
-      "south",
-      2
-    ],
-    [
-      "s",
-      6,
-      2,
-      7,
-      6,
-      2,
-      6,
-      "north",
-      2
-    ],
-    [
-      "s",
-      6,
-      1,
-      6,
-      6,
-      2,
-      6,
-      "up",
-      2
-    ],
-    [
-      "s",
-      6,
-      3,
-      6,
-      6,
-      2,
-      6,
-      "down",
-      2
-    ],
-    [
-      "m",
-      6,
-      2,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      6,
-      3,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      6,
-      2,
-      5,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      5,
-      2,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      6,
-      1,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      6,
-      2,
-      7,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      7,
-      2,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "s",
-      7,
-      2,
-      6,
-      8,
-      2,
-      6,
-      "east",
-      2
-    ],
-    [
-      "s",
-      9,
-      2,
-      6,
-      8,
-      2,
-      6,
-      "west",
-      2
-    ],
-    [
-      "s",
-      8,
-      2,
-      5,
-      8,
-      2,
-      6,
-      "south",
-      2
-    ],
-    [
-      "s",
-      8,
-      2,
-      7,
-      8,
-      2,
-      6,
-      "north",
-      2
-    ],
-    [
-      "s",
-      8,
-      1,
-      6,
-      8,
-      2,
-      6,
-      "up",
-      2
-    ],
-    [
-      "s",
-      8,
-      3,
-      6,
-      8,
-      2,
-      6,
-      "down",
-      2
-    ],
-    [
-      "m",
-      8,
-      2,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "s",
-      6,
-      2,
-      6,
-      7,
-      2,
-      6,
-      "east",
-      2
-    ],
-    [
-      "s",
-      8,
-      2,
-      6,
-      7,
-      2,
-      6,
-      "west",
-      2
-    ],
-    [
-      "s",
-      7,
-      2,
-      5,
-      7,
-      2,
-      6,
-      "south",
-      2
-    ],
-    [
-      "s",
-      7,
-      2,
-      7,
-      7,
-      2,
-      6,
-      "north",
-      2
-    ],
-    [
-      "s",
-      7,
-      1,
-      6,
-      7,
-      2,
-      6,
-      "up",
-      2
-    ],
-    [
-      "s",
-      7,
-      3,
-      6,
-      7,
-      2,
-      6,
-      "down",
-      2
-    ],
-    [
-      "m",
-      7,
-      3,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      7,
-      2,
-      5,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      6,
-      2,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
     ],
     [
       "m",
@@ -12645,60 +11757,6 @@
     [
       "m",
       9,
-      3,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      9,
-      2,
-      5,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      8,
-      2,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      9,
-      1,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      9,
-      2,
-      7,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      10,
-      2,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      9,
       2,
       6,
       null,
@@ -12770,6 +11828,33 @@
       6,
       "down",
       2
+    ],
+    [
+      "m",
+      8,
+      1,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      8,
+      2,
+      7,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      9,
+      2,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
     ],
     [
       "m",
@@ -12849,6 +11934,15 @@
     [
       "m",
       9,
+      2,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      9,
       3,
       6,
       null,
@@ -12902,7 +11996,886 @@
     ],
     [
       "m",
+      8,
+      2,
+      6,
+      null,
+      2,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      8,
+      3,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      8,
+      2,
+      5,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      7,
+      2,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "s",
+      5,
+      2,
+      6,
+      6,
+      2,
+      6,
+      "east",
+      2
+    ],
+    [
+      "s",
+      7,
+      2,
+      6,
+      6,
+      2,
+      6,
+      "west",
+      2
+    ],
+    [
+      "s",
+      6,
+      2,
+      5,
+      6,
+      2,
+      6,
+      "south",
+      2
+    ],
+    [
+      "s",
+      6,
+      2,
+      7,
+      6,
+      2,
+      6,
+      "north",
+      2
+    ],
+    [
+      "s",
+      6,
+      1,
+      6,
+      6,
+      2,
+      6,
+      "up",
+      2
+    ],
+    [
+      "s",
+      6,
+      3,
+      6,
+      6,
+      2,
+      6,
+      "down",
+      2
+    ],
+    [
+      "m",
+      6,
+      3,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      6,
+      2,
+      5,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      5,
+      2,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      6,
+      1,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      6,
+      2,
+      7,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      7,
+      2,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      6,
+      2,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "s",
+      6,
+      2,
+      6,
+      7,
+      2,
+      6,
+      "east",
+      2
+    ],
+    [
+      "s",
+      8,
+      2,
+      6,
+      7,
+      2,
+      6,
+      "west",
+      2
+    ],
+    [
+      "s",
+      7,
+      2,
+      5,
+      7,
+      2,
+      6,
+      "south",
+      2
+    ],
+    [
+      "s",
+      7,
+      2,
+      7,
+      7,
+      2,
+      6,
+      "north",
+      2
+    ],
+    [
+      "s",
+      7,
+      1,
+      6,
+      7,
+      2,
+      6,
+      "up",
+      2
+    ],
+    [
+      "s",
+      7,
+      3,
+      6,
+      7,
+      2,
+      6,
+      "down",
+      2
+    ],
+    [
+      "m",
+      7,
+      1,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      7,
+      2,
+      7,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      8,
+      2,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      7,
+      2,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "s",
+      5,
+      2,
+      6,
+      6,
+      2,
+      6,
+      "east",
+      2
+    ],
+    [
+      "s",
+      7,
+      2,
+      6,
+      6,
+      2,
+      6,
+      "west",
+      2
+    ],
+    [
+      "s",
+      6,
+      2,
+      5,
+      6,
+      2,
+      6,
+      "south",
+      2
+    ],
+    [
+      "s",
+      6,
+      2,
+      7,
+      6,
+      2,
+      6,
+      "north",
+      2
+    ],
+    [
+      "s",
+      6,
+      1,
+      6,
+      6,
+      2,
+      6,
+      "up",
+      2
+    ],
+    [
+      "s",
+      6,
+      3,
+      6,
+      6,
+      2,
+      6,
+      "down",
+      2
+    ],
+    [
+      "m",
+      6,
+      3,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      6,
+      2,
+      5,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      5,
+      2,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      6,
+      1,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      6,
+      2,
+      7,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      7,
+      2,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "s",
+      7,
+      2,
+      6,
+      8,
+      2,
+      6,
+      "east",
+      2
+    ],
+    [
+      "s",
       9,
+      2,
+      6,
+      8,
+      2,
+      6,
+      "west",
+      2
+    ],
+    [
+      "s",
+      8,
+      2,
+      5,
+      8,
+      2,
+      6,
+      "south",
+      2
+    ],
+    [
+      "s",
+      8,
+      2,
+      7,
+      8,
+      2,
+      6,
+      "north",
+      2
+    ],
+    [
+      "s",
+      8,
+      1,
+      6,
+      8,
+      2,
+      6,
+      "up",
+      2
+    ],
+    [
+      "s",
+      8,
+      3,
+      6,
+      8,
+      2,
+      6,
+      "down",
+      2
+    ],
+    [
+      "m",
+      8,
+      1,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      8,
+      2,
+      7,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      9,
+      2,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      8,
+      2,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "s",
+      6,
+      2,
+      6,
+      7,
+      2,
+      6,
+      "east",
+      2
+    ],
+    [
+      "s",
+      8,
+      2,
+      6,
+      7,
+      2,
+      6,
+      "west",
+      2
+    ],
+    [
+      "s",
+      7,
+      2,
+      5,
+      7,
+      2,
+      6,
+      "south",
+      2
+    ],
+    [
+      "s",
+      7,
+      2,
+      7,
+      7,
+      2,
+      6,
+      "north",
+      2
+    ],
+    [
+      "s",
+      7,
+      1,
+      6,
+      7,
+      2,
+      6,
+      "up",
+      2
+    ],
+    [
+      "s",
+      7,
+      3,
+      6,
+      7,
+      2,
+      6,
+      "down",
+      2
+    ],
+    [
+      "m",
+      7,
+      1,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      7,
+      2,
+      7,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      8,
+      2,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "s",
+      8,
+      2,
+      6,
+      9,
+      2,
+      6,
+      "east",
+      2
+    ],
+    [
+      "s",
+      10,
+      2,
+      6,
+      9,
+      2,
+      6,
+      "west",
+      2
+    ],
+    [
+      "s",
+      9,
+      2,
+      5,
+      9,
+      2,
+      6,
+      "south",
+      2
+    ],
+    [
+      "s",
+      9,
+      2,
+      7,
+      9,
+      2,
+      6,
+      "north",
+      2
+    ],
+    [
+      "s",
+      9,
+      1,
+      6,
+      9,
+      2,
+      6,
+      "up",
+      2
+    ],
+    [
+      "s",
+      9,
+      3,
+      6,
+      9,
+      2,
+      6,
+      "down",
+      2
+    ],
+    [
+      "m",
+      9,
+      2,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "s",
+      7,
+      2,
+      6,
+      8,
+      2,
+      6,
+      "east",
+      2
+    ],
+    [
+      "s",
+      9,
+      2,
+      6,
+      8,
+      2,
+      6,
+      "west",
+      2
+    ],
+    [
+      "s",
+      8,
+      2,
+      5,
+      8,
+      2,
+      6,
+      "south",
+      2
+    ],
+    [
+      "s",
+      8,
+      2,
+      7,
+      8,
+      2,
+      6,
+      "north",
+      2
+    ],
+    [
+      "s",
+      8,
+      1,
+      6,
+      8,
+      2,
+      6,
+      "up",
+      2
+    ],
+    [
+      "s",
+      8,
+      3,
+      6,
+      8,
+      2,
+      6,
+      "down",
+      2
+    ],
+    [
+      "m",
+      8,
+      1,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      8,
+      2,
+      7,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      9,
+      2,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      8,
+      2,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "s",
+      8,
+      2,
+      6,
+      9,
+      2,
+      6,
+      "east",
+      2
+    ],
+    [
+      "s",
+      10,
+      2,
+      6,
+      9,
+      2,
+      6,
+      "west",
+      2
+    ],
+    [
+      "s",
+      9,
+      2,
+      5,
+      9,
+      2,
+      6,
+      "south",
+      2
+    ],
+    [
+      "s",
+      9,
+      2,
+      7,
+      9,
+      2,
+      6,
+      "north",
+      2
+    ],
+    [
+      "s",
+      9,
+      1,
+      6,
+      9,
+      2,
+      6,
+      "up",
+      2
+    ],
+    [
+      "s",
+      9,
+      3,
+      6,
+      9,
+      2,
+      6,
+      "down",
+      2
+    ],
+    [
+      "m",
+      9,
+      2,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      9,
+      3,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      9,
+      2,
+      5,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      8,
+      2,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      9,
+      1,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      9,
+      2,
+      7,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      10,
       2,
       6,
       null,
@@ -13014,6 +12987,60 @@
     [
       "m",
       6,
+      3,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      6,
+      2,
+      5,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      5,
+      2,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      6,
+      1,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      6,
+      2,
+      7,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      7,
+      2,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      6,
       2,
       6,
       null,
@@ -13089,33 +13116,6 @@
     [
       "m",
       7,
-      3,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      7,
-      2,
-      5,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      6,
-      2,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      7,
       1,
       6,
       null,
@@ -13214,15 +13214,6 @@
       6,
       "down",
       2
-    ],
-    [
-      "m",
-      6,
-      2,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
     ],
     [
       "m",
@@ -13347,6 +13338,33 @@
     [
       "m",
       8,
+      1,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      8,
+      2,
+      7,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      9,
+      2,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      8,
       2,
       6,
       null,
@@ -13382,38 +13400,20 @@
     ],
     [
       "m",
-      8,
-      1,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      8,
-      2,
-      7,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      9,
-      2,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
       7,
       2,
       6,
       null,
       2,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      6,
+      2,
+      6,
+      null,
+      0,
       "minecraft:redstone_wire"
     ],
     [
@@ -13427,16 +13427,7 @@
     ],
     [
       "m",
-      6,
-      2,
-      6,
-      null,
-      2,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      6,
+      7,
       3,
       6,
       null,
@@ -13445,7 +13436,7 @@
     ],
     [
       "m",
-      6,
+      7,
       2,
       5,
       null,
@@ -13454,7 +13445,7 @@
     ],
     [
       "m",
-      5,
+      6,
       2,
       6,
       null,
@@ -13464,28 +13455,10 @@
     [
       "m",
       6,
-      1,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      6,
-      2,
-      7,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      7,
       2,
       6,
       null,
-      0,
+      2,
       "minecraft:redstone_wire"
     ],
     [
@@ -13495,33 +13468,6 @@
       6,
       null,
       1,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      8,
-      1,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      8,
-      2,
-      7,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      9,
-      2,
-      6,
-      null,
-      0,
       "minecraft:redstone_wire"
     ],
     [
@@ -13535,34 +13481,7 @@
     ],
     [
       "m",
-      8,
-      2,
-      6,
-      null,
-      2,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      7,
-      2,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      8,
-      2,
-      6,
-      null,
-      1,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      8,
+      9,
       3,
       6,
       null,
@@ -13571,7 +13490,7 @@
     ],
     [
       "m",
-      8,
+      9,
       2,
       5,
       null,
@@ -13580,7 +13499,7 @@
     ],
     [
       "m",
-      7,
+      8,
       2,
       6,
       null,
@@ -13589,18 +13508,9 @@
     ],
     [
       "m",
-      8,
+      9,
       1,
       6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      8,
-      2,
-      7,
       null,
       0,
       "minecraft:redstone_wire"
@@ -13609,6 +13519,33 @@
       "m",
       9,
       2,
+      7,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      10,
+      2,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      8,
+      2,
+      6,
+      null,
+      2,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      7,
+      2,
       6,
       null,
       0,
@@ -13617,33 +13554,6 @@
     [
       "m",
       7,
-      2,
-      6,
-      null,
-      2,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      7,
-      2,
-      6,
-      null,
-      1,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      6,
-      2,
-      6,
-      null,
-      2,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      6,
       3,
       6,
       null,
@@ -13652,7 +13562,7 @@
     ],
     [
       "m",
-      6,
+      7,
       2,
       5,
       null,
@@ -13661,97 +13571,7 @@
     ],
     [
       "m",
-      5,
-      2,
       6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      6,
-      1,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      6,
-      2,
-      7,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      7,
-      2,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      7,
-      2,
-      6,
-      null,
-      1,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      8,
-      1,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      8,
-      2,
-      7,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      9,
-      2,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      9,
-      2,
-      6,
-      null,
-      1,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      8,
-      2,
-      6,
-      null,
-      2,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      7,
       2,
       6,
       null,
@@ -13796,38 +13616,20 @@
     ],
     [
       "m",
-      8,
-      1,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      8,
-      2,
-      7,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      9,
-      2,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
       7,
       2,
       6,
       null,
       2,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      6,
+      2,
+      6,
+      null,
+      0,
       "minecraft:redstone_wire"
     ],
     [
@@ -13841,16 +13643,7 @@
     ],
     [
       "m",
-      6,
-      2,
-      6,
-      null,
-      2,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      6,
+      7,
       3,
       6,
       null,
@@ -13859,7 +13652,7 @@
     ],
     [
       "m",
-      6,
+      7,
       2,
       5,
       null,
@@ -13868,7 +13661,7 @@
     ],
     [
       "m",
-      5,
+      6,
       2,
       6,
       null,
@@ -13878,28 +13671,10 @@
     [
       "m",
       6,
-      1,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      6,
-      2,
-      7,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      7,
       2,
       6,
       null,
-      0,
+      2,
       "minecraft:redstone_wire"
     ],
     [
@@ -13909,33 +13684,6 @@
       6,
       null,
       1,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      8,
-      1,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      8,
-      2,
-      7,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      9,
-      2,
-      6,
-      null,
-      0,
       "minecraft:redstone_wire"
     ],
     [
@@ -13949,6 +13697,60 @@
     ],
     [
       "m",
+      9,
+      3,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      9,
+      2,
+      5,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      8,
+      2,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      9,
+      1,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      9,
+      2,
+      7,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      10,
+      2,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
       8,
       2,
       6,
@@ -13959,6 +13761,33 @@
     [
       "m",
       7,
+      2,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      7,
+      3,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      7,
+      2,
+      5,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      6,
       2,
       6,
       null,
@@ -14003,38 +13832,20 @@
     ],
     [
       "m",
-      8,
-      1,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      8,
-      2,
-      7,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      9,
-      2,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
       7,
       2,
       6,
       null,
       2,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      6,
+      2,
+      6,
+      null,
+      0,
       "minecraft:redstone_wire"
     ],
     [
@@ -14048,16 +13859,7 @@
     ],
     [
       "m",
-      6,
-      2,
-      6,
-      null,
-      2,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      6,
+      7,
       3,
       6,
       null,
@@ -14066,7 +13868,7 @@
     ],
     [
       "m",
-      6,
+      7,
       2,
       5,
       null,
@@ -14075,7 +13877,7 @@
     ],
     [
       "m",
-      5,
+      6,
       2,
       6,
       null,
@@ -14085,6 +13887,60 @@
     [
       "m",
       6,
+      2,
+      6,
+      null,
+      2,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      7,
+      2,
+      6,
+      null,
+      1,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      9,
+      2,
+      6,
+      null,
+      1,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      9,
+      3,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      9,
+      2,
+      5,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      8,
+      2,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      9,
       1,
       6,
       null,
@@ -14093,9 +13949,90 @@
     ],
     [
       "m",
-      6,
+      9,
       2,
       7,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      10,
+      2,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      8,
+      2,
+      6,
+      null,
+      2,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      7,
+      2,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      7,
+      3,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      7,
+      2,
+      5,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      6,
+      2,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      8,
+      2,
+      6,
+      null,
+      1,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      8,
+      3,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      8,
+      2,
+      5,
       null,
       0,
       "minecraft:redstone_wire"
@@ -14107,6 +14044,69 @@
       6,
       null,
       0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      7,
+      2,
+      6,
+      null,
+      2,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      6,
+      2,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      7,
+      2,
+      6,
+      null,
+      1,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      7,
+      3,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      7,
+      2,
+      5,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      6,
+      2,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      6,
+      2,
+      6,
+      null,
+      2,
       "minecraft:redstone_wire"
     ],
     [
@@ -14279,33 +14279,6 @@
     [
       "m",
       11,
-      3,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      11,
-      2,
-      5,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      10,
-      2,
-      6,
-      null,
-      0,
-      "minecraft:redstone_wire"
-    ],
-    [
-      "m",
-      11,
       1,
       6,
       null,
@@ -14333,6 +14306,33 @@
     [
       "m",
       11,
+      2,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      11,
+      3,
+      6,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      11,
+      2,
+      5,
+      null,
+      0,
+      "minecraft:redstone_wire"
+    ],
+    [
+      "m",
+      10,
       2,
       6,
       null,

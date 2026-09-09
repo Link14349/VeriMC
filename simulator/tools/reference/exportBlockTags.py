@@ -10,7 +10,7 @@ from pathlib import Path
 from zipfile import ZipFile
 
 root = Path(__file__).resolve().parents[2]
-WANTED = ['walls']
+WANTED = ['walls', 'does_not_block_hoppers']
 
 with ZipFile(root / '.cache/reference/game.jar') as jar:
     def tag(name, parents=()):

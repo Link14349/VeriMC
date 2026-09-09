@@ -669,6 +669,7 @@ bool Simulator::stepEvent() {
             if (event.phase == 1) {if(at(event.pos).device==Device::noteBlock)noteEvent(event.pos);else if(at(event.pos).device==Device::bell)bellEvent(event);else pistonEvent(event);}
             else if (event.phase == 3) {
                 if (at(event.pos).device == Device::button) buttonContact(event.pos);
+                else if (at(event.pos).device == Device::hopper) hopperEntityContact(event.pos);
                 else tripwireContact(event.pos);
             }
             else if (event.phase == 2) {

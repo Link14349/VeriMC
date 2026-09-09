@@ -66,6 +66,8 @@
 
 `fuzzRedstone.py --seed S --rounds N --output <新目录>` 生成随机小电路与随机输入历史，逐轮从原版捕获并对照；出现差异时先按格子隔离，再贪心删命令自动缩减到最小复现，报告保留坐标、种子与存活命令。`captureSupportDirection.py` 是它找到的前两个差异的固定回归：14 刻，覆盖各方块类各自检查支撑的方向，以及从背面开栅栏门时的朝向翻转（含一次不带 `playerFacing` 的交互）。`captureFenceGateInWall.py` 是第三个差异的回归：14 刻，覆盖 `IN_WALL` 只跟随垂直于朝向那条轴。墙本身仍未实现，只有栅栏门与普通方块进入 `watch`，该组因此不开刻内轨迹。
 
+`captureHopperPickup.py` → `java26_2HopperPickup`：30 刻 / 8 组，覆盖漏斗吸取掉落物的两条原版路径（方块实体阶段的 `suckInItems` 与实体阶段的 `HopperBlock.entityInside`）、吸取体积边界、上方方块阻挡与 `DOES_NOT_BLOCK_HOPPERS`、8 gt 冷却、部分吸入、上方容器优先级与受电禁用。场景新增 `watchGroundItems` 观测项，原版侧直接调用 `HopperBlockEntity.getItemsAtAndAbove`。协议见 [器件层实体输入/输出协议](redstoneAudit/entityIoProtocol.md)。
+
 `exportBlockTags.py` 从固定 JAR 的 `data/minecraft/tags/block/` 递归解析内置方块标签写入 `data/blockTags.json`：`Bootstrap.bootStrap()` 不加载数据包标签，`BlockTags.WALLS` 在注册表导出器里是空的，必须另走这条路径。
 
 `CaptureRedstoneVanilla` 是第二个参考入口：它自建 `MinecraftServer`，启用的功能开关正好是 `FeatureFlags.VANILLA_SET`、数据包只有 `vanilla`，用来把 GameTest 环境固有的 `trade_rebalance` 区分出来（`GameTestServer.ENABLED_FEATURES` 是 `private static final`，无法降级）。`vanillaReplay.py <fixture|all> <新目录>` 在 fixture 记录的**绝对原点与时钟**上复跑同一条时间线，逐字段对照 GameTest 捕获、再交给 `checkReference`，并对带轨迹的场景额外跑一次关掉轨迹的同原点同环境对照。捕获里的 `referenceEnvironment` 现在记录 `dataPacks`、`gameTime` 与 `clockTicks`。详见 [严格 vanilla-only 参考服务器](redstoneAudit/vanillaOnlyReference.md)。

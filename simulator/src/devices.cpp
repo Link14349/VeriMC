@@ -274,6 +274,7 @@ bool Simulator::stimulateDevice(BlockPos pos, const Json& stimulus) {
         }
         return true;
     }
+    if (state.device == Device::hopper && stimulus.contains("groundItems")) { stimulateGroundItems(pos, stimulus); return true; }
     if (state.device == Device::jukebox || state.device == Device::container || state.device == Device::hopper || state.device == Device::dropper || isBookshelf(id) || isDecoratedPot(id)) {
         if (stimulus.contains("inventory")) setInventory(pos, stimulus.at("inventory"));
         else if (state.device == Device::container && stimulus.contains("viewers")) setViewers(pos, integerInRange(stimulus, "viewers", 0, 1000000));
@@ -348,6 +349,21 @@ void Simulator::validateRuntime(BlockPos pos) const {
         if(!last.is_number_integer() || last < -1 || last > 5) throw std::invalid_argument("无效雕纹书架最后操作槽位");
     }
     if (device == Device::detectorRail) normalizeCarts(data.values.value("carts", Json::array()));
+    if (data.values.contains("groundItems")) {
+        if (device != Device::hopper) throw std::invalid_argument("只有漏斗可以持有掉落物输入");
+        const auto& items = data.values.at("groundItems");
+        if (!items.is_array() || items.size() > 32) throw std::invalid_argument("无效掉落物列表");
+        for (const auto& entry : items) {
+            if (!entry.is_object() || entry.size() != 5) throw std::invalid_argument("无效掉落物记录");
+            const auto item = registry.itemId(entry.at("item"));
+            integerInRange(entry, "count", 1, registry.item(item).maxStack);
+            for (const char* axis : {"x", "y", "z"}) {
+                if (!entry.at(axis).is_number()) throw std::invalid_argument("无效掉落物坐标");
+                const double value = entry.at(axis).get<double>();
+                if (!std::isfinite(value) || value < -2.0 || value > 4.0) throw std::invalid_argument("无效掉落物坐标");
+            }
+        }
+    }
     if (device == Device::tripwire) integerInRange(data.values, "entities", 0, 1000000);
     if (device == Device::button) {
         int arrows = integerInRange(data.values, "arrows", 0, 1000000);

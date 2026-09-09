@@ -21,6 +21,8 @@ struct BlockType {
     bool stairs{};
     // 原版 BlockTags.WALLS，栅栏门的 IN_WALL 判据。
     bool wall{};
+    // 原版 BlockTags.DOES_NOT_BLOCK_HOPPERS：完整碰撞方块也不挡住漏斗吸取掉落物。
+    bool doesNotBlockHoppers{};
     std::uint8_t instrument{};
 };
 // A power-of-two stride avoids division by 40 in each checked vector lookup.

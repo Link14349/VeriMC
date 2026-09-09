@@ -78,6 +78,8 @@ public:
     int displayValue(BlockPos pos) const;
     int viewerCount(BlockPos pos) const { auto found = runtime.find(pos); return found == runtime.end() ? 0 : found->second.values.value("viewers", 0); }
     bool bellRinging(BlockPos pos) const { auto found=runtime.find(pos);return found!=runtime.end() && found->second.values.value("ringing",false); }
+    // 漏斗吸取范围内、按声明顺序排列的掉落物；与原版 getItemsAtAndAbove 的结果对照。
+    Json suckableItems(BlockPos pos) const;
     bool jukeboxPlaying(BlockPos pos) const { auto found=jukeboxes.find(pos);return found!=jukeboxes.end() && found->second.song>=0; }
     std::size_t cartCount(BlockPos pos) const {
         auto found = runtime.find(pos);
@@ -248,6 +250,17 @@ private:
     std::uint64_t registerEntity(BlockPos pos);
     void pruneEvents();
     void updateComparatorNeighbors(BlockPos pos, StateId source = noSnapshot);
+    // 器件层实体物品输入（issue #12 第一阶段）：漏斗吸取声明在其吸取范围内的掉落物。
+    // 不模拟掉落物的运动、碰撞或合并，只执行原版 suckInItems 的方块侧逻辑。
+    void stimulateGroundItems(BlockPos pos, const Json& input);
+    bool itemInSuckRange(BlockPos pos, const Json& entry) const;
+    bool itemInsideHopperBlock(BlockPos pos, const Json& entry) const;
+    bool suckItemEntities(BlockPos pos);
+    void insertStack(BlockPos pos, ItemStack& stack, Tick cooldown);
+    // 原版 HopperBlock.entityInside：掉落物停在漏斗自己那一格时，每刻每个实体各触发一次
+    // tryMoveItems。这条路径在实体阶段执行，早于方块实体阶段，而且不受上方方块阻挡。
+    void hopperEntityContact(BlockPos pos);
+    bool hopperHasContact(BlockPos pos) const;
     void runtimeChanged(BlockPos pos, bool notifyComparators = true);
     void updatePressurePlate(BlockPos pos);
     void updateButton(BlockPos pos);
