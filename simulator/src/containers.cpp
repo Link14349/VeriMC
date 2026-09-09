@@ -3,6 +3,7 @@
 #include <array>
 #include <cmath>
 #include <set>
+#include <tuple>
 
 namespace simulator {
 namespace {
@@ -154,6 +155,71 @@ std::size_t Simulator::containerEntitySize(const std::string& type) {
     for (const auto* boat : chestBoatTypes) if (type == boat) return chestBoatSlots;
     throw std::invalid_argument("容器实体只支持运输矿车、漏斗矿车与运输船/运输竹筏");
 }
+
+// ---- 跨格实体身份：注册尺寸 → 世界坐标包围盒 ----
+//
+// 26.2 反编译源码核实（simulator/.cache/reference/sources）：
+//   * `world/entity/EntityTypes.java:284-286` CHEST_MINECART、`:525-527` HOPPER_MINECART
+//     都是 `.sized(0.98F, 0.7F)`（`:665-667` 的普通 MINECART 同尺寸）。
+//   * 同文件 `:157-164`（ACACIA_CHEST_BOAT）等十个运输船/竹筏 EntityType，以及
+//     `:192-199` BAMBOO_CHEST_RAFT，全部是 `.sized(1.375F, 0.5625F)`。
+//   * `world/entity/EntityDimensions.java:19-23` `makeBoundingBox(x,y,z)`：
+//     `float w = width / 2` 之后 `new AABB(x-w, y, z-w, x+w, y+h, z+w)`——
+//     **y 是脚**，盒子从 y 往上长 height。
+//   * `world/entity/Entity.java:477-487` `setPos` → `makeBoundingBox()` → `dimensions.makeBoundingBox(position)`。
+//   * `world/phys/AABB.java:245-247` `intersects`：六个方向全是**严格**不等号，相切不算相交。
+//
+// 器件层协议约定实体停在**格中心**（脚 y = 格底 + 0.5；运动/浮力/乘骑一律不建模），
+// 于是声明在 (X,Y,Z) 的：
+//   * 矿车盒 = [X+0.01, X+0.99] × [Y+0.5, Y+1.2] × [Z+0.01, Z+0.99]
+//     —— 竖直探到上面那一格 0.2 格，水平不出格：**覆盖 2 格**。
+//   * 运输船盒 = [X-0.1875, X+1.1875] × [Y+0.5, Y+1.0625] × [Z-0.1875, Z+1.1875]
+//     —— 水平向四周各探出 0.1875 格：**覆盖 3×2×3 = 18 格**。
+// 这两条都有上一轮的**原版实测**：真实服务器上用同一条 getEntityContainer 查询扫
+// 5×3×5 邻域，船在 18 格上报、第 19 格没有；矿车在自己那一格与正上方那一格上报（2 格），
+// 而当时的内核在正上方那一格报空。宽/高的浮点值按 float 计算后再转 double，
+// 与原版 `float w = this.width / 2.0F` 逐位一致。
+Simulator::EntityBox Simulator::containerEntityBox(BlockPos cell, const std::string& type) {
+    const bool boat = type != "chest_minecart" && type != "hopper_minecart";
+    const float width = boat ? 1.375F : 0.98F, height = boat ? 0.5625F : 0.7F;
+    const double half = static_cast<double>(width / 2.0F);
+    const double x = cell.x + 0.5, y = cell.y + 0.5, z = cell.z + 0.5;
+    return {x - half, y, z - half, x + half, y + static_cast<double>(height), z + half};
+}
+// 原版 getContainerAt(level, pos)（HopperBlockEntity.java:363-365）与方块漏斗的
+// getSourceContainer（同文件 :354-356，levelX/Y/Z 见 :403-415，getLevelY()+1.0 = 上一格中心）
+// 用的都是「格心 ± 0.5」这个盒子，正好等于那一格。
+Simulator::EntityBox Simulator::cellQueryBox(BlockPos pos) {
+    return {static_cast<double>(pos.x), static_cast<double>(pos.y), static_cast<double>(pos.z),
+            pos.x + 1.0, pos.y + 1.0, pos.z + 1.0};
+}
+bool Simulator::boxesOverlap(const EntityBox& a, const EntityBox& b) {
+    return a.minX < b.maxX && a.maxX > b.minX && a.minY < b.maxY && a.maxY > b.minY && a.minZ < b.maxZ && a.maxZ > b.minZ;
+}
+// 候选枚举。原版的顺序来自实体分区存储：EntitySectionStorage.forEachAccessibleNonEmptySection
+// （EntitySectionStorage.java:37-61）按 x 升序遍历、同一个 x 内按 section key 升序
+// （SectionPos.java:217-222 的位序是 x 高位、z 次之、y 低位），而**同一个 16³ 分区内部**
+// 是 EntitySection 的插入顺序（EntitySection.java:30-37 直接遍历 ClassInstanceMultiMap），
+// 也就是生成顺序，与坐标无关。器件层协议不建模生成顺序，所以这里的规则是**显式约定**：
+// 先按 (x, z, y) 排声明格——这与跨分区那一层的原版顺序一致——再按格内声明顺序。
+// 同一格里的顺序仍然完全由声明列表给出，与跨格改造之前逐条一致。
+// **注意**：多个格子落在同一个分区里时，原版顺序是生成顺序，本内核给不出来；
+// 这一条只影响 nextInt 选中的是谁，不影响候选个数，因此不改变随机源的消耗。
+std::vector<Simulator::EntityCandidate> Simulator::containerEntityCandidates(const EntityBox& query) const {
+    std::vector<EntityCandidate> result;
+    if (entityCells.empty()) return result;
+    std::vector<BlockPos> cells(entityCells.begin(), entityCells.end());
+    std::sort(cells.begin(), cells.end(), [](BlockPos a, BlockPos b) {
+        return std::tie(a.x, a.z, a.y) < std::tie(b.x, b.z, b.y);
+    });
+    for (auto cell : cells) {
+        const auto& entities = runtime.at(cell).values.at("containerEntities");
+        for (std::size_t index = 0; index < entities.size(); ++index)
+            if (boxesOverlap(containerEntityBox(cell, entities.at(index).at("type").get<std::string>()), query))
+                result.push_back({cell, static_cast<int>(index)});
+    }
+    return result;
+}
 // 器件层实体容器输入：整体替换这一格声明的容器实体集合，空数组表示全部移除。
 // 不建模矿车的运动、碰撞与拾取，只声明「哪一格里有哪些容器实体、各装了什么」。
 // 允许声明在空气格上：矿车通常停在空气或铁轨那一格里。
@@ -174,14 +240,19 @@ void Simulator::stimulateContainerEntities(BlockPos pos, const Json& input) {
         stored.push_back(std::move(row));
     }
     auto& values = runtime[pos].values;
-    if (stored.empty()) values.erase("containerEntities"); else values["containerEntities"] = std::move(stored);
+    const bool empty = stored.empty();
+    if (empty) values.erase("containerEntities"); else values["containerEntities"] = std::move(stored);
+    if (empty) entityCells.erase(pos); else entityCells.insert(pos);
     // 空气格上的空声明不留下运行时记录，否则工程里会多出一行没有内容的器件数据。
     const auto& data = runtime.at(pos);
     if (data.values.empty() && data.inventory.empty() && data.output == 0 && world.get(pos) == 0) runtime.erase(pos);
     // 矿车出现或消失不是方块实体变化，不通知比较器；runtimeChanged 仍会唤醒
-    // 这一格下方的漏斗、朝这一格的漏斗，以及下方两格里的漏斗矿车，
-    // 正是可能读到它的三条路径。
+    // 这一格下方的漏斗、朝这一格的漏斗，以及下方两格里的漏斗矿车。
     runtimeChanged(pos, false);
+    // 跨格可见性让读者远不止那几条路径：船横向探出 0.1875 格，声明在这一格的船
+    // 会被九个水平位置的漏斗看见。新声明出现时必须把所有可能读到它的漏斗与漏斗矿车
+    // 都唤醒；消失时不必——能看到容器实体的漏斗本来就每刻都在抽随机数、从不休眠。
+    if (!empty) wakeEntityReaders(pos);
     // 这一格自己新出现漏斗矿车时还要唤醒它自己：runtimeChanged 只照顾下方两格。
     if (cellHasCartHopper(pos)) { cartCells.insert(pos); wakeCartHopper(pos); }
     else cartCells.erase(pos);
@@ -213,11 +284,14 @@ std::vector<Simulator::InventorySlot> Simulator::entityContainerSlots(BlockPos p
     for (std::size_t i = 0; i < size; ++i) result.push_back({pos, i, entity});
     return result;
 }
-// 原版 getEntityContainer：候选非空时用 level.random.nextInt(size) 选一个，**总是**消耗一次随机数。
-std::optional<int> Simulator::chooseContainerEntity(BlockPos pos) {
-    const auto count = containerEntityCount(pos);
-    if (!count) return std::nullopt;
-    return static_cast<int>(worldRandom.nextInt(static_cast<int>(count)));
+// 原版 getEntityContainer（HopperBlockEntity.java:393-398）：先用查询盒把候选捞出来，
+// 非空时用 level.getRandom().nextInt(entities.size()) 选一个，**总是**消耗一次随机数。
+// 候选个数现在是**跨格**统计的：一条船会同时出现在九个水平位置的候选表里，
+// 两条隔一格声明的船进同一张表，于是 nextInt 的参数不等于本格的声明数。
+std::optional<Simulator::EntityCandidate> Simulator::chooseContainerEntity(const EntityBox& query) {
+    const auto candidates = containerEntityCandidates(query);
+    if (candidates.empty()) return std::nullopt;
+    return candidates[static_cast<std::size_t>(worldRandom.nextInt(static_cast<int>(candidates.size())))];
 }
 Json Simulator::containerEntitiesJson(BlockPos pos) const {
     auto found = runtime.find(pos);

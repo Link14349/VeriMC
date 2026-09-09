@@ -95,10 +95,11 @@ bool Simulator::hasBlockContainer(BlockPos pos) const {
 bool Simulator::hopperEject(BlockPos pos, bool* drew) {
     const auto target = pos.relative(at(pos).facing);
     if (hasBlockContainer(target)) return transferItem(pos, target);
-    const auto entity = chooseContainerEntity(target);
+    // 实体候选按**包围盒**取：朝向格里没有任何声明，但邻格的船探进来时照样算候选。
+    const auto entity = chooseContainerEntity(cellQueryBox(target));
     if (!entity) return false;
     if (drew) *drew = true;
-    return transferSlots(containerSlots(pos), entityContainerSlots(target, *entity), pos, target, false);
+    return transferSlots(containerSlots(pos), entityContainerSlots(entity->pos, entity->entity), pos, entity->pos, false);
 }
 
 bool Simulator::transferItem(BlockPos from, BlockPos to, bool pulling) {
@@ -344,9 +345,9 @@ void Simulator::tickHopper(const ScheduledEvent& event) {
         if (!hasBlockContainer(source)) {
             // getSourceContainer 的实体分支：容器实体优先于掉落物，选中一个就只从它拉取，
             // 拉不到也不会退回去吸掉落物（原版 container != null 分支直接 return false）。
-            if (const auto entity = chooseContainerEntity(source)) {
+            if (const auto entity = chooseContainerEntity(cellQueryBox(source))) {
                 drew = true;
-                moved = transferSlots(entityContainerSlots(source, *entity), containerSlots(event.pos), source, event.pos, true) || moved;
+                moved = transferSlots(entityContainerSlots(entity->pos, entity->entity), containerSlots(event.pos), entity->pos, event.pos, true) || moved;
             }
             else {
                 const auto aboveId = world.get(source);
@@ -421,9 +422,52 @@ bool Simulator::cellHasCartHopper(BlockPos pos) const {
     return false;
 }
 
-void Simulator::rebuildCartCells() {
+void Simulator::rebuildEntityCells() {
     cartCells.clear();
-    for (const auto& [pos, data] : runtime) { (void)data; if (cellHasCartHopper(pos)) cartCells.insert(pos); }
+    entityCells.clear();
+    for (const auto& [pos, data] : runtime) {
+        if (data.values.contains("containerEntities")) entityCells.insert(pos);
+        if (cellHasCartHopper(pos)) cartCells.insert(pos);
+    }
+}
+
+// 矿车自己那一侧的查询盒。MinecartHopper.getLevelX/Y/Z（MinecartHopper.java:63-75）
+// 是 `getX() / getY()+0.5 / getZ()`，HopperBlockEntity.getSourceContainer（:354-356）
+// 把它 +1.0 之后交给 getContainerAt，实体分支再 ±0.5。协议约定矿车停在格中心
+// （脚 y = 格底 + 0.5），于是盒子是 [X, X+1] × [Y+1.5, Y+2.5] × [Z, Z+1]。
+//
+// **这个盒子与方块容器那一格不是一回事**：方块那一侧走
+// `BlockPos.containing(levelX, levelY+1.0, levelZ)` = 上面**第二**格，
+// 而实体那一侧按盒子算——上面第二格里、同样停在格中心的实体脚正好在 Y+2.5，
+// AABB 的严格不等号把它排除掉，真正落进盒子的是**正上方那一格**里的实体
+// （矿车盒 [Y+1.5, Y+2.2]、船盒 [Y+1.5, Y+2.0625] 都与 [Y+1.5, Y+2.5] 相交）。
+// 换成「停在铁轨高度」那个约定（脚 y = 格底 + 0.0625）结论一样，仍然只有正上方那一格，
+// 所以这条不依赖那个知道得不太确切的 y。
+// **这一条只有源码推导，没有原版差分**：本轮参考捕获资源被别的 agent 独占。
+Simulator::EntityBox Simulator::cartEntityQueryBox(BlockPos cell) {
+    return {static_cast<double>(cell.x), cell.y + 1.5, static_cast<double>(cell.z),
+            cell.x + 1.0, cell.y + 2.5, cell.z + 1.0};
+}
+
+// 新声明的容器实体要唤醒所有可能读到它的漏斗与漏斗矿车。覆盖格最多是
+// 「声明格向水平各扩一格、向上扩一格」（船 3×2×3 = 18 格，矿车 1×2×1 = 2 格），
+// 这里按最大范围扫，多唤醒几个漏斗只会让它们各跑一遍 tickHopper——
+// 原版本来就是每个漏斗每刻都跑一遍，休眠才是内核的优化，所以多跑永远不会错。
+void Simulator::wakeEntityReaders(BlockPos cell) {
+    for (int dx = -1; dx <= 1; ++dx) for (int dz = -1; dz <= 1; ++dz) for (int dy = 0; dy <= 1; ++dy) {
+        const BlockPos covered{cell.x + dx, cell.y + dy, cell.z + dz};
+        // 读者一：正下方那一格的漏斗（suckInItems 查的是自己上面那一格）。
+        if (!hoppers.empty()) {
+            wakeHopper(covered.relative(Direction::down));
+            // 读者二：朝着这一格的漏斗（ejectItems 查的是自己朝向的那一格）。
+            for (auto direction : directions) {
+                const auto neighbor = covered.relative(direction);
+                if (at(neighbor).device == Device::hopper && at(neighbor).facing == opposite(direction)) wakeHopper(neighbor);
+            }
+        }
+        // 读者三：正下方那一格里的漏斗矿车（它的查询盒罩住的是正上方那一格）。
+        wakeCartHopper(covered.relative(Direction::down));
+    }
 }
 
 void Simulator::scheduleCartSuction(BlockPos cell, Tick when) {
@@ -465,9 +509,10 @@ bool Simulator::cartHopperSuck(BlockPos cell, int entity, BlockPos source) {
         return true;
     }
     // 没有方块容器才查实体容器：候选非空就抽一次 nextInt，与这次是否真的搬动无关，
-    // 因此只要上面第二格还停着容器实体就必须逐刻重跑（与方块漏斗那一侧同一条理由）。
-    if (const auto chosen = chooseContainerEntity(source)) {
-        transferSlots(entityContainerSlots(source, *chosen), target, source, cell, true);
+    // 因此只要查询盒里还停着容器实体就必须逐刻重跑（与方块漏斗那一侧同一条理由）。
+    // 注意查的是 cartEntityQueryBox 而不是 source 那一格，理由见该函数上面的注释。
+    if (const auto chosen = chooseContainerEntity(cartEntityQueryBox(cell))) {
+        transferSlots(entityContainerSlots(chosen->pos, chosen->entity), target, chosen->pos, cell, true);
         return true;
     }
     // 掉落物分支（suckInItems 的 else 与 MinecartHopper.suckInItems 的包围盒扫描）

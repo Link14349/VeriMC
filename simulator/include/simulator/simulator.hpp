@@ -240,6 +240,10 @@ private:
     // 不进快照；整体替换 runtime 的地方（loadProject / restore / exchange / clear）负责同步。
     // 存在的唯一理由是给「每次方块或器件数据变化都要唤醒下方两格的矿车」这条热路径一个便宜的守卫。
     std::unordered_set<BlockPos, PosHash> cartCells;
+    // 声明了至少一个容器实体的格子。同样完全由 runtime 推导、不进快照，与 cartCells 同步维护。
+    // 跨格可见性让「哪一格能看到这个实体」不再是一次哈希查表，候选枚举必须遍历所有声明格；
+    // 这个集合让「世界里根本没有容器实体」这个绝大多数情况保持零开销。
+    std::unordered_set<BlockPos, PosHash> entityCells;
     std::unordered_map<BlockPos, std::uint64_t, PosHash> entityOrders;
     std::unordered_map<BlockPos, StateId, PosHash> changes;
     std::vector<Probe> probes;
@@ -342,7 +346,22 @@ private:
     static std::size_t containerEntitySize(const std::string& type);
     std::size_t containerEntityCount(BlockPos pos) const;
     std::vector<InventorySlot> entityContainerSlots(BlockPos pos, int entity) const;
-    std::optional<int> chooseContainerEntity(BlockPos pos);
+    // ---- 跨格实体身份（issue #12）----
+    // 容器实体**不属于**它被声明的那一格：声明格只决定它的位置（协议约定停在格中心，
+    // 脚 y = 格底 + 0.5），能不能被看见完全由 EntityType 注册尺寸算出的包围盒
+    // 与查询盒是否相交决定（AABB.java:245-247，严格不等号，相切不算）。
+    // 因此 getEntityContainer 的入口是**一个盒子**，不是一格坐标。
+    struct EntityBox { double minX, minY, minZ, maxX, maxY, maxZ; };
+    // 候选是「哪一格声明的第几个实体」这一对，因为库存仍然按声明格存放。
+    struct EntityCandidate { BlockPos pos; int entity; };
+    static EntityBox containerEntityBox(BlockPos cell, const std::string& type);
+    // 原版 getContainerAt(level,pos) 走的那条：中心在格心、边长 1 的盒子，正好是这一格。
+    static EntityBox cellQueryBox(BlockPos pos);
+    static bool boxesOverlap(const EntityBox& a, const EntityBox& b);
+    std::vector<EntityCandidate> containerEntityCandidates(const EntityBox& query) const;
+    std::optional<EntityCandidate> chooseContainerEntity(const EntityBox& query);
+    // 新声明的容器实体可能被相当远的漏斗看见（船横向覆盖九格），把这些读者全部唤醒。
+    void wakeEntityReaders(BlockPos cell);
     // ---- 漏斗矿车主动吸取（issue #12 最后一条）----
     // 这条路径**尚无原版差分**：本轮参考捕获资源被别的 agent 独占，
     // 下面的实现全部由 26.2 反编译源码推导，只有上一轮一次原版探针实测作为旁证。
@@ -350,12 +369,15 @@ private:
     // 事件里的方块类型固定记 0：矿车不是方块，那一格的方块可以随便换。
     static constexpr std::uint64_t cartSuctionEvent = 1;
     bool cellHasCartHopper(BlockPos pos) const;
-    void rebuildCartCells();
+    void rebuildEntityCells();
     void scheduleCartSuction(BlockPos cell, Tick when);
     void wakeCartHopper(BlockPos cell);
     void wakeCartHoppers(BlockPos changed);
     void tickCartHoppers(BlockPos cell);
+    // source 是**方块容器**那一格（BlockPos.containing(levelX, levelY+1, levelZ)）；
+    // 实体容器那一侧用的是矿车自己的查询盒，与 source 不是同一块地方，见 cartEntityQueryBox。
     bool cartHopperSuck(BlockPos cell, int entity, BlockPos source);
+    static EntityBox cartEntityQueryBox(BlockPos cell);
     // 原版 getContainerAt 先看 getBlockContainer；这里为真表示该格有方块容器，
     // 实体容器只在为假时才会被查询。堆肥桶是 WorldlyContainerHolder，也算方块容器。
     bool hasBlockContainer(BlockPos pos) const;

@@ -938,7 +938,7 @@ void Simulator::clear() {
     environmentActions.clear(); pendingActionIds.clear(); nextActionId = 1; actionsDropped = 0;
     recentTorchToggles.clear(); torchToggleCounts.clear();
     sensors.clear();sensorSections.clear();jukeboxes.clear();
-    world.clear(); runtime.clear(); motions.clear(); chunkStates.clear(); hoppers.clear(); cartCells.clear(); entityOrders.clear(); nextEntityOrder = 0; scheduled = {}; scheduledKeys.clear(); blockTicks = {}; changes.clear(); currentTick = 0; nextOrder = 0; sequence = 0; currentPhase = 4;
+    world.clear(); runtime.clear(); motions.clear(); chunkStates.clear(); hoppers.clear(); cartCells.clear(); entityCells.clear(); entityOrders.clear(); nextEntityOrder = 0; scheduled = {}; scheduledKeys.clear(); blockTicks = {}; changes.clear(); currentTick = 0; nextOrder = 0; sequence = 0; currentPhase = 4;
     probes.clear(); probeDependencies.clear(); nextProbeId = 1; trace.clear(); traceDropped = 0; statistics = {}; breakRequested = false; faulted = false; pauseReason.clear(); ++revision;
     updateTrace = Json::array(); updateTraceTruncated = false;
     if (retainedTrace) retainedTrace = 0;

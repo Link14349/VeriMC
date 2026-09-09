@@ -59,7 +59,7 @@ void Simulator::restore(const Simulator& snapshot) {
     worldRandom = snapshot.worldRandom; randomSeed = snapshot.randomSeed;
     environmentActions = snapshot.environmentActions; pendingActionIds = snapshot.pendingActionIds; nextActionId = snapshot.nextActionId; actionsDropped = snapshot.actionsDropped;
     blockTicks = snapshot.blockTicks;
-    hoppers = snapshot.hoppers; cartCells = snapshot.cartCells; entityOrders = snapshot.entityOrders; nextEntityOrder = snapshot.nextEntityOrder;
+    hoppers = snapshot.hoppers; cartCells = snapshot.cartCells; entityCells = snapshot.entityCells; entityOrders = snapshot.entityOrders; nextEntityOrder = snapshot.nextEntityOrder;
     sensors = snapshot.sensors; sensorSections = snapshot.sensorSections;
     jukeboxes=snapshot.jukeboxes;
     recentTorchToggles = snapshot.recentTorchToggles; torchToggleCounts = snapshot.torchToggleCounts;
@@ -294,8 +294,9 @@ void Simulator::loadProject(ProjectSource& source) {
         if (candidate.at(p).device == Device::detectorRail) state.values["carts"] = candidate.normalizeCarts(state.values.value("carts", Json::array()));
         candidate.validateRuntime(p);
     }
-    // 漏斗矿车索引完全由 containerEntities 推导，不进文件；这里在 blockData 读完之后重建。
-    candidate.rebuildCartCells();
+    // 容器实体索引（entityCells / cartCells）完全由 containerEntities 推导，不进文件；
+    // 这里在 blockData 读完之后重建，旧工程与旧快照因此原样可读、默认行为不变。
+    candidate.rebuildEntityCells();
     if (checkpoint) {
         candidate.currentTick = data.at("tick"); candidate.nextOrder = data.at("nextOrder"); candidate.sequence = data.at("sequence");
         if (candidate.currentTick == UINT64_MAX) throw std::invalid_argument("仿真时间超出范围");
@@ -498,7 +499,7 @@ void Simulator::exchangeProject(Simulator& other) {
     using std::swap;
     swap(world, other.world); swap(runtime, other.runtime); swap(motions, other.motions); swap(chunkStates, other.chunkStates);
     swap(scheduled, other.scheduled); swap(scheduledKeys, other.scheduledKeys); swap(blockTicks, other.blockTicks);
-    swap(hoppers, other.hoppers); swap(cartCells, other.cartCells); swap(entityOrders, other.entityOrders); swap(nextEntityOrder, other.nextEntityOrder);
+    swap(hoppers, other.hoppers); swap(cartCells, other.cartCells); swap(entityCells, other.entityCells); swap(entityOrders, other.entityOrders); swap(nextEntityOrder, other.nextEntityOrder);
     swap(sensors, other.sensors); swap(sensorSections, other.sensorSections); swap(jukeboxes, other.jukeboxes);
     swap(recentTorchToggles, other.recentTorchToggles); swap(torchToggleCounts, other.torchToggleCounts); swap(probes, other.probes);
     swap(probeDependencies, other.probeDependencies); swap(trace, other.trace); swap(currentTick, other.currentTick);

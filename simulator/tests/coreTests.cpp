@@ -1233,9 +1233,13 @@ int main() {
         pull.advanceTo(20);
         expect(pull.containerEntitiesJson(above).at(0).at("inventory").empty(), "the second pull did not empty the chest boat");
         // 向运输船推入：船不是方块实体，写入不通知比较器；27 槽从 slot 0 起填。
+        // 几何刻意选成「漏斗朝下、船在正下方」（与原版差分 java26_2BoatContainers 的
+        // 11/32 号工位同一个形状）：船横向探出 0.1875 格，如果改成朝东推进旁边那一格，
+        // 船会同时探进漏斗**自己上面那一格**，于是同一刻里推出去的东西又被吸回来——
+        // 那是跨格可见性本身的效果，另有专门的用例，这里要的是干净的推入。
         Simulator push(r); floor(push);
-        const BlockPos pusher{0, 1, 0}, front{1, 1, 0};
-        push.place(pusher, r.state("hopper", {{"facing", "east"}}));
+        const BlockPos pusher{0, 2, 0}, front{0, 1, 0};
+        push.place(pusher, r.state("hopper", {{"facing", "down"}}));
         push.stimulate(front, {{"containerEntities", Json::array({{{"type", "bamboo_chest_raft"}, {"inventory", Json::array()}}})}});
         push.stimulate(pusher, {{"inventory", Json::array({stone(0, 1)})}});
         push.advanceTo(4);
@@ -1247,7 +1251,7 @@ int main() {
             return std::stoull(world.saveProject("draws", true).at("randomSource").at("draws").get<std::string>());
         };
         Simulator blocked(r); floor(blocked);
-        blocked.place(pusher, r.state("hopper", {{"facing", "east"}}));
+        blocked.place(pusher, r.state("hopper", {{"facing", "down"}}));
         Json full = Json::array();
         for (int slot = 0; slot < 27; ++slot) full.push_back(stone(slot, 64));
         blocked.stimulate(front, {{"containerEntities", Json::array({{{"type", "spruce_chest_boat"}, {"inventory", full}}})}});
@@ -1409,8 +1413,12 @@ int main() {
         auto cargo = [&](const Simulator& world) { return world.containerEntitiesJson(cart).at(0).at("inventory"); };
 
         // 1) 从上面第二格的方块漏斗里逐刻各掏一件，**没有冷却**。
+        // 源漏斗朝北（推向空气）而不是朝下：漏斗矿车盒高 0.7、脚在格中心，会向上探进
+        // **正上方那一格** 0.2 格，朝下的源漏斗因此会顺手往矿车里推东西，
+        // 一刻就变成「自己吸一件 + 被推一件」，把这里要钉的「每刻恰好一件」搅浑。
+        // 漏斗不是 WorldlyContainer，朝向不影响矿车能从它身上取出什么。
         Simulator s(r); floor(s);
-        s.place(source, r.state("hopper", {{"facing", "down"}}));
+        s.place(source, r.state("hopper", {{"facing", "north"}}));
         s.stimulate(source, {{"inventory", Json::array({stone(0, 3)})}});
         s.stimulate(cart, cartOnly);
         const auto beforeDraws = draws(s);
@@ -1462,18 +1470,31 @@ int main() {
             expect(draws(quiet) == quietDraws, std::string("an idle hopper minecart below ") + (*above ? above : "air") + " drew randomness");
         }
 
-        // 5) 上面第二格是**容器实体**：走 getEntityContainer，候选非空就每刻抽一次 nextInt，
+        // 5) 实体容器那一侧走 getEntityContainer，候选非空就每刻抽一次 nextInt，
         //    一件都搬不动也照抽（与方块漏斗那一侧完全同一条理由）。
+        //    **查询格与方块那一侧不同**：方块查的是 BlockPos.containing(levelY+1.0)＝上面第二格，
+        //    实体查的是那一点周围 ±0.5 的盒子＝[Y+1.5, Y+2.5]，停在格中心的实体脚在格底+0.5，
+        //    第二格里的脚正好落在 Y+2.5 这条边上、被 AABB 的严格不等号排除，
+        //    真正落进盒子的是**正上方那一格**里的实体。见 cartEntityQueryBox 的注释。
+        //    以下几条是这一轮跨格改造的结果，**只有源码推导，没有原版差分**。
         Simulator entity(r); floor(entity);
-        entity.stimulate(source, {{"containerEntities", Json::array({{{"type", "chest_minecart"}, {"inventory", Json::array()}}})}});
+        entity.stimulate(justAbove, {{"containerEntities", Json::array({{{"type", "chest_minecart"}, {"inventory", Json::array()}}})}});
         entity.stimulate(cart, cartOnly);
         entity.advanceTo(10); const auto entityTen = draws(entity);
         entity.advanceTo(20);
-        expect(draws(entity) - entityTen == 10, "a hopper minecart above an empty container entity stopped drawing: "
+        expect(draws(entity) - entityTen == 10, "a hopper minecart below an empty container entity stopped drawing: "
                + std::to_string(draws(entity) - entityTen) + " draws over 10 ticks");
+        // 对照：同一个声明挪到上面**第二**格就一次也不抽——那里的实体脚在盒子的边界上。
+        Simulator offBox(r); floor(offBox);
+        offBox.stimulate(source, {{"containerEntities", Json::array({{{"type", "chest_minecart"}, {"inventory", Json::array()}}})}});
+        offBox.stimulate(cart, cartOnly);
+        const auto offBoxDraws = draws(offBox);
+        offBox.advanceTo(20);
+        expect(draws(offBox) == offBoxDraws, "a container entity two cells above the hopper minecart entered its query box: "
+               + std::to_string(draws(offBox) - offBoxDraws) + " draws");
         // 同一格里两辆漏斗矿车，各自吸一次，因此每刻抽两次。
         Simulator pair(r); floor(pair);
-        pair.stimulate(source, {{"containerEntities", Json::array({{{"type", "chest_minecart"}, {"inventory", Json::array()}}})}});
+        pair.stimulate(justAbove, {{"containerEntities", Json::array({{{"type", "chest_minecart"}, {"inventory", Json::array()}}})}});
         pair.stimulate(cart, {{"containerEntities", Json::array({{{"type", "hopper_minecart"}, {"inventory", Json::array()}},
                                                                  {{"type", "hopper_minecart"}, {"inventory", Json::array()}}})}});
         pair.advanceTo(10); const auto pairTen = draws(pair);
