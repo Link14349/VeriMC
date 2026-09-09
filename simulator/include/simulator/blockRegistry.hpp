@@ -56,6 +56,8 @@ public:
     bool has(StateId id, const std::string& property) const { return type(id).properties.contains(property); }
     std::size_t stateCount() const { return states.size(); }
     std::size_t typeCount() const { return types.size(); }
+    // 计划刻只记录方块类型编号，回查名字时用这个。
+    const BlockType& typeAt(std::uint16_t index) const { return types.at(index); }
     const BlockType& blockType(std::uint16_t id) const { return types.at(id); }
     const std::vector<std::uint8_t>& ruleFingerprint() const { return rulesHash; }
     std::uint32_t itemId(const std::string& name) const;

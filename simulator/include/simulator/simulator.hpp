@@ -95,6 +95,10 @@ public:
     // stalledSince 只在从工程文件恢复时显式给出；正常调用由当前刻自动记录。
     void setChunkState(int chunkX, int chunkZ, ChunkState state, std::optional<Tick> stalledSince = std::nullopt);
     Json chunkStatesJson() const;
+    // 待执行的方块计划刻与方块事件，按原版 DRAIN_ORDER / 插入顺序排列，
+    // 用于与原版队列逐项对照。坐标是绝对坐标，比较时再换算成相对。
+    Json pendingBlockTicksJson() const;
+    Json pendingBlockEventsJson() const;
     // 是否还有可以执行的事件；只剩不可 ticking 区块里的事件时返回 false。
     bool runnable() const;
     // 区块不 ticking 时方块实体根本不执行，它们的倒计时也不会递减。事件被延后一刻时

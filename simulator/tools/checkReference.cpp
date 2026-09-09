@@ -71,6 +71,22 @@ int main(int argc, char** argv) {
                     }
                     else simulation.stimulate(pos, command.at("stimulus"));
                 }
+                // 待执行队列是整帧一份，不按观测位置分组。坐标换算成相对原点后逐项比较。
+                if (frame.contains("blockTicks") && !differs) {
+                    const auto relative = [&](Json rows) {
+                        for (auto& row : rows) { row[0] = row[0].get<int>() - origin.x; row[1] = row[1].get<int>() - origin.y; row[2] = row[2].get<int>() - origin.z; }
+                        return rows;
+                    };
+                    for (const char* field : {"blockTicks", "blockEvents"}) {
+                        const Json actual = relative(std::string(field) == "blockTicks" ? simulation.pendingBlockTicksJson() : simulation.pendingBlockEventsJson());
+                        if (frame.at(field) != actual) {
+                            differs = true;
+                            result["status"] = "difference";
+                            result["firstDifference"] = {{"tick", tick}, {"field", field}, {"expected", frame.at(field)}, {"actual", actual}};
+                            break;
+                        }
+                    }
+                }
                 for (std::size_t index = 0; index < fixture.at("watch").size(); ++index) {
                     const auto pos = absolute(fixture.at("watch").at(index));
                     auto compare = [&](const char* field, const Json& expected, const Json& actual) {

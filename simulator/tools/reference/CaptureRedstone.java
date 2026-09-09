@@ -98,6 +98,45 @@ public class CaptureRedstone extends TestFunctionLoader {
         }
         return entry;
     }
+    /**
+     * The pending block tick queue and the block event queue, read straight off the level.
+     * `LevelTicks` has no public listing API, so the containers are read reflectively; nothing is
+     * written back. Sorted by vanilla's own DRAIN_ORDER (trigger tick, priority, sub-tick order);
+     * the sub-tick counter itself is a vanilla-internal serial number and is not reported,
+     * only the order it produces.
+     */
+    @SuppressWarnings("unchecked")
+    static JsonArray pendingBlockTicks(net.minecraft.server.level.ServerLevel level) {
+        var containers = (it.unimi.dsi.fastutil.longs.Long2ObjectMap<Object>)field(level.getBlockTicks(), "allContainers");
+        var collected = new ArrayList<net.minecraft.world.ticks.ScheduledTick<net.minecraft.world.level.block.Block>>();
+        for (var container : containers.values())
+            collected.addAll((java.util.PriorityQueue<net.minecraft.world.ticks.ScheduledTick<net.minecraft.world.level.block.Block>>)field(container, "tickQueue"));
+        collected.sort(net.minecraft.world.ticks.ScheduledTick.DRAIN_ORDER);
+        JsonArray result = new JsonArray();
+        for (var tick : collected) {
+            JsonArray row = new JsonArray();
+            addRelative(row, tick.pos());
+            row.add(blockName(tick.type()));
+            row.add(tick.triggerTick() - level.getGameTime());
+            row.add(tick.priority().getValue());
+            result.add(row);
+        }
+        return result;
+    }
+    @SuppressWarnings("unchecked")
+    static JsonArray pendingBlockEvents(net.minecraft.server.level.ServerLevel level) {
+        var events = (Iterable<net.minecraft.world.level.BlockEventData>)field(level, "blockEvents");
+        JsonArray result = new JsonArray();
+        for (var event : events) {
+            JsonArray row = new JsonArray();
+            addRelative(row, event.pos());
+            row.add(blockName(event.block()));
+            row.add(event.paramA());
+            row.add(event.paramB());
+            result.add(row);
+        }
+        return result;
+    }
     static int remainingInBurst = 0;
     static void recordTraceEntry(BlockPos pos) {
         // forEachUpdatedPos fires once per peek for every kind except the multi update, which
@@ -505,6 +544,12 @@ public class CaptureRedstone extends TestFunctionLoader {
                     inventories.add(inventory);
                 }
                 frame.add("states", states); frame.add("analogs", analogs); frame.add("inventories", inventories); frames.add(frame);
+                if (scenario.has("watchScheduled")) {
+                    // 队列坐标同样相对捕获原点，traceOrigin 在这里复用。
+                    traceOrigin = origin;
+                    frame.add("blockTicks", pendingBlockTicks(level));
+                    frame.add("blockEvents", pendingBlockEvents(level));
+                }
                 if (scenario.has("watchChunkState")) {
                     JsonArray chunkRows = new JsonArray();
                     for (var value : scenario.getAsJsonArray("watch")) {

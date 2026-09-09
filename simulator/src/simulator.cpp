@@ -129,6 +129,28 @@ bool Simulator::runnable() const {
     }
     return false;
 }
+Json Simulator::pendingBlockTicksJson() const {
+    auto events = blockTicks.queuedEvents();
+    Json result = Json::array();
+    for (const auto& event : events)
+        result.push_back(Json::array({event.pos.x, event.pos.y, event.pos.z, registry.typeAt(event.type).name,
+                                      static_cast<std::int64_t>(event.tick) - static_cast<std::int64_t>(currentTick), event.priority}));
+    return result;
+}
+Json Simulator::pendingBlockEventsJson() const {
+    std::vector<ScheduledEvent> events;
+    auto queue = scheduled;
+    while (!queue.empty()) {
+        const auto event = queue.top(); queue.pop();
+        if (event.phase == 1 && scheduledKeys.contains({event.pos, event.type, event.phase, event.data})) events.push_back(event);
+    }
+    std::sort(events.begin(), events.end(), [](const ScheduledEvent& a, const ScheduledEvent& b) { return a.order < b.order; });
+    Json result = Json::array();
+    for (const auto& event : events)
+        result.push_back(Json::array({event.pos.x, event.pos.y, event.pos.z, registry.typeAt(event.type).name,
+                                      static_cast<int>(event.data & 3u), static_cast<int>(event.data >> 2)}));
+    return result;
+}
 Json Simulator::chunkStatesJson() const {
     static constexpr const char* names[]{"unloaded", "loaded", "blockTicking", "entityTicking"};
     std::vector<std::pair<BlockPos, ChunkRecord>> rows(chunkStates.begin(), chunkStates.end());
