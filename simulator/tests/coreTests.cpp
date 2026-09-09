@@ -1368,6 +1368,160 @@ int main() {
         expect(draws(moving) - movingTen == 2, "a transferring hopper drew during its 8 gt cooldown: "
                + std::to_string(draws(moving) - movingTen) + " draws over 16 ticks");
     });
+    test("hopper minecarts suck from the second block above them", [&] {
+        // 反过来那半边：MinecartHopper 自己每刻吸一次。
+        // 源码核实（26.2 反编译）：MinecartHopper.java:84-88 tick() -> :97-102 tryConsumeItems()
+        // （**没有任何冷却字段**）-> :104-117 suckInItems() -> HopperBlockEntity.java:218-246，
+        // 查询格是 BlockPos.containing(levelX, levelY + 1.0, levelZ)，而
+        // MinecartHopper.getLevelY()（:69-71）= getY() + 0.5、isGridAligned()（:78-81）为 false。
+        // 本协议约定矿车停在格中心，于是查的是**上面第二格**；停在铁轨高度（格底 + 0.0625）
+        // 的矿车查的是正上方那一格，而那个 y 目前无法声明。
+        // 刻内顺序来自 ServerLevel.java:426（实体）先于 :450（方块实体）。
+        // **以下全部是内核单元回归，没有原版差分**：本轮参考捕获资源被独占。
+        auto stone = [](int slot, int count) { return Json{{"slot", slot}, {"item", "minecraft:stone"}, {"count", count}}; };
+        auto draws = [](const Simulator& world) {
+            return std::stoull(world.saveProject("draws", true).at("randomSource").at("draws").get<std::string>());
+        };
+        const BlockPos cart{0, 1, 0}, justAbove{0, 2, 0}, source{0, 3, 0};
+        const Json cartOnly{{"containerEntities", Json::array({{{"type", "hopper_minecart"}, {"inventory", Json::array()}}})}};
+        auto cargo = [&](const Simulator& world) { return world.containerEntitiesJson(cart).at(0).at("inventory"); };
+
+        // 1) 从上面第二格的方块漏斗里逐刻各掏一件，**没有冷却**。
+        Simulator s(r); floor(s);
+        s.place(source, r.state("hopper", {{"facing", "down"}}));
+        s.stimulate(source, {{"inventory", Json::array({stone(0, 3)})}});
+        s.stimulate(cart, cartOnly);
+        const auto beforeDraws = draws(s);
+        for (int tick = 1; tick <= 3; ++tick) {
+            s.advanceTo(static_cast<Tick>(tick));
+            expect(cargo(s) == Json::array({stone(0, tick)}),
+                   "the hopper minecart did not take exactly one item on tick " + std::to_string(tick) + ": " + cargo(s).dump());
+            expect(s.inventoryJson(source, false) == (tick == 3 ? Json::array() : Json::array({stone(0, 3 - tick)})),
+                   "the source hopper lost the wrong amount on tick " + std::to_string(tick));
+        }
+        expect(draws(s) == beforeDraws, "pulling from a block container consumed world randomness");
+        // 对照：同一个源换成方块漏斗在下面接，8 gt 冷却下 3 刻只搬得动一件。
+        Simulator slow(r); floor(slow);
+        slow.place(source, r.state("hopper", {{"facing", "down"}}));
+        slow.place(justAbove, r.state("hopper", {{"facing", "down"}}));
+        slow.stimulate(source, {{"inventory", Json::array({stone(0, 3)})}});
+        slow.advanceTo(3);
+        expect(slow.inventoryJson(justAbove, false) == Json::array({stone(0, 1)}),
+               "the block hopper control moved more than one item in three ticks: " + slow.inventoryJson(justAbove, false).dump());
+
+        // 2) 从上面第二格的箱子里吸，同样每刻一件、同样不抽随机数。
+        Simulator chest(r); floor(chest);
+        chest.place(source, r.state("chest"));
+        chest.stimulate(source, {{"inventory", Json::array({stone(0, 5)})}});
+        chest.stimulate(cart, cartOnly);
+        const auto chestDraws = draws(chest);
+        chest.advanceTo(5);
+        expect(cargo(chest) == Json::array({stone(0, 5)}), "five ticks did not drain the chest into the cart: " + cargo(chest).dump());
+        expect(chest.inventoryJson(source, false).empty(), "the chest kept items the cart should have taken");
+        expect(draws(chest) == chestDraws, "a block chest source consumed world randomness");
+
+        // 3) 正上方那一格**不是**查询格：装满的箱子放在矿车正上方时一件都掏不走。
+        Simulator wrong(r); floor(wrong);
+        wrong.place(justAbove, r.state("chest"));
+        wrong.stimulate(justAbove, {{"inventory", Json::array({stone(0, 5)})}});
+        wrong.stimulate(cart, cartOnly);
+        wrong.advanceTo(20);
+        expect(cargo(wrong).empty(), "the cart read the block directly above instead of the second one: " + cargo(wrong).dump());
+        expect(wrong.inventoryJson(justAbove, false) == Json::array({stone(0, 5)}), "the chest directly above the cart lost items");
+
+        // 4) 空气 / 实心方块 / 非容器：什么也不做，也不抽随机数，而且能安静下来。
+        for (const char* above : {"", "stone", "redstone_block"}) {
+            Simulator quiet(r); floor(quiet);
+            if (*above) quiet.place(source, r.state(above));
+            quiet.stimulate(cart, cartOnly);
+            const auto quietDraws = draws(quiet);
+            quiet.advanceTo(30);
+            expect(cargo(quiet).empty(), std::string("the cart picked something up below ") + (*above ? above : "air"));
+            expect(draws(quiet) == quietDraws, std::string("an idle hopper minecart below ") + (*above ? above : "air") + " drew randomness");
+        }
+
+        // 5) 上面第二格是**容器实体**：走 getEntityContainer，候选非空就每刻抽一次 nextInt，
+        //    一件都搬不动也照抽（与方块漏斗那一侧完全同一条理由）。
+        Simulator entity(r); floor(entity);
+        entity.stimulate(source, {{"containerEntities", Json::array({{{"type", "chest_minecart"}, {"inventory", Json::array()}}})}});
+        entity.stimulate(cart, cartOnly);
+        entity.advanceTo(10); const auto entityTen = draws(entity);
+        entity.advanceTo(20);
+        expect(draws(entity) - entityTen == 10, "a hopper minecart above an empty container entity stopped drawing: "
+               + std::to_string(draws(entity) - entityTen) + " draws over 10 ticks");
+        // 同一格里两辆漏斗矿车，各自吸一次，因此每刻抽两次。
+        Simulator pair(r); floor(pair);
+        pair.stimulate(source, {{"containerEntities", Json::array({{{"type", "chest_minecart"}, {"inventory", Json::array()}}})}});
+        pair.stimulate(cart, {{"containerEntities", Json::array({{{"type", "hopper_minecart"}, {"inventory", Json::array()}},
+                                                                 {{"type", "hopper_minecart"}, {"inventory", Json::array()}}})}});
+        pair.advanceTo(10); const auto pairTen = draws(pair);
+        pair.advanceTo(20);
+        expect(draws(pair) - pairTen == 20, "two hopper minecarts in one cell did not draw twice per tick: "
+               + std::to_string(draws(pair) - pairTen) + " draws over 10 ticks");
+        // 同一格里的运输矿车不会吸，只有漏斗矿车会。
+        Simulator passive(r); floor(passive);
+        passive.place(source, r.state("chest"));
+        passive.stimulate(source, {{"inventory", Json::array({stone(0, 4)})}});
+        passive.stimulate(cart, {{"containerEntities", Json::array({{{"type", "chest_minecart"}, {"inventory", Json::array()}},
+                                                                    {{"type", "hopper_minecart"}, {"inventory", Json::array()}}})}});
+        passive.advanceTo(4);
+        expect(passive.containerEntitiesJson(cart).at(0).at("inventory").empty(), "a chest minecart sucked items on its own");
+        expect(passive.containerEntitiesJson(cart).at(1).at("inventory") == Json::array({stone(0, 4)}),
+               "the hopper minecart did not drain the chest: " + passive.containerEntitiesJson(cart).dump());
+
+        // 6) 同刻顺序：实体阶段早于方块实体阶段，所以源漏斗里最后一件被矿车抢走，
+        //    源漏斗自己朝下推出的那一次什么都推不出去。
+        Simulator race(r); floor(race);
+        race.place(source, r.state("hopper", {{"facing", "down"}}));
+        race.place(justAbove, r.state("chest"));
+        race.stimulate(source, {{"inventory", Json::array({stone(0, 1)})}});
+        race.stimulate(cart, cartOnly);
+        race.advanceTo(1);
+        expect(cargo(race) == Json::array({stone(0, 1)}), "the minecart lost the same-tick race to the block hopper: " + cargo(race).dump());
+        expect(race.inventoryJson(justAbove, false).empty(), "the block hopper ejected before the entity phase ran");
+        expect(race.inventoryJson(source, false).empty(), "the source hopper kept its item");
+
+        // 7) 休眠后要被唤醒：先放空箱子，10 刻后才装东西；再看方块本身晚到的情况。
+        Simulator late(r); floor(late);
+        late.place(source, r.state("chest"));
+        late.stimulate(cart, cartOnly);
+        late.advanceTo(10);
+        expect(cargo(late).empty(), "the cart took something out of an empty chest");
+        late.stimulate(source, {{"inventory", Json::array({stone(0, 1)})}});
+        late.advanceTo(12);
+        expect(cargo(late) == Json::array({stone(0, 1)}), "a dormant hopper minecart missed a later inventory change: " + cargo(late).dump());
+        Simulator later(r); floor(later);
+        later.stimulate(cart, cartOnly);
+        later.advanceTo(10);
+        later.place(source, r.state("chest"));
+        later.stimulate(source, {{"inventory", Json::array({stone(0, 1)})}});
+        later.advanceTo(12);
+        expect(cargo(later) == Json::array({stone(0, 1)}), "a dormant hopper minecart missed a later block placement: " + cargo(later).dump());
+
+        // 8) 快照往返：吸取途中存盘、重载，队列与后续行为都必须一致。
+        Simulator live(r); floor(live);
+        live.place(source, r.state("chest"));
+        live.stimulate(source, {{"inventory", Json::array({stone(0, 5)})}});
+        live.stimulate(cart, cartOnly);
+        live.advanceTo(2);
+        auto saved = live.saveProject("cartSuction", true);
+        Simulator restored(r); restored.loadProject(saved);
+        expect(restored.saveProject("cartSuction", true) == saved, "hopper minecart checkpoint diverged");
+        live.advanceTo(5); restored.advanceTo(5);
+        expect(restored.containerEntitiesJson(cart) == live.containerEntitiesJson(cart),
+               "a restored hopper minecart sucked differently: " + restored.containerEntitiesJson(cart).dump());
+        expect(restored.inventoryJson(source, false) == live.inventoryJson(source, false), "a restored source chest diverged");
+        // 电路工程不带运行队列，重新加载后矿车必须自己起跑。
+        Simulator circuit(r); floor(circuit);
+        circuit.place(source, r.state("chest"));
+        circuit.stimulate(source, {{"inventory", Json::array({stone(0, 3)})}});
+        circuit.stimulate(cart, cartOnly);
+        Simulator reopened(r); reopened.loadProject(circuit.saveProject("cartCircuit", false));
+        reopened.advanceTo(3);
+        expect(reopened.containerEntitiesJson(cart).at(0).at("inventory") == Json::array({stone(0, 3)}),
+               "a hopper minecart loaded from a circuit never started sucking: "
+               + reopened.containerEntitiesJson(cart).dump());
+    });
     test("full 26.2 sine table and daylight index boundaries", [&] {
         std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/../tests/fixtures/java26_2SineTable.json");
         expect(static_cast<bool>(file), "missing vanilla sine table fixture");
