@@ -59,7 +59,7 @@ void Simulator::restore(const Simulator& snapshot) {
     worldRandom = snapshot.worldRandom; randomSeed = snapshot.randomSeed;
     environmentActions = snapshot.environmentActions; pendingActionIds = snapshot.pendingActionIds; nextActionId = snapshot.nextActionId; actionsDropped = snapshot.actionsDropped;
     blockTicks = snapshot.blockTicks;
-    hoppers = snapshot.hoppers; entityOrders = snapshot.entityOrders; nextEntityOrder = snapshot.nextEntityOrder;
+    hoppers = snapshot.hoppers; cartCells = snapshot.cartCells; entityOrders = snapshot.entityOrders; nextEntityOrder = snapshot.nextEntityOrder;
     sensors = snapshot.sensors; sensorSections = snapshot.sensorSections;
     jukeboxes=snapshot.jukeboxes;
     recentTorchToggles = snapshot.recentTorchToggles; torchToggleCounts = snapshot.torchToggleCounts;
@@ -294,6 +294,8 @@ void Simulator::loadProject(ProjectSource& source) {
         if (candidate.at(p).device == Device::detectorRail) state.values["carts"] = candidate.normalizeCarts(state.values.value("carts", Json::array()));
         candidate.validateRuntime(p);
     }
+    // 漏斗矿车索引完全由 containerEntities 推导，不进文件；这里在 blockData 读完之后重建。
+    candidate.rebuildCartCells();
     if (checkpoint) {
         candidate.currentTick = data.at("tick"); candidate.nextOrder = data.at("nextOrder"); candidate.sequence = data.at("sequence");
         if (candidate.currentTick == UINT64_MAX) throw std::invalid_argument("仿真时间超出范围");
@@ -317,7 +319,12 @@ void Simulator::loadProject(ProjectSource& source) {
             if (e.phase == 1 && ((e.data & 3u) > 2 || (e.data >> 2) > 5)) throw std::invalid_argument("无效活塞方块事件");
             if(e.phase==1 && e.type==registry[registry.state("note_block")].type && e.data!=0)throw std::invalid_argument("无效音符盒方块事件");
             if(e.phase==1 && e.type==registry[registry.state("bell")].type && ((e.data&3u)!=1 || (e.data>>2)<2))throw std::invalid_argument("无效钟方块事件");
-            if (e.phase == 3 && (candidate.at(e.pos).type != e.type || (candidate.at(e.pos).device != Device::tripwire && candidate.at(e.pos).device != Device::button && candidate.at(e.pos).device != Device::hopper) || e.data != 0 || e.entityOrder != 0)) throw std::invalid_argument("无效的环境接触事件");
+            // 漏斗矿车的吸取事件挂在矿车所在的格子上，那一格通常是空气，类型固定记 0。
+            // 这里**不**要求那一格现在还有矿车：撤走矿车不撤销已排的事件（撤销会让
+            // 同一个键被重新插入而排出第二份事件），过期的那一份触发时直接空跑。
+            const bool cartSuction = e.phase == 3 && e.data == Simulator::cartSuctionEvent;
+            if (cartSuction && (e.type != 0 || e.entityOrder != 0)) throw std::invalid_argument("无效的漏斗矿车吸取事件");
+            if (e.phase == 3 && !cartSuction && (candidate.at(e.pos).type != e.type || (candidate.at(e.pos).device != Device::tripwire && candidate.at(e.pos).device != Device::button && candidate.at(e.pos).device != Device::hopper) || e.data != 0 || e.entityOrder != 0)) throw std::invalid_argument("无效的环境接触事件");
             // 区块不可 ticking 时事件合法地停在过去，等区块恢复才执行。
             const bool tickableChunk = e.phase == 3 ? candidate.chunkEntityTicking(e.pos) : candidate.chunkBlockTicking(e.pos);
             if ((e.phase != 0 && e.tick < candidate.currentTick && tickableChunk) || e.type >= registry.typeCount() || e.priority < -3 || e.priority > 3 || e.phase > 3 || e.order >= candidate.nextOrder || !usedOrders.insert(e.order).second) throw std::invalid_argument("无效的运行队列");
@@ -456,6 +463,11 @@ void Simulator::loadProject(ProjectSource& source) {
         visitInitial([&](Cell cell) { candidate.onPlace(cell.pos, cell.state, 0); });
         visitInitial([&](Cell cell) { if(registry[cell.state].device==Device::jukebox && candidate.stackAt({cell.pos,0}).count)candidate.updateJukeboxItem(cell.pos); });
         visitInitial([&](Cell cell) { candidate.neighborChanged(cell.pos); });
+        // 电路工程不带运行队列，漏斗矿车停在空气格上、不会被 forEachCell 扫到，
+        // 只能在这里显式起跑。排序是为了让 nextOrder 的分配与哈希遍历顺序无关。
+        std::vector<BlockPos> carts(candidate.cartCells.begin(), candidate.cartCells.end());
+        std::sort(carts.begin(), carts.end());
+        for (auto pos : carts) candidate.scheduleCartSuction(pos, candidate.currentTick);
     }
     for (const auto& row : source.rows("probes")) {
         auto newId = candidate.addProbe(row.at("pos").get<BlockPos>(), row.at("name"), row.at("mode"), parseDirection(row.at("direction")));
@@ -486,7 +498,7 @@ void Simulator::exchangeProject(Simulator& other) {
     using std::swap;
     swap(world, other.world); swap(runtime, other.runtime); swap(motions, other.motions); swap(chunkStates, other.chunkStates);
     swap(scheduled, other.scheduled); swap(scheduledKeys, other.scheduledKeys); swap(blockTicks, other.blockTicks);
-    swap(hoppers, other.hoppers); swap(entityOrders, other.entityOrders); swap(nextEntityOrder, other.nextEntityOrder);
+    swap(hoppers, other.hoppers); swap(cartCells, other.cartCells); swap(entityOrders, other.entityOrders); swap(nextEntityOrder, other.nextEntityOrder);
     swap(sensors, other.sensors); swap(sensorSections, other.sensorSections); swap(jukeboxes, other.jukeboxes);
     swap(recentTorchToggles, other.recentTorchToggles); swap(torchToggleCounts, other.torchToggleCounts); swap(probes, other.probes);
     swap(probeDependencies, other.probeDependencies); swap(trace, other.trace); swap(currentTick, other.currentTick);

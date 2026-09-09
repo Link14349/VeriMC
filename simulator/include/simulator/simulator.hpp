@@ -165,7 +165,7 @@ public:
     // storage so a successful file import can retain the previous world as undo.
     void exchangeProject(Simulator& other);
     std::size_t estimatedBytes() const {
-        auto bytes = world.storageBytes() + trace.size() * sizeof(TraceEdge) + runtime.size() * 512 + scheduled.size() * 128 + hoppers.size() * 96 + entityOrders.size() * 64 + blockTicks.estimatedBytes();
+        auto bytes = world.storageBytes() + trace.size() * sizeof(TraceEdge) + runtime.size() * 512 + scheduled.size() * 128 + hoppers.size() * 96 + cartCells.size() * 48 + entityOrders.size() * 64 + blockTicks.estimatedBytes();
         for (const auto& [pos, data] : runtime) { (void)pos; bytes += data.inventory.capacity() * sizeof(ItemStack); }
         return bytes + recentTorchToggles.size() * sizeof(TorchToggle) + torchToggleCounts.size() * 64 + environmentActions.size() * 2048 + sensors.size() * 384 + sensorSections.size() * 96 + jukeboxes.size() * 128;
     }
@@ -177,7 +177,6 @@ private:
     bool addCompost(BlockPos pos, std::uint32_t item);
     bool insertCompost(BlockPos from, BlockPos into, ItemStack stack);
     void emptyComposter(BlockPos pos, StateId state);
-    bool transferComposter(BlockPos from, BlockPos into, bool pulling);
     StateId noteInstrument(BlockPos pos, StateId state) const;
     void playNote(BlockPos pos, StateId state);
     void noteEvent(BlockPos pos);
@@ -237,6 +236,10 @@ private:
     std::unordered_map<BlockPos, unsigned, PosHash> torchToggleCounts;
     std::unordered_map<BlockPos, PistonMotion, PosHash> motions;
     std::unordered_map<BlockPos, HopperState, PosHash> hoppers;
+    // 声明了至少一辆漏斗矿车的格子。完全由 runtime 的 containerEntities 推导，
+    // 不进快照；整体替换 runtime 的地方（loadProject / restore / exchange / clear）负责同步。
+    // 存在的唯一理由是给「每次方块或器件数据变化都要唤醒下方两格的矿车」这条热路径一个便宜的守卫。
+    std::unordered_set<BlockPos, PosHash> cartCells;
     std::unordered_map<BlockPos, std::uint64_t, PosHash> entityOrders;
     std::unordered_map<BlockPos, StateId, PosHash> changes;
     std::vector<Probe> probes;
@@ -326,7 +329,8 @@ private:
     bool isBookshelf(StateId state) const;
     bool isDecoratedPot(StateId state) const;
     bool canInsertStack(const InventorySlot& slot, ItemStack stack) const;
-    bool canExtractStack(const InventorySlot& slot, BlockPos into) const;
+    // into 是**目标槽位表**而不是坐标：漏斗矿车的目标是实体库存，那一格上可能根本没有方块。
+    bool canExtractStack(const InventorySlot& slot, const std::vector<InventorySlot>& into) const;
     void updateBookshelfSlot(const InventorySlot& slot);
     std::vector<InventorySlot> containerSlots(BlockPos pos, bool ignoreBlockage = true) const;
     // 器件层实体容器（issue #12）：声明在某一格里的运输/漏斗矿车、运输船/运输竹筏。
@@ -339,6 +343,19 @@ private:
     std::size_t containerEntityCount(BlockPos pos) const;
     std::vector<InventorySlot> entityContainerSlots(BlockPos pos, int entity) const;
     std::optional<int> chooseContainerEntity(BlockPos pos);
+    // ---- 漏斗矿车主动吸取（issue #12 最后一条）----
+    // 这条路径**尚无原版差分**：本轮参考捕获资源被别的 agent 独占，
+    // 下面的实现全部由 26.2 反编译源码推导，只有上一轮一次原版探针实测作为旁证。
+    // 事件挂在「矿车所在的那一格」上，data 用这个常量与其他阶段 3 接触事件区分，
+    // 事件里的方块类型固定记 0：矿车不是方块，那一格的方块可以随便换。
+    static constexpr std::uint64_t cartSuctionEvent = 1;
+    bool cellHasCartHopper(BlockPos pos) const;
+    void rebuildCartCells();
+    void scheduleCartSuction(BlockPos cell, Tick when);
+    void wakeCartHopper(BlockPos cell);
+    void wakeCartHoppers(BlockPos changed);
+    void tickCartHoppers(BlockPos cell);
+    bool cartHopperSuck(BlockPos cell, int entity, BlockPos source);
     // 原版 getContainerAt 先看 getBlockContainer；这里为真表示该格有方块容器，
     // 实体容器只在为假时才会被查询。堆肥桶是 WorldlyContainerHolder，也算方块容器。
     bool hasBlockContainer(BlockPos pos) const;
@@ -356,6 +373,9 @@ private:
     void containerChanged(BlockPos pos);
     bool inventoryEmpty(BlockPos pos) const;
     bool inventoryFull(BlockPos pos) const;
+    // targetSlots 非空时表示目标是实体容器（漏斗矿车），此时不要求「取用者正好在堆肥桶正下方」：
+    // 原版 OutputContainer.canTakeItemThroughFace 只看方向 DOWN，与取用者的位置无关。
+    bool transferComposter(BlockPos from, BlockPos into, bool pulling, const std::vector<InventorySlot>* targetSlots = nullptr);
     bool transferItem(BlockPos from, BlockPos to, bool pulling = false);
     bool transferSlots(const std::vector<InventorySlot>& sourceSlots, const std::vector<InventorySlot>& targetSlots,
                        BlockPos from, BlockPos to, bool pulling);

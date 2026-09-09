@@ -37,12 +37,12 @@ bool Simulator::canInsertStack(const InventorySlot& slot, ItemStack stack) const
     if(isBookshelf(world.get(slot.pos))) return registry.item(stack.item).bookshelfBook && !stackAt(slot).count;
     return true;
 }
-bool Simulator::canExtractStack(const InventorySlot& slot, BlockPos into) const {
+bool Simulator::canExtractStack(const InventorySlot& slot, const std::vector<InventorySlot>& into) const {
     if(slot.entity>=0)return true;
-    if(at(slot.pos).device==Device::jukebox){for(const auto& target:containerSlots(into))if(!stackAt(target).count)return true;return false;}
+    if(at(slot.pos).device==Device::jukebox){for(const auto& target:into)if(!stackAt(target).count)return true;return false;}
     if(!isBookshelf(world.get(slot.pos))) return true;
     const auto source=stackAt(slot);
-    for(const auto& target:containerSlots(into)) {
+    for(const auto& target:into) {
         const auto stack=stackAt(target);
         if(!stack.count || (source.item==stack.item && source.count+stack.count<=registry.item(stack.item).maxStack)) return true;
     }
@@ -178,8 +178,12 @@ void Simulator::stimulateContainerEntities(BlockPos pos, const Json& input) {
     const auto& data = runtime.at(pos);
     if (data.values.empty() && data.inventory.empty() && data.output == 0 && world.get(pos) == 0) runtime.erase(pos);
     // 矿车出现或消失不是方块实体变化，不通知比较器；runtimeChanged 仍会唤醒
-    // 这一格下方的漏斗和朝这一格的漏斗，正是可能读到它的两条路径。
+    // 这一格下方的漏斗、朝这一格的漏斗，以及下方两格里的漏斗矿车，
+    // 正是可能读到它的三条路径。
     runtimeChanged(pos, false);
+    // 这一格自己新出现漏斗矿车时还要唤醒它自己：runtimeChanged 只照顾下方两格。
+    if (cellHasCartHopper(pos)) { cartCells.insert(pos); wakeCartHopper(pos); }
+    else cartCells.erase(pos);
 }
 void Simulator::validateContainerEntities(const Json& entities) const {
     if (!entities.is_array() || entities.empty() || entities.size() > containerEntityLimit) throw std::invalid_argument("无效容器实体列表");

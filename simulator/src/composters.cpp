@@ -24,8 +24,10 @@ void Simulator::emptyComposter(BlockPos pos, StateId state) {
     emitGameEvent("block_change",pos,{false,false,false,next});
 }
 
-bool Simulator::transferComposter(BlockPos from, BlockPos into, bool pulling) {
-    if(at(into).device==Device::composter) {
+bool Simulator::transferComposter(BlockPos from, BlockPos into, bool pulling, const std::vector<InventorySlot>* targetSlots) {
+    // targetSlots 非空 = 目标是那一格里的实体容器（漏斗矿车），推入分支对它不可达：
+    // 矿车没有 ejectItems，只会吸取。
+    if(!targetSlots && at(into).device==Device::composter) {
         if(from!=into.relative(Direction::up) || at(into).staticAnalog>=7)return false;
         for(const auto& slot:containerSlots(from)) {
             const auto stack=stackAt(slot);if(!stack.count)continue;
@@ -35,19 +37,24 @@ bool Simulator::transferComposter(BlockPos from, BlockPos into, bool pulling) {
         }
         return false;
     }
-    if(!pulling || into!=from.relative(Direction::down) || at(from).staticAnalog!=8)return false;
+    // 方块漏斗只会从正上方拉取，所以保留那条几何断言；漏斗矿车拉的是**上面第二格**，
+    // 而原版 OutputContainer.canTakeItemThroughFace（ComposterBlock.java:471-473）只检查
+    // 方向是 DOWN、物品是骨粉，与取用者离得多远无关，因此实体目标不受这条限制。
+    if(!pulling || (!targetSlots && into!=from.relative(Direction::down)) || at(from).staticAnalog!=8)return false;
     const auto state=world.get(from);const ItemStack bone{registry.itemId("bone_meal"),1};
     // This is a temporary vanilla OutputContainer, not a persistent inventory.
     // SimpleContainer.removeItem invokes its setChanged before insertion. Even
     // a failed insertion empties the block; restoring the temporary slot emits
     // a second empty notification rather than restoring the compost level.
     emptyComposter(from,state);
-    for(const auto& slot:containerSlots(into)) {
+    for(const auto& slot:targetSlots?*targetSlots:containerSlots(into)) {
         if(!canInsertStack(slot,bone))continue;
         const auto existing=stackAt(slot);
         if(existing.count && (existing.item!=bone.item || existing.count>=registry.item(bone.item).maxStack))continue;
         writeStack(slot,{bone.item,static_cast<std::uint16_t>(existing.count+1)},existing.count==0);
-        containerChanged(into);emptyComposter(from,state);return true;
+        // 矿车不是方块实体，AbstractMinecartContainer.setChanged 是空实现，不通知比较器。
+        if(slot.entity<0)containerChanged(into);
+        emptyComposter(from,state);return true;
     }
     emptyComposter(from,state);return false;
 }

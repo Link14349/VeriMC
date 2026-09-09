@@ -105,6 +105,7 @@ void Simulator::runtimeChanged(BlockPos pos, bool notifyComparators) {
     sampleAffected(pos);
     if (notifyComparators) updateComparatorNeighbors(pos);
     if (!hoppers.empty()) wakeHoppers(pos);
+    wakeCartHoppers(pos);
 }
 
 void Simulator::updatePressurePlate(BlockPos pos) {

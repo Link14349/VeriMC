@@ -124,7 +124,7 @@ bool Simulator::transferSlots(const std::vector<InventorySlot>& sourceSlots, con
     for (const auto& source : sourceSlots) {
         auto original = stackAt(source);
         if (!original.count) continue;
-        if(pulling && !canExtractStack(source,to)) continue;
+        if(pulling && !canExtractStack(source,targetSlots)) continue;
         auto remaining = original;
         --remaining.count;
         writeStack(source, remaining);
@@ -360,7 +360,8 @@ void Simulator::tickHopper(const ScheduledEvent& event) {
             retryExtraction = !pulled && at(source).device != Device::hopper && !isDecoratedPot(world.get(source)) && !inventoryEmpty(source);
             if(retryExtraction && (isBookshelf(world.get(source)) || at(source).device==Device::jukebox)) {
                 retryExtraction=false;
-                for(const auto& slot:containerSlots(source)) if(stackAt(slot).count && canExtractStack(slot,event.pos)) {retryExtraction=true;break;}
+                const auto into=containerSlots(event.pos);
+                for(const auto& slot:containerSlots(source)) if(stackAt(slot).count && canExtractStack(slot,into)) {retryExtraction=true;break;}
             }
             moved = pulled || moved;
         }
@@ -376,5 +377,113 @@ void Simulator::tickHopper(const ScheduledEvent& event) {
     }
     // A failed transfer has no future work until inventory, topology or power
     // changes. Those mutations wake only adjacent dependent hoppers.
+}
+
+// ---- 漏斗矿车主动吸取（issue #12 的最后一条）----
+//
+// 26.2 反编译源码核实（simulator/.cache/reference/sources）：
+//   * `vehicle/minecart/MinecartHopper.java:84-88` `tick()`：先把 consumedItemThisFrame 清零，
+//     再 super.tick()（移动，途中 makeStepAlongTrack:91-95 可能提前吸一次），最后 tryConsumeItems()。
+//   * 同文件 `:97-102` `tryConsumeItems()`：判据只有 服务端 / isAlive / isEnabled /
+//     本帧还没搬过 / suckInItems()。**没有任何冷却字段**——矿车这一侧不存在 8 gt 冷却。
+//   * 同文件 `:104-117` `suckInItems()`：先 `HopperBlockEntity.suckInItems(level, this)`，
+//     失败才看包围盒 inflate(0.25,0,0.25) 里的掉落物实体。
+//   * 同文件 `:63-81`：`getLevelX/Y/Z` 是 `getX() / getY()+0.5 / getZ()`，`isGridAligned()` 为 **false**。
+//   * `block/entity/HopperBlockEntity.java:218-246` `suckInItems`：查询格是
+//     `BlockPos.containing(levelX, levelY + 1.0, levelZ)`，取用方向恒为 `Direction.DOWN`；
+//     `isGridAligned()` 为假时**跳过**「上方完整方块阻挡」那一条。
+//   * 同文件 `:354-356 → :367-376`：`getSourceContainer → getContainerAt`，
+//     `getBlockContainer`（:378-391）优先，为空才 `getEntityContainer`（:393-398），
+//     后者候选非空就一定消耗一次 `level.getRandom().nextInt(size)`。
+//   * 同文件 `:314-348` `tryMoveInItem`：置 8 gt 冷却那一条要求收件方 `instanceof HopperBlockEntity`，
+//     矿车不是，所以矿车被塞满也不会进入冷却；成功取出时 `:255` 对**源容器**调用 setChanged。
+//   * 顺序：`server/level/ServerLevel.java:426` 先 `entityTickList.forEach`（实体），
+//     `:450` 才 `tickBlockEntities()`。所以同一刻里矿车吸取**早于**方块漏斗，
+//     对应内核的阶段 3 早于阶段 2。
+//   * `isEnabled()` 只被 `activateMinecart` 改写，而它唯一的调用点是
+//     `NewMinecartBehavior.java:250` / `OldMinecartBehavior.java:66` 的 `moveAlongTrack`——
+//     属于轨道与运动模型，本协议明确不建模，因此这里的矿车**恒为启用**。
+//
+// 本协议约定矿车停在**格中心**（y = 格底 + 0.5），于是 levelY + 1.0 = 格底 + 2.0，
+// 掏的是**上面第二格**。停在铁轨高度（y = 格底 + 0.0625）的矿车掏的是正上方那一格，
+// 但那个 y **目前无法声明**：位置的粒度是「哪一格」，不是实数坐标。
+//
+// **尚无原版差分。** 本轮参考捕获资源被另一个 agent 独占，下面的行为全部是从源码推出的期望；
+// 唯一的实测旁证是上一轮的原版探针（12 刻、格中心停放、方块漏斗放在上面第二格：
+// 第 3/4/5 刻各被搬走一件、3→0、全程零冷却、世界随机源一步没动），只覆盖这一个几何。
+
+bool Simulator::cellHasCartHopper(BlockPos pos) const {
+    auto found = runtime.find(pos);
+    if (found == runtime.end()) return false;
+    auto entities = found->second.values.find("containerEntities");
+    if (entities == found->second.values.end()) return false;
+    for (const auto& row : *entities) if (row.at("type") == "hopper_minecart") return true;
+    return false;
+}
+
+void Simulator::rebuildCartCells() {
+    cartCells.clear();
+    for (const auto& [pos, data] : runtime) { (void)data; if (cellHasCartHopper(pos)) cartCells.insert(pos); }
+}
+
+void Simulator::scheduleCartSuction(BlockPos cell, Tick when) {
+    // 方块类型固定记 0：矿车不是方块，那一格的方块可以随便换，事件不能因此被丢掉。
+    if (scheduledKeys.insert({cell, 0, 3, cartSuctionEvent}).second)
+        scheduled.push({when, 0, nextOrder++, cell, 0, 3, cartSuctionEvent, 0});
+}
+
+void Simulator::wakeCartHopper(BlockPos cell) {
+    if (!cartCells.count(cell)) return;
+    // 刻内顺序是 0（方块计划刻）→ 1（方块事件）→ 3（实体接触）→ 2（方块实体）→ 4（命令）。
+    // 只有还没走到阶段 3 的时候才来得及在**本刻**吸取。
+    scheduleCartSuction(cell, currentTick + (currentPhase <= 1 ? 0 : 1));
+}
+
+void Simulator::wakeCartHoppers(BlockPos changed) {
+    if (cartCells.empty()) return;
+    // 矿车只读上面第二格，所以一格的方块或器件数据变化只可能影响下方两格里的矿车。
+    wakeCartHopper(changed.relative(Direction::down, 2));
+}
+
+// 返回「下一刻还得再跑一次」。原版矿车每刻都调用 suckInItems 且没有冷却，
+// 内核为省事在无事可做时休眠——只有确实没有可观测效果时这才等价。
+// 有可观测效果的三种情况：抽了随机数、搬动了物品、失败的提取仍然通知了源容器。
+bool Simulator::cartHopperSuck(BlockPos cell, int entity, BlockPos source) {
+    const auto target = entityContainerSlots(cell, entity);
+    if (target.empty()) return false;
+    if (hasBlockContainer(source)) {
+        // 堆肥桶是 WorldlyContainerHolder，走 getBlockContainer 的第一条分支。
+        if (at(source).device == Device::composter) return transferComposter(source, cell, true, &target);
+        if (transferSlots(containerSlots(source), target, source, cell, true)) return true;
+        // 提取失败时原版照样走一遍 removeItem/setItem，对普通容器就是可观测的 setChanged；
+        // 漏斗与饰纹陶罐在 setItem 里不通知，失败就真的什么都没发生，可以休眠。
+        if (at(source).device == Device::hopper || isDecoratedPot(world.get(source)) || inventoryEmpty(source)) return false;
+        if (isBookshelf(world.get(source)) || at(source).device == Device::jukebox) {
+            for (const auto& slot : containerSlots(source)) if (stackAt(slot).count && canExtractStack(slot, target)) return true;
+            return false;
+        }
+        return true;
+    }
+    // 没有方块容器才查实体容器：候选非空就抽一次 nextInt，与这次是否真的搬动无关，
+    // 因此只要上面第二格还停着容器实体就必须逐刻重跑（与方块漏斗那一侧同一条理由）。
+    if (const auto chosen = chooseContainerEntity(source)) {
+        transferSlots(entityContainerSlots(source, *chosen), target, source, cell, true);
+        return true;
+    }
+    // 掉落物分支（suckInItems 的 else 与 MinecartHopper.suckInItems 的包围盒扫描）
+    // 尚未建模：groundItems 是声明在**漏斗方块**上的，矿车没有对应的声明入口。
+    return false;
+}
+
+void Simulator::tickCartHoppers(BlockPos cell) {
+    if (!cartCells.count(cell)) return;
+    const auto source = cell.relative(Direction::up, 2);
+    bool again = false;
+    // 同一格里的多辆矿车按声明顺序各自吸一次，各自都可能抽一次随机数。
+    for (std::size_t index = 0; index < containerEntityCount(cell); ++index) {
+        if (runtime.at(cell).values.at("containerEntities").at(index).at("type") != "hopper_minecart") continue;
+        again = cartHopperSuck(cell, static_cast<int>(index), source) || again;
+    }
+    if (again) scheduleCartSuction(cell, currentTick + 1);
 }
 }
