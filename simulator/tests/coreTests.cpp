@@ -1490,13 +1490,18 @@ int main() {
         late.stimulate(source, {{"inventory", Json::array({stone(0, 1)})}});
         late.advanceTo(12);
         expect(cargo(late) == Json::array({stone(0, 1)}), "a dormant hopper minecart missed a later inventory change: " + cargo(late).dump());
+        // 装满的堆肥桶是 WorldlyContainerHolder，算方块容器，而放置它**不写任何器件数据**，
+        // 所以这一格只能走 setBlock 那条唤醒路径。顺带钉住堆肥桶这个源：原版
+        // ComposterBlock.OutputContainer.canTakeItemThroughFace（ComposterBlock.java:471-473）
+        // 只检查方向是 DOWN、物品是骨粉，与取用者离得多远无关，因此隔了一格的矿车照样掏得到。
         Simulator later(r); floor(later);
         later.stimulate(cart, cartOnly);
         later.advanceTo(10);
-        later.place(source, r.state("chest"));
-        later.stimulate(source, {{"inventory", Json::array({stone(0, 1)})}});
+        later.place(source, r.state("composter", {{"level", "8"}}));
         later.advanceTo(12);
-        expect(cargo(later) == Json::array({stone(0, 1)}), "a dormant hopper minecart missed a later block placement: " + cargo(later).dump());
+        expect(cargo(later) == Json::array({{{"slot", 0}, {"item", "minecraft:bone_meal"}, {"count", 1}}}),
+               "a dormant hopper minecart missed a later block placement: " + cargo(later).dump());
+        expect(r.property(later.world.get(source), "level") == "0", "the hopper minecart did not empty the composter above it");
 
         // 8) 快照往返：吸取途中存盘、重载，队列与后续行为都必须一致。
         Simulator live(r); floor(live);
