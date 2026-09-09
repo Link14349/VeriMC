@@ -68,6 +68,17 @@ def group(bx, bz):
     commands.append({'tick': 0, 'pos': [bx + 4, 1, bz + 12],
                      'stimulus': {'inventory': [{'slot': 0, 'item': 'minecraft:stone', 'count': 5}]}})
     watch.extend([[bx + 4, 1, bz + 12], [bx + 5, 1, bz + 12]])
+    # Two more block entity timers that must freeze with the chunk: a playing jukebox counts
+    # elapsed ticks, and a sculk sensor counts down its vibration delay.
+    put(0, (bx + 8, 1, bz + 12), 'jukebox')
+    commands.append({'tick': 1, 'pos': [bx + 8, 1, bz + 12],
+                     'stimulus': {'inventory': [{'slot': 0, 'item': 'minecraft:music_disc_cat', 'count': 1}]}})
+    watch.append([bx + 8, 1, bz + 12])
+    put(0, (bx + 8, 1, bz + 8), 'sculk_sensor')
+    put(0, (bx + 9, 1, bz + 8), 'redstone_lamp')
+    commands.append({'tick': 4, 'pos': [bx + 12, 1, bz + 8],
+                     'stimulus': {'gameEvent': 'minecraft:block_place'}})
+    watch.extend([[bx + 8, 1, bz + 8], [bx + 9, 1, bz + 8]])
 
 
 def drive(bx, bz, tick, on):
@@ -102,8 +113,8 @@ def build(origin, fixtureName):
     chunkState(40, (4, 1, 4), 'entityTicking')
     # The chunk borders have to fall at known relative coordinates, so this fixture cannot be
     # re-captured through GameTest, which picks its own random origin.
-    return runVanillaCapture(commands, watch, 60, fixtureName, origin,
-                             watchChunkState=True, discardDrops=True, requiresAlignedOrigin=True)
+    return runVanillaCapture(commands, watch, 60, fixtureName, origin, watchChunkState=True,
+                             watchJukeboxes=True, discardDrops=True, requiresAlignedOrigin=True)
 
 
 if __name__ == '__main__':

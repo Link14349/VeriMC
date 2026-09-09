@@ -1857,6 +1857,61 @@
     {
       "tick": 0,
       "pos": [
+        8,
+        1,
+        12
+      ],
+      "stateId": 6964
+    },
+    {
+      "tick": 1,
+      "pos": [
+        8,
+        1,
+        12
+      ],
+      "stimulus": {
+        "inventory": [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ]
+      }
+    },
+    {
+      "tick": 0,
+      "pos": [
+        8,
+        1,
+        8
+      ],
+      "stateId": 27164
+    },
+    {
+      "tick": 0,
+      "pos": [
+        9,
+        1,
+        8
+      ],
+      "stateId": 9480
+    },
+    {
+      "tick": 4,
+      "pos": [
+        12,
+        1,
+        8
+      ],
+      "stimulus": {
+        "gameEvent": "minecraft:block_place"
+      }
+    },
+    {
+      "tick": 0,
+      "pos": [
         33,
         0,
         33
@@ -3708,6 +3763,61 @@
       }
     },
     {
+      "tick": 0,
+      "pos": [
+        40,
+        1,
+        44
+      ],
+      "stateId": 6964
+    },
+    {
+      "tick": 1,
+      "pos": [
+        40,
+        1,
+        44
+      ],
+      "stimulus": {
+        "inventory": [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ]
+      }
+    },
+    {
+      "tick": 0,
+      "pos": [
+        40,
+        1,
+        40
+      ],
+      "stateId": 27164
+    },
+    {
+      "tick": 0,
+      "pos": [
+        41,
+        1,
+        40
+      ],
+      "stateId": 9480
+    },
+    {
+      "tick": 4,
+      "pos": [
+        44,
+        1,
+        40
+      ],
+      "stimulus": {
+        "gameEvent": "minecraft:block_place"
+      }
+    },
+    {
       "tick": 2,
       "pos": [
         4,
@@ -3890,6 +4000,21 @@
       12
     ],
     [
+      8,
+      1,
+      12
+    ],
+    [
+      8,
+      1,
+      8
+    ],
+    [
+      9,
+      1,
+      8
+    ],
+    [
       36,
       1,
       36
@@ -3933,9 +4058,25 @@
       37,
       1,
       44
+    ],
+    [
+      40,
+      1,
+      44
+    ],
+    [
+      40,
+      1,
+      40
+    ],
+    [
+      41,
+      1,
+      40
     ]
   ],
   "watchChunkState": true,
+  "watchJukeboxes": true,
   "discardDrops": true,
   "requiresAlignedOrigin": true,
   "reference": "Minecraft Java 26.2 strict vanilla-only dedicated server, nonexperimental redstone",
@@ -3969,6 +4110,9 @@
         0,
         11317,
         3988,
+        6964,
+        27164,
+        9480,
         6778,
         7093,
         7093,
@@ -3977,7 +4121,10 @@
         1,
         0,
         11317,
-        3988
+        3988,
+        6964,
+        27164,
+        9480
       ],
       "analogs": [
         -1,
@@ -3989,6 +4136,9 @@
         -1,
         1,
         0,
+        0,
+        0,
+        -1,
         -1,
         -1,
         -1,
@@ -3997,7 +4147,10 @@
         -1,
         -1,
         1,
-        0
+        0,
+        0,
+        0,
+        -1
       ],
       "inventories": [
         [],
@@ -4022,6 +4175,9 @@
         [],
         [],
         [],
+        [],
+        [],
+        [],
         [
           {
             "slot": 0,
@@ -4029,6 +4185,9 @@
             "count": 5
           }
         ],
+        [],
+        [],
+        [],
         []
       ],
       "chunkStates": [
@@ -4121,7 +4280,69 @@
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": false,
+          "elapsed": 0
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": false,
+          "elapsed": 0
+        },
+        null,
+        null
       ]
     },
     {
@@ -4136,6 +4357,9 @@
         0,
         11317,
         3988,
+        6963,
+        27164,
+        9480,
         6778,
         7093,
         7093,
@@ -4144,7 +4368,10 @@
         1,
         0,
         11317,
-        3988
+        3988,
+        6963,
+        27164,
+        9480
       ],
       "analogs": [
         -1,
@@ -4156,6 +4383,9 @@
         -1,
         1,
         1,
+        2,
+        0,
+        -1,
         -1,
         -1,
         -1,
@@ -4164,7 +4394,10 @@
         -1,
         -1,
         1,
-        1
+        1,
+        2,
+        0,
+        -1
       ],
       "inventories": [
         [],
@@ -4188,6 +4421,15 @@
             "count": 1
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -4208,7 +4450,16 @@
             "item": "minecraft:stone",
             "count": 1
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -4300,7 +4551,69 @@
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 0
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 0
+        },
+        null,
+        null
       ]
     },
     {
@@ -4315,6 +4628,9 @@
         0,
         11317,
         3988,
+        6963,
+        27164,
+        9480,
         6777,
         7093,
         7093,
@@ -4323,7 +4639,10 @@
         1,
         0,
         11317,
-        3988
+        3988,
+        6963,
+        27164,
+        9480
       ],
       "analogs": [
         -1,
@@ -4335,6 +4654,9 @@
         -1,
         1,
         1,
+        2,
+        0,
+        -1,
         -1,
         -1,
         -1,
@@ -4343,7 +4665,10 @@
         -1,
         -1,
         1,
-        1
+        1,
+        2,
+        0,
+        -1
       ],
       "inventories": [
         [],
@@ -4367,6 +4692,15 @@
             "count": 1
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -4387,7 +4721,16 @@
             "item": "minecraft:stone",
             "count": 1
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -4479,7 +4822,69 @@
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 1
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 1
+        },
+        null,
+        null
       ]
     },
     {
@@ -4494,6 +4899,9 @@
         2311,
         11317,
         3988,
+        6963,
+        27164,
+        9480,
         6777,
         7093,
         7093,
@@ -4502,7 +4910,10 @@
         2311,
         2311,
         11317,
-        3988
+        3988,
+        6963,
+        27164,
+        9480
       ],
       "analogs": [
         -1,
@@ -4514,6 +4925,9 @@
         -1,
         1,
         1,
+        2,
+        0,
+        -1,
         -1,
         -1,
         -1,
@@ -4522,7 +4936,10 @@
         -1,
         -1,
         1,
-        1
+        1,
+        2,
+        0,
+        -1
       ],
       "inventories": [
         [],
@@ -4546,6 +4963,15 @@
             "count": 1
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -4566,7 +4992,16 @@
             "item": "minecraft:stone",
             "count": 1
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -4658,7 +5093,69 @@
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 2
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 2
+        },
+        null,
+        null
       ]
     },
     {
@@ -4673,6 +5170,9 @@
         2311,
         11317,
         3988,
+        6963,
+        27164,
+        9480,
         6777,
         7093,
         7093,
@@ -4681,7 +5181,10 @@
         2311,
         2311,
         11317,
-        3988
+        3988,
+        6963,
+        27164,
+        9480
       ],
       "analogs": [
         -1,
@@ -4693,6 +5196,9 @@
         -1,
         1,
         1,
+        2,
+        0,
+        -1,
         -1,
         -1,
         -1,
@@ -4701,7 +5207,10 @@
         -1,
         -1,
         1,
-        1
+        1,
+        2,
+        0,
+        -1
       ],
       "inventories": [
         [],
@@ -4725,6 +5234,15 @@
             "count": 1
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -4745,7 +5263,16 @@
             "item": "minecraft:stone",
             "count": 1
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -4837,7 +5364,69 @@
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 3
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 3
+        },
+        null,
+        null
       ]
     },
     {
@@ -4852,6 +5441,9 @@
         1,
         11317,
         3988,
+        6963,
+        27214,
+        9479,
         6777,
         7093,
         7093,
@@ -4860,7 +5452,10 @@
         2275,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27214,
+        9479
       ],
       "analogs": [
         -1,
@@ -4872,6 +5467,9 @@
         -1,
         1,
         1,
+        2,
+        11,
+        -1,
         -1,
         -1,
         -1,
@@ -4880,7 +5478,10 @@
         -1,
         -1,
         1,
-        1
+        1,
+        2,
+        11,
+        -1
       ],
       "inventories": [
         [],
@@ -4904,6 +5505,15 @@
             "count": 1
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -4924,7 +5534,16 @@
             "item": "minecraft:stone",
             "count": 1
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -5016,7 +5635,69 @@
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 4
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 4
+        },
+        null,
+        null
       ]
     },
     {
@@ -5031,6 +5712,9 @@
         1,
         11317,
         3988,
+        6963,
+        27214,
+        9479,
         6777,
         7093,
         7093,
@@ -5039,7 +5723,10 @@
         2275,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27214,
+        9479
       ],
       "analogs": [
         -1,
@@ -5051,6 +5738,9 @@
         -1,
         1,
         1,
+        2,
+        11,
+        -1,
         -1,
         -1,
         -1,
@@ -5059,7 +5749,10 @@
         -1,
         -1,
         1,
-        1
+        1,
+        2,
+        11,
+        -1
       ],
       "inventories": [
         [],
@@ -5083,6 +5776,15 @@
             "count": 1
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -5103,7 +5805,16 @@
             "item": "minecraft:stone",
             "count": 1
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -5195,7 +5906,69 @@
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 5
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 5
+        },
+        null,
+        null
       ]
     },
     {
@@ -5210,6 +5983,9 @@
         1,
         11317,
         3988,
+        6963,
+        27214,
+        9479,
         6777,
         7093,
         7093,
@@ -5218,7 +5994,10 @@
         2275,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27214,
+        9479
       ],
       "analogs": [
         -1,
@@ -5230,6 +6009,9 @@
         -1,
         1,
         1,
+        2,
+        11,
+        -1,
         -1,
         -1,
         -1,
@@ -5238,7 +6020,10 @@
         -1,
         -1,
         1,
-        1
+        1,
+        2,
+        11,
+        -1
       ],
       "inventories": [
         [],
@@ -5262,6 +6047,15 @@
             "count": 1
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -5282,7 +6076,16 @@
             "item": "minecraft:stone",
             "count": 1
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -5331,6 +6134,36 @@
           "loaded": true
         },
         {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
@@ -5375,6 +6208,38 @@
           "entityTicking": true,
           "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 5
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 6
+        },
+        null,
+        null
       ]
     },
     {
@@ -5389,6 +6254,9 @@
         1,
         11317,
         3988,
+        6963,
+        27214,
+        9479,
         6777,
         7093,
         7093,
@@ -5397,7 +6265,10 @@
         2275,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27214,
+        9479
       ],
       "analogs": [
         -1,
@@ -5409,6 +6280,9 @@
         -1,
         1,
         1,
+        2,
+        11,
+        -1,
         -1,
         -1,
         -1,
@@ -5417,7 +6291,10 @@
         -1,
         -1,
         1,
-        1
+        1,
+        2,
+        11,
+        -1
       ],
       "inventories": [
         [],
@@ -5441,6 +6318,15 @@
             "count": 1
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -5461,7 +6347,16 @@
             "item": "minecraft:stone",
             "count": 1
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -5510,6 +6405,36 @@
           "loaded": true
         },
         {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
@@ -5554,6 +6479,38 @@
           "entityTicking": true,
           "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 5
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 7
+        },
+        null,
+        null
       ]
     },
     {
@@ -5568,6 +6525,9 @@
         1,
         11317,
         3988,
+        6963,
+        27214,
+        9479,
         6777,
         7093,
         7093,
@@ -5576,7 +6536,10 @@
         2275,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27214,
+        9479
       ],
       "analogs": [
         -1,
@@ -5588,6 +6551,9 @@
         -1,
         1,
         1,
+        2,
+        11,
+        -1,
         -1,
         -1,
         -1,
@@ -5596,7 +6562,10 @@
         -1,
         -1,
         1,
-        1
+        1,
+        2,
+        11,
+        -1
       ],
       "inventories": [
         [],
@@ -5620,6 +6589,15 @@
             "count": 1
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -5640,7 +6618,16 @@
             "item": "minecraft:stone",
             "count": 2
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -5689,6 +6676,36 @@
           "loaded": true
         },
         {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
@@ -5733,6 +6750,38 @@
           "entityTicking": true,
           "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 5
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 8
+        },
+        null,
+        null
       ]
     },
     {
@@ -5747,6 +6796,9 @@
         1,
         11317,
         3988,
+        6963,
+        27214,
+        9479,
         6777,
         7092,
         7093,
@@ -5755,7 +6807,10 @@
         2275,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27214,
+        9479
       ],
       "analogs": [
         -1,
@@ -5767,6 +6822,9 @@
         -1,
         1,
         1,
+        2,
+        11,
+        -1,
         -1,
         -1,
         -1,
@@ -5775,7 +6833,10 @@
         -1,
         -1,
         1,
-        1
+        1,
+        2,
+        11,
+        -1
       ],
       "inventories": [
         [],
@@ -5799,6 +6860,15 @@
             "count": 1
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -5819,7 +6889,16 @@
             "item": "minecraft:stone",
             "count": 2
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -5868,6 +6947,36 @@
           "loaded": true
         },
         {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
@@ -5912,6 +7021,38 @@
           "entityTicking": true,
           "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 5
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 9
+        },
+        null,
+        null
       ]
     },
     {
@@ -5926,6 +7067,9 @@
         1,
         11317,
         3988,
+        6963,
+        27214,
+        9479,
         6777,
         7092,
         7093,
@@ -5934,7 +7078,10 @@
         2275,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27214,
+        9479
       ],
       "analogs": [
         -1,
@@ -5946,6 +7093,9 @@
         -1,
         1,
         1,
+        2,
+        11,
+        -1,
         -1,
         -1,
         -1,
@@ -5954,7 +7104,10 @@
         -1,
         -1,
         1,
-        1
+        1,
+        2,
+        11,
+        -1
       ],
       "inventories": [
         [],
@@ -5978,6 +7131,15 @@
             "count": 1
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -5998,7 +7160,16 @@
             "item": "minecraft:stone",
             "count": 2
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -6047,6 +7218,36 @@
           "loaded": true
         },
         {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
@@ -6091,6 +7292,38 @@
           "entityTicking": true,
           "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 5
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 10
+        },
+        null,
+        null
       ]
     },
     {
@@ -6105,6 +7338,9 @@
         1,
         11317,
         3988,
+        6963,
+        27214,
+        9479,
         6777,
         7092,
         7093,
@@ -6113,7 +7349,10 @@
         2275,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27214,
+        9479
       ],
       "analogs": [
         -1,
@@ -6125,6 +7364,9 @@
         -1,
         1,
         1,
+        2,
+        11,
+        -1,
         -1,
         -1,
         -1,
@@ -6133,7 +7375,10 @@
         -1,
         -1,
         1,
-        1
+        1,
+        2,
+        11,
+        -1
       ],
       "inventories": [
         [],
@@ -6157,6 +7402,15 @@
             "count": 1
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -6177,7 +7431,16 @@
             "item": "minecraft:stone",
             "count": 2
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -6226,6 +7489,36 @@
           "loaded": true
         },
         {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
@@ -6270,6 +7563,38 @@
           "entityTicking": true,
           "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 5
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 11
+        },
+        null,
+        null
       ]
     },
     {
@@ -6284,6 +7609,9 @@
         1,
         11317,
         3988,
+        6963,
+        27214,
+        9479,
         6777,
         7092,
         7093,
@@ -6292,7 +7620,10 @@
         2275,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27214,
+        9479
       ],
       "analogs": [
         -1,
@@ -6304,6 +7635,9 @@
         -1,
         1,
         1,
+        2,
+        11,
+        -1,
         -1,
         -1,
         -1,
@@ -6312,7 +7646,10 @@
         -1,
         -1,
         1,
-        1
+        1,
+        2,
+        11,
+        -1
       ],
       "inventories": [
         [],
@@ -6336,6 +7673,15 @@
             "count": 1
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -6356,7 +7702,16 @@
             "item": "minecraft:stone",
             "count": 2
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -6405,6 +7760,36 @@
           "loaded": true
         },
         {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
@@ -6449,6 +7834,38 @@
           "entityTicking": true,
           "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 5
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 12
+        },
+        null,
+        null
       ]
     },
     {
@@ -6463,6 +7880,9 @@
         1,
         11317,
         3988,
+        6963,
+        27214,
+        9479,
         6778,
         7092,
         7093,
@@ -6471,7 +7891,10 @@
         2275,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27214,
+        9479
       ],
       "analogs": [
         -1,
@@ -6483,6 +7906,9 @@
         -1,
         1,
         1,
+        2,
+        11,
+        -1,
         -1,
         -1,
         -1,
@@ -6491,7 +7917,10 @@
         -1,
         -1,
         1,
-        1
+        1,
+        2,
+        11,
+        -1
       ],
       "inventories": [
         [],
@@ -6515,6 +7944,15 @@
             "count": 1
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -6535,7 +7973,16 @@
             "item": "minecraft:stone",
             "count": 2
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -6584,6 +8031,36 @@
           "loaded": true
         },
         {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
@@ -6628,6 +8105,38 @@
           "entityTicking": true,
           "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 5
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 13
+        },
+        null,
+        null
       ]
     },
     {
@@ -6642,6 +8151,9 @@
         1,
         11317,
         3988,
+        6963,
+        27214,
+        9479,
         6778,
         7092,
         7093,
@@ -6650,7 +8162,10 @@
         0,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27214,
+        9479
       ],
       "analogs": [
         -1,
@@ -6662,6 +8177,9 @@
         -1,
         1,
         1,
+        2,
+        11,
+        -1,
         -1,
         -1,
         -1,
@@ -6670,7 +8188,10 @@
         -1,
         -1,
         1,
-        1
+        1,
+        2,
+        11,
+        -1
       ],
       "inventories": [
         [],
@@ -6694,6 +8215,15 @@
             "count": 1
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -6714,7 +8244,16 @@
             "item": "minecraft:stone",
             "count": 2
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -6763,6 +8302,36 @@
           "loaded": true
         },
         {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
@@ -6807,6 +8376,38 @@
           "entityTicking": true,
           "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 5
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 14
+        },
+        null,
+        null
       ]
     },
     {
@@ -6821,6 +8422,9 @@
         1,
         11317,
         3988,
+        6963,
+        27214,
+        9479,
         6778,
         7092,
         7093,
@@ -6829,7 +8433,10 @@
         0,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27214,
+        9479
       ],
       "analogs": [
         -1,
@@ -6841,6 +8448,9 @@
         -1,
         1,
         1,
+        2,
+        11,
+        -1,
         -1,
         -1,
         -1,
@@ -6849,7 +8459,10 @@
         -1,
         -1,
         1,
-        1
+        1,
+        2,
+        11,
+        -1
       ],
       "inventories": [
         [],
@@ -6873,6 +8486,15 @@
             "count": 1
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -6893,7 +8515,16 @@
             "item": "minecraft:stone",
             "count": 2
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -6942,6 +8573,36 @@
           "loaded": true
         },
         {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
@@ -6986,6 +8647,38 @@
           "entityTicking": true,
           "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 5
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 15
+        },
+        null,
+        null
       ]
     },
     {
@@ -7000,6 +8693,9 @@
         1,
         11317,
         3988,
+        6963,
+        27214,
+        9479,
         6778,
         7092,
         7093,
@@ -7008,7 +8704,10 @@
         0,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27214,
+        9479
       ],
       "analogs": [
         -1,
@@ -7020,6 +8719,9 @@
         -1,
         1,
         1,
+        2,
+        11,
+        -1,
         -1,
         -1,
         -1,
@@ -7028,7 +8730,10 @@
         -1,
         -1,
         1,
-        1
+        1,
+        2,
+        11,
+        -1
       ],
       "inventories": [
         [],
@@ -7052,6 +8757,15 @@
             "count": 1
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -7072,7 +8786,16 @@
             "item": "minecraft:stone",
             "count": 3
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -7121,6 +8844,36 @@
           "loaded": true
         },
         {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
@@ -7165,6 +8918,38 @@
           "entityTicking": true,
           "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 5
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 16
+        },
+        null,
+        null
       ]
     },
     {
@@ -7179,6 +8964,9 @@
         1,
         11317,
         3988,
+        6963,
+        27214,
+        9479,
         6778,
         7092,
         7092,
@@ -7187,7 +8975,10 @@
         0,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27214,
+        9479
       ],
       "analogs": [
         -1,
@@ -7199,6 +8990,9 @@
         -1,
         1,
         1,
+        2,
+        11,
+        -1,
         -1,
         -1,
         -1,
@@ -7207,7 +9001,10 @@
         -1,
         -1,
         1,
-        1
+        1,
+        2,
+        11,
+        -1
       ],
       "inventories": [
         [],
@@ -7231,6 +9028,15 @@
             "count": 1
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -7251,7 +9057,16 @@
             "item": "minecraft:stone",
             "count": 3
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -7300,6 +9115,36 @@
           "loaded": true
         },
         {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
@@ -7344,6 +9189,38 @@
           "entityTicking": true,
           "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 5
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 17
+        },
+        null,
+        null
       ]
     },
     {
@@ -7358,6 +9235,9 @@
         1,
         11317,
         3988,
+        6963,
+        27214,
+        9479,
         6778,
         7092,
         7092,
@@ -7366,7 +9246,10 @@
         0,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27214,
+        9479
       ],
       "analogs": [
         -1,
@@ -7378,6 +9261,9 @@
         -1,
         1,
         1,
+        2,
+        11,
+        -1,
         -1,
         -1,
         -1,
@@ -7386,7 +9272,10 @@
         -1,
         -1,
         1,
-        1
+        1,
+        2,
+        11,
+        -1
       ],
       "inventories": [
         [],
@@ -7410,6 +9299,15 @@
             "count": 1
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -7430,7 +9328,16 @@
             "item": "minecraft:stone",
             "count": 3
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -7479,6 +9386,36 @@
           "loaded": true
         },
         {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
@@ -7523,6 +9460,38 @@
           "entityTicking": true,
           "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 5
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 18
+        },
+        null,
+        null
       ]
     },
     {
@@ -7537,6 +9506,9 @@
         1,
         11317,
         3988,
+        6963,
+        27214,
+        9479,
         6778,
         7092,
         7092,
@@ -7545,7 +9517,10 @@
         0,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27214,
+        9479
       ],
       "analogs": [
         -1,
@@ -7557,6 +9532,9 @@
         -1,
         1,
         1,
+        2,
+        11,
+        -1,
         -1,
         -1,
         -1,
@@ -7565,7 +9543,10 @@
         -1,
         -1,
         1,
-        1
+        1,
+        2,
+        11,
+        -1
       ],
       "inventories": [
         [],
@@ -7589,6 +9570,15 @@
             "count": 1
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -7609,7 +9599,16 @@
             "item": "minecraft:stone",
             "count": 3
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -7658,6 +9657,36 @@
           "loaded": true
         },
         {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
@@ -7702,6 +9731,38 @@
           "entityTicking": true,
           "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 5
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 19
+        },
+        null,
+        null
       ]
     },
     {
@@ -7716,6 +9777,9 @@
         1,
         11317,
         3988,
+        6963,
+        27214,
+        9479,
         6778,
         7092,
         7092,
@@ -7724,7 +9788,10 @@
         0,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27214,
+        9479
       ],
       "analogs": [
         -1,
@@ -7736,6 +9803,9 @@
         -1,
         1,
         1,
+        2,
+        11,
+        -1,
         -1,
         -1,
         -1,
@@ -7744,7 +9814,10 @@
         -1,
         -1,
         1,
-        1
+        1,
+        2,
+        11,
+        -1
       ],
       "inventories": [
         [],
@@ -7768,6 +9841,15 @@
             "count": 1
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -7788,7 +9870,16 @@
             "item": "minecraft:stone",
             "count": 3
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -7837,6 +9928,36 @@
           "loaded": true
         },
         {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
@@ -7881,6 +10002,38 @@
           "entityTicking": true,
           "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 5
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 20
+        },
+        null,
+        null
       ]
     },
     {
@@ -7895,6 +10048,9 @@
         1,
         11317,
         3988,
+        6963,
+        27214,
+        9479,
         6778,
         7093,
         7092,
@@ -7903,7 +10059,10 @@
         0,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27214,
+        9479
       ],
       "analogs": [
         -1,
@@ -7915,6 +10074,9 @@
         -1,
         1,
         1,
+        2,
+        11,
+        -1,
         -1,
         -1,
         -1,
@@ -7923,7 +10085,10 @@
         -1,
         -1,
         1,
-        1
+        1,
+        2,
+        11,
+        -1
       ],
       "inventories": [
         [],
@@ -7947,6 +10112,15 @@
             "count": 1
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -7967,7 +10141,16 @@
             "item": "minecraft:stone",
             "count": 3
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -8016,6 +10199,36 @@
           "loaded": true
         },
         {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
@@ -8060,6 +10273,38 @@
           "entityTicking": true,
           "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 5
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 21
+        },
+        null,
+        null
       ]
     },
     {
@@ -8074,6 +10319,9 @@
         1,
         11317,
         3988,
+        6963,
+        27214,
+        9479,
         6778,
         7093,
         7092,
@@ -8082,7 +10330,10 @@
         0,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27214,
+        9479
       ],
       "analogs": [
         -1,
@@ -8094,6 +10345,9 @@
         -1,
         1,
         1,
+        2,
+        11,
+        -1,
         -1,
         -1,
         -1,
@@ -8102,7 +10356,10 @@
         -1,
         -1,
         1,
-        1
+        1,
+        2,
+        11,
+        -1
       ],
       "inventories": [
         [],
@@ -8126,6 +10383,15 @@
             "count": 1
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -8146,7 +10412,16 @@
             "item": "minecraft:stone",
             "count": 3
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -8195,6 +10470,36 @@
           "loaded": true
         },
         {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
@@ -8239,6 +10544,38 @@
           "entityTicking": true,
           "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 5
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 22
+        },
+        null,
+        null
       ]
     },
     {
@@ -8253,6 +10590,9 @@
         1,
         11317,
         3988,
+        6963,
+        27214,
+        9479,
         6778,
         7093,
         7092,
@@ -8261,7 +10601,10 @@
         0,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27214,
+        9479
       ],
       "analogs": [
         -1,
@@ -8273,6 +10616,9 @@
         -1,
         1,
         1,
+        2,
+        11,
+        -1,
         -1,
         -1,
         -1,
@@ -8281,7 +10627,10 @@
         -1,
         -1,
         1,
-        1
+        1,
+        2,
+        11,
+        -1
       ],
       "inventories": [
         [],
@@ -8305,6 +10654,15 @@
             "count": 1
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -8325,7 +10683,16 @@
             "item": "minecraft:stone",
             "count": 3
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -8374,6 +10741,36 @@
           "loaded": true
         },
         {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
@@ -8418,6 +10815,38 @@
           "entityTicking": true,
           "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 5
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 23
+        },
+        null,
+        null
       ]
     },
     {
@@ -8432,6 +10861,9 @@
         1,
         11317,
         3988,
+        6963,
+        27214,
+        9479,
         6778,
         7093,
         7092,
@@ -8440,7 +10872,10 @@
         0,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27214,
+        9479
       ],
       "analogs": [
         -1,
@@ -8452,6 +10887,9 @@
         -1,
         1,
         1,
+        2,
+        11,
+        -1,
         -1,
         -1,
         -1,
@@ -8460,7 +10898,10 @@
         -1,
         -1,
         1,
-        1
+        1,
+        2,
+        11,
+        -1
       ],
       "inventories": [
         [],
@@ -8484,6 +10925,15 @@
             "count": 1
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -8504,7 +10954,16 @@
             "item": "minecraft:stone",
             "count": 4
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -8553,6 +11012,36 @@
           "loaded": true
         },
         {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
@@ -8597,6 +11086,38 @@
           "entityTicking": true,
           "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 5
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 24
+        },
+        null,
+        null
       ]
     },
     {
@@ -8611,6 +11132,9 @@
         1,
         11317,
         3988,
+        6963,
+        27214,
+        9479,
         6778,
         7093,
         7092,
@@ -8619,7 +11143,10 @@
         0,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27214,
+        9479
       ],
       "analogs": [
         -1,
@@ -8631,6 +11158,9 @@
         -1,
         1,
         1,
+        2,
+        11,
+        -1,
         -1,
         -1,
         -1,
@@ -8639,7 +11169,10 @@
         -1,
         -1,
         1,
-        1
+        1,
+        2,
+        11,
+        -1
       ],
       "inventories": [
         [],
@@ -8663,6 +11196,15 @@
             "count": 1
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -8683,7 +11225,16 @@
             "item": "minecraft:stone",
             "count": 4
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -8732,6 +11283,36 @@
           "loaded": true
         },
         {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
@@ -8776,6 +11357,38 @@
           "entityTicking": true,
           "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 5
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 25
+        },
+        null,
+        null
       ]
     },
     {
@@ -8790,6 +11403,9 @@
         1,
         11317,
         3988,
+        6963,
+        27214,
+        9479,
         6778,
         7093,
         7092,
@@ -8798,7 +11414,10 @@
         0,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27214,
+        9479
       ],
       "analogs": [
         -1,
@@ -8810,6 +11429,9 @@
         -1,
         1,
         1,
+        2,
+        11,
+        -1,
         -1,
         -1,
         -1,
@@ -8818,7 +11440,10 @@
         -1,
         -1,
         1,
-        1
+        1,
+        2,
+        11,
+        -1
       ],
       "inventories": [
         [],
@@ -8842,6 +11467,15 @@
             "count": 1
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -8862,7 +11496,16 @@
             "item": "minecraft:stone",
             "count": 4
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -8911,6 +11554,36 @@
           "loaded": true
         },
         {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
@@ -8955,6 +11628,38 @@
           "entityTicking": true,
           "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 5
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 26
+        },
+        null,
+        null
       ]
     },
     {
@@ -8969,6 +11674,9 @@
         1,
         11317,
         3988,
+        6963,
+        27214,
+        9479,
         6778,
         7093,
         7092,
@@ -8977,7 +11685,10 @@
         0,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27214,
+        9479
       ],
       "analogs": [
         -1,
@@ -8989,6 +11700,9 @@
         -1,
         1,
         1,
+        2,
+        11,
+        -1,
         -1,
         -1,
         -1,
@@ -8997,7 +11711,10 @@
         -1,
         -1,
         1,
-        1
+        1,
+        2,
+        11,
+        -1
       ],
       "inventories": [
         [],
@@ -9021,6 +11738,15 @@
             "count": 1
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -9041,7 +11767,16 @@
             "item": "minecraft:stone",
             "count": 4
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -9090,6 +11825,36 @@
           "loaded": true
         },
         {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
@@ -9134,6 +11899,38 @@
           "entityTicking": true,
           "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 5
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 27
+        },
+        null,
+        null
       ]
     },
     {
@@ -9148,6 +11945,9 @@
         1,
         11317,
         3988,
+        6963,
+        27214,
+        9479,
         6778,
         7093,
         7092,
@@ -9156,7 +11956,10 @@
         0,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27214,
+        9479
       ],
       "analogs": [
         -1,
@@ -9168,6 +11971,9 @@
         -1,
         1,
         1,
+        2,
+        11,
+        -1,
         -1,
         -1,
         -1,
@@ -9176,7 +11982,10 @@
         -1,
         -1,
         1,
-        1
+        1,
+        2,
+        11,
+        -1
       ],
       "inventories": [
         [],
@@ -9200,6 +12009,15 @@
             "count": 1
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -9220,7 +12038,16 @@
             "item": "minecraft:stone",
             "count": 4
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -9269,6 +12096,36 @@
           "loaded": true
         },
         {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
@@ -9313,6 +12170,38 @@
           "entityTicking": true,
           "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 5
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 28
+        },
+        null,
+        null
       ]
     },
     {
@@ -9327,6 +12216,9 @@
         1,
         11317,
         3988,
+        6963,
+        27214,
+        9479,
         6778,
         7093,
         7093,
@@ -9335,7 +12227,10 @@
         0,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27214,
+        9479
       ],
       "analogs": [
         -1,
@@ -9347,6 +12242,9 @@
         -1,
         1,
         1,
+        2,
+        11,
+        -1,
         -1,
         -1,
         -1,
@@ -9355,7 +12253,10 @@
         -1,
         -1,
         1,
-        1
+        1,
+        2,
+        11,
+        -1
       ],
       "inventories": [
         [],
@@ -9379,6 +12280,15 @@
             "count": 1
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -9399,7 +12309,16 @@
             "item": "minecraft:stone",
             "count": 4
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -9448,6 +12367,36 @@
           "loaded": true
         },
         {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
@@ -9492,6 +12441,38 @@
           "entityTicking": true,
           "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 5
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 29
+        },
+        null,
+        null
       ]
     },
     {
@@ -9506,6 +12487,9 @@
         1,
         11317,
         3988,
+        6963,
+        27214,
+        9479,
         6778,
         7093,
         7093,
@@ -9514,7 +12498,10 @@
         0,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27214,
+        9479
       ],
       "analogs": [
         -1,
@@ -9526,6 +12513,9 @@
         -1,
         1,
         1,
+        2,
+        11,
+        -1,
         -1,
         -1,
         -1,
@@ -9534,7 +12524,10 @@
         -1,
         -1,
         1,
-        1
+        1,
+        2,
+        11,
+        -1
       ],
       "inventories": [
         [],
@@ -9558,6 +12551,15 @@
             "count": 1
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -9578,7 +12580,16 @@
             "item": "minecraft:stone",
             "count": 4
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -9627,6 +12638,36 @@
           "loaded": true
         },
         {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
@@ -9671,6 +12712,38 @@
           "entityTicking": true,
           "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 5
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 30
+        },
+        null,
+        null
       ]
     },
     {
@@ -9685,6 +12758,9 @@
         1,
         11317,
         3988,
+        6963,
+        27214,
+        9479,
         6778,
         7093,
         7093,
@@ -9693,7 +12769,10 @@
         0,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27214,
+        9479
       ],
       "analogs": [
         -1,
@@ -9705,6 +12784,9 @@
         -1,
         1,
         1,
+        2,
+        11,
+        -1,
         -1,
         -1,
         -1,
@@ -9713,7 +12795,10 @@
         -1,
         -1,
         1,
-        1
+        1,
+        2,
+        11,
+        -1
       ],
       "inventories": [
         [],
@@ -9737,6 +12822,15 @@
             "count": 1
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -9757,7 +12851,16 @@
             "item": "minecraft:stone",
             "count": 4
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -9806,6 +12909,36 @@
           "loaded": true
         },
         {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
@@ -9850,6 +12983,38 @@
           "entityTicking": true,
           "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 5
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 31
+        },
+        null,
+        null
       ]
     },
     {
@@ -9864,6 +13029,9 @@
         1,
         11317,
         3988,
+        6963,
+        27214,
+        9479,
         6778,
         7093,
         7093,
@@ -9872,7 +13040,10 @@
         0,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27214,
+        9479
       ],
       "analogs": [
         -1,
@@ -9884,6 +13055,9 @@
         -1,
         1,
         1,
+        2,
+        11,
+        -1,
         -1,
         -1,
         -1,
@@ -9892,7 +13066,10 @@
         -1,
         -1,
         0,
-        1
+        1,
+        2,
+        11,
+        -1
       ],
       "inventories": [
         [],
@@ -9916,6 +13093,15 @@
             "count": 1
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -9930,7 +13116,16 @@
             "item": "minecraft:stone",
             "count": 5
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -9979,6 +13174,36 @@
           "loaded": true
         },
         {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
@@ -10023,6 +13248,38 @@
           "entityTicking": true,
           "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 5
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 32
+        },
+        null,
+        null
       ]
     },
     {
@@ -10037,6 +13294,9 @@
         1,
         11317,
         3988,
+        6963,
+        27214,
+        9479,
         6778,
         7093,
         7093,
@@ -10045,7 +13305,10 @@
         0,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27214,
+        9479
       ],
       "analogs": [
         -1,
@@ -10057,6 +13320,9 @@
         -1,
         1,
         1,
+        2,
+        11,
+        -1,
         -1,
         -1,
         -1,
@@ -10065,7 +13331,10 @@
         -1,
         -1,
         0,
-        1
+        1,
+        2,
+        11,
+        -1
       ],
       "inventories": [
         [],
@@ -10089,6 +13358,15 @@
             "count": 1
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -10103,7 +13381,16 @@
             "item": "minecraft:stone",
             "count": 5
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -10152,6 +13439,36 @@
           "loaded": true
         },
         {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
@@ -10196,6 +13513,38 @@
           "entityTicking": true,
           "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 5
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 33
+        },
+        null,
+        null
       ]
     },
     {
@@ -10210,6 +13559,9 @@
         1,
         11317,
         3988,
+        6963,
+        27214,
+        9479,
         6778,
         7093,
         7093,
@@ -10218,7 +13570,10 @@
         0,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27168,
+        9479
       ],
       "analogs": [
         -1,
@@ -10230,6 +13585,9 @@
         -1,
         1,
         1,
+        2,
+        11,
+        -1,
         -1,
         -1,
         -1,
@@ -10238,7 +13596,10 @@
         -1,
         -1,
         0,
-        1
+        1,
+        2,
+        0,
+        -1
       ],
       "inventories": [
         [],
@@ -10262,6 +13623,15 @@
             "count": 1
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -10276,7 +13646,16 @@
             "item": "minecraft:stone",
             "count": 5
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -10325,6 +13704,36 @@
           "loaded": true
         },
         {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
@@ -10369,6 +13778,38 @@
           "entityTicking": true,
           "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 5
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 34
+        },
+        null,
+        null
       ]
     },
     {
@@ -10383,6 +13824,9 @@
         1,
         11317,
         3988,
+        6963,
+        27214,
+        9479,
         6778,
         7093,
         7093,
@@ -10391,7 +13835,10 @@
         0,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27168,
+        9479
       ],
       "analogs": [
         -1,
@@ -10403,6 +13850,9 @@
         -1,
         1,
         1,
+        2,
+        11,
+        -1,
         -1,
         -1,
         -1,
@@ -10411,7 +13861,10 @@
         -1,
         -1,
         0,
-        1
+        1,
+        2,
+        0,
+        -1
       ],
       "inventories": [
         [],
@@ -10435,6 +13888,15 @@
             "count": 1
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -10449,7 +13911,16 @@
             "item": "minecraft:stone",
             "count": 5
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -10498,6 +13969,36 @@
           "loaded": true
         },
         {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
@@ -10542,6 +14043,38 @@
           "entityTicking": true,
           "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 5
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 35
+        },
+        null,
+        null
       ]
     },
     {
@@ -10556,6 +14089,9 @@
         1,
         11317,
         3988,
+        6963,
+        27214,
+        9479,
         6778,
         7093,
         7093,
@@ -10564,7 +14100,10 @@
         0,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27168,
+        9479
       ],
       "analogs": [
         -1,
@@ -10576,6 +14115,9 @@
         -1,
         1,
         1,
+        2,
+        11,
+        -1,
         -1,
         -1,
         -1,
@@ -10584,7 +14126,10 @@
         -1,
         -1,
         0,
-        1
+        1,
+        2,
+        0,
+        -1
       ],
       "inventories": [
         [],
@@ -10608,6 +14153,15 @@
             "count": 1
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -10622,7 +14176,16 @@
             "item": "minecraft:stone",
             "count": 5
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -10671,6 +14234,36 @@
           "loaded": true
         },
         {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
@@ -10715,6 +14308,38 @@
           "entityTicking": true,
           "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 5
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 36
+        },
+        null,
+        null
       ]
     },
     {
@@ -10729,6 +14354,9 @@
         1,
         11317,
         3988,
+        6963,
+        27214,
+        9479,
         6778,
         7093,
         7093,
@@ -10737,7 +14365,10 @@
         0,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27168,
+        9479
       ],
       "analogs": [
         -1,
@@ -10749,6 +14380,9 @@
         -1,
         1,
         1,
+        2,
+        11,
+        -1,
         -1,
         -1,
         -1,
@@ -10757,7 +14391,10 @@
         -1,
         -1,
         0,
-        1
+        1,
+        2,
+        0,
+        -1
       ],
       "inventories": [
         [],
@@ -10781,6 +14418,15 @@
             "count": 1
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -10795,7 +14441,16 @@
             "item": "minecraft:stone",
             "count": 5
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -10844,6 +14499,36 @@
           "loaded": true
         },
         {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
@@ -10888,6 +14573,38 @@
           "entityTicking": true,
           "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 5
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 37
+        },
+        null,
+        null
       ]
     },
     {
@@ -10902,6 +14619,9 @@
         1,
         11317,
         3988,
+        6963,
+        27214,
+        9479,
         6778,
         7093,
         7093,
@@ -10910,7 +14630,10 @@
         0,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27168,
+        9480
       ],
       "analogs": [
         -1,
@@ -10922,6 +14645,9 @@
         -1,
         1,
         1,
+        2,
+        11,
+        -1,
         -1,
         -1,
         -1,
@@ -10930,7 +14656,10 @@
         -1,
         -1,
         0,
-        1
+        1,
+        2,
+        0,
+        -1
       ],
       "inventories": [
         [],
@@ -10954,6 +14683,15 @@
             "count": 1
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -10968,7 +14706,16 @@
             "item": "minecraft:stone",
             "count": 5
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -11017,6 +14764,36 @@
           "loaded": true
         },
         {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
@@ -11061,6 +14838,38 @@
           "entityTicking": true,
           "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 5
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 38
+        },
+        null,
+        null
       ]
     },
     {
@@ -11075,6 +14884,9 @@
         1,
         11317,
         3988,
+        6963,
+        27214,
+        9479,
         6778,
         7093,
         7093,
@@ -11083,7 +14895,10 @@
         0,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27168,
+        9480
       ],
       "analogs": [
         -1,
@@ -11095,6 +14910,9 @@
         -1,
         1,
         1,
+        2,
+        11,
+        -1,
         -1,
         -1,
         -1,
@@ -11103,7 +14921,10 @@
         -1,
         -1,
         0,
-        1
+        1,
+        2,
+        0,
+        -1
       ],
       "inventories": [
         [],
@@ -11127,6 +14948,15 @@
             "count": 1
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -11141,7 +14971,16 @@
             "item": "minecraft:stone",
             "count": 5
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -11190,6 +15029,36 @@
           "loaded": true
         },
         {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": false,
+          "entityTicking": false,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
@@ -11234,6 +15103,38 @@
           "entityTicking": true,
           "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 5
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 39
+        },
+        null,
+        null
       ]
     },
     {
@@ -11248,6 +15149,9 @@
         1,
         11317,
         3988,
+        6963,
+        27168,
+        9479,
         6778,
         7093,
         7093,
@@ -11256,7 +15160,10 @@
         0,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27168,
+        9480
       ],
       "analogs": [
         -1,
@@ -11268,6 +15175,9 @@
         -1,
         1,
         1,
+        2,
+        0,
+        -1,
         -1,
         -1,
         -1,
@@ -11276,7 +15186,10 @@
         -1,
         -1,
         0,
-        1
+        1,
+        2,
+        0,
+        -1
       ],
       "inventories": [
         [],
@@ -11300,6 +15213,15 @@
             "count": 1
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -11314,7 +15236,16 @@
             "item": "minecraft:stone",
             "count": 5
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -11406,7 +15337,69 @@
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 6
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 40
+        },
+        null,
+        null
       ]
     },
     {
@@ -11421,6 +15414,9 @@
         1,
         11317,
         3988,
+        6963,
+        27168,
+        9479,
         6778,
         7093,
         7093,
@@ -11429,7 +15425,10 @@
         0,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27168,
+        9480
       ],
       "analogs": [
         -1,
@@ -11441,6 +15440,9 @@
         -1,
         1,
         1,
+        2,
+        0,
+        -1,
         -1,
         -1,
         -1,
@@ -11449,7 +15451,10 @@
         -1,
         -1,
         0,
-        1
+        1,
+        2,
+        0,
+        -1
       ],
       "inventories": [
         [],
@@ -11473,6 +15478,15 @@
             "count": 1
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -11487,7 +15501,16 @@
             "item": "minecraft:stone",
             "count": 5
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -11579,7 +15602,69 @@
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 7
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 41
+        },
+        null,
+        null
       ]
     },
     {
@@ -11594,6 +15679,9 @@
         1,
         11317,
         3988,
+        6963,
+        27168,
+        9479,
         6778,
         7093,
         7093,
@@ -11602,7 +15690,10 @@
         0,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27168,
+        9480
       ],
       "analogs": [
         -1,
@@ -11614,6 +15705,9 @@
         -1,
         1,
         1,
+        2,
+        0,
+        -1,
         -1,
         -1,
         -1,
@@ -11622,7 +15716,10 @@
         -1,
         -1,
         0,
-        1
+        1,
+        2,
+        0,
+        -1
       ],
       "inventories": [
         [],
@@ -11646,6 +15743,15 @@
             "count": 2
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -11660,7 +15766,16 @@
             "item": "minecraft:stone",
             "count": 5
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -11752,7 +15867,69 @@
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 8
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 42
+        },
+        null,
+        null
       ]
     },
     {
@@ -11767,6 +15944,9 @@
         1,
         11317,
         3988,
+        6963,
+        27168,
+        9479,
         6778,
         7093,
         7093,
@@ -11775,7 +15955,10 @@
         0,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27168,
+        9480
       ],
       "analogs": [
         -1,
@@ -11787,6 +15970,9 @@
         -1,
         1,
         1,
+        2,
+        0,
+        -1,
         -1,
         -1,
         -1,
@@ -11795,7 +15981,10 @@
         -1,
         -1,
         0,
-        1
+        1,
+        2,
+        0,
+        -1
       ],
       "inventories": [
         [],
@@ -11819,6 +16008,15 @@
             "count": 2
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -11833,7 +16031,16 @@
             "item": "minecraft:stone",
             "count": 5
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -11925,7 +16132,69 @@
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 9
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 43
+        },
+        null,
+        null
       ]
     },
     {
@@ -11940,6 +16209,9 @@
         1,
         11317,
         3988,
+        6963,
+        27168,
+        9480,
         6778,
         7093,
         7093,
@@ -11948,7 +16220,10 @@
         0,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27164,
+        9480
       ],
       "analogs": [
         -1,
@@ -11960,6 +16235,9 @@
         -1,
         1,
         1,
+        2,
+        0,
+        -1,
         -1,
         -1,
         -1,
@@ -11968,7 +16246,10 @@
         -1,
         -1,
         0,
-        1
+        1,
+        2,
+        0,
+        -1
       ],
       "inventories": [
         [],
@@ -11992,6 +16273,15 @@
             "count": 2
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -12006,7 +16296,16 @@
             "item": "minecraft:stone",
             "count": 5
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -12098,7 +16397,69 @@
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 10
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 44
+        },
+        null,
+        null
       ]
     },
     {
@@ -12113,6 +16474,9 @@
         1,
         11317,
         3988,
+        6963,
+        27168,
+        9480,
         6778,
         7093,
         7093,
@@ -12121,7 +16485,10 @@
         0,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27164,
+        9480
       ],
       "analogs": [
         -1,
@@ -12133,6 +16500,9 @@
         -1,
         1,
         1,
+        2,
+        0,
+        -1,
         -1,
         -1,
         -1,
@@ -12141,7 +16511,10 @@
         -1,
         -1,
         0,
-        1
+        1,
+        2,
+        0,
+        -1
       ],
       "inventories": [
         [],
@@ -12165,6 +16538,15 @@
             "count": 2
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -12179,7 +16561,16 @@
             "item": "minecraft:stone",
             "count": 5
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -12271,7 +16662,69 @@
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 11
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 45
+        },
+        null,
+        null
       ]
     },
     {
@@ -12286,6 +16739,9 @@
         1,
         11317,
         3988,
+        6963,
+        27168,
+        9480,
         6778,
         7093,
         7093,
@@ -12294,7 +16750,10 @@
         0,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27164,
+        9480
       ],
       "analogs": [
         -1,
@@ -12306,6 +16765,9 @@
         -1,
         1,
         1,
+        2,
+        0,
+        -1,
         -1,
         -1,
         -1,
@@ -12314,7 +16776,10 @@
         -1,
         -1,
         0,
-        1
+        1,
+        2,
+        0,
+        -1
       ],
       "inventories": [
         [],
@@ -12338,6 +16803,15 @@
             "count": 2
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -12352,7 +16826,16 @@
             "item": "minecraft:stone",
             "count": 5
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -12444,7 +16927,69 @@
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 12
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 46
+        },
+        null,
+        null
       ]
     },
     {
@@ -12459,6 +17004,9 @@
         1,
         11317,
         3988,
+        6963,
+        27168,
+        9480,
         6778,
         7093,
         7093,
@@ -12467,7 +17015,10 @@
         0,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27164,
+        9480
       ],
       "analogs": [
         -1,
@@ -12479,6 +17030,9 @@
         -1,
         1,
         1,
+        2,
+        0,
+        -1,
         -1,
         -1,
         -1,
@@ -12487,7 +17041,10 @@
         -1,
         -1,
         0,
-        1
+        1,
+        2,
+        0,
+        -1
       ],
       "inventories": [
         [],
@@ -12511,6 +17068,15 @@
             "count": 2
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -12525,7 +17091,16 @@
             "item": "minecraft:stone",
             "count": 5
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -12617,7 +17192,69 @@
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 13
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 47
+        },
+        null,
+        null
       ]
     },
     {
@@ -12632,6 +17269,9 @@
         1,
         11317,
         3988,
+        6963,
+        27168,
+        9480,
         6778,
         7093,
         7093,
@@ -12640,7 +17280,10 @@
         0,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27164,
+        9480
       ],
       "analogs": [
         -1,
@@ -12652,6 +17295,9 @@
         -1,
         1,
         1,
+        2,
+        0,
+        -1,
         -1,
         -1,
         -1,
@@ -12660,7 +17306,10 @@
         -1,
         -1,
         0,
-        1
+        1,
+        2,
+        0,
+        -1
       ],
       "inventories": [
         [],
@@ -12684,6 +17333,15 @@
             "count": 2
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -12698,7 +17356,16 @@
             "item": "minecraft:stone",
             "count": 5
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -12790,7 +17457,69 @@
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 14
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 48
+        },
+        null,
+        null
       ]
     },
     {
@@ -12805,6 +17534,9 @@
         1,
         11317,
         3988,
+        6963,
+        27168,
+        9480,
         6778,
         7093,
         7093,
@@ -12813,7 +17545,10 @@
         0,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27164,
+        9480
       ],
       "analogs": [
         -1,
@@ -12825,6 +17560,9 @@
         -1,
         1,
         1,
+        2,
+        0,
+        -1,
         -1,
         -1,
         -1,
@@ -12833,7 +17571,10 @@
         -1,
         -1,
         0,
-        1
+        1,
+        2,
+        0,
+        -1
       ],
       "inventories": [
         [],
@@ -12857,6 +17598,15 @@
             "count": 2
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -12871,7 +17621,16 @@
             "item": "minecraft:stone",
             "count": 5
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -12963,7 +17722,69 @@
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 15
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 49
+        },
+        null,
+        null
       ]
     },
     {
@@ -12978,6 +17799,9 @@
         1,
         11317,
         3988,
+        6963,
+        27164,
+        9480,
         6778,
         7093,
         7093,
@@ -12986,7 +17810,10 @@
         0,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27164,
+        9480
       ],
       "analogs": [
         -1,
@@ -12998,6 +17825,9 @@
         -1,
         1,
         1,
+        2,
+        0,
+        -1,
         -1,
         -1,
         -1,
@@ -13006,7 +17836,10 @@
         -1,
         -1,
         0,
-        1
+        1,
+        2,
+        0,
+        -1
       ],
       "inventories": [
         [],
@@ -13030,6 +17863,15 @@
             "count": 3
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -13044,7 +17886,16 @@
             "item": "minecraft:stone",
             "count": 5
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -13136,7 +17987,69 @@
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 16
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 50
+        },
+        null,
+        null
       ]
     },
     {
@@ -13151,6 +18064,9 @@
         1,
         11317,
         3988,
+        6963,
+        27164,
+        9480,
         6778,
         7093,
         7093,
@@ -13159,7 +18075,10 @@
         0,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27164,
+        9480
       ],
       "analogs": [
         -1,
@@ -13171,6 +18090,9 @@
         -1,
         1,
         1,
+        2,
+        0,
+        -1,
         -1,
         -1,
         -1,
@@ -13179,7 +18101,10 @@
         -1,
         -1,
         0,
-        1
+        1,
+        2,
+        0,
+        -1
       ],
       "inventories": [
         [],
@@ -13203,6 +18128,15 @@
             "count": 3
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -13217,7 +18151,16 @@
             "item": "minecraft:stone",
             "count": 5
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -13309,7 +18252,69 @@
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 17
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 51
+        },
+        null,
+        null
       ]
     },
     {
@@ -13324,6 +18329,9 @@
         1,
         11317,
         3988,
+        6963,
+        27164,
+        9480,
         6778,
         7093,
         7093,
@@ -13332,7 +18340,10 @@
         0,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27164,
+        9480
       ],
       "analogs": [
         -1,
@@ -13344,6 +18355,9 @@
         -1,
         1,
         1,
+        2,
+        0,
+        -1,
         -1,
         -1,
         -1,
@@ -13352,7 +18366,10 @@
         -1,
         -1,
         0,
-        1
+        1,
+        2,
+        0,
+        -1
       ],
       "inventories": [
         [],
@@ -13376,6 +18393,15 @@
             "count": 3
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -13390,7 +18416,16 @@
             "item": "minecraft:stone",
             "count": 5
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -13482,7 +18517,69 @@
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 18
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 52
+        },
+        null,
+        null
       ]
     },
     {
@@ -13497,6 +18594,9 @@
         1,
         11317,
         3988,
+        6963,
+        27164,
+        9480,
         6778,
         7093,
         7093,
@@ -13505,7 +18605,10 @@
         0,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27164,
+        9480
       ],
       "analogs": [
         -1,
@@ -13517,6 +18620,9 @@
         -1,
         1,
         1,
+        2,
+        0,
+        -1,
         -1,
         -1,
         -1,
@@ -13525,7 +18631,10 @@
         -1,
         -1,
         0,
-        1
+        1,
+        2,
+        0,
+        -1
       ],
       "inventories": [
         [],
@@ -13549,6 +18658,15 @@
             "count": 3
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -13563,7 +18681,16 @@
             "item": "minecraft:stone",
             "count": 5
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -13655,7 +18782,69 @@
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 19
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 53
+        },
+        null,
+        null
       ]
     },
     {
@@ -13670,6 +18859,9 @@
         1,
         11317,
         3988,
+        6963,
+        27164,
+        9480,
         6778,
         7093,
         7093,
@@ -13678,7 +18870,10 @@
         0,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27164,
+        9480
       ],
       "analogs": [
         -1,
@@ -13690,6 +18885,9 @@
         -1,
         1,
         1,
+        2,
+        0,
+        -1,
         -1,
         -1,
         -1,
@@ -13698,7 +18896,10 @@
         -1,
         -1,
         0,
-        1
+        1,
+        2,
+        0,
+        -1
       ],
       "inventories": [
         [],
@@ -13722,6 +18923,15 @@
             "count": 3
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -13736,7 +18946,16 @@
             "item": "minecraft:stone",
             "count": 5
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -13828,7 +19047,69 @@
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 20
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 54
+        },
+        null,
+        null
       ]
     },
     {
@@ -13843,6 +19124,9 @@
         1,
         11317,
         3988,
+        6963,
+        27164,
+        9480,
         6778,
         7093,
         7093,
@@ -13851,7 +19135,10 @@
         0,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27164,
+        9480
       ],
       "analogs": [
         -1,
@@ -13863,6 +19150,9 @@
         -1,
         1,
         1,
+        2,
+        0,
+        -1,
         -1,
         -1,
         -1,
@@ -13871,7 +19161,10 @@
         -1,
         -1,
         0,
-        1
+        1,
+        2,
+        0,
+        -1
       ],
       "inventories": [
         [],
@@ -13895,6 +19188,15 @@
             "count": 3
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -13909,7 +19211,16 @@
             "item": "minecraft:stone",
             "count": 5
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -14001,7 +19312,69 @@
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 21
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 55
+        },
+        null,
+        null
       ]
     },
     {
@@ -14016,6 +19389,9 @@
         1,
         11317,
         3988,
+        6963,
+        27164,
+        9480,
         6778,
         7093,
         7093,
@@ -14024,7 +19400,10 @@
         0,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27164,
+        9480
       ],
       "analogs": [
         -1,
@@ -14036,6 +19415,9 @@
         -1,
         1,
         1,
+        2,
+        0,
+        -1,
         -1,
         -1,
         -1,
@@ -14044,7 +19426,10 @@
         -1,
         -1,
         0,
-        1
+        1,
+        2,
+        0,
+        -1
       ],
       "inventories": [
         [],
@@ -14068,6 +19453,15 @@
             "count": 3
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -14082,7 +19476,16 @@
             "item": "minecraft:stone",
             "count": 5
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -14174,7 +19577,69 @@
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 22
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 56
+        },
+        null,
+        null
       ]
     },
     {
@@ -14189,6 +19654,9 @@
         1,
         11317,
         3988,
+        6963,
+        27164,
+        9480,
         6778,
         7093,
         7093,
@@ -14197,7 +19665,10 @@
         0,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27164,
+        9480
       ],
       "analogs": [
         -1,
@@ -14209,6 +19680,9 @@
         -1,
         1,
         1,
+        2,
+        0,
+        -1,
         -1,
         -1,
         -1,
@@ -14217,7 +19691,10 @@
         -1,
         -1,
         0,
-        1
+        1,
+        2,
+        0,
+        -1
       ],
       "inventories": [
         [],
@@ -14241,6 +19718,15 @@
             "count": 3
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -14255,7 +19741,16 @@
             "item": "minecraft:stone",
             "count": 5
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -14347,7 +19842,69 @@
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 23
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 57
+        },
+        null,
+        null
       ]
     },
     {
@@ -14362,6 +19919,9 @@
         1,
         11317,
         3988,
+        6963,
+        27164,
+        9480,
         6778,
         7093,
         7093,
@@ -14370,7 +19930,10 @@
         0,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27164,
+        9480
       ],
       "analogs": [
         -1,
@@ -14382,6 +19945,9 @@
         -1,
         1,
         1,
+        2,
+        0,
+        -1,
         -1,
         -1,
         -1,
@@ -14390,7 +19956,10 @@
         -1,
         -1,
         0,
-        1
+        1,
+        2,
+        0,
+        -1
       ],
       "inventories": [
         [],
@@ -14414,6 +19983,15 @@
             "count": 4
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -14428,7 +20006,16 @@
             "item": "minecraft:stone",
             "count": 5
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -14520,7 +20107,69 @@
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 24
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 58
+        },
+        null,
+        null
       ]
     },
     {
@@ -14535,6 +20184,9 @@
         1,
         11317,
         3988,
+        6963,
+        27164,
+        9480,
         6778,
         7093,
         7093,
@@ -14543,7 +20195,10 @@
         0,
         1,
         11317,
-        3988
+        3988,
+        6963,
+        27164,
+        9480
       ],
       "analogs": [
         -1,
@@ -14555,6 +20210,9 @@
         -1,
         1,
         1,
+        2,
+        0,
+        -1,
         -1,
         -1,
         -1,
@@ -14563,7 +20221,10 @@
         -1,
         -1,
         0,
-        1
+        1,
+        2,
+        0,
+        -1
       ],
       "inventories": [
         [],
@@ -14587,6 +20248,15 @@
             "count": 4
           }
         ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        [],
         [],
         [],
         [],
@@ -14601,7 +20271,16 @@
             "item": "minecraft:stone",
             "count": 5
           }
-        ]
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:music_disc_cat",
+            "count": 1
+          }
+        ],
+        [],
+        []
       ],
       "chunkStates": [
         {
@@ -14693,7 +20372,69 @@
           "blockTicking": true,
           "entityTicking": true,
           "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
+        },
+        {
+          "blockTicking": true,
+          "entityTicking": true,
+          "loaded": true
         }
+      ],
+      "jukeboxes": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 25
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          "playing": true,
+          "elapsed": 59
+        },
+        null,
+        null
       ]
     }
   ]

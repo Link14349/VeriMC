@@ -71,9 +71,9 @@
 `exportBlockTags.py` 从固定 JAR 的 `data/minecraft/tags/block/` 递归解析内置方块标签写入 `data/blockTags.json`：`Bootstrap.bootStrap()` 不加载数据包标签，`BlockTags.WALLS` 在注册表导出器里是空的，必须另走这条路径。
 
 `captureChunkLifecycle.py` 用严格 vanilla-only 服务器在**按区块对齐的选定原点**上生成
-`java26_2ChunkLifecycle` 与 `java26_2ChunkLifecycleNegative`：60 刻 / 18 点，
+`java26_2ChunkLifecycle` 与 `java26_2ChunkLifecycleNegative`：60 刻 / 24 点，
 覆盖一个区块停止 ticking 时的方块计划刻、方块事件与方块实体三类待办，
-以及恢复后过期计划刻的一次性执行与漏斗冷却的冻结。捕获逐帧记录原版自己的
+以及恢复后过期计划刻的一次性执行，与漏斗冷却、唱片机播放计时、幽匿感测体倒计时三种冻结。捕获逐帧记录原版自己的
 `shouldTickBlocksAt` / `isPositionEntityTicking` / `hasChunkAt`。这两个 fixture 带
 `requiresAlignedOrigin`，`auditReference.py` 会跳过（GameTest 自选随机原点）。
 详见 [区块生命周期模型](redstoneAudit/chunkLifecyclePlan.md)。
