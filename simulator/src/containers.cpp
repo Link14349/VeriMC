@@ -207,17 +207,19 @@ bool Simulator::boxesOverlap(const EntityBox& a, const EntityBox& b) {
 // 这一条只影响 nextInt 选中的是谁，不影响候选个数，因此不改变随机源的消耗。
 std::vector<Simulator::EntityCandidate> Simulator::containerEntityCandidates(const EntityBox& query) const {
     std::vector<EntityCandidate> result;
+    // 绝大多数世界里一个容器实体都没有，这里直接短路，热路径上不多花一分钱。
     if (entityCells.empty()) return result;
-    std::vector<BlockPos> cells(entityCells.begin(), entityCells.end());
-    std::sort(cells.begin(), cells.end(), [](BlockPos a, BlockPos b) {
-        return std::tie(a.x, a.z, a.y) < std::tie(b.x, b.z, b.y);
-    });
-    for (auto cell : cells) {
+    // 先按包围盒筛，再给（通常只有零到两个的）结果排序，不必给整张声明表排序；
+    // 排序也让结果与 entityCells 的哈希遍历顺序无关。
+    for (auto cell : entityCells) {
         const auto& entities = runtime.at(cell).values.at("containerEntities");
         for (std::size_t index = 0; index < entities.size(); ++index)
             if (boxesOverlap(containerEntityBox(cell, entities.at(index).at("type").get<std::string>()), query))
                 result.push_back({cell, static_cast<int>(index)});
     }
+    std::sort(result.begin(), result.end(), [](const EntityCandidate& a, const EntityCandidate& b) {
+        return std::tie(a.pos.x, a.pos.z, a.pos.y, a.entity) < std::tie(b.pos.x, b.pos.z, b.pos.y, b.entity);
+    });
     return result;
 }
 // 器件层实体容器输入：整体替换这一格声明的容器实体集合，空数组表示全部移除。

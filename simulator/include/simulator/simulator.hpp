@@ -165,7 +165,7 @@ public:
     // storage so a successful file import can retain the previous world as undo.
     void exchangeProject(Simulator& other);
     std::size_t estimatedBytes() const {
-        auto bytes = world.storageBytes() + trace.size() * sizeof(TraceEdge) + runtime.size() * 512 + scheduled.size() * 128 + hoppers.size() * 96 + cartCells.size() * 48 + entityOrders.size() * 64 + blockTicks.estimatedBytes();
+        auto bytes = world.storageBytes() + trace.size() * sizeof(TraceEdge) + runtime.size() * 512 + scheduled.size() * 128 + hoppers.size() * 96 + cartCells.size() * 48 + entityCells.size() * 48 + entityOrders.size() * 64 + blockTicks.estimatedBytes();
         for (const auto& [pos, data] : runtime) { (void)pos; bytes += data.inventory.capacity() * sizeof(ItemStack); }
         return bytes + recentTorchToggles.size() * sizeof(TorchToggle) + torchToggleCounts.size() * 64 + environmentActions.size() * 2048 + sensors.size() * 384 + sensorSections.size() * 96 + jukeboxes.size() * 128;
     }
