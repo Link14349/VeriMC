@@ -83,6 +83,7 @@ void Simulator::setChunkState(int chunkX, int chunkZ, ChunkState state, std::opt
     const BlockPos chunk{chunkX, 0, chunkZ};
     auto previous = chunkStates;
     const bool wasTicking = chunkBlockTicking({chunkX * 16, 0, chunkZ * 16});
+    const bool wasEntityTicking = chunkEntityTicking({chunkX * 16, 0, chunkZ * 16});
     const Tick previousStall = wasTicking ? currentTick : previous.at(chunk).stalledSince;
     if (state == ChunkState::entityTicking && !stalledSince) chunkStates.erase(chunk);
     else chunkStates[chunk] = {state, stalledSince.value_or(wasTicking ? currentTick : previousStall)};
@@ -106,8 +107,11 @@ void Simulator::setChunkState(int chunkX, int chunkZ, ChunkState state, std::opt
     // 恢复后把过期的一并执行。
     if (!wasTicking && state >= ChunkState::blockTicking && !stalledSince && currentTick > previousStall) {
         shiftBlockEntityTimers(chunk, currentTick - previousStall);
-        liftStaleEvents(chunk);
     }
+    // blockTicking -> entityTicking 只恢复实体接触，不移动方块实体倒计时，
+    // 但它同样可能让停在过去的阶段 3 事件变为可执行，须先恢复快照队列不变量。
+    if (!stalledSince && ((!wasTicking && state >= ChunkState::blockTicking)
+        || (!wasEntityTicking && state == ChunkState::entityTicking))) liftStaleEvents(chunk);
     ++revision;
 }
 // 只移动「倒计时/进度」类的时刻。wakeAt 与被延后的事件保持同步，由事件处理器在恢复后

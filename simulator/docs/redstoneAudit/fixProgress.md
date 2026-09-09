@@ -310,20 +310,19 @@ R15 到此为**已排除**，不是假设。
 两个内置对照：`detector_rail` 同样出现快照错配但保持 `east_west`
 （它没有四参 `updateState` 覆写）；可弯折的 `rail` 根本不发这条 Full。
 
-**内核当前不复现**，`checkReference` 报
+**原缺陷已修复并集成**。修复前 `checkReference` 报
 `tick 4, [6,2,6], states: expected 2188 (north_south) / actual 2190 (east_west)`。
-本轮已把 `updateRail` 改成使用传入的快照（原版 `BaseRailBlock.neighborChanged(state,…)`
-全程用这个参数），50 个既有 fixture 逐条不变，**但这一步不足以让见证通过**：
-分叉点在快照的**捕获时机**或之后的覆写，尚未定位到。
-因此 `java26_2FullUpdateSnapshot` 目前是仓库里**唯一不 match** 的时间线 fixture，
-它是**已知缺陷的证据**，不是回归——**没有**注册进 `coreTests` 的差分列表，
-以免用一个必然失败的用例阻塞构建。
+仅把 `updateRail` 改成使用传入快照还不够：`placeRail` 发 Full 更新时，必须取
+`RailConnection` 自己计算并保留的状态（原版 `RailState.getState()`），不能在邻轨级联
+完成后重读世界。子代理 M 的修复已由 Codex 复核并集成为 `b5d1f4d`。
+原见证已注册为核心回归，51 个时间线全部匹配；新的严格 vanilla-only 复跑还比较了
+全部 2110 条刻内轨迹，并确认同原点关闭轨迹后观测不变。详见 `continuationAudit.md`。
 
-普通 `rail` 分支（`rails.cpp` 的 `Device::rail`）有同样的快照缺口，
-但这个场景不隔离它；修复时需要第二个场景。
+普通 `rail` 分支也已按原版用传入快照构造连接计算（`e851685`），
+但这个场景不隔离它；仍需第二个原版见证，不能把不回归当成该分支的直接证据。
 
 补充：随机搜索（25 个随机电路 × 12 轮，含铁轨/活塞/红石粉）**零命中**——
-这个竞争不是模糊测试能撞上的。
+本轮随机搜索未命中，定向构造成功；不能据此断言模糊测试不可能命中。
 
 ---
 

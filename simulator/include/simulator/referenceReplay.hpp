@@ -147,7 +147,7 @@ inline void compareUpdateTraces(const Json& fixture, const Simulator& simulation
 
 // 用外部捕获的原版观测逐刻对照本内核。返回 {"status": "match"|"difference", ...}；
 // 结构性问题（重放没能走到观测刻、缺少外部反馈声明等）以异常报出。
-inline Json replayReferenceFixture(Simulator& simulation, const Json& fixture, const std::string& traceOut = {}) {
+inline Json replayReferenceFixture(Simulator& simulation, const Json& fixture, const std::string& traceOut = {}, std::size_t eventBudget = 1000000) {
     Json result{{"status", "match"}};
     if (!fixture.at("frames").is_array() || fixture.at("frames").empty()
         || !fixture.at("watch").is_array() || fixture.at("watch").empty())
@@ -179,7 +179,7 @@ inline Json replayReferenceFixture(Simulator& simulation, const Json& fixture, c
         // 推进到观测刻。中途因外部动作暂停时先比对再确认，然后接着推进；
         // 仿真必须真正到达观测刻且不带任何暂停，静态观察不得掩盖未处理的外部动作。
         while (true) {
-            simulation.advanceTo(tick);
+            simulation.advanceTo(tick, eventBudget);
             if (!actions.settle(simulation)) break;
         }
         if (simulation.hasPendingActions())
@@ -188,6 +188,10 @@ inline Json replayReferenceFixture(Simulator& simulation, const Json& fixture, c
             throw std::runtime_error("Replay paused for a reason other than external actions: " + simulation.pauseReason);
         if (simulation.currentTick != tick)
             throw std::runtime_error("Replay stopped before completing observation tick " + std::to_string(tick));
+        // advanceTo 的预算返回是可继续的软边界，不一定设置 breakRequested。
+        // 时钟已到目标刻不代表该刻所有事件都执行完，不能让静态 watch 掩盖剩余工作。
+        if (simulation.pendingEvents() && simulation.nextTick() <= tick && simulation.runnable())
+            throw std::runtime_error("Replay budget ended with runnable events at observation tick " + std::to_string(tick));
         simulation.markUpdateTrace(tick);
         for (const auto& command : fixture.at("commands")) if (command.at("tick") == tick) {
             const auto pos = absolute(command.at("pos"));

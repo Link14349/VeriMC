@@ -20,6 +20,20 @@ void tripwireLine(Simulator& s) {
 int main() {
     BlockRegistry r; int passed = 0, failed = 0;
     auto test = [&](const std::string& name, const std::function<void()>& run) { try { run(); ++passed; std::cout << "PASS " << name << '\n'; } catch (const std::exception& e) { ++failed; std::cerr << "FAIL " << name << ": " << e.what() << '\n'; } };
+    test("reference replay rejects unfinished work at the observation tick", [&] {
+        Json fixture{{"origin", BlockPos{0,0,0}}, {"watch", Json::array({BlockPos{30,0,0}})}, {"endTick", 1},
+                     {"commands", Json::array()}, {"frames", Json::array()}};
+        for (int x : {0, 4}) fixture["commands"].push_back({{"tick",0}, {"pos",BlockPos{x,0,0}}, {"stateId",r.state("hopper")}});
+        for (int t : {0, 1}) fixture["frames"].push_back({{"tick",t}, {"states",Json::array({0})}, {"analogs",Json::array({0})}});
+        Simulator full(r);
+        expect(replayReferenceFixture(full, fixture).at("status") == "match", "ordinary complete replay failed");
+        Simulator limited(r); bool rejected = false;
+        try { replayReferenceFixture(limited, fixture, {}, 1); }
+        catch (const std::runtime_error& error) { rejected = std::string(error.what()).find("runnable events at observation tick") != std::string::npos; }
+        expect(limited.currentTick == 1 && !limited.breakRequested && limited.pendingEvents() > 0,
+               "test did not reach a same-tick soft budget boundary");
+        expect(rejected, "static observation hid an unfinished tick");
+    });
     test("palette defaults reproduce native placement before any world state is sent", [&] {
         for (const auto& item : r.catalog()) {
             const auto id = item.at("defaultState").get<StateId>();
@@ -986,8 +1000,15 @@ int main() {
         contact.advanceTo(5);
         expect(contact.inventoryJson(hopper, false).empty(), "entity contact ran in blockTicking chunk: " + contact.inventoryJson(hopper, false).dump() + " above=" + std::to_string(contact.world.get(hopper.relative(Direction::up))) + " full=" + std::to_string(r[contact.world.get(hopper.relative(Direction::up))].fullCube));
         contact.setChunkState(0, 0, Simulator::ChunkState::entityTicking);
+        const auto contactSaved = contact.saveProject("entity-resume", true);
+        Simulator contactRestored(r); contactRestored.loadProject(contactSaved);
+        expect(contactRestored.saveProject("entity-resume", true) == contactSaved,
+               "entity-only resume produced an unloadable snapshot before advance");
         contact.advanceTo(6);
+        contactRestored.advanceTo(6);
         expect(!contact.inventoryJson(hopper, false).empty(), "entity contact did not resume");
+        expect(contactRestored.inventoryJson(hopper, false) == contact.inventoryJson(hopper, false),
+               "entity contact differs after resuming from the transition snapshot");
     });
     test("vibration delivery needs the 3x3 chunks around the listener to be block ticking", [&] {
         // 原版 VibrationSystem.Ticker.receiveVibration 第一句就是

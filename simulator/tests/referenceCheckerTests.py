@@ -39,7 +39,7 @@ class ReferenceCheckerTests(unittest.TestCase):
             code, report = run()
             self.assertNotEqual(code, 0)
             self.assertEqual(report['status'], 'error')
-            self.assertIn('Replay stopped', report['error'])
+            self.assertIn('Replay requires explicit external-action feedback', report['error'])
 
 
 if __name__ == '__main__':
