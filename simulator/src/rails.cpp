@@ -213,8 +213,18 @@ Json Simulator::normalizeCarts(const Json& carts) const {
     for (const auto& cart : carts) {
         auto type = cart.at("type").get<std::string>();
         std::size_t size = type == "chest_minecart" ? 27 : type == "hopper_minecart" ? 5 : 0;
-        if (size == 0 && type != "minecart" && type != "furnace_minecart" && type != "tnt_minecart") throw std::invalid_argument("不支持此矿车接触类型");
+        if (size == 0 && type != "minecart" && type != "furnace_minecart" && type != "tnt_minecart" && type != "command_block_minecart")
+            throw std::invalid_argument("不支持此矿车接触类型");
         Json row{{"type", type}};
+        // 命令方块矿车的比较器读数是它内部命令方块的 successCount。本项目不实现命令解释器，
+        // 该计数作为显式外部输入给出，与讲台页数、标靶命中同属受限实体输入。
+        if (type == "command_block_minecart") {
+            if (!cart.contains("successCount")) throw std::invalid_argument("命令方块矿车需要显式的 successCount");
+            const auto& value = cart.at("successCount");
+            if (!value.is_number_integer() || value.get<std::int64_t>() < 0 || value.get<std::int64_t>() > 15)
+                throw std::invalid_argument("successCount 必须是 0–15 的整数");
+            row["successCount"] = value.get<int>();
+        } else if (cart.contains("successCount")) throw std::invalid_argument("只有命令方块矿车接受 successCount");
         auto edits = parseInventory(cart.value("inventory", Json::array()), size);
         if (size) {
             row["inventory"] = Json::array();
@@ -234,6 +244,12 @@ const Json* Simulator::firstContainerCart(BlockPos pos) const {
 }
 
 int Simulator::cartAnalog(BlockPos pos) const {
+    // 原版 DetectorRailBlock.getAnalogOutputSignal 先找命令方块矿车，找到就直接返回它的
+    // successCount，容器矿车根本不参与比较。
+    auto found = runtime.find(pos);
+    if (found != runtime.end() && found->second.values.contains("carts"))
+        for (const auto& cart : found->second.values.at("carts"))
+            if (cart.at("type") == "command_block_minecart") return cart.at("successCount").get<int>();
     auto cart = firstContainerCart(pos);
     if (!cart) return 0;
     float fullness = 0;

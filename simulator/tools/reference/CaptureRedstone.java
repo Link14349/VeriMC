@@ -328,6 +328,11 @@ public class CaptureRedstone extends TestFunctionLoader {
                         var entityType = BuiltInRegistries.ENTITY_TYPE.getValue(Identifier.withDefaultNamespace(cart.get("type").getAsString()));
                         var entity = entityType.create(level, EntitySpawnReason.COMMAND);
                         entity.setPos(pos.getX() + .5, pos.getY() + .0625, pos.getZ() + .5); entity.setNoGravity(true);
+                        // The command block minecart's comparator reading is its command block's
+                        // success count. This project has no command interpreter, so the count is an
+                        // explicit external input, set through the same public setter vanilla uses.
+                        if (entity instanceof net.minecraft.world.entity.vehicle.minecart.MinecartCommandBlock commandCart)
+                            commandCart.getCommandBlock().setSuccessCount(cart.get("successCount").getAsInt());
                         if (entity instanceof Container container && cart.has("inventory")) for (var item : cart.getAsJsonArray("inventory")) {
                             var row = item.getAsJsonObject(); int count = row.get("count").getAsInt();
                             container.setItem(row.get("slot").getAsInt(), count == 0 ? ItemStack.EMPTY : new ItemStack(BuiltInRegistries.ITEM.getValue(Identifier.parse(row.get("item").getAsString())), count));
