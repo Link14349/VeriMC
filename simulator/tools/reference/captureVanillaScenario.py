@@ -15,11 +15,12 @@ rootDir = Path(__file__).resolve().parents[2]
 cacheDir = rootDir / '.cache/reference'
 
 
-def runVanillaCapture(commands, watch, endTick, fixtureName, origin, **scenarioOptions):
+def runVanillaCapture(commands, watch, endTick, fixtureName, origin, capturePath=None, **scenarioOptions):
     scenario = {'endTick': endTick, 'commands': commands, 'watch': watch, **scenarioOptions}
     scenarioPath = cacheDir / 'vanillaScenario.json'
     scenarioPath.write_text(json.dumps(scenario, indent=2), encoding='utf-8')
-    outputPath = rootDir / ('tests/fixtures/' + fixtureName + '.json')
+    # Fuzzing writes outside the checked-in fixture directory.
+    outputPath = Path(capturePath) if capturePath else rootDir / ('tests/fixtures/' + fixtureName + '.json')
     outputPath.parent.mkdir(parents=True, exist_ok=True)
     subprocess.run(['python3', str(Path(__file__).with_name('runReferenceTool.py')), 'CaptureRedstoneVanilla',
                     str(scenarioPath), str(outputPath), str(cacheDir / 'vanillaUniverse'),

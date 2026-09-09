@@ -64,7 +64,7 @@
 
 `ExportComposting` 在通常四路径参数之后，追加 `data/compostingRules.json` 的绝对输出路径，导出 115 种材料和 4,176 次隔离插入记录。`captureComposters.py` 增加第二十一组 GameTest，111 刻 / 26 点，验证临时输入/输出容器及失败抽取副作用，见 [堆肥桶说明](composters.md)。
 
-`fuzzRedstone.py --seed S --rounds N --output <新目录>` 生成随机小电路与随机输入历史，逐轮从原版捕获并对照；出现差异时先按格子隔离，再贪心删命令自动缩减到最小复现，报告保留坐标、种子与存活命令。`captureSupportDirection.py` 是它找到的前两个差异的固定回归：14 刻，覆盖各方块类各自检查支撑的方向，以及从背面开栅栏门时的朝向翻转（含一次不带 `playerFacing` 的交互）。`captureFenceGateInWall.py` 是第三个差异的回归：14 刻，覆盖 `IN_WALL` 只跟随垂直于朝向那条轴。墙本身仍未实现，只有栅栏门与普通方块进入 `watch`，该组因此不开刻内轨迹。
+`fuzzRedstone.py --seed S --rounds N --output <新目录>` 生成随机小电路与随机输入历史，逐轮从原版捕获并对照；出现差异时先按格子隔离，再贪心删命令自动缩减，报告保留坐标、种子与存活命令。默认整轮的每一次捕获（本轮、格子隔离、每一步缩减、末次确认）都用**同一个从种子取出的固定原点**，经严格 vanilla-only 服务器进行，因此缩减候选在**原始绝对坐标**上确认；`--gameTest` 可退回旧路径（GameTest 每次自选原点，候选只在自己的原点上确认）。缩减是有预算的贪心删除，不是最小性证明。`captureSupportDirection.py` 是它找到的前两个差异的固定回归：14 刻，覆盖各方块类各自检查支撑的方向，以及从背面开栅栏门时的朝向翻转（含一次不带 `playerFacing` 的交互）。`captureFenceGateInWall.py` 是第三个差异的回归：14 刻，覆盖 `IN_WALL` 只跟随垂直于朝向那条轴。墙本身仍未实现，只有栅栏门与普通方块进入 `watch`，该组因此不开刻内轨迹。
 
 `captureHopperPickup.py` → `java26_2HopperPickup`：30 刻 / 8 组，覆盖漏斗吸取掉落物的两条原版路径（方块实体阶段的 `suckInItems` 与实体阶段的 `HopperBlock.entityInside`）、吸取体积边界、上方方块阻挡与 `DOES_NOT_BLOCK_HOPPERS`、8 gt 冷却、部分吸入、上方容器优先级与受电禁用。场景新增 `watchGroundItems` 观测项，原版侧直接调用 `HopperBlockEntity.getItemsAtAndAbove`。协议见 [器件层实体输入/输出协议](redstoneAudit/entityIoProtocol.md)。
 

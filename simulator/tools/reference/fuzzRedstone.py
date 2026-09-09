@@ -8,8 +8,13 @@ commands while the difference survives. This is budgeted reduction, not a minima
 
 Every step re-captures from the pinned reference; nothing is inferred. Coordinates, seed
 and the surviving command history are written to the report so a failure is reproducible.
-GameTest chooses a new origin for each capture: a reduced witness is confirmed at its own
-recorded origin, not proved equivalent to the initial failure at the initial coordinates.
+
+By default every capture of a run — the round, the cell isolation, each reduction step and the
+final confirmation — uses **one fixed origin**, drawn once from the seed, through the strict
+vanilla-only server (`CaptureRedstoneVanilla`). The reduced witness is therefore confirmed at the
+same absolute coordinates as the original failure. `--gameTest` restores the old path, which goes
+through GameTest and lets it draw a new origin for every capture; a witness reduced that way is
+only confirmed at its own recorded origin.
 
     python3 tools/reference/fuzzRedstone.py --seed 1 --rounds 3 --output <new directory>
 """
@@ -22,6 +27,7 @@ import sys
 from pathlib import Path
 
 from captureRedstone import runCapture, blocks, state
+from captureVanillaScenario import runVanillaCapture
 
 rootDir = Path(__file__).resolve().parents[2]
 
@@ -117,8 +123,11 @@ def cellOf(position):
     return ((x - ORIGIN) // CELL, (z - ORIGIN) // CELL)
 
 
-def capture(commands, watch, endTick, path):
-    runCapture(commands, watch, endTick, capturePath=str(path), lenientInteract=True)
+def capture(commands, watch, endTick, path, origin=None):
+    if origin is None:
+        runCapture(commands, watch, endTick, capturePath=str(path), lenientInteract=True)
+    else:
+        runVanillaCapture(commands, watch, endTick, None, origin, capturePath=str(path), lenientInteract=True)
     return json.loads(Path(path).read_text())
 
 
@@ -150,8 +159,8 @@ def captureEvidence(path):
             'origin': capture.get('origin'), 'referenceEnvironment': capture.get('referenceEnvironment')}
 
 
-def shrink(checker, commands, watch, endTick, key, workDir, budget):
-    """Budgeted command reduction; each accepted witness has its own captured origin."""
+def shrink(checker, commands, watch, endTick, key, workDir, budget, origin):
+    """Budgeted command reduction. With a fixed origin every step keeps the original coordinates."""
     step = 0
     changed = True
     while changed and step < budget:
@@ -163,7 +172,7 @@ def shrink(checker, commands, watch, endTick, key, workDir, budget):
             step += 1
             path = workDir / f'shrink{step}.json'
             try:
-                capture(candidate, watch, endTick, path)
+                capture(candidate, watch, endTick, path, origin)
             except subprocess.CalledProcessError:
                 continue
             if differenceKey(check(checker, path)) == key:
@@ -180,12 +189,23 @@ def main():
     parser.add_argument('--checker', type=Path, default=rootDir / 'buildAudit/checkReference')
     parser.add_argument('--output', required=True, type=Path)
     parser.add_argument('--shrinkBudget', type=int, default=60)
+    parser.add_argument('--gameTest', action='store_true',
+                        help='capture through GameTest, which draws a new origin for every capture')
     args = parser.parse_args()
     if args.rounds < 1 or args.ticks < 4 or args.shrinkBudget < 0:
         parser.error('rounds must be positive, ticks >= 4, and shrinkBudget >= 0')
     args.output.mkdir(parents=True, exist_ok=False)
-    report = {'seed': args.seed, 'rounds': args.rounds, 'ticks': args.ticks,
-              'reductionScope': 'budgeted; recaptures use new origins; no minimality or fixed-origin guarantee',
+    # One origin for the whole run, drawn from the seed, so a reduced witness keeps the exact
+    # coordinates of the original failure. Chunk aligned and far from the other test worlds.
+    originRng = random.Random(args.seed)
+    origin = None if args.gameTest else [16 * originRng.randrange(-800000, 800000), -59,
+                                         16 * originRng.randrange(-800000, 800000)]
+    report = {'seed': args.seed, 'rounds': args.rounds, 'ticks': args.ticks, 'origin': origin,
+              'reductionScope': ('budgeted greedy command removal; no minimality proof. '
+                                 + ('every capture uses the fixed origin above, so the reduced witness is confirmed '
+                                    'at the original coordinates' if origin else
+                                    'GameTest draws a new origin per capture, so a reduced witness is only confirmed '
+                                    'at its own recorded origin')),
               'results': []}
     failures = 0
     for round_ in range(args.rounds):
@@ -199,7 +219,7 @@ def main():
                 commands += cellCommands
                 watch += cellWatch
         path = args.output / f'round{round_}.json'
-        capture(commands, watch, args.ticks, path)
+        capture(commands, watch, args.ticks, path, origin)
         result = check(args.checker, path)
         row = {'round': round_, 'cells': GRID * GRID, 'commands': len(commands), 'watch': len(watch),
                'status': result['status'], 'origin': result.get('origin')}
@@ -212,14 +232,14 @@ def main():
             row['cell'] = list(cell)
             cellCommands, cellWatch = cells.get(cell, (commands, watch))
             reduced = args.output / f'round{round_}Cell.json'
-            capture(cellCommands, cellWatch, args.ticks, reduced)
+            capture(cellCommands, cellWatch, args.ticks, reduced, origin)
             cellKey = differenceKey(check(args.checker, reduced))
             if cellKey == key:
                 reducedDir = args.output / f'round{round_}Reduction'
                 reducedDir.mkdir()
-                shrunk, steps, budgetReached = shrink(args.checker, cellCommands, cellWatch, args.ticks, key, reducedDir, args.shrinkBudget)
+                shrunk, steps, budgetReached = shrink(args.checker, cellCommands, cellWatch, args.ticks, key, reducedDir, args.shrinkBudget, origin)
                 candidate = args.output / f'round{round_}Reduced.json'
-                capture(shrunk, cellWatch, args.ticks, candidate)
+                capture(shrunk, cellWatch, args.ticks, candidate, origin)
                 confirmation = check(args.checker, candidate)
                 row['reducedCommands'] = len(shrunk)
                 row['shrinkSteps'] = steps
@@ -228,6 +248,8 @@ def main():
                 row['reducedEvidence'] = captureEvidence(candidate)
                 row['reducedComparison'] = confirmation
                 row['reducedWitnessConfirmed'] = differenceKey(confirmation) == key
+                # 固定原点时，缩减候选与原始失败在**同一绝对坐标**上确认。
+                row['reducedAtOriginalCoordinates'] = origin is not None and row['reducedEvidence']['origin'] == row['origin']
             else:
                 row['note'] = 'difference does not survive isolation to a single cell'
         elif result['status'] != 'match':

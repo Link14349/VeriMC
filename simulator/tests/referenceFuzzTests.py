@@ -14,9 +14,11 @@ captureStub = types.ModuleType('captureRedstone')
 captureStub.runCapture = None
 captureStub.blocks = {}
 captureStub.state = None
+vanillaStub = types.ModuleType('captureVanillaScenario')
+vanillaStub.runVanillaCapture = None
 spec = importlib.util.spec_from_file_location('referenceFuzzer', root / 'tools/reference/fuzzRedstone.py')
 fuzzer = importlib.util.module_from_spec(spec)
-with patch.dict(sys.modules, {'captureRedstone': captureStub}):
+with patch.dict(sys.modules, {'captureRedstone': captureStub, 'captureVanillaScenario': vanillaStub}):
     spec.loader.exec_module(fuzzer)
 
 
@@ -49,9 +51,9 @@ class ReferenceFuzzTests(unittest.TestCase):
         tempRoot.mkdir(parents=True, exist_ok=True)
         with tempfile.TemporaryDirectory(dir=tempRoot) as temporary:
             output = Path(temporary) / 'run'
-            def capture(commands, watch, endTick, path):
+            def capture(commands, watch, endTick, path, origin=None):
                 path.write_text(json.dumps({'origin': [13, -58, 21], 'referenceEnvironment': {}}))
-            args = ['fuzzRedstone.py', '--output', str(output), '--rounds', '2', '--shrinkBudget', '0']
+            args = ['fuzzRedstone.py', '--output', str(output), '--rounds', '2', '--shrinkBudget', '0', '--gameTest']
             with patch.object(sys, 'argv', args), patch.object(fuzzer, 'GRID', 1), \
                  patch.object(fuzzer, 'buildCell', return_value=([{'tick': 0}], [[3,2,3]])), \
                  patch.object(fuzzer, 'capture', side_effect=capture), \
@@ -63,6 +65,35 @@ class ReferenceFuzzTests(unittest.TestCase):
                 self.assertTrue(row['shrinkBudgetReached'])
             self.assertTrue((output / 'round0Reduction').is_dir())
             self.assertTrue((output / 'round1Reduction').is_dir())
+            self.assertIsNone(report['origin'])
+            for row in report['results']:
+                self.assertFalse(row['reducedAtOriginalCoordinates'])
+
+    def testFixedOriginKeepsTheOriginalCoordinates(self):
+        # Every capture of a run must be handed the one origin drawn from the seed, and the
+        # reduced witness must be reported as confirmed at those same coordinates.
+        failure = {'status': 'difference',
+                   'firstDifference': {'relativePos': [3, 2, 3], 'tick': 0,
+                                       'field': 'states', 'expected': 1, 'actual': 0}}
+        tempRoot = root / 'testResults/referenceFuzzTests'
+        tempRoot.mkdir(parents=True, exist_ok=True)
+        seen = []
+        with tempfile.TemporaryDirectory(dir=tempRoot) as temporary:
+            output = Path(temporary) / 'run'
+            def capture(commands, watch, endTick, path, origin=None):
+                seen.append(origin)
+                path.write_text(json.dumps({'origin': origin, 'referenceEnvironment': {}}))
+            args = ['fuzzRedstone.py', '--output', str(output), '--rounds', '1', '--shrinkBudget', '0']
+            with patch.object(sys, 'argv', args), patch.object(fuzzer, 'GRID', 1),                  patch.object(fuzzer, 'buildCell', return_value=([{'tick': 0}], [[3, 2, 3]])),                  patch.object(fuzzer, 'capture', side_effect=capture),                  patch.object(fuzzer, 'check', side_effect=[failure, failure, failure]):
+                self.assertEqual(fuzzer.main(), 1)
+            report = json.loads((output / 'report.json').read_text())
+            self.assertIsNotNone(report['origin'])
+            self.assertEqual(report['origin'][0] % 16, 0)
+            self.assertEqual(report['origin'][2] % 16, 0)
+            self.assertTrue(seen and all(value == report['origin'] for value in seen))
+            row = report['results'][0]
+            self.assertTrue(row['reducedWitnessConfirmed'])
+            self.assertTrue(row['reducedAtOriginalCoordinates'])
 
 
 if __name__ == '__main__':
