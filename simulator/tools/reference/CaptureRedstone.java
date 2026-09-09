@@ -62,12 +62,18 @@ public class CaptureRedstone extends TestFunctionLoader {
     static Map<BlockPos, List<Player>> viewers = new HashMap<>();
     static BlockPos pos(JsonArray p) { return new BlockPos(p.get(0).getAsInt(), p.get(1).getAsInt(), p.get(2).getAsInt()); }
     static JsonArray coordinates(BlockPos p) { JsonArray a = new JsonArray(); a.add(p.getX()); a.add(p.getY()); a.add(p.getZ()); return a; }
-    static void applyCommand(GameTestHelper helper, BlockPos pos, JsonObject command) {
-        var level = helper.getLevel();
+    /** Same anonymous player GameTestHelper.makeMockPlayer builds, so both harnesses interact identically. */
+    static Player mockPlayer(Level level, GameType gameType) {
+        return new Player(level, new com.mojang.authlib.GameProfile(UUID.randomUUID(), "test-mock-player")) {
+            @Override public GameType gameMode() { return gameType; }
+            @Override public boolean isClientAuthoritative() { return false; }
+        };
+    }
+    static void applyCommand(net.minecraft.server.level.ServerLevel level, BlockPos pos, JsonObject command) {
         if (command.has("stateId")) {
             var placed = Block.stateById(command.get("stateId").getAsInt());
             if (command.has("playerPlace")) {
-                var player=helper.makeMockPlayer(GameType.CREATIVE);
+                var player=mockPlayer(level, GameType.CREATIVE);
                 // Stairs read the player's horizontal direction directly and take HALF from the clicked face;
                 // chests use the opposite direction and always keep the original click below the target.
                 boolean stairs=placed.getBlock() instanceof StairBlock;
@@ -97,7 +103,7 @@ public class CaptureRedstone extends TestFunctionLoader {
                 else if (state.getBlock() instanceof NoteBlock || state.getBlock() instanceof DaylightDetectorBlock
                     || state.getBlock() instanceof RedStoneWireBlock || state.getBlock() instanceof DiodeBlock
                     || state.getBlock() instanceof TrapDoorBlock || state.getBlock() instanceof FenceGateBlock) {
-                    var player=helper.makeMockPlayer(GameType.CREATIVE);
+                    var player=mockPlayer(level, GameType.CREATIVE);
                     // Fence gates flip their facing toward the player when opened from behind, so the
                     // look direction has to be explicit. Without one, look along the gate's own facing,
                     // which is exactly the case where vanilla does not flip.
@@ -175,7 +181,7 @@ public class CaptureRedstone extends TestFunctionLoader {
                     bell.onHit(level,state,hit,null,true);
                 }
             } else if (state.getBlock() instanceof NoteBlock note) {
-                var player=helper.makeMockPlayer(GameType.CREATIVE);
+                var player=mockPlayer(level, GameType.CREATIVE);
                 var method=NoteBlock.class.getDeclaredMethod("attack",BlockState.class,Level.class,BlockPos.class,Player.class);
                 method.setAccessible(true);method.invoke(note,state,level,pos,player);
             } else if (state.getBlock() instanceof TargetBlock) {
@@ -216,7 +222,7 @@ public class CaptureRedstone extends TestFunctionLoader {
                 }
             } else if (state.getBlock() instanceof TripWireBlock wire) {
                 if (input.has("shear")) {
-                    var player = helper.makeMockPlayer(GameType.CREATIVE);
+                    var player = mockPlayer(level, GameType.CREATIVE);
                     player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(Items.SHEARS));
                     wire.playerWillDestroy(level, pos, state, player);
                     level.setBlock(pos, Block.stateById(0), 3);
@@ -272,7 +278,7 @@ public class CaptureRedstone extends TestFunctionLoader {
                 } else if (input.has("viewers")) {
                     var players = viewers.computeIfAbsent(pos, key -> new ArrayList<>());
                     int target = input.get("viewers").getAsInt();
-                    while (players.size() < target) { var player = helper.makeMockPlayer(GameType.CREATIVE); players.add(player); container.startOpen(player); }
+                    while (players.size() < target) { var player = mockPlayer(level, GameType.CREATIVE); players.add(player); container.startOpen(player); }
                     while (players.size() > target) container.stopOpen(players.removeLast());
                 } else throw new IllegalArgumentException("Unknown inventory input");
             } else if (state.getBlock() instanceof BasePressurePlateBlock plate) {
@@ -311,66 +317,89 @@ public class CaptureRedstone extends TestFunctionLoader {
         register.accept(ResourceKey.create(Registries.TEST_FUNCTION, Identifier.parse("simulator:capture")), CaptureRedstone::capture);
     }
     static void capture(GameTestHelper helper) {
+        runTimeline(helper.getLevel(), helper.absolutePos(BlockPos.ZERO),
+            "Minecraft Java 26.2 GameTest, nonexperimental redstone",
+            (tick, action) -> { if (tick == 0) action.run(); else helper.runAtTickTime(tick, action); },
+            helper::succeed);
+    }
+    /** Schedules one timeline step; the two harnesses differ only in how a tick is reached. */
+    public interface TickHook { void at(int tick, Runnable action); }
+    /**
+     * Replays the scenario against an already running level. `origin` is the absolute position of
+     * relative (0,0,0); every command, watch entry and trace coordinate is expressed against it.
+     * The action for tick t must run at the same phase of the server tick in both harnesses:
+     * after the level tick, which is where GameTestTicker runs and where our own server calls back.
+     */
+    static void runTimeline(net.minecraft.server.level.ServerLevel level, BlockPos origin, String referenceLabel, TickHook hook, Runnable onFinished) {
         // Match referenceVersion.json: natural random ticks are external to this
         // loaded-region circuit model. Explicit randomTick stimuli still execute.
-        helper.getLevel().getGameRules().set(net.minecraft.world.level.gamerules.GameRules.RANDOM_TICK_SPEED, 0, helper.getLevel().getServer());
+        level.getGameRules().set(net.minecraft.world.level.gamerules.GameRules.RANDOM_TICK_SPEED, 0, level.getServer());
         JsonObject result = scenario.deepCopy();
-        result.addProperty("reference", "Minecraft Java 26.2 GameTest, nonexperimental redstone");
+        result.addProperty("reference", referenceLabel);
         // Record the actual harness environment, not just our intended profile.
         // GameTest enables trade_rebalance even though redstone experiments are off.
         JsonObject environment = new JsonObject();
         environment.addProperty("javaVersion", System.getProperty("java.version"));
-        environment.addProperty("randomTickSpeed", helper.getLevel().getGameRules().get(net.minecraft.world.level.gamerules.GameRules.RANDOM_TICK_SPEED));
+        environment.addProperty("randomTickSpeed", level.getGameRules().get(net.minecraft.world.level.gamerules.GameRules.RANDOM_TICK_SPEED));
         JsonArray featureFlags = new JsonArray();
-        net.minecraft.world.flag.FeatureFlags.REGISTRY.toNames(helper.getLevel().enabledFeatures()).stream()
+        net.minecraft.world.flag.FeatureFlags.REGISTRY.toNames(level.enabledFeatures()).stream()
             .map(Object::toString).sorted().forEach(featureFlags::add);
         environment.add("featureFlags", featureFlags);
+        JsonArray enabledPacks = new JsonArray();
+        level.getServer().getPackRepository().getSelectedIds().stream().sorted().forEach(enabledPacks::add);
+        environment.add("dataPacks", enabledPacks);
         result.add("referenceEnvironment", environment);
-        result.add("origin", coordinates(helper.absolutePos(BlockPos.ZERO)));
+        result.add("origin", coordinates(origin));
         JsonArray frames = new JsonArray(); result.add("frames", frames);
         if(scenario.has("forceLoadedNeighborhood") && scenario.get("forceLoadedNeighborhood").getAsBoolean()) {
-            var base=helper.absolutePos(BlockPos.ZERO);
-            for(int x=Math.floorDiv(base.getX(),16)-1;x<=Math.floorDiv(base.getX()+48,16)+1;++x)
-                for(int z=Math.floorDiv(base.getZ(),16)-1;z<=Math.floorDiv(base.getZ()+48,16)+1;++z) {
-                    helper.getLevel().getChunk(x,z);helper.getLevel().setChunkForced(x,z,true);
+            for(int x=Math.floorDiv(origin.getX(),16)-1;x<=Math.floorDiv(origin.getX()+48,16)+1;++x)
+                for(int z=Math.floorDiv(origin.getZ(),16)-1;z<=Math.floorDiv(origin.getZ()+48,16)+1;++z) {
+                    level.getChunk(x,z);level.setChunkForced(x,z,true);
                 }
         }
-        for (int x = 0; x < 48; ++x) for (int y = 0; y < 6; ++y) for (int z = 0; z < 48; ++z) helper.getLevel().setBlock(helper.absolutePos(new BlockPos(x,y,z)), Block.stateById(0), 18);
+        for (int x = 0; x < 48; ++x) for (int y = 0; y < 6; ++y) for (int z = 0; z < 48; ++z) level.setBlock(origin.offset(x,y,z), Block.stateById(0), 18);
         traceLimit = scenario.has("updateTraceLimit") ? scenario.get("updateTraceLimit").getAsInt() : 0;
         traceTruncated = false; traceEntries = new JsonArray();
         int end = scenario.get("endTick").getAsInt();
         for (int t = 0; t <= end; ++t) {
             final int tick = t;
-            Runnable run = () -> {
+            hook.at(t, () -> {
+                if (tick == 0) {
+                    // Sampled at the first timeline tick, not at setup: an independent harness can
+                    // only line up daylight and the 20 gt detector phase if it knows both clocks.
+                    // 26.2 keeps day time in the WorldClock registry, not in level data.
+                    environment.addProperty("gameTime", level.getGameTime());
+                    level.dimensionType().defaultClock().ifPresent(
+                        clock -> environment.addProperty("clockTicks", level.clockManager().getTotalTicks(clock)));
+                }
                 if (traceLimit > 0) {
                     // ServerLevel.tick clears the listener every tick when nothing subscribes,
                     // so reinstall it here; it then covers the next server tick and these commands.
-                    traceOrigin = helper.absolutePos(BlockPos.ZERO);
-                    neighborUpdaterOf(helper.getLevel()).setDebugListener(CaptureRedstone::recordTraceEntry);
+                    traceOrigin = origin;
+                    neighborUpdaterOf(level).setDebugListener(CaptureRedstone::recordTraceEntry);
                     appendTrace(new JsonPrimitive(tick));
                 }
                 for (var value : scenario.getAsJsonArray("commands")) {
                     JsonObject command = value.getAsJsonObject(); if (command.get("tick").getAsInt() != tick) continue;
-                    var absolute = helper.absolutePos(pos(command.getAsJsonArray("pos")));
-                    applyCommand(helper, absolute, command);
+                    applyCommand(level, origin.offset(pos(command.getAsJsonArray("pos"))), command);
                 }
                 if (scenario.has("discardDrops") && scenario.get("discardDrops").getAsBoolean()) {
                     // Isolate block logic from random dropped-hook trajectories;
                     // explicit contact inputs remain real persistent entities.
-                    var bounds = net.minecraft.world.phys.AABB.encapsulatingFullBlocks(helper.absolutePos(new BlockPos(-4,-4,-4)), helper.absolutePos(new BlockPos(52,10,52)));
-                    for (var drop : helper.getLevel().getEntitiesOfClass(ItemEntity.class, bounds)) drop.discard();
+                    var bounds = net.minecraft.world.phys.AABB.encapsulatingFullBlocks(origin.offset(-4,-4,-4), origin.offset(52,10,52));
+                    for (var drop : level.getEntitiesOfClass(ItemEntity.class, bounds)) drop.discard();
                 }
                 JsonObject frame = new JsonObject(); frame.addProperty("tick", tick); JsonArray states = new JsonArray(); JsonArray analogs = new JsonArray(); JsonArray inventories = new JsonArray();JsonArray bells=new JsonArray();JsonArray jukeboxes=new JsonArray();
                 for (var value : scenario.getAsJsonArray("watch")) {
-                    var absolute = helper.absolutePos(pos(value.getAsJsonArray()));
-                    states.add(Block.getId(helper.getLevel().getBlockState(absolute)));
-                    var entity = helper.getLevel().getBlockEntity(absolute);
-                    var state = helper.getLevel().getBlockState(absolute);
+                    var absolute = origin.offset(pos(value.getAsJsonArray()));
+                    states.add(Block.getId(level.getBlockState(absolute)));
+                    var entity = level.getBlockEntity(absolute);
+                    var state = level.getBlockState(absolute);
                     bells.add(entity instanceof net.minecraft.world.level.block.entity.BellBlockEntity bell && bell.shaking);
                     if(entity instanceof net.minecraft.world.level.block.entity.JukeboxBlockEntity box) {
                         var player=new JsonObject();player.addProperty("playing",box.getSongPlayer().isPlaying());player.addProperty("elapsed",box.getSongPlayer().getTicksSinceSongStarted());jukeboxes.add(player);
                     }else jukeboxes.add(JsonNull.INSTANCE);
-                    analogs.add(entity instanceof ComparatorBlockEntity comparator ? comparator.getOutputSignal() : state.hasAnalogOutputSignal() ? state.getAnalogOutputSignal(helper.getLevel(), absolute, Direction.NORTH) : -1);
+                    analogs.add(entity instanceof ComparatorBlockEntity comparator ? comparator.getOutputSignal() : state.hasAnalogOutputSignal() ? state.getAnalogOutputSignal(level, absolute, Direction.NORTH) : -1);
                     JsonArray inventory = new JsonArray();
                     if (entity instanceof Container container) for (int slot = 0; slot < container.getContainerSize(); ++slot) {
                         var stack = container.getItem(slot);
@@ -389,10 +418,9 @@ public class CaptureRedstone extends TestFunctionLoader {
                     }
                     try { Files.writeString(output, new GsonBuilder().setPrettyPrinting().create().toJson(result)); }
                     catch (Exception e) { throw new RuntimeException(e); }
-                    helper.succeed();
+                    onFinished.run();
                 }
-            };
-            if (t == 0) run.run(); else helper.runAtTickTime(t, run);
+            });
         }
     }
     public static void main(String[] args) throws Exception {

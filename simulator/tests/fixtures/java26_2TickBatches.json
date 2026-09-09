@@ -189,10 +189,27 @@
     ]
   ],
   "reference": "Minecraft Java 26.2 GameTest, nonexperimental redstone",
+  "referenceEnvironment": {
+    "javaVersion": "25.0.4.1",
+    "randomTickSpeed": 0,
+    "featureFlags": [
+      "minecraft:trade_rebalance",
+      "minecraft:vanilla"
+    ],
+    "dataPacks": [
+      "file/simulator",
+      "minecart_improvements",
+      "redstone_experiments",
+      "trade_rebalance",
+      "vanilla"
+    ],
+    "gameTime": 10,
+    "clockTicks": 10
+  },
   "origin": [
-    -13226336,
+    11225707,
     -58,
-    -3507518
+    -6256098
   ],
   "frames": [
     {

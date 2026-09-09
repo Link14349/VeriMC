@@ -12,6 +12,8 @@ classDir.mkdir(exist_ok=True)
 classPath = os.pathsep.join([str(cacheDir / 'game.jar')] + [str(p) for p in sorted((cacheDir / 'libraries').rglob('*.jar'))])
 toolName = sys.argv[1] if len(sys.argv) > 1 else 'ExportReference'
 sourcePath = Path(__file__).parent / (toolName + '.java')
-subprocess.run(['javac', '-cp', classPath, '-d', str(classDir), str(sourcePath)], check=True)
+# The vanilla-only capture server reuses CaptureRedstone's timeline, so let javac resolve
+# sibling tool sources instead of requiring a separate compile step for each of them.
+subprocess.run(['javac', '-cp', classPath, '-sourcepath', str(sourcePath.parent), '-d', str(classDir), str(sourcePath)], check=True)
 args = sys.argv[2:] or [str(rootDir / 'data/blockStates.json')]
 subprocess.run(['java', '-cp', str(classDir) + os.pathsep + classPath, toolName] + args, check=True, cwd=cacheDir)

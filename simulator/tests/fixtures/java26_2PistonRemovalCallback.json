@@ -1098,12 +1098,21 @@
     "featureFlags": [
       "minecraft:trade_rebalance",
       "minecraft:vanilla"
-    ]
+    ],
+    "dataPacks": [
+      "file/simulator",
+      "minecart_improvements",
+      "redstone_experiments",
+      "trade_rebalance",
+      "vanilla"
+    ],
+    "gameTime": 7,
+    "clockTicks": 7
   },
   "origin": [
-    6032598,
+    -7838120,
     -58,
-    4825698
+    -11685896
   ],
   "frames": [
     {

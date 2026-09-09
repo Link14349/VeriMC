@@ -68,6 +68,8 @@
 
 `exportBlockTags.py` 从固定 JAR 的 `data/minecraft/tags/block/` 递归解析内置方块标签写入 `data/blockTags.json`：`Bootstrap.bootStrap()` 不加载数据包标签，`BlockTags.WALLS` 在注册表导出器里是空的，必须另走这条路径。
 
+`CaptureRedstoneVanilla` 是第二个参考入口：它自建 `MinecraftServer`，启用的功能开关正好是 `FeatureFlags.VANILLA_SET`、数据包只有 `vanilla`，用来把 GameTest 环境固有的 `trade_rebalance` 区分出来（`GameTestServer.ENABLED_FEATURES` 是 `private static final`，无法降级）。`vanillaReplay.py <fixture|all> <新目录>` 在 fixture 记录的**绝对原点与时钟**上复跑同一条时间线，逐字段对照 GameTest 捕获、再交给 `checkReference`，并对带轨迹的场景额外跑一次关掉轨迹的同原点同环境对照。捕获里的 `referenceEnvironment` 现在记录 `dataPacks`、`gameTime` 与 `clockTicks`。详见 [严格 vanilla-only 参考服务器](redstoneAudit/vanillaOnlyReference.md)。
+
 `captureMachineMatrix.py` 增加准连接机器矩阵组：14 刻 / 88 点，同一台机器 22 份，覆盖四个 x 偏移 × 四个 z 偏移的位置相关桶序、活塞六个朝向与两种放置顺序，另逐条对照 31,740 条更新轨迹；实测捕获原点 x、z 均为负值。
 
 `captureUpdateTrace.py` 增加刻内更新轨迹组：14 刻 / 9 点，另逐条对照 3,327 条邻居/形状更新坐标。原版侧使用 `CollectingNeighborUpdater.setDebugListener` 这一公开钩子，不修改游戏代码；截断不判为通过。加 `--no-trace` 可用同一时间线复跑以验证跟踪不改变执行语义。详见 [刻内更新轨迹](redstoneAudit/updateTrace.md)。
