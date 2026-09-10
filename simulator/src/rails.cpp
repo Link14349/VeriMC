@@ -52,10 +52,16 @@ struct RailConnection {
     StateId state;
     bool straight;
     std::vector<BlockPos> connections;
-    RailConnection(Simulator& simulator, BlockPos position) : sim(simulator), pos(position), state(sim.world.get(pos)), straight(sim.at(pos).device != Device::rail) {
+    // 原版 `RailState(level, pos, state)` 的第三个参数是**调用方给的状态**，不是世界里的方块：
+    // `this.state`、`this.block`、`this.isStraight` 与初始 `updateConnections` 全部由它决定
+    // （RailState.java:20-28）。`getRail()` 那条路径传的确实是 `level.getBlockState(pos)`，
+    // 但 `updateDir(level, pos, state, …)` 传的是 `neighborChanged` 收到的快照。
+    RailConnection(Simulator& simulator, BlockPos position, StateId seed)
+        : sim(simulator), pos(position), state(seed), straight(sim.registry[seed].device != Device::rail) {
         auto ends = railConnections(pos, railShape(sim, state));
         connections.assign(ends.begin(), ends.end());
     }
+    RailConnection(Simulator& simulator, BlockPos position) : RailConnection(simulator, position, simulator.world.get(position)) {}
     bool connects(BlockPos other) const {
         return std::any_of(connections.begin(), connections.end(), [other](BlockPos p) { return p.x == other.x && p.z == other.z; });
     }
@@ -140,8 +146,18 @@ struct RailConnection {
 }
 
 void Simulator::placeRail(BlockPos pos) {
-    RailConnection(*this, pos).place(bestSignal(pos) > 0, true);
-    if (isRail(at(pos).device) && at(pos).device != Device::rail) neighborChanged(pos, world.get(pos));
+    RailConnection rail(*this, pos);
+    rail.place(bestSignal(pos) > 0, true);
+    // 原版 BaseRailBlock.updateState 只为“直线型”铁轨发通知，而且走 FullNeighborUpdate：
+    //   state = this.updateDir(level, pos, state, true);
+    //   if (this.isStraight) level.neighborChanged(state, pos, this, null, movedByPiston);
+    // 带的快照是 `updateDir` 的**返回值**，也就是 `RailState.getState()`——RailState 自己
+    // 在 `place()` 里算出来并写进世界的那一份（RailState.java:331-333、:349）。
+    // RailState 之后**不再重读世界**：`place()` 里对相邻铁轨的 `connectTo` 级联会继续改世界，
+    // 但 `this.state` 保持不变。所以这里必须用 `rail.state`，不能用 `world.get(pos)`：
+    // 级联可能已经把本格改成别的形状/通电状态，那样快照就提前变“新”了。
+    if (isRail(at(pos).device) && at(pos).device != Device::rail)
+        neighborChangedSnapshot(pos, rail.state, world.get(pos));
     if (at(pos).device == Device::detectorRail) updateDetectorRail(pos);
 }
 
@@ -169,15 +185,27 @@ bool Simulator::poweredRailPath(BlockPos pos, StateId state, bool forward, int d
     return poweredAt(next) || (!climbing && poweredAt(next.relative(Direction::down)));
 }
 
-void Simulator::updateRail(BlockPos pos, StateId source) {
-    auto state = world.get(pos); auto shape = railShape(*this, state);
+// state 是 FullNeighborUpdate 入队时的**快照**，不是当前世界里的方块。原版
+// BaseRailBlock.neighborChanged(state, ...) 全程用这个参数，PoweredRailBlock 更是把
+// 整个快照写回：`setBlock(pos, state.setValue(POWERED, shouldPower), 3)`。
+// 因此同一层里铁轨形状被改掉时，这条更新会把**旧形状**连同新的通电状态一起写回去。
+void Simulator::updateRail(BlockPos pos, StateId state, StateId source) {
+    // 原版 BaseRailBlock.neighborChanged 的第一句是
+    // `if (!level.isClientSide() && level.getBlockState(pos).is(this))`（BaseRailBlock.java:83）：
+    // 快照说这里是某种铁轨，但世界里已经不是**同一个方块**时直接返回。
+    // 快照形式让入队时的状态可能比世界旧，没有这道闸就会对已经不是铁轨的格子
+    // `setBlock(pos, 0)`，或者把铁轨状态凭空写回去。
+    if (at(pos).type != registry[state].type) return;
+    auto shape = railShape(*this, state);
     auto slope = slopeDirection(shape);
     if (!survives(pos, state) || (slope && (at(pos.relative(*slope)).rigidMask & 2u) == 0)) { setBlock(pos, 0); return; }
-    if (at(pos).device == Device::rail) {
+    if (registry[state].device == Device::rail) {
         if (!registry[registry.type(source).defaultState].signalSource) return;
         int count = 0; for (auto d : horizontal) if (railAt(*this, pos.relative(d))) ++count;
-        if (count == 3) RailConnection(*this, pos).place(bestSignal(pos) > 0, false);
-    } else if (at(pos).device == Device::poweredRail || at(pos).device == Device::activatorRail) {
+        // 原版 RailBlock.updateState 走 `this.updateDir(level, pos, state, false)`，
+        // 里面是 `new RailState(level, pos, state)`——同样以**快照**为准，而不是重读世界。
+        if (count == 3) RailConnection(*this, pos, state).place(bestSignal(pos) > 0, false);
+    } else if (registry[state].device == Device::poweredRail || registry[state].device == Device::activatorRail) {
         bool powered = bestSignal(pos) > 0 || poweredRailPath(pos, state, true, 0) || poweredRailPath(pos, state, false, 0);
         if (powered != registry[state].powered) {
             setBlock(pos, registry.withBool(state, "powered", powered));
@@ -195,7 +223,9 @@ void Simulator::updateDetectorRail(BlockPos pos) {
     if (occupied != registry[state].powered) {
         auto next = registry.withBool(state, "powered", occupied);
         setBlock(pos, next);
-        for (auto connection : railConnections(pos, railShape(*this, next))) neighborChanged(connection, world.get(connection));
+        // 原版 DetectorRailBlock.updatePowerToConnected 同样是带快照的通知。
+        for (auto connection : railConnections(pos, railShape(*this, next)))
+            neighborChangedSnapshot(connection, world.get(connection), world.get(connection));
         updateNeighbors(pos, -1, state); updateNeighbors(pos.relative(Direction::down), -1, state);
     }
     if (occupied) schedule(pos, 20);
@@ -208,8 +238,18 @@ Json Simulator::normalizeCarts(const Json& carts) const {
     for (const auto& cart : carts) {
         auto type = cart.at("type").get<std::string>();
         std::size_t size = type == "chest_minecart" ? 27 : type == "hopper_minecart" ? 5 : 0;
-        if (size == 0 && type != "minecart" && type != "furnace_minecart" && type != "tnt_minecart") throw std::invalid_argument("不支持此矿车接触类型");
+        if (size == 0 && type != "minecart" && type != "furnace_minecart" && type != "tnt_minecart" && type != "command_block_minecart")
+            throw std::invalid_argument("不支持此矿车接触类型");
         Json row{{"type", type}};
+        // 命令方块矿车的比较器读数是它内部命令方块的 successCount。本项目不实现命令解释器，
+        // 该计数作为显式外部输入给出，与讲台页数、标靶命中同属受限实体输入。
+        if (type == "command_block_minecart") {
+            if (!cart.contains("successCount")) throw std::invalid_argument("命令方块矿车需要显式的 successCount");
+            const auto& value = cart.at("successCount");
+            if (!value.is_number_integer() || value.get<std::int64_t>() < 0 || value.get<std::int64_t>() > 15)
+                throw std::invalid_argument("successCount 必须是 0–15 的整数");
+            row["successCount"] = value.get<int>();
+        } else if (cart.contains("successCount")) throw std::invalid_argument("只有命令方块矿车接受 successCount");
         auto edits = parseInventory(cart.value("inventory", Json::array()), size);
         if (size) {
             row["inventory"] = Json::array();
@@ -229,6 +269,12 @@ const Json* Simulator::firstContainerCart(BlockPos pos) const {
 }
 
 int Simulator::cartAnalog(BlockPos pos) const {
+    // 原版 DetectorRailBlock.getAnalogOutputSignal 先找命令方块矿车，找到就直接返回它的
+    // successCount，容器矿车根本不参与比较。
+    auto found = runtime.find(pos);
+    if (found != runtime.end() && found->second.values.contains("carts"))
+        for (const auto& cart : found->second.values.at("carts"))
+            if (cart.at("type") == "command_block_minecart") return cart.at("successCount").get<int>();
     auto cart = firstContainerCart(pos);
     if (!cart) return 0;
     float fullness = 0;

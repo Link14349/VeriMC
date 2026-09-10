@@ -1,0 +1,305 @@
+{
+  "simulationCommit": "cc6b156723fb68fc0131def99013315f3ff3b455",
+  "referenceGameSha256": "183c0499c5f855570ee487dd38e141a53f0121f83a0b07a3bac2d8b6698823e8",
+  "referenceEnvironment": {
+    "javaVersion": "25.0.4.1",
+    "randomTickSpeed": 0,
+    "featureFlags": [
+      "minecraft:trade_rebalance",
+      "minecraft:vanilla"
+    ]
+  },
+  "scope": "Fresh Java GameTest captures with natural random ticks disabled, compared with C++ at captured coordinates; sampled fields only",
+  "scenarioCount": 22,
+  "frameCount": 3105,
+  "observedPositionsAcrossScenarios": 870,
+  "positionFrameCount": 73614,
+  "scenarios": [
+    {
+      "fixture": "java26_2Bells.json",
+      "frames": 123,
+      "origin": [
+        -2197802,
+        -58,
+        6810086
+      ],
+      "status": "match",
+      "watch": 34,
+      "captureSha256": "517da2073347b80811ef12daad7eb61ac93b32df22e47d30194408babc706f24",
+      "baselineSha256": "9238062d07e75e5d6e884d8df97d5664a616c990f48e4a965cd9aceb8adda7a1"
+    },
+    {
+      "fixture": "java26_2Bookshelves.json",
+      "frames": 57,
+      "origin": [
+        -696893,
+        -58,
+        -1570449
+      ],
+      "status": "match",
+      "watch": 11,
+      "captureSha256": "5317e2f45357267ce209077c03ff958f641da2a0097c5922c360bf31961542e9",
+      "baselineSha256": "869fa08081c2dfb58c70bfc1b82164c13b47bc512c7d1b03d6aa969b6bccbdb0"
+    },
+    {
+      "fixture": "java26_2Buttons.json",
+      "frames": 101,
+      "origin": [
+        -9697949,
+        -58,
+        -10325133
+      ],
+      "status": "match",
+      "watch": 16,
+      "captureSha256": "45d9aedf52580780b172deea8d03a85a6d2d1e1827cb0d950b405fece68c2c25",
+      "baselineSha256": "047dce170c3fad050dc1a95596edb98f6f8dde6aaf319c8d297f77c31f35e6ab"
+    },
+    {
+      "fixture": "java26_2Composters.json",
+      "frames": 111,
+      "origin": [
+        14462529,
+        -58,
+        -3780380
+      ],
+      "status": "match",
+      "watch": 26,
+      "captureSha256": "7a2d633bd5b1312b2d14f6e6da354dd84de1b603719e8016f1dc1b370ec7dbaa",
+      "baselineSha256": "87e9ee7ab06a5be1afd9db657392dabf4907abe0a09e5877b3d8910294e852e1"
+    },
+    {
+      "fixture": "java26_2Containers.json",
+      "frames": 17,
+      "origin": [
+        -2779952,
+        -58,
+        -11879369
+      ],
+      "status": "match",
+      "watch": 14,
+      "captureSha256": "0caeadc3e7c9916c85203c79bee2112fc0eb11162615ef34a9331c068318a68d",
+      "baselineSha256": "bb91d1be90fc2211941bbf98dd444b08d92b3404333a228c57dd66f715265cc9"
+    },
+    {
+      "fixture": "java26_2CopperChests.json",
+      "frames": 25,
+      "origin": [
+        -5103480,
+        -58,
+        -6972273
+      ],
+      "status": "match",
+      "watch": 132,
+      "captureSha256": "e1855b58a96cf32468c4977b9d7afc2f112c7c25a1a186b622b532b625fe297d",
+      "baselineSha256": "f690323eada74c258450a2010b0f0537157d9a0a84895a4e86cfaaa74f09c39f"
+    },
+    {
+      "fixture": "java26_2DeviceVibrations.json",
+      "frames": 155,
+      "origin": [
+        -14791884,
+        -58,
+        4463373
+      ],
+      "status": "match",
+      "watch": 31,
+      "captureSha256": "488f76311967923ed67dbc209fcb87f1c261b979aad7bedbaa610c35b5e88a30",
+      "baselineSha256": "3db34d18a959b72a34d0d505211de391c3585a91f1e0febf6bf43ccdc472661e"
+    },
+    {
+      "fixture": "java26_2Devices.json",
+      "frames": 29,
+      "origin": [
+        -10902752,
+        -58,
+        724870
+      ],
+      "status": "match",
+      "watch": 32,
+      "captureSha256": "9688a43c37cd09795ca8e877332d2c60f7fc8449d1c4c7f5ca4d1ca90394b0ed",
+      "baselineSha256": "79621cfc7c47154e8534734e744fc0deef22f77d31787d9ce6a3faf7e6a1145e"
+    },
+    {
+      "fixture": "java26_2Droppers.json",
+      "frames": 31,
+      "origin": [
+        -3264599,
+        -58,
+        -11942914
+      ],
+      "status": "match",
+      "watch": 19,
+      "captureSha256": "4ba6a59ce6e63dd5242c5f7e9cd6b6be15fc29725d2f6a16ee7e7e78fa499796",
+      "baselineSha256": "8b1493d50bfbb4a1518a655fff34cff8710f10cb0ada46e505ee3288a958b48f"
+    },
+    {
+      "fixture": "java26_2Hoppers.json",
+      "frames": 65,
+      "origin": [
+        -12627099,
+        -58,
+        -13992089
+      ],
+      "status": "match",
+      "watch": 25,
+      "captureSha256": "0cce287aaa304b1bbf6310d818bf5b374894c8d2de3afd76d9cb8bcf2db11a14",
+      "baselineSha256": "6aca84f6cb1ccbe72fdaa02828ba879364e268d6de262b9cbe5589854d30221c"
+    },
+    {
+      "fixture": "java26_2JukeboxHoppers.json",
+      "frames": 1456,
+      "origin": [
+        13933891,
+        -58,
+        -12179268
+      ],
+      "status": "match",
+      "watch": 11,
+      "captureSha256": "8b1827f8a2fea290232ef14491339f3a4064efb1f41a195d799e85ef8fe525bd",
+      "baselineSha256": "adb01a13cac6dacd576a5dc3ecdce9899ef62413049fe5b9a69242b48a1747da"
+    },
+    {
+      "fixture": "java26_2Jukeboxes.json",
+      "frames": 151,
+      "origin": [
+        -6622554,
+        -58,
+        -14534512
+      ],
+      "status": "match",
+      "watch": 68,
+      "captureSha256": "9292a3a2f9a718d3c61ba143f13a65cc82b24421e9ac820eec742dff0063a404",
+      "baselineSha256": "03fde29c322a626e402b0d2d51a7eb5a6e240655a172b0b60d1a0b91d17f7a04"
+    },
+    {
+      "fixture": "java26_2Notes.json",
+      "frames": 100,
+      "origin": [
+        -4208579,
+        -58,
+        -5436066
+      ],
+      "status": "match",
+      "watch": 32,
+      "captureSha256": "64f074e31c9a7943edb8826119716fd5d79e23c983254a4f9627aab21050c113",
+      "baselineSha256": "b66c7f55858dcea8db847466bac04008f41c6649dbcd850b97eb7a307d7bc0ef"
+    },
+    {
+      "fixture": "java26_2Pots.json",
+      "frames": 73,
+      "origin": [
+        6702669,
+        -58,
+        -14988268
+      ],
+      "status": "match",
+      "watch": 26,
+      "captureSha256": "72d8b82657719648d7a79b0c5ceae470b6cae661196196e427ffc9c408853756",
+      "baselineSha256": "61bd202f39bdfce32c09c151dbc05f2662744fdd81dbd53abceed220aa1232d2"
+    },
+    {
+      "fixture": "java26_2Rails.json",
+      "frames": 45,
+      "origin": [
+        -11420640,
+        -58,
+        2231107
+      ],
+      "status": "match",
+      "watch": 93,
+      "captureSha256": "52066aec127a0080124835f3de7b47f1cf6ad38de9265e91e1f8901d0957412e",
+      "baselineSha256": "8f4fb8b1e294ac3cfe6c0aa74fad8c7fb6171e960cab377b329c6f654adefa67"
+    },
+    {
+      "fixture": "java26_2Redstone.json",
+      "frames": 25,
+      "origin": [
+        -14040416,
+        -58,
+        10858895
+      ],
+      "status": "match",
+      "watch": 47,
+      "captureSha256": "fef7e477bcf7180265effd76b7d23070135cd9f753f37d43fe8c206bac8a2ab6",
+      "baselineSha256": "680307597af3e88773fc3f8eeb0f9e43b264d7472b55cad8e9b3fe23cde5131d"
+    },
+    {
+      "fixture": "java26_2Targets.json",
+      "frames": 53,
+      "origin": [
+        -5147802,
+        -58,
+        13166500
+      ],
+      "status": "match",
+      "watch": 26,
+      "captureSha256": "080c26226e013ce099b5ad4cbdd585d89a6487923db1d24a080d7133d3e63fca",
+      "baselineSha256": "c51e04d7d58467c7ea8a8903a5a13d9e2be7452066ac51a53bb336a875381328"
+    },
+    {
+      "fixture": "java26_2TickBatches.json",
+      "frames": 25,
+      "origin": [
+        6389025,
+        -58,
+        4339003
+      ],
+      "status": "match",
+      "watch": 8,
+      "captureSha256": "1520631b75919afff76a2ef60e7fbf37c81897f7c1941911248b41365fc3d27f",
+      "baselineSha256": "b004f4b174633d61fc74a5568b6bfef988fbe0e2a3b31d87bd5c44e522182a72"
+    },
+    {
+      "fixture": "java26_2Torches.json",
+      "frames": 195,
+      "origin": [
+        8640803,
+        -58,
+        -13686074
+      ],
+      "status": "match",
+      "watch": 5,
+      "captureSha256": "0ea702435e45670d4d6dc86e5655768a6eab8be46f04529d272ea88e8000992b",
+      "baselineSha256": "5a23226c8d21dab0d206b6af56088917e351a8aed2b696faa2b6d06bffddfb53"
+    },
+    {
+      "fixture": "java26_2Tripwire.json",
+      "frames": 70,
+      "origin": [
+        -280150,
+        -58,
+        1784514
+      ],
+      "status": "match",
+      "watch": 121,
+      "captureSha256": "394ba167d2f17733784db0ae9a803f153cda2e9723dc28bf362cc4f3ff8c4718",
+      "baselineSha256": "e90add6581d6c1330a4f083ff0d449d28cbfc07f9e3477d0ab96813996f175e6"
+    },
+    {
+      "fixture": "java26_2Vibrations.json",
+      "frames": 161,
+      "origin": [
+        -2733702,
+        -58,
+        6285531
+      ],
+      "status": "match",
+      "watch": 13,
+      "captureSha256": "0169836c8d7d76af5035b0668490dbbc66c7476ebef0aab30377b29fa49c5bc0",
+      "baselineSha256": "723947fc73bca2ed7c71021d19bf537fb66523555446740be7470aa0ba40d1b3"
+    },
+    {
+      "fixture": "java26_2WireGeometry.json",
+      "frames": 37,
+      "origin": [
+        -12712807,
+        -58,
+        1332051
+      ],
+      "status": "match",
+      "watch": 80,
+      "captureSha256": "c3e4a214368fdf2e648c001fba17ac93b6b999240b5b4f0a4fe2bd5f913ccdf0",
+      "newScenario": true
+    }
+  ]
+}

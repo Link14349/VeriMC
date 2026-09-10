@@ -55,10 +55,11 @@ std::unique_ptr<Simulator> Simulator::clone() const {
 void Simulator::restore(const Simulator& snapshot) {
     if (&registry != &snapshot.registry) throw std::invalid_argument("运行快照的注册表不匹配");
     world = snapshot.world; runtime = snapshot.runtime; motions = snapshot.motions; scheduled = snapshot.scheduled; scheduledKeys = snapshot.scheduledKeys;
+    chunkStates = snapshot.chunkStates;
     worldRandom = snapshot.worldRandom; randomSeed = snapshot.randomSeed;
     environmentActions = snapshot.environmentActions; pendingActionIds = snapshot.pendingActionIds; nextActionId = snapshot.nextActionId; actionsDropped = snapshot.actionsDropped;
     blockTicks = snapshot.blockTicks;
-    hoppers = snapshot.hoppers; entityOrders = snapshot.entityOrders; nextEntityOrder = snapshot.nextEntityOrder;
+    hoppers = snapshot.hoppers; cartCells = snapshot.cartCells; entityCells = snapshot.entityCells; entityOrders = snapshot.entityOrders; nextEntityOrder = snapshot.nextEntityOrder;
     sensors = snapshot.sensors; sensorSections = snapshot.sensorSections;
     jukeboxes=snapshot.jukeboxes;
     recentTorchToggles = snapshot.recentTorchToggles; torchToggleCounts = snapshot.torchToggleCounts;
@@ -78,7 +79,11 @@ void Simulator::writeProject(ProjectSink& sink, const std::string& name, bool ch
     if(!checkpoint)for(const auto& [pos,data]:runtime)if(at(pos).device==Device::bell && data.values.value("ringing",false))throw std::invalid_argument("钟仍在摆动，请保存运行快照或等待停止");
     if(!checkpoint)for(const auto& [pos,player]:jukeboxes){(void)player;if((stackAt({pos,0}).count>0)!=(registry.property(world.get(pos),"has_record")=="true"))throw std::invalid_argument("唱片标志与库存不一致，请保存运行快照");}
     Json data{{"format", "verimc.simulator"}, {"formatVersion", 1}, {"minecraftVersion", "26.2"}, {"edition", "java"}, {"kind", checkpoint ? "checkpoint" : "circuit"}, {"name", name}};
+    // loadedRegionOnly 仍然为真：世界不会自动加载区块，只有显式声明的区域存在。
+    // 每个区块的 ticking 状态由下面的 chunkStates 表达。
     data["profile"] = {{"experimentalRedstone", false}, {"naturalRandomTicks", false}, {"loadedRegionOnly", true}};
+    // 只有出现非默认区块状态时才写这一段，默认整张图 entityTicking 的工程文件保持原样。
+    if (!chunkStates.empty()) data["chunkStates"] = chunkStatesJson();
     data["randomSource"] = {{"algorithm", "javaLegacy48"}, {"seed", std::to_string(randomSeed)}};
     data["nextEntityOrder"] = nextEntityOrder;
     if (checkpoint) {
@@ -248,6 +253,38 @@ void Simulator::loadProject(ProjectSource& source) {
         if (!checkpoint && registry[id].device == Device::movingPiston) throw std::invalid_argument("运动中的活塞需要包含内部状态的运行快照");
         if (!checkpoint && isSensor(registry[id].device) && (registry.property(id,"sculk_sensor_phase") != "inactive" || registry[id].power)) throw std::invalid_argument("非空闲感测体需要运行快照");
     });
+    if (data.contains("chunkStates")) {
+        const auto& rows = data.at("chunkStates");
+        if (!rows.is_array() || rows.size() > 65536) throw std::invalid_argument("无效区块状态表");
+        static const std::map<std::string, Simulator::ChunkState> names{
+            {"unloaded", Simulator::ChunkState::unloaded}, {"loaded", Simulator::ChunkState::loaded},
+            {"blockTicking", Simulator::ChunkState::blockTicking}, {"entityTicking", Simulator::ChunkState::entityTicking}};
+        for (const auto& row : rows) {
+            if (!row.is_object() || row.size() != 3 || !row.contains("chunk") || !row.contains("state") || !row.at("stalledSince").is_number_unsigned())
+                throw std::invalid_argument("无效区块状态记录");
+            const auto& chunk = row.at("chunk");
+            if (!chunk.is_array() || chunk.size() != 2 || !chunk.at(0).is_number_integer() || !chunk.at(1).is_number_integer())
+                throw std::invalid_argument("无效区块坐标");
+            auto found = names.find(row.at("state").get<std::string>());
+            if (found == names.end()) throw std::invalid_argument("无效区块状态");
+            if (chunk.at(0) < INT32_MIN / 16 || chunk.at(0) > INT32_MAX / 16 || chunk.at(1) < INT32_MIN / 16 || chunk.at(1) > INT32_MAX / 16)
+                throw std::invalid_argument("区块坐标越界");
+            const auto x = chunk.at(0).get<int>(), z = chunk.at(1).get<int>();
+            // Restore the table atomically; validating partial rows would treat
+            // not-yet-restored neighbours as default entity-ticking chunks.
+            if (!candidate.chunkStates.emplace(BlockPos{static_cast<int>(x),0,static_cast<int>(z)},
+                    Simulator::ChunkRecord{found->second,row.at("stalledSince").get<Tick>()}).second)
+                throw std::invalid_argument("重复区块状态");
+        }
+        for (const auto& [chunk, record] : candidate.chunkStates) {
+            if (record.state != Simulator::ChunkState::unloaded) continue;
+            for (int dx=-1;dx<=1;++dx) for (int dz=-1;dz<=1;++dz) {
+                const auto neighbor=candidate.chunkStates.find({chunk.x+dx,0,chunk.z+dz});
+                if (neighbor==candidate.chunkStates.end() || neighbor->second.state>=Simulator::ChunkState::blockTicking)
+                    throw std::invalid_argument("可 ticking 的区块周围八格不能是未加载区块");
+            }
+        }
+    }
     std::unordered_set<std::uint64_t> usedRanks;
     candidate.nextEntityOrder = data.value("nextEntityOrder", std::uint64_t{0});
     for (const auto& row : source.rows("entityOrder")) {
@@ -257,7 +294,11 @@ void Simulator::loadProject(ProjectSource& source) {
     }
     for (const auto& row : source.rows("blockData")) {
         auto p = row.at("pos").get<BlockPos>();
-        if (candidate.world.get(p) == 0) throw std::invalid_argument("器件数据对应位置没有方块");
+        // 容器实体（运输/漏斗矿车）是声明在格子里的实体，通常停在空气格上，
+        // 因此只含 containerEntities 的记录允许没有方块；其余器件数据仍必须有方块承载。
+        bool entitiesOnly = row.at("values").is_object() && row.at("values").contains("containerEntities")
+            && row.at("values").size() == 1 && !row.contains("inventory") && (!row.contains("output") || row.at("output") == 0);
+        if (candidate.world.get(p) == 0 && !entitiesOnly) throw std::invalid_argument("器件数据对应位置没有方块");
         auto& state = candidate.runtime[p]; state.values = row.at("values");
         if (checkpoint) {
             state.output = row.at("output");
@@ -267,6 +308,9 @@ void Simulator::loadProject(ProjectSource& source) {
         if (candidate.at(p).device == Device::detectorRail) state.values["carts"] = candidate.normalizeCarts(state.values.value("carts", Json::array()));
         candidate.validateRuntime(p);
     }
+    // 容器实体索引（entityCells / cartCells）完全由 containerEntities 推导，不进文件；
+    // 这里在 blockData 读完之后重建，旧工程与旧快照因此原样可读、默认行为不变。
+    candidate.rebuildEntityCells();
     if (checkpoint) {
         candidate.currentTick = data.at("tick"); candidate.nextOrder = data.at("nextOrder"); candidate.sequence = data.at("sequence");
         if (candidate.currentTick == UINT64_MAX) throw std::invalid_argument("仿真时间超出范围");
@@ -290,8 +334,15 @@ void Simulator::loadProject(ProjectSource& source) {
             if (e.phase == 1 && ((e.data & 3u) > 2 || (e.data >> 2) > 5)) throw std::invalid_argument("无效活塞方块事件");
             if(e.phase==1 && e.type==registry[registry.state("note_block")].type && e.data!=0)throw std::invalid_argument("无效音符盒方块事件");
             if(e.phase==1 && e.type==registry[registry.state("bell")].type && ((e.data&3u)!=1 || (e.data>>2)<2))throw std::invalid_argument("无效钟方块事件");
-            if (e.phase == 3 && (candidate.at(e.pos).type != e.type || (candidate.at(e.pos).device != Device::tripwire && candidate.at(e.pos).device != Device::button) || e.data != 0 || e.entityOrder != 0)) throw std::invalid_argument("无效的环境接触事件");
-            if ((e.phase != 0 && e.tick < candidate.currentTick) || e.type >= registry.typeCount() || e.priority < -3 || e.priority > 3 || e.phase > 3 || e.order >= candidate.nextOrder || !usedOrders.insert(e.order).second) throw std::invalid_argument("无效的运行队列");
+            // 漏斗矿车的吸取事件挂在矿车所在的格子上，那一格通常是空气，类型固定记 0。
+            // 这里**不**要求那一格现在还有矿车：撤走矿车不撤销已排的事件（撤销会让
+            // 同一个键被重新插入而排出第二份事件），过期的那一份触发时直接空跑。
+            const bool cartSuction = e.phase == 3 && e.data == Simulator::cartSuctionEvent;
+            if (cartSuction && (e.type != 0 || e.entityOrder != 0)) throw std::invalid_argument("无效的漏斗矿车吸取事件");
+            if (e.phase == 3 && !cartSuction && (candidate.at(e.pos).type != e.type || (candidate.at(e.pos).device != Device::tripwire && candidate.at(e.pos).device != Device::button && candidate.at(e.pos).device != Device::hopper) || e.data != 0 || e.entityOrder != 0)) throw std::invalid_argument("无效的环境接触事件");
+            // 区块不可 ticking 时事件合法地停在过去，等区块恢复才执行。
+            const bool tickableChunk = e.phase == 3 ? candidate.chunkEntityTicking(e.pos) : candidate.chunkBlockTicking(e.pos);
+            if ((e.phase != 0 && e.tick < candidate.currentTick && tickableChunk) || e.type >= registry.typeCount() || e.priority < -3 || e.priority > 3 || e.phase > 3 || e.order >= candidate.nextOrder || !usedOrders.insert(e.order).second) throw std::invalid_argument("无效的运行队列");
             if (e.phase == 0) {
                 if (!data.contains("blockTickState") && e.tick <= candidate.currentTick) throw std::invalid_argument("旧版快照缺少本刻计划事件批次，请使用电路工程重新开始运行");
                 if (!candidate.blockTicks.schedule(e)) throw std::invalid_argument("重复方块计划刻");
@@ -315,7 +366,7 @@ void Simulator::loadProject(ProjectSource& source) {
         for (const auto& row : source.rows("hoppers")) {
             auto pos = row.at("pos").get<BlockPos>();
             HopperState hopper{row.at("readyAt"), row.at("firstTick"), readWakeTime(row.at("wakeAt")), row.at("generation")};
-            if (candidate.at(pos).device != Device::hopper || !candidate.entityOrders.contains(pos) || hopper.generation >= candidate.nextOrder || (hopper.wakeAt != UINT64_MAX && hopper.wakeAt < candidate.currentTick) || !candidate.hoppers.emplace(pos, hopper).second) throw std::invalid_argument("无效漏斗运行状态");
+            if (candidate.at(pos).device != Device::hopper || !candidate.entityOrders.contains(pos) || hopper.generation >= candidate.nextOrder || (hopper.wakeAt != UINT64_MAX && hopper.wakeAt < candidate.currentTick && candidate.chunkBlockTicking(pos)) || !candidate.hoppers.emplace(pos, hopper).second) throw std::invalid_argument("无效漏斗运行状态");
             if (hopper.wakeAt != UINT64_MAX && !candidate.scheduledKeys.contains({pos, candidate.at(pos).type, 2, hopper.generation})) throw std::invalid_argument("快照缺少漏斗唤醒事件");
         }
         auto hopperQueue = candidate.scheduled;
@@ -341,9 +392,14 @@ void Simulator::loadProject(ProjectSource& source) {
                     || (value.context.affectedState!=UINT32_MAX && registry.type(value.context.affectedState).dampensVibrations))throw std::invalid_argument("无效感测体待接收事件");
             }
             const bool busy=sensor.candidate.has_value() || sensor.current.has_value();
+            // 相邻区块不全 ticking 时原版 receiveVibration 直接返回 false：current 保留，
+            // travelTime 已减到 0 并每刻重试。这种「卡住待投递」状态下 remaining==0 合法。
+            const bool stuck=sensor.current && sensor.remaining==0 && !candidate.adjacentChunksTicking(pos);
             if(sensor.remaining<0 || sensor.remaining>18 || sensor.candidateTick>candidate.currentTick || (sensor.candidate && sensor.current) || (!sensor.current && sensor.remaining!=0)
-                || (sensor.current && (sensor.remaining==0 || sensor.remaining>=static_cast<int>(std::floor(sensor.current->distance))))
-                || (busy && (sensor.wakeAt<candidate.currentTick || sensor.wakeAt==UINT64_MAX || sensor.generation>=candidate.nextOrder)) || (!busy && sensor.wakeAt!=UINT64_MAX))throw std::invalid_argument("感测体传播与唤醒状态不一致");
+                || (sensor.current && !stuck && (sensor.remaining==0 || sensor.remaining>=static_cast<int>(std::floor(sensor.current->distance))))
+                // 停摆区块里最后一批事件被放回当刻、随后空闲推进跳到目标刻，wakeAt 因此
+                // 落在 currentTick 之前。与漏斗同样为这种状态开口子。
+                || (busy && ((sensor.wakeAt<candidate.currentTick && candidate.chunkBlockTicking(pos)) || sensor.wakeAt==UINT64_MAX || sensor.generation>=candidate.nextOrder)) || (!busy && sensor.wakeAt!=UINT64_MAX))throw std::invalid_argument("感测体传播与唤醒状态不一致");
             if(busy && !candidate.scheduledKeys.contains({pos,candidate.at(pos).type,2,sensor.generation}))throw std::invalid_argument("快照缺少感测体唤醒事件");
             if(!candidate.sensors.emplace(pos,sensor).second)throw std::invalid_argument("重复感测体运行数据");
         }
@@ -366,7 +422,8 @@ void Simulator::loadProject(ProjectSource& source) {
             const auto stack=candidate.stackAt({pos,0});
             if(player.song>=0 && (!stack.count || registry.item(stack.item).jukeboxSong!=player.song))throw std::invalid_argument("播放曲目与唱片不一致");
             const bool ticking=player.song>=0 && hasRecord;
-            if(ticking!=(player.wakeAt!=UINT64_MAX) || (ticking && (player.wakeAt<candidate.currentTick || player.wakeAt<player.firstTick || player.generation>=candidate.nextOrder || !candidate.scheduledKeys.contains({pos,candidate.at(pos).type,2,player.generation}))))throw std::invalid_argument("唱片机播放与队列不一致");
+            // 与漏斗、感测体同理：停摆区块里的唱片机 wakeAt 会落在 currentTick 之前。
+            if(ticking!=(player.wakeAt!=UINT64_MAX) || (ticking && ((player.wakeAt<candidate.currentTick && candidate.chunkBlockTicking(pos)) || player.wakeAt<player.firstTick || player.generation>=candidate.nextOrder || !candidate.scheduledKeys.contains({pos,candidate.at(pos).type,2,player.generation}))))throw std::invalid_argument("唱片机播放与队列不一致");
             if(!candidate.jukeboxes.emplace(pos,player).second)throw std::invalid_argument("重复唱片机数据");
         }
         auto jukeboxQueue=candidate.scheduled;
@@ -383,7 +440,14 @@ void Simulator::loadProject(ProjectSource& source) {
             if(event.phase!=2)continue;
             if(!candidate.runtime.contains(event.pos))throw std::invalid_argument("钟缺少运行数据");
             const auto& values=candidate.runtime.at(event.pos).values;
-            if(!values.value("ringing",false) || values.at("bellWakeAt")!=event.tick || values.at("bellGeneration")!=event.data || !queuedBells.insert(event.pos).second)throw std::invalid_argument("钟摆动与队列不一致");
+            // 停摆区块里事件被放回当刻，而 bellWakeAt 保持冻结的结束时刻，两者可以不等；
+            // 恢复后 finishBell 会按 bellWakeAt 重排，届时又必须相等。
+            // 两种合法的不相等：一是区块停摆，事件被放回当刻而 bellWakeAt 保持冻结的结束时刻；
+            // 二是区块刚恢复、shiftBlockEntityTimers 已把 bellWakeAt 后移而那个过期事件还没被
+            // finishBell 重排——此时事件在过去、结束时刻在现在或将来。其余不相等一律拒绝。
+            const bool bellPending=!candidate.chunkBlockTicking(event.pos)
+                || (event.tick<=candidate.currentTick && values.at("bellWakeAt").get<Tick>()>=candidate.currentTick);
+            if(!values.value("ringing",false) || (!bellPending && values.at("bellWakeAt")!=event.tick) || values.at("bellGeneration")!=event.data || !queuedBells.insert(event.pos).second)throw std::invalid_argument("钟摆动与队列不一致");
         }
         candidate.world.forEachCell([&](Cell cell) { if(registry[cell.state].device==Device::bell) {
             if(!candidate.entityOrders.contains(cell.pos))throw std::invalid_argument("钟缺少方块实体顺序");
@@ -414,6 +478,11 @@ void Simulator::loadProject(ProjectSource& source) {
         visitInitial([&](Cell cell) { candidate.onPlace(cell.pos, cell.state, 0); });
         visitInitial([&](Cell cell) { if(registry[cell.state].device==Device::jukebox && candidate.stackAt({cell.pos,0}).count)candidate.updateJukeboxItem(cell.pos); });
         visitInitial([&](Cell cell) { candidate.neighborChanged(cell.pos); });
+        // 电路工程不带运行队列，漏斗矿车停在空气格上、不会被 forEachCell 扫到，
+        // 只能在这里显式起跑。排序是为了让 nextOrder 的分配与哈希遍历顺序无关。
+        std::vector<BlockPos> carts(candidate.cartCells.begin(), candidate.cartCells.end());
+        std::sort(carts.begin(), carts.end());
+        for (auto pos : carts) candidate.scheduleCartSuction(pos, candidate.currentTick);
     }
     for (const auto& row : source.rows("probes")) {
         auto newId = candidate.addProbe(row.at("pos").get<BlockPos>(), row.at("name"), row.at("mode"), parseDirection(row.at("direction")));
@@ -442,9 +511,9 @@ void Simulator::loadProject(ProjectSource& source) {
 void Simulator::exchangeProject(Simulator& other) {
     if (&registry != &other.registry) throw std::invalid_argument("工程注册表不匹配");
     using std::swap;
-    swap(world, other.world); swap(runtime, other.runtime); swap(motions, other.motions);
+    swap(world, other.world); swap(runtime, other.runtime); swap(motions, other.motions); swap(chunkStates, other.chunkStates);
     swap(scheduled, other.scheduled); swap(scheduledKeys, other.scheduledKeys); swap(blockTicks, other.blockTicks);
-    swap(hoppers, other.hoppers); swap(entityOrders, other.entityOrders); swap(nextEntityOrder, other.nextEntityOrder);
+    swap(hoppers, other.hoppers); swap(cartCells, other.cartCells); swap(entityCells, other.entityCells); swap(entityOrders, other.entityOrders); swap(nextEntityOrder, other.nextEntityOrder);
     swap(sensors, other.sensors); swap(sensorSections, other.sensorSections); swap(jukeboxes, other.jukeboxes);
     swap(recentTorchToggles, other.recentTorchToggles); swap(torchToggleCounts, other.torchToggleCounts); swap(probes, other.probes);
     swap(probeDependencies, other.probeDependencies); swap(trace, other.trace); swap(currentTick, other.currentTick);

@@ -1,4 +1,5 @@
 #include "simulator/simulator.hpp"
+#include "simulator/referenceReplay.hpp"
 #include "simulator/legacyRandom.hpp"
 #include <iostream>
 #include <functional>
@@ -19,6 +20,20 @@ void tripwireLine(Simulator& s) {
 int main() {
     BlockRegistry r; int passed = 0, failed = 0;
     auto test = [&](const std::string& name, const std::function<void()>& run) { try { run(); ++passed; std::cout << "PASS " << name << '\n'; } catch (const std::exception& e) { ++failed; std::cerr << "FAIL " << name << ": " << e.what() << '\n'; } };
+    test("reference replay rejects unfinished work at the observation tick", [&] {
+        Json fixture{{"origin", BlockPos{0,0,0}}, {"watch", Json::array({BlockPos{30,0,0}})}, {"endTick", 1},
+                     {"commands", Json::array()}, {"frames", Json::array()}};
+        for (int x : {0, 4}) fixture["commands"].push_back({{"tick",0}, {"pos",BlockPos{x,0,0}}, {"stateId",r.state("hopper")}});
+        for (int t : {0, 1}) fixture["frames"].push_back({{"tick",t}, {"states",Json::array({0})}, {"analogs",Json::array({0})}});
+        Simulator full(r);
+        expect(replayReferenceFixture(full, fixture).at("status") == "match", "ordinary complete replay failed");
+        Simulator limited(r); bool rejected = false;
+        try { replayReferenceFixture(limited, fixture, {}, 1); }
+        catch (const std::runtime_error& error) { rejected = std::string(error.what()).find("runnable events at observation tick") != std::string::npos; }
+        expect(limited.currentTick == 1 && !limited.breakRequested && limited.pendingEvents() > 0,
+               "test did not reach a same-tick soft budget boundary");
+        expect(rejected, "static observation hid an unfinished tick");
+    });
     test("palette defaults reproduce native placement before any world state is sent", [&] {
         for (const auto& item : r.catalog()) {
             const auto id = item.at("defaultState").get<StateId>();
@@ -73,7 +88,7 @@ int main() {
         auto read = [](const Json& row) { return ScheduledEvent{row.at("tick"), row.at("priority"), row.at("order"), row.at("pos").get<BlockPos>(), row.at("type")}; };
         for (const auto& row : fixture.at("initial")) ticks.schedule(read(row));
         for (const auto& run : fixture.at("runs")) {
-            ticks.collect(run.at("tick"), run.at("limit"));
+            ticks.collect(run.at("tick"), {}, run.at("limit"));
             std::size_t index = 0;
             while (ticks.hasBatch()) {
                 const auto event = ticks.pop();
@@ -162,6 +177,129 @@ int main() {
             expect(s.inventoryJson(pos)[0]["count"]==row.at("remaining") && action["count"]==row.at("count"),"emission inventory differs");
         }
     });
+    // 显式动作闭环：投掷器抛出 → 外部环境反馈（声明落点）→ 漏斗按既有原版路径再吸收。
+    // 抛出的初始位置与速度直接取自既有原版实测 java26_2DropperMotion.json（facing=east、
+    // seedBits=0 那一例，逐位比较）；落点的声明形式与既有原版实测 java26_2HopperPickup.json
+    // 里的 groundItems 外部刺激完全一致，漏斗吸取走的是同一条已经与原版对照过的路径。
+    // **抛出点到落点之间那一段（物品在空中飞行）是外部输入，不是本内核实现的物品运动**：
+    // 内核既不模拟也不推断实体运动，落点由 fixture 显式声明。
+    // 「投掷器→空气→落点→漏斗」这个组合场景本身还缺一次原版捕获（本轮不跑捕获）。
+    auto vanillaEject = [&] {
+        std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/../tests/fixtures/java26_2DropperMotion.json");
+        expect(static_cast<bool>(file), "missing vanilla dropper motion fixture");
+        const auto fixture = Json::parse(file);
+        for (const auto& row : fixture.at("cases")) if (row.at("facing") == "east" && row.at("seedBits") == "0") return row;
+        throw std::runtime_error("missing vanilla dropper motion case");
+    };
+    // extraDropper：第二台投掷器晚一刻再抛一次，用来构造「fixture 未声明的动作」。
+    // stock：投掷器初始物品数，1 表示抛出后容器变空（比较器输出 1→0）。
+    auto ejectClosure = [&](const Json& motion, bool extraDropper, int stock) {
+        const auto origin = motion.at("source").get<BlockPos>();
+        const auto dropper = r.state("dropper", {{"facing", "east"}});
+        const auto triggered = r.state("dropper", {{"facing", "east"}, {"triggered", "true"}});
+        const auto hopper = r.state("hopper", {{"facing", "down"}});
+        auto command = [](Tick tick, Json pos, const char* key, Json value) {
+            Json result = Json::object(); result["tick"] = tick; result["pos"] = pos; result[key] = value; return result;
+        };
+        Json inventory = Json::object();
+        inventory["inventory"] = Json::array({Json{{"slot", 0}, {"item", "stone"}, {"count", stock}}});
+        Json landing = Json::object();
+        landing["groundItems"] = Json::array({Json{{"item", "minecraft:stone"}, {"count", 1}, {"y", 0.72}}});
+        Json commands = Json::array();
+        commands.push_back(command(0, Json::array({0, 0, 0}), "stateId", dropper));
+        commands.push_back(command(0, Json::array({0, 0, 0}), "stimulus", inventory));
+        commands.push_back(command(0, Json::array({3, 0, 0}), "stateId", hopper));
+        commands.push_back(command(0, Json::array({-1, 0, 0}), "stateId", r.state("redstone_block")));
+        if (extraDropper) {
+            commands.push_back(command(0, Json::array({0, 0, 4}), "stateId", dropper));
+            commands.push_back(command(0, Json::array({0, 0, 4}), "stimulus", inventory));
+            commands.push_back(command(1, Json::array({-1, 0, 4}), "stateId", r.state("redstone_block")));
+        }
+        // 外部环境反馈：落点是显式输入，出现在漏斗的吸取体积里。
+        commands.push_back(command(8, Json::array({3, 0, 0}), "stimulus", landing));
+        Json declaration = Json::object();
+        declaration["index"] = 0; declaration["tick"] = 4; declaration["order"] = 0; declaration["kind"] = "itemEjected";
+        declaration["source"] = Json::array({0, 0, 0}); declaration["item"] = "minecraft:stone"; declaration["count"] = 1;
+        declaration["position"] = motion.at("position"); declaration["positionBits"] = motion.at("positionBits");
+        declaration["velocity"] = motion.at("velocity"); declaration["velocityBits"] = motion.at("velocityBits");
+        Json frames = Json::array();
+        for (Tick tick = 0; tick <= 20; ++tick) {
+            Json frame = Json::object();
+            frame["tick"] = tick;
+            frame["states"] = Json::array({triggered, hopper});
+            frame["analogs"] = Json::array({-1, -1});
+            // 第 8 刻声明的落点必须真的落在吸取体积里，第 20 刻必须已经被吸走。
+            if (tick == 8) frame["groundItems"] = Json::array({nullptr, Json::array({Json{{"item", "minecraft:stone"}, {"count", 1}}})});
+            if (tick == 20) {
+                frame["groundItems"] = Json::array({nullptr, Json::array()});
+                frame["inventories"] = Json::array({stock > 1 ? Json::array({Json{{"slot", 0}, {"item", "minecraft:stone"}, {"count", stock - 1}}}) : Json::array(),
+                                                    Json::array({Json{{"slot", 0}, {"item", "minecraft:stone"}, {"count", 1}}})});
+            }
+            frames.push_back(frame);
+        }
+        Json fixture = Json::object();
+        fixture["origin"] = origin;
+        fixture["watch"] = Json::array({Json::array({0, 0, 0}), Json::array({3, 0, 0})});
+        fixture["randomSeed"] = 0; fixture["endTick"] = 20;
+        fixture["commands"] = commands; fixture["frames"] = frames;
+        fixture["expectedActions"] = Json::array({declaration});
+        return fixture;
+    };
+    test("dropper ejection, declared landing and hopper pickup close the loop", [&] {
+        const auto motion = vanillaEject();
+        const auto fixture = ejectClosure(motion, false, 2);
+        Simulator s(r);
+        const auto outcome = replayReferenceFixture(s, fixture);
+        expect(outcome.at("status") == "match", "闭环重放未通过：" + outcome.dump());
+        const auto origin = fixture.at("origin").get<BlockPos>();
+        const BlockPos hopper{origin.x + 3, origin.y, origin.z};
+        expect(s.actionHistory().size() == 1 && s.actionHistory().front().at("resolved") == true && !s.hasPendingActions(),
+               "抛出动作没有按记录顺序逐条确认");
+        expect(s.suckableItems(hopper).empty() && s.inventoryJson(hopper, false).size() == 1,
+               "漏斗没有吸走外部声明的落点物品");
+        expect(s.saveProject("eject", true)["randomSource"]["state"] == motion.at("randomState"),
+               "抛出消耗的世界随机数与原版实测不一致");
+    });
+    test("declared external actions reject undeclared, mismatched and unrelated pauses", [&] {
+        const auto motion = vanillaEject();
+        auto replay = [&](const Json& fixture, const std::function<void(Simulator&)>& prepare) {
+            Simulator s(r);
+            if (prepare) prepare(s);
+            try {
+                const auto outcome = replayReferenceFixture(s, fixture);
+                return outcome.at("status") == "match" ? std::string() : "difference " + outcome.dump();
+            } catch (const std::exception& error) { return std::string(error.what()); }
+        };
+        auto mustFail = [&](const Json& fixture, const std::string& fragment, const std::string& what,
+                            const std::function<void(Simulator&)>& prepare = {}) {
+            const auto message = replay(fixture, prepare);
+            expect(message.find(fragment) != std::string::npos, what + "；实际：" + (message.empty() ? std::string("match") : message));
+        };
+        const auto base = ejectClosure(motion, false, 2);
+        auto edited = [&](const std::function<void(Json&)>& change) { Json copy = base; change(copy); return copy; };
+        // 未声明任何外部动作：不允许把暂停当成成功。
+        mustFail(edited([](Json& f) { f.erase("expectedActions"); }), "requires explicit external-action feedback", "没有声明也让重放通过了");
+        mustFail(edited([](Json& f) { f["expectedActions"] = Json::array(); }), "Undeclared external action", "空声明没有拦住实际抛出");
+        // 实际多抛了一次，而 fixture 只声明了一次。
+        mustFail(ejectClosure(motion, true, 2), "Undeclared external action", "多出来的抛出被吞掉了");
+        // 序列 / 数量 / 初值。
+        mustFail(edited([](Json& f) { f["expectedActions"][0]["tick"] = 5; }), "differs in tick", "游戏刻不符仍然通过");
+        mustFail(edited([](Json& f) { f["expectedActions"][0]["index"] = 1; }), "differs in index", "序号不符仍然通过");
+        mustFail(edited([](Json& f) { f["expectedActions"][0]["order"] = 1; }), "differs in same-tick order", "同刻顺序不符仍然通过");
+        mustFail(edited([](Json& f) { f["expectedActions"][0]["source"] = Json::array({1, 0, 0}); }), "differs in source", "源坐标不符仍然通过");
+        mustFail(edited([](Json& f) { f["expectedActions"][0]["item"] = "minecraft:dirt"; }), "differs in item", "物品不符仍然通过");
+        mustFail(edited([](Json& f) { f["expectedActions"][0]["count"] = 2; }), "differs in count", "数量不符仍然通过");
+        mustFail(edited([](Json& f) { f["expectedActions"][0]["position"][1] = 0.0; }), "differs in position", "初始位置不符仍然通过");
+        mustFail(edited([](Json& f) { f["expectedActions"][0]["velocity"][0] = 0.0; }), "differs in velocity", "初始速度不符仍然通过");
+        mustFail(edited([](Json& f) { f["expectedActions"][0]["velocityBits"][2] = "bfa310e3c7dabeb2"; }), "differs in velocityBits[2]", "速度末位不符仍然通过");
+        mustFail(edited([](Json& f) { f["expectedActions"][0].erase("velocity"); f["expectedActions"][0].erase("velocityBits"); }), "must state its velocity", "没有声明初速度也算通过");
+        // 声明了却始终没有发生。
+        mustFail(edited([](Json& f) { auto extra = f["expectedActions"][0]; extra["index"] = 1; extra["tick"] = 12; f["expectedActions"].push_back(extra); }),
+                 "never happened", "声明了却没发生的抛出被放过");
+        // 其他原因的暂停：探针断点与抛出发生在同一刻，确认外部动作不得把它一并清掉。
+        mustFail(ejectClosure(motion, false, 1), "paused for a reason other than external actions", "探针断点被外部动作确认顺手清掉了",
+                 [&](Simulator& s) { s.configureProbe(s.addProbe(motion.at("source").get<BlockPos>(), "eject", "analog"), Json{{"trigger", "falling"}}); });
+    });
     test("block tick cap defers backlog and zero delay waits for next collection", [&] {
         BlockTicks ticks;
         for (std::uint64_t i = 0; i < 65537; ++i) ticks.schedule({1, 0, i, {static_cast<int>(i), 0, 0}, 1});
@@ -192,31 +330,13 @@ int main() {
         try { restored.loadProject(invalid); } catch (...) { threw = true; }
         expect(threw && before == restored.saveProject("before", true), "invalid batch import changed world");
     });
-    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers", "java26_2Hoppers", "java26_2Torches", "java26_2Rails", "java26_2TickBatches", "java26_2Tripwire", "java26_2Buttons", "java26_2Droppers", "java26_2Targets", "java26_2CopperChests", "java26_2Bookshelves", "java26_2Pots", "java26_2Vibrations", "java26_2DeviceVibrations", "java26_2Notes", "java26_2Bells", "java26_2Jukeboxes", "java26_2JukeboxHoppers", "java26_2Composters"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
+    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers", "java26_2Hoppers", "java26_2Torches", "java26_2Rails", "java26_2FullUpdateSnapshot", "java26_2TickBatches", "java26_2Tripwire", "java26_2Buttons", "java26_2Droppers", "java26_2Targets", "java26_2CopperChests", "java26_2Bookshelves", "java26_2Pots", "java26_2Vibrations", "java26_2DeviceVibrations", "java26_2Notes", "java26_2Bells", "java26_2Jukeboxes", "java26_2JukeboxHoppers", "java26_2Composters", "java26_2WireGeometry", "java26_2PistonPushability", "java26_2DaylightVibration", "java26_2StairShapes", "java26_2RailNotificationSource", "java26_2PistonRemovalCallback", "java26_2DiodeSupportBreak", "java26_2ObserverRemoval", "java26_2PistonLandingShape", "java26_2WireShapeToggle", "java26_2RemovalNotifySource", "java26_2RepeaterLockRefresh", "java26_2ItemFrameComparator", "java26_2UpdateTrace", "java26_2MachineMatrix", "java26_2SupportDirection", "java26_2FenceGateInWall", "java26_2UpdateSource", "java26_2HopperPickup", "java26_2ChunkLifecycle", "java26_2ChunkLifecycleNegative", "java26_2ScheduledQueue", "java26_2RandomState", "java26_2BlockEntityOrder", "java26_2EntityContainers", "java26_2BlockTicking", "java26_2SensorEdgeChunks", "java26_2SensorEdgeDiagonal", "java26_2SensorEdgeNegative", "java26_2BoatContainers", "java26_2EjectHopper", "java26_2CrossChunkContact"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
         std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/../tests/fixtures/" + fixtureName + ".json"); expect(static_cast<bool>(file), "missing vanilla reference fixture");
-        auto fixture = Json::parse(file); auto origin = fixture["origin"].get<BlockPos>(); Simulator s(r);
-        auto absolute = [&](const Json& p) { auto pos = p.get<BlockPos>(); return BlockPos{origin.x + pos.x, origin.y + pos.y, origin.z + pos.z}; };
-        for (const auto& frame : fixture["frames"]) {
-            Tick tick = frame["tick"]; s.advanceTo(tick);
-            for (const auto& command : fixture["commands"]) if (command["tick"] == tick) {
-                auto p = absolute(command["pos"]);
-                if (command.contains("placedBy") || command.contains("playerPlace")) s.place(p, command["stateId"]);
-                else if (command.contains("stateId")) s.setBlock(p, command["stateId"]);
-                else if (command.contains("interact")) s.interact(p);
-                else s.stimulate(p, command["stimulus"]);
-            }
-            for (std::size_t i = 0; i < fixture["watch"].size(); ++i) {
-                auto p = absolute(fixture["watch"][i]); auto expected = frame["states"][i].get<StateId>();
-                expect(s.world.get(p) == expected, "tick " + std::to_string(tick) + " position " + fixture["watch"][i].dump() + " expected " + r.describe(expected).dump() + " got " + r.describe(s.world.get(p)).dump());
-                if (frame["analogs"][i] != -1) expect(s.analogOutput(p) == frame["analogs"][i].get<int>(), "analog mismatch at " + std::to_string(tick) + " " + fixture["watch"][i].dump());
-                if(frame.contains("bells"))expect(s.inspect(p)["runtime"].value("ringing",false)==frame["bells"][i].get<bool>(),"bell shaking differs at "+std::to_string(tick)+" "+fixture["watch"][i].dump());
-                if(frame.contains("jukeboxes") && !frame["jukeboxes"][i].is_null()) {
-                    auto player=s.inspect(p)["jukebox"];const auto& expectedPlayer=frame["jukeboxes"][i];
-                    expect(player["playing"]==expectedPlayer["playing"] && player["elapsed"]==expectedPlayer["elapsed"],"jukebox playback differs at "+std::to_string(tick)+" "+fixture["watch"][i].dump()+" expected "+expectedPlayer.dump()+" got "+player.dump());
-                }
-                if (frame.contains("inventories")) expect(s.inventoryJson(p, false) == frame["inventories"][i], "inventory mismatch at " + std::to_string(tick) + " " + fixture["watch"][i].dump() + " expected " + frame["inventories"][i].dump() + " got " + s.inventoryJson(p, false).dump());
-            }
-        }
+        const auto fixture = Json::parse(file); Simulator s(r);
+        // 差分重放循环与 checkReference 工具共用 referenceReplay.hpp 里的同一份实现，
+        // 免得某个字段只在其中一条入口里被比较。
+        const auto outcome = replayReferenceFixture(s, fixture);
+        expect(outcome.at("status") == "match", "vanilla differential: " + outcome.dump());
     });
     test("all original compost probabilities and random insertion samples", [&] {
         std::ifstream file(std::string(SIMULATOR_DATA_DIR)+"/../tests/fixtures/java26_2Composting.json");auto fixture=Json::parse(file);
@@ -642,6 +762,1044 @@ int main() {
     test("invalid project import leaves current world intact", [&] { Simulator s(r); s.place({0, 0, 0}, r.state("stone")); auto before = s.saveProject("test", true); auto bad = before; bad["blocks"][0]["name"] = "minecraft:not_a_block"; bool threw = false; try { s.loadProject(bad); } catch (...) { threw = true; } expect(threw && before == s.saveProject("test", true), "load not atomic"); });
     test("piston motion checkpoint continues across event phases", [&] { Simulator s(r); s.place({0,0,0},r.state("sticky_piston",{{"facing","east"}})); s.place({1,0,0},r.state("stone")); s.place({-1,0,0},r.state("redstone_block")); s.advanceTo(1); expect(s.at({2,0,0}).device == Device::movingPiston, "missing moving block"); auto snapshot=s.saveProject("moving",true); Simulator restored(r); restored.loadProject(snapshot); s.advanceTo(4); restored.advanceTo(4); expect(s.saveProject("moving",true)==restored.saveProject("moving",true),"motion checkpoint diverged"); expect(s.at({2,0,0}).device==Device::solid,"push failed"); s.setBlock({-1,0,0},0); s.advanceTo(8); expect(s.world.get({1,0,0})==r.state("stone") && s.world.get({2,0,0})==0,"sticky pull failed"); });
     test("update budget abort cannot resume after discarding updates", [&] { Simulator s(r); s.world.set({1,-1,0},r.state("stone")); s.place({1,0,0},r.state("redstone_wire")); auto before = s.clone(); s.updateBudget=1; bool threw=false; try { s.place({0,0,0},r.state("redstone_block")); } catch (...) { threw=true; } expect(threw&&s.faulted,"budget did not abort"); s.breakRequested=false; threw=false; try { s.advanceTo(1); } catch (...) { threw=true; } expect(threw,"faulted run resumed"); s.restore(*before); expect(!s.faulted&&s.world.size()==before->world.size(),"snapshot failed to recover"); });
+    test("fence gate IN_WALL follows the perpendicular axis only", [&] {
+        // 原版 FenceGateBlock.updateShape 只在 FACING.getClockWise() 那条轴上重算 IN_WALL；
+        // 放置时按同一条轴两侧是否是墙取值，朝向轴上的形状更新完全不动它。
+        Simulator s(r);
+        s.place({0, 0, 0}, r.state("oak_fence_gate", {{"facing", "north"}}));
+        expect(r.property(s.world.get({0, 0, 0}), "in_wall") == "false", "bare gate should not be in a wall");
+        s.setBlock({1, 0, 0}, r.state("cobblestone_wall"));
+        expect(r.property(s.world.get({0, 0, 0}), "in_wall") == "true", "perpendicular wall did not set IN_WALL");
+        s.setBlock({0, 0, -1}, r.state("white_wool"));
+        expect(r.property(s.world.get({0, 0, 0}), "in_wall") == "true", "facing-axis update must not clear IN_WALL");
+        s.setBlock({1, 0, 0}, 0);
+        expect(r.property(s.world.get({0, 0, 0}), "in_wall") == "false", "removing the wall did not clear IN_WALL");
+        s.place({0, 0, 4}, r.state("oak_fence_gate", {{"facing", "north"}}));
+        s.setBlock({0, 0, 5}, r.state("cobblestone_wall"));
+        expect(r.property(s.world.get({0, 0, 4}), "in_wall") == "false", "wall on the facing axis must be ignored");
+        s.world.set({1, 0, 8}, r.state("cobblestone_wall"));
+        s.place({0, 0, 8}, r.state("oak_fence_gate", {{"facing", "north"}}));
+        expect(r.property(s.world.get({0, 0, 8}), "in_wall") == "true", "placement did not read the perpendicular walls");
+    });
+    test("26.2 redstone capability coverage gate", [&] {
+        // Every block whose 26.2 class actually overrides a redstone-relevant callback, or that
+        // emits a signal or analog output, must be either explicitly supported here or refused.
+        std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/../tests/fixtures/java26_2BlockCapabilities.json");
+        expect(static_cast<bool>(file), "missing vanilla block capability fixture");
+        auto fixture = Json::parse(file);
+        std::set<std::string> relevant;
+        for (const auto& row : fixture.at("blocks")) relevant.insert(row.at("name").get<std::string>());
+        expect(relevant.size() == fixture.at("blocks").size(), "duplicate capability rows");
+        std::map<std::string, int> placeable;
+        std::vector<std::string> refused;
+        for (std::size_t index = 0; index < r.typeCount(); ++index) {
+            const auto& type = r.blockType(static_cast<std::uint16_t>(index));
+            expect(type.supportLevel == "implemented" || type.supportLevel == "partial"
+                || type.supportLevel == "externalStimulus" || type.supportLevel == "unimplemented",
+                "unknown support level " + type.supportLevel + " for " + type.name);
+            if (type.device == Device::dispenser || type.device == Device::crafter || type.device == Device::furnace)
+                expect(type.supportLevel == "unimplemented", "placeholder device became placeable: " + type.name);
+            if (!relevant.contains(type.name)) continue;
+            if (type.supportLevel == "unimplemented") refused.push_back(type.name);
+            else ++placeable[type.className + "=" + type.supportLevel];
+        }
+        std::vector<std::string> actual;
+        for (const auto& [key, count] : placeable) actual.push_back(key + "x" + std::to_string(count));
+        const std::vector<std::string> expected{
+            "BarrelBlock=implementedx1", "BeehiveBlock=externalStimulusx2", "BellBlock=partialx1", "ButtonBlock=implementedx14",
+            "CalibratedSculkSensorBlock=partialx1", "CauldronBlock=externalStimulusx1", "ChestBlock=implementedx1", "ChiseledBookShelfBlock=partialx1",
+            "ComparatorBlock=implementedx1", "ComposterBlock=partialx1", "CopperBulbBlock=implementedx4", "CopperChestBlock=implementedx4",
+            "CopperGolemStatueBlock=externalStimulusx4", "DaylightDetectorBlock=externalStimulusx1", "DecoratedPotBlock=partialx1", "DetectorRailBlock=externalStimulusx1",
+            "DoorBlock=implementedx17", "DropperBlock=partialx1", "EndPortalFrameBlock=externalStimulusx1", "FenceGateBlock=implementedx12",
+            "HopperBlock=implementedx1", "JukeboxBlock=partialx1", "LavaCauldronBlock=externalStimulusx1", "LayeredCauldronBlock=externalStimulusx2",
+            "LecternBlock=externalStimulusx1", "LeverBlock=implementedx1", "LightningRodBlock=externalStimulusx4", "MovingPistonBlock=implementedx1",
+            "NoteBlock=partialx1", "ObserverBlock=implementedx1", "PiglinWallSkullBlock=partialx1", "PistonBaseBlock=implementedx2",
+            "PistonHeadBlock=implementedx1", "PlayerHeadBlock=partialx1", "PlayerWallHeadBlock=partialx1", "PoweredBlock=implementedx1",
+            "PoweredRailBlock=implementedx2", "PressurePlateBlock=externalStimulusx14", "RailBlock=implementedx1", "RedStoneWireBlock=implementedx1",
+            "RedstoneLampBlock=implementedx1", "RedstoneTorchBlock=implementedx1", "RedstoneWallTorchBlock=implementedx1", "RepeaterBlock=implementedx1",
+            "RespawnAnchorBlock=externalStimulusx1", "SculkSensorBlock=partialx1", "SkullBlock=partialx5", "TargetBlock=externalStimulusx1",
+            "TrapDoorBlock=implementedx17", "TrappedChestBlock=implementedx1", "TripWireBlock=externalStimulusx1", "TripWireHookBlock=implementedx1",
+            "WallSkullBlock=partialx4", "WeatheringCopperBulbBlock=implementedx4", "WeatheringCopperChestBlock=implementedx4", "WeatheringCopperDoorBlock=implementedx4",
+            "WeatheringCopperGolemStatueBlock=externalStimulusx4", "WeatheringCopperTrapDoorBlock=implementedx4", "WeatheringLightningRodBlock=externalStimulusx4", "WeightedPressurePlateBlock=externalStimulusx2",
+            "WitherSkullBlock=partialx1", "WitherWallSkullBlock=partialx1"};
+        expect(actual == expected, "redstone-relevant palette changed; update the inventory and add per-device evidence. actual="
+            + Json(actual).dump());
+        expect(refused.size() == 243, "refused redstone block count changed: " + std::to_string(refused.size()));
+        Simulator s(r); floor(s);
+        for (const auto& name : refused) {
+            bool threw = false;
+            try { s.place({0, 1, 0}, r.state(name)); } catch (...) { threw = true; }
+            expect(threw && s.world.get({0, 1, 0}) == 0, "unimplemented block was placed: " + name);
+        }
+    });
+    test("item frame comparator input validation and checkpoint", [&] {
+        Simulator s(r); floor(s);
+        BlockPos comparator{0, 1, 0}, mount{1, 1, 0};
+        s.place(comparator, r.state("comparator", {{"facing", "east"}}));
+        s.place(mount, r.state("stone"));
+        s.stimulate(mount, {{"itemFrames", Json::array({{{"facing", "east"}, {"rotation", 5}, {"hasItem", true}}})}});
+        s.advanceTo(2);
+        expect(s.analogOutput(comparator) == 6, "item frame rotation reading");
+        auto saved = s.saveProject("frames", true); Simulator restored(r); restored.loadProject(saved);
+        expect(restored.analogOutput(comparator) == 6, "item frame lost across checkpoint");
+        s.stimulate(mount, {{"itemFrames", Json::array()}});
+        s.advanceTo(4);
+        expect(s.analogOutput(comparator) == 0, "item frame removal not applied");
+        auto rejects = [&](const Json& input) {
+            bool threw = false; try { s.stimulate(mount, input); } catch (...) { threw = true; }
+            return threw;
+        };
+        expect(rejects({{"itemFrames", Json::array({{{"facing", "east"}, {"rotation", 8}, {"hasItem", true}}})}}), "rotation 8 accepted");
+        expect(rejects({{"itemFrames", Json::array({{{"facing", "east"}, {"rotation", 0}, {"hasItem", true}, {"item", "stone"}}})}}), "unknown frame field accepted");
+        expect(rejects({{"itemFrames", Json::array()}, {"viewers", 1}}), "mixed stimulus accepted");
+        bool threw = false; try { s.stimulate({5, 1, 0}, {{"itemFrames", Json::array({{{"facing", "east"}, {"rotation", 0}, {"hasItem", false}}})}}); } catch (...) { threw = true; }
+        expect(threw, "item frame accepted on an empty cell");
+    });
+    test("chunk lifecycle: stalled ticks, deferred block events and frozen block entities", [&] {
+        Simulator s(r);
+        // 一格里放中继器链、活塞和漏斗；把它所在的区块从 entityTicking 降到 loaded，
+        // 三类待办都应当停住，恢复后继续。
+        for (int x = 0; x < 8; ++x) for (int z = 0; z < 8; ++z) s.world.set({x, -1, z}, r.state("stone"));
+        s.place({1, 0, 1}, r.state("repeater", {{"facing", "west"}, {"delay", "4"}}));
+        s.place({2, 0, 1}, r.state("redstone_lamp"));
+        s.place({1, 0, 4}, r.state("piston", {{"facing", "east"}}));
+        s.place({2, 0, 4}, r.state("stone"));
+        s.place({1, 0, 6}, r.state("hopper", {{"facing", "east"}}));
+        s.place({2, 0, 6}, r.state("chest"));
+        s.stimulate({1, 0, 6}, {{"inventory", Json::array({{{"slot", 0}, {"item", "minecraft:stone"}, {"count", 5}}})}});
+        s.advanceTo(2);
+        expect(s.inventoryJson({2, 0, 6}, false).size() == 1, "hopper did not start transferring before the stall");
+        // 先停摆，再在停摆的区块里加电源：邻居更新照常立即发生，但由此排下的计划刻与
+        // 方块事件都必须等到区块恢复。
+        s.setChunkState(0, 0, Simulator::ChunkState::loaded);
+        s.place({0, 0, 1}, r.state("redstone_block"));
+        s.place({0, 0, 4}, r.state("redstone_block"));
+        const auto stalledLamp = s.world.get({2, 0, 1});
+        const auto stalledPiston = s.world.get({1, 0, 4});
+        s.advanceTo(60);
+        expect(s.world.get({2, 0, 1}) == stalledLamp && s.world.get({1, 0, 4}) == stalledPiston,
+               "stalled chunk kept running scheduled ticks or block events");
+        expect(s.inventoryJson({2, 0, 6}, false).size() == 1, "stalled chunk kept ticking the hopper");
+        // 停摆期间保存/读取，冻结的倒计时必须原样恢复。
+        auto saved = s.saveProject("chunks", true); Simulator restored(r); restored.loadProject(saved);
+        expect(restored.chunkState({0, 0, 0}) == Simulator::ChunkState::loaded, "chunk state lost across checkpoint");
+        for (Simulator* world : {&s, &restored}) {
+            world->setChunkState(0, 0, Simulator::ChunkState::entityTicking);
+            world->advanceTo(80);
+            expect(world->world.get({1, 0, 4}) != stalledPiston, "piston block event was dropped instead of deferred");
+            expect(world->world.get({2, 0, 1}) != stalledLamp, "overdue scheduled ticks were dropped");
+        }
+        expect(s.inventoryJson({2, 0, 6}, false) == restored.inventoryJson({2, 0, 6}, false),
+               "hopper cooldown differs after restoring a stalled checkpoint");
+    });
+    test("过期快照的铁轨更新遇到已被替换的方块时什么也不做", [&] {
+        // 原版 BaseRailBlock.neighborChanged 第一句就是
+        // `if (!level.isClientSide() && level.getBlockState(pos).is(this))`（BaseRailBlock.java:83）。
+        // FullNeighborUpdate 带的是入队时的快照，那一格完全可能已经被换掉；
+        // 没有这道闸，内核会把铁轨状态凭空写回去，或者对非铁轨方块调用 setBlock(pos, 0)。
+        const BlockPos rail{1, 1, 0}, driver{0, 1, 0};
+        for (auto* which : {"powered_rail", "rail"}) {
+            Simulator s(r); floor(s);
+            s.place(rail, r.state(which, {{"shape", "north_south"}}));
+            const auto snapshot = s.world.get(rail);
+            const auto sourceId = r.state("redstone_block");
+            // 把那一格换成完全不同的方块，再拿**过期的铁轨快照**投递一次邻居更新。
+            s.setBlock(rail, r.state("stone"));
+            const auto beforeCell = s.world.get(rail);
+            s.place(driver, sourceId);
+            s.neighborChangedSnapshot(rail, snapshot, sourceId);
+            s.advanceTo(s.currentTick + 4);
+            expect(s.world.get(rail) == beforeCell,
+                   std::string("stale ") + which + " snapshot rewrote a cell that is no longer that block: "
+                   + r.describe(s.world.get(rail)).dump());
+        }
+    });
+    test("removing item frames preserves host inventory and runtime", [&] {
+        for (auto name : {"chest", "hopper"}) {
+            Simulator s(r); floor(s); const BlockPos p{0,1,0};
+            s.place(p,r.state(name));
+            s.stimulate(p, {{"inventory",Json::array({{{"slot",0},{"item","minecraft:stone"},{"count",10}}})}});
+            auto inventory=s.inventoryJson(p,false);
+            s.stimulate(p,{{"itemFrames",Json::array({{{"facing","east"},{"rotation",5},{"hasItem",true}}})}});
+            s.stimulate(p,{{"itemFrames",Json::array()}});
+            expect(s.inventoryJson(p,false)==inventory,"removing frame erased host inventory");
+            Simulator copy(r); copy.loadProject(s.saveProject("frames",true));
+            expect(copy.inventoryJson(p,false)==inventory,"frame removal broke checkpoint");
+        }
+    });
+    test("chunk table restore is independent of row order and atomic", [&] {
+        Simulator s(r);
+        for(int x=-1;x<=1;++x)for(int z=-1;z<=1;++z)s.setChunkState(x,z,Simulator::ChunkState::loaded);
+        s.setChunkState(0,0,Simulator::ChunkState::unloaded);
+        for(bool checkpoint:{false,true}) {
+            auto saved=s.saveProject("chunks",checkpoint);
+            Simulator copy(r); copy.loadProject(saved);
+            expect(copy.chunkStatesJson()==s.chunkStatesJson(),"chunk table lost");
+            std::reverse(saved["chunkStates"].begin(),saved["chunkStates"].end());
+            copy.loadProject(saved);
+            expect(copy.chunkStatesJson()==s.chunkStatesJson(),"chunk order changed result");
+            const auto before=copy.saveProject("before",true);
+            auto invalid=saved;
+            invalid["chunkStates"]=Json::array({{{"chunk",Json::array({0,0})},{"state","unloaded"},{"stalledSince",std::uint64_t{0}}}});
+            bool invalidRejected=false;try{copy.loadProject(invalid);}catch(...){invalidRejected=true;}
+            expect(invalidRejected && copy.saveProject("before",true)==before,"invalid complete topology was accepted");
+            saved["chunkStates"].push_back(saved["chunkStates"][0]);
+            bool rejected=false;try{copy.loadProject(saved);}catch(...){rejected=true;}
+            expect(rejected && copy.saveProject("before",true)==before,"duplicate chunk was not atomically rejected");
+        }
+    });
+    test("stale diode snapshots respect live block identity", [&] {
+        const BlockPos pos{1, 1, 0};
+        for (auto* name : {"comparator", "repeater"}) {
+            Simulator s(r);
+            // No support: without the live identity guard, the stale diode
+            // callback removes the replacement stone as an unsupported diode.
+            s.setBlock(pos, r.state("stone"), 2);
+            const auto before = s.saveProject("identity", true);
+            s.neighborChangedSnapshot(pos, r.state(name), r.state("stone"));
+            expect(s.world.get(pos) == r.state("stone"), "stale diode removed replacement block");
+            expect(s.saveProject("identity", true) == before, "stale diode changed runtime or queues");
+        }
+    });
+    test("实体接触按掉落物自己所在的区块判定，而不是漏斗所在的区块", [&] {
+        // 原版有两条吸取路径，判据不同：`suckInItems` 是漏斗自己的方块实体 tick，
+        // 用 AABB 查实体，**不关心物品所在区块**；`entityInside` 由掉落物自己的 tick 驱动，
+        // 判据是**物品所在区块**。要隔离后者，就得用上方的完整方块挡掉前者。
+        // 物品放在 x=-0.05：0.25 立方包围盒仍与漏斗那一格相交，
+        // 但 BlockPos.containing(-0.05) = -1，落在区块 (-1,0) 里。
+        Simulator s(r); floor(s, -20, 20);
+        const BlockPos hopper{0, 1, 0};
+        s.place(hopper, r.state("hopper", {{"facing", "down"}}));
+        s.place({0, 2, 0}, r.state("stone"));  // 挡掉 suckInItems，只剩 entityInside
+        s.stimulate(hopper, {{"groundItems", Json::array({{{"item", "minecraft:stone"}, {"count", 1}, {"x", -0.05}, {"y", 0.75}, {"z", 0.5}}})}});
+        expect(s.suckableItems(hopper).size() == 1, "the declared item was not inside the suck volume");
+        // 漏斗所在区块照常 entityTicking，只把**物品所在**的区块降到 blockTicking。
+        s.setChunkState(-1, 0, Simulator::ChunkState::blockTicking);
+        s.advanceTo(20);
+        expect(s.suckableItems(hopper).size() == 1 && s.inventoryJson(hopper, false).empty(),
+               "an item whose own chunk is not entity ticking was still picked up");
+        s.setChunkState(-1, 0, Simulator::ChunkState::entityTicking);
+        s.advanceTo(24);
+        expect(s.suckableItems(hopper).empty() && s.inventoryJson(hopper, false).size() == 1,
+               "the item was not picked up once its own chunk resumed entity ticking");
+    });
+    test("唱片机、感测体与钟在停摆区块里也能存读，且钟的摆动计时同样冻结", [&] {
+        // 停摆时 `stepEvent` 把最后一批事件放回**当前刻**并停下，随后空闲推进把 currentTick
+        // 直接跳到目标刻，于是这些方块实体的 wakeAt 落在 currentTick 之前。漏斗的快照校验
+        // 为此开了口子，唱片机与感测体没有；钟则连 wakeAt 同步都没有。
+        // 另外 `bellWakeAt` 是「摆动还剩多久」的倒计时，停摆期间必须和漏斗冷却一样冻结。
+        Simulator s(r);
+        for (int x = 0; x < 8; ++x) for (int z = 0; z < 8; ++z) s.world.set({x, -1, z}, r.state("stone"));
+        s.place({1, 0, 1}, r.state("jukebox"));
+        s.stimulate({1, 0, 1}, {{"inventory", Json::array({{{"slot", 0}, {"item", "minecraft:music_disc_cat"}, {"count", 1}}})}});
+        s.place({1, 0, 4}, r.state("sculk_sensor"));
+        s.place({1, 0, 6}, r.state("bell"));
+        s.interact({1, 0, 6});
+        s.advanceTo(2);
+        s.stimulate({4, 0, 4}, {{"gameEvent", "minecraft:block_place"}});
+        s.advanceTo(3);
+        expect(s.inspect({1, 0, 6})["runtime"]["ringing"] == true, "bell was not ringing before the stall");
+        const auto elapsedBefore = s.inspect({1, 0, 1}).at("jukebox").at("elapsed");
+        s.setChunkState(0, 0, Simulator::ChunkState::loaded);
+        s.advanceTo(300);
+        expect(s.inspect({1, 0, 1}).at("jukebox").at("elapsed") == elapsedBefore, "jukebox kept counting while stalled");
+        expect(s.inspect({1, 0, 6})["runtime"]["ringing"] == true, "bell shake timer kept running while stalled");
+        // 停摆中存读：三种方块实体的快照都必须能原样加载。
+        auto saved = s.saveProject("stalledEntities", true);
+        Simulator restored(r); restored.loadProject(saved);
+        expect(restored.saveProject("stalledEntities", true) == saved, "stalled block entity checkpoint diverged");
+        // 恢复后钟还应当摆完剩下的刻数，而不是一恢复就停。
+        for (Simulator* world : {&s, &restored}) {
+            world->setChunkState(0, 0, Simulator::ChunkState::entityTicking);
+            // 恢复之后、下一次推进之前再存读一次：此刻 bellWakeAt 已被后移，
+            // 而那个过期事件还没被 finishBell 重排，两者必然不相等。
+            // 这个窗口里产出的快照也必须能读回来。
+            auto resumed = world->saveProject("resumed", true);
+            Simulator again(r); again.loadProject(resumed);
+            expect(again.saveProject("resumed", true) == resumed, "checkpoint taken right after resuming a stalled chunk diverged");
+            world->advanceTo(301);
+            expect(world->inspect({1, 0, 6})["runtime"]["ringing"] == true, "bell stopped immediately after the chunk resumed");
+            world->advanceTo(360);
+            expect(world->inspect({1, 0, 6})["runtime"]["ringing"] == false, "bell never stopped after resuming");
+        }
+        // 未加载区块拒绝写入；可 ticking 区块周围八格不能是未加载区块，
+        // 因此要先把一圈降级成 loaded 才能卸载中心，正如原版票据等级形成的加载环。
+        for (int dx = -1; dx <= 1; ++dx) for (int dz = -1; dz <= 1; ++dz) s.setChunkState(5 + dx, 5 + dz, Simulator::ChunkState::loaded);
+        s.setChunkState(5, 5, Simulator::ChunkState::unloaded);
+        bool threw = false; try { s.setBlock({80, 0, 80}, r.state("stone")); } catch (...) { threw = true; }
+        expect(threw && s.world.get({80, 0, 80}) == 0, "wrote into an unloaded chunk");
+        threw = false; try { s.setChunkState(6, 5, Simulator::ChunkState::entityTicking); } catch (...) { threw = true; }
+        expect(threw, "a ticking chunk was allowed next to an unloaded one");
+    });
+    test("block ticking runs block entities and restores only the frozen interval", [&] {
+        // Source-derived: LevelChunk.isTicking checks BLOCK_TICKING, not ENTITY_TICKING.
+        // Compare against a continuously ticking control to catch both skipped ticks and
+        // accidental extra cooldown shifts on blockTicking -> entityTicking transitions.
+        Simulator s(r), control(r);
+        const BlockPos hopper{2, 0, 2}, chest{3, 0, 2};
+        for (auto* world : {&s, &control}) {
+            world->place(hopper, r.state("hopper", {{"facing", "east"}}));
+            world->place(chest, r.state("chest"));
+            world->stimulate(hopper, {{"inventory", Json::array({{{"slot", 0}, {"item", "minecraft:stone"}, {"count", 30}}})}});
+        }
+        s.setChunkState(0, 0, Simulator::ChunkState::blockTicking);
+        expect(s.runnable(), "block entity in blockTicking chunk considered unrunnable");
+        s.advanceTo(10); control.advanceTo(10);
+        expect(s.inventoryJson(chest, false) == control.inventoryJson(chest, false), "blockTicking skipped hopper ticks");
+        s.setChunkState(0, 0, Simulator::ChunkState::loaded);
+        s.advanceTo(30);
+        const auto saved = s.saveProject("block-only", true);
+        Simulator restored(r); restored.loadProject(saved);
+        for (auto* world : {&s, &restored}) world->setChunkState(0, 0, Simulator::ChunkState::blockTicking);
+        for (Tick tick = 31; tick <= 50; ++tick) {
+            if (tick == 36) for (auto* world : {&s, &restored}) world->setChunkState(0, 0, Simulator::ChunkState::entityTicking);
+            control.advanceTo(tick - 20);
+            for (auto* world : {&s, &restored}) {
+                world->advanceTo(tick);
+                expect(world->inventoryJson(chest, false) == control.inventoryJson(chest, false), "restored cooldown differs from exactly 20 frozen ticks");
+            }
+        }
+        // Entity contact must still stay gated. A solid block above disables BE pickup
+        // but does not disable HopperBlock.entityInside for an item in the hopper itself.
+        Simulator contact(r);
+        contact.place(hopper, r.state("hopper"));
+        contact.place(hopper.relative(Direction::up), r.state("stone"));
+        contact.setChunkState(0, 0, Simulator::ChunkState::blockTicking);
+        contact.stimulate(hopper, {{"groundItems", Json::array({{{"item", "minecraft:dirt"}, {"count", 1}, {"y", 0.7}}})}});
+        contact.advanceTo(5);
+        expect(contact.inventoryJson(hopper, false).empty(), "entity contact ran in blockTicking chunk: " + contact.inventoryJson(hopper, false).dump() + " above=" + std::to_string(contact.world.get(hopper.relative(Direction::up))) + " full=" + std::to_string(r[contact.world.get(hopper.relative(Direction::up))].fullCube));
+        contact.setChunkState(0, 0, Simulator::ChunkState::entityTicking);
+        const auto contactSaved = contact.saveProject("entity-resume", true);
+        Simulator contactRestored(r); contactRestored.loadProject(contactSaved);
+        expect(contactRestored.saveProject("entity-resume", true) == contactSaved,
+               "entity-only resume produced an unloadable snapshot before advance");
+        contact.advanceTo(6);
+        contactRestored.advanceTo(6);
+        expect(!contact.inventoryJson(hopper, false).empty(), "entity contact did not resume");
+        expect(contactRestored.inventoryJson(hopper, false) == contact.inventoryJson(hopper, false),
+               "entity contact differs after resuming from the transition snapshot");
+    });
+    test("vibration delivery needs the 3x3 chunks around the listener to be block ticking", [&] {
+        // 原版 VibrationSystem.Ticker.receiveVibration 第一句就是
+        // requiresAdjacentChunksToBeTicking && !areAdjacentChunksTicking -> return false，
+        // 而 SculkSensorBlockEntity.VibrationUser 返回 true（校准感测体继承它）。
+        // 返回 false 时既不投递也不清 currentVibration，于是每刻重试而不是丢弃。
+        const BlockPos pos{8, 0, 8};      // 区块 (0,0)
+        const BlockPos source{2, 0, 8};   // 同区块，距离 6 → 传播 6 刻
+        auto build = [&](Simulator& world, const char* block) {
+            world.place(pos, r.state(block));
+            world.advanceTo(1);
+            world.stimulate(source, {{"gameEvent", "step"}});
+        };
+        // 一、缺省（不声明任何区块状态）行为必须完全不变：第 1+6=7 刻照常投递。
+        Simulator base(r); build(base, "sculk_sensor");
+        base.advanceTo(6); expect(base.displayValue(pos) == 0, "default vibration arrived early");
+        base.advanceTo(7); expect(base.displayValue(pos) == 4, "default vibration delivery changed");
+        // 二、监听者在 blockTicking 边缘区块，相邻区块只有 loaded。
+        // entityTicking 区块的八邻居至少 blockTicking，不能用那个不可达构造作原版证据。
+        // 感测体一旦被激活就会先 active 再 cooldown 最后回到 inactive，所以要在这三段之内
+        // 直接看 sculk_sensor_phase，光看功率会漏掉「已经响过又冷却完了」。
+        Simulator s(r); build(s, "sculk_sensor");
+        s.setChunkState(0, 0, Simulator::ChunkState::blockTicking);
+        s.setChunkState(1, 0, Simulator::ChunkState::loaded);
+        auto idle = [&](const Simulator& world) {
+            return world.displayValue(pos) == 0 && r.property(world.world.get(pos), "sculk_sensor_phase") == "inactive";
+        };
+        s.advanceTo(8); expect(idle(s), "vibration was delivered while an adjacent chunk was not block ticking");
+        s.advanceTo(40); expect(idle(s), "blocked vibration was delivered later while the chunk was still stalled");
+        expect(s.pendingEvents() == 1, "blocked vibration stopped retrying instead of waking every tick");
+        // 三、停摆中保存/读取：未投递的振动（current 仍在、remaining 已减到 0）原样恢复。
+        auto saved = s.saveProject("stuck", true);
+        expect(saved["sensors"].size() == 1 && saved["sensors"][0].contains("current") && saved["sensors"][0]["remaining"] == 0,
+               "blocked vibration was not kept as a travelling-but-undelivered state");
+        Simulator restored(r); restored.loadProject(saved);
+        expect(restored.saveProject("stuck", true) == saved, "blocked vibration checkpoint changed across a reload");
+        for (Simulator* world : {&s, &restored}) {
+            world->setChunkState(1, 0, Simulator::ChunkState::blockTicking);
+            world->advanceTo(41);
+            expect(world->displayValue(pos) == 4, "vibration was dropped instead of retried once the adjacent chunk resumed");
+        }
+        // 四、校准幽匿感测体走同一条路径（半径 16，同样距离 6 → 功率 10）。
+        Simulator c(r); build(c, "calibrated_sculk_sensor");
+        c.setChunkState(0, 0, Simulator::ChunkState::blockTicking);
+        c.setChunkState(0, -1, Simulator::ChunkState::loaded);  // 换一个方向的相邻区块
+        c.advanceTo(8); expect(idle(c), "calibrated sensor ignored the adjacent chunk requirement");
+        c.advanceTo(40); expect(idle(c), "calibrated sensor delivered later while the chunk was still stalled");
+        c.setChunkState(0, -1, Simulator::ChunkState::blockTicking);
+        c.advanceTo(41);
+        expect(c.displayValue(pos) == 10, "calibrated sensor never delivered after the adjacent chunk resumed");
+    });
+    test("hopper ground item input validation, range and checkpoint", [&] {
+        Simulator s(r); floor(s);
+        const BlockPos hopper{0, 1, 0};
+        s.place(hopper, r.state("hopper", {{"facing", "down"}}));
+        // 在吸取体积里、但不与漏斗自己那一格重叠：只走方块实体阶段的 suckInItems。
+        s.stimulate(hopper, {{"groundItems", Json::array({{{"item", "minecraft:stone"}, {"count", 3}, {"y", 1.2}}})}});
+        expect(s.suckableItems(hopper).size() == 1, "declared item is not in the suck volume");
+        s.advanceTo(4);
+        expect(s.inventoryJson(hopper, false).size() == 1 && s.suckableItems(hopper).empty(), "hopper did not take the dropped stack");
+        auto saved = s.saveProject("drops", true); Simulator restored(r); restored.loadProject(saved);
+        expect(restored.inventoryJson(hopper, false) == s.inventoryJson(hopper, false), "hopper inventory lost across checkpoint");
+        // 声明集合整体替换，坐标超出体积的条目不参与吸取但仍然保留在输入里。
+        s.stimulate(hopper, {{"groundItems", Json::array({{{"item", "minecraft:dirt"}, {"count", 1}, {"y", 2.5}}})}});
+        expect(s.suckableItems(hopper).empty(), "an item above the suck volume was reported as suckable");
+        auto savedOut = s.saveProject("drops", true); Simulator keptOut(r); keptOut.loadProject(savedOut);
+        expect(keptOut.suckableItems(hopper).empty(), "out-of-range declaration changed across checkpoint");
+        auto rejects = [&](BlockPos pos, const Json& input) {
+            bool threw = false; try { s.stimulate(pos, input); } catch (...) { threw = true; }
+            return threw;
+        };
+        expect(rejects(hopper, {{"groundItems", Json::array({{{"item", "minecraft:stone"}, {"count", 0}}})}}), "zero count accepted");
+        expect(rejects(hopper, {{"groundItems", Json::array({{{"item", "minecraft:stone"}, {"count", 65}}})}}), "over-stack count accepted");
+        expect(rejects(hopper, {{"groundItems", Json::array({{{"item", "minecraft:stone"}, {"count", 1}, {"w", 1}}})}}), "unknown drop field accepted");
+        expect(rejects(hopper, {{"groundItems", Json::array({{{"item", "minecraft:stone"}, {"count", 1}, {"y", 9.0}}})}}), "far away coordinate accepted");
+        expect(rejects(hopper, {{"groundItems", Json::array()}, {"viewers", 1}}), "mixed drop stimulus accepted");
+        s.place({3, 1, 0}, r.state("chest"));
+        expect(rejects({3, 1, 0}, {{"groundItems", Json::array({{{"item", "minecraft:stone"}, {"count", 1}}})}}), "drops accepted on a chest");
+    });
+    test("container entity declaration, replacement and snapshot round-trip", [&] {
+        Simulator s(r); floor(s);
+        const BlockPos cart{0, 2, 0};
+        auto declare = [&](const Json& entities) { s.stimulate(cart, {{"containerEntities", entities}}); };
+        auto stone = [](int slot, int count) { return Json{{"slot", slot}, {"item", "minecraft:stone"}, {"count", count}}; };
+        // 空气格上的声明：矿车通常停在空气或铁轨那一格里，不需要方块承载。
+        declare(Json::array({{{"type", "chest_minecart"}, {"inventory", Json::array({stone(0, 5), stone(26, 1)})}},
+                             {{"type", "hopper_minecart"}, {"inventory", Json::array({stone(4, 2)})}}}));
+        expect(s.world.get(cart) == 0, "declaring container entities placed a block");
+        expect(s.containerEntitiesJson(cart).size() == 2, "declared container entities were dropped");
+        expect(s.containerEntitiesJson(cart).at(0).at("inventory").size() == 2, "minecart inventory was not stored");
+        // 整体替换，不是合并。
+        declare(Json::array({{{"type", "hopper_minecart"}, {"inventory", Json::array()}}}));
+        expect(s.containerEntitiesJson(cart).size() == 1 && s.containerEntitiesJson(cart).at(0).at("type") == "hopper_minecart",
+               "container entity declaration was merged instead of replaced");
+        // 工程与运行快照都必须带上空气格里的声明。
+        declare(Json::array({{{"type", "chest_minecart"}, {"inventory", Json::array({stone(0, 3)})}}}));
+        for (bool checkpoint : {false, true}) {
+            auto saved = s.saveProject("carts", checkpoint); Simulator restored(r); restored.loadProject(saved);
+            expect(restored.containerEntitiesJson(cart) == s.containerEntitiesJson(cart),
+                   std::string(checkpoint ? "checkpoint" : "project") + " lost the container entity declaration");
+        }
+        auto snapshot = s.saveProject("carts", true);
+        auto corrupt = [&](const std::function<void(Json&)>& mutate) {
+            auto broken = snapshot;
+            for (auto& row : broken["blockData"]) if (row["values"].contains("containerEntities")) mutate(row["values"]["containerEntities"]);
+            Simulator target(r); bool threw = false;
+            try { target.loadProject(broken); } catch (...) { threw = true; }
+            return threw;
+        };
+        expect(corrupt([](Json& e) { e = Json::array(); }), "snapshot accepted noncanonical empty container entity list");
+        expect(corrupt([](Json& e) { e.at(0)["type"] = "minecart"; }), "snapshot with a non-container minecart accepted");
+        expect(corrupt([&](Json& e) { e.at(0)["inventory"] = Json::array({stone(27, 1)}); }), "snapshot with an out-of-range cart slot accepted");
+        expect(corrupt([&](Json& e) { e.at(0)["inventory"] = Json::array({stone(0, 65)}); }), "snapshot with an over-stacked cart slot accepted");
+        expect(corrupt([](Json& e) { e = Json::object(); }), "snapshot with a non-array cart list accepted");
+        // 空数组整体移除，空气格上不再留下器件数据行。
+        declare(Json::array());
+        expect(s.containerEntitiesJson(cart).empty(), "clearing the declaration left entities behind");
+        expect(s.saveProject("carts", true).at("blockData").empty(), "an empty declaration left a runtime row on air");
+        auto rejects = [&](BlockPos pos, const Json& input) {
+            bool threw = false; try { s.stimulate(pos, input); } catch (...) { threw = true; }
+            return threw;
+        };
+        expect(rejects(cart, {{"containerEntities", Json::array({{{"type", "minecart"}}})}}), "a non-container minecart was accepted");
+        expect(rejects(cart, {{"containerEntities", Json::array({{{"inventory", Json::array()}}})}}), "a container entity without a type was accepted");
+        expect(rejects(cart, {{"containerEntities", Json::array({{{"type", "chest_minecart"}, {"x", 1}}})}}), "an unknown container entity field was accepted");
+        expect(rejects(cart, {{"containerEntities", Json::array({{{"type", "hopper_minecart"}, {"inventory", Json::array({stone(5, 1)})}}})}}), "an out-of-range hopper minecart slot was accepted");
+        expect(rejects(cart, {{"containerEntities", Json::array({{{"type", "chest_minecart"}, {"inventory", Json::array({stone(0, 65)})}}})}}), "an over-stacked cart slot was accepted");
+        expect(rejects(cart, {{"containerEntities", Json::array({{{"type", "chest_minecart"}, {"inventory", Json::array({stone(1, 1), stone(1, 1)})}}})}}), "a duplicated cart slot was accepted");
+        expect(rejects(cart, {{"containerEntities", Json::object()}}), "a non-array container entity list was accepted");
+        expect(rejects(cart, {{"containerEntities", Json::array()}, {"viewers", 1}}), "a mixed container entity stimulus was accepted");
+        Json many = Json::array();
+        for (int i = 0; i < 17; ++i) many.push_back({{"type", "hopper_minecart"}, {"inventory", Json::array()}});
+        expect(rejects(cart, {{"containerEntities", many}}), "more container entities than the declared limit were accepted");
+        expect(s.containerEntitiesJson(cart).empty(), "a rejected declaration still changed the cell");
+    });
+    test("chest boats and rafts are container entities too", [&] {
+        // 26.2 的 EntitySelector.CONTAINER_ENTITY_SELECTOR 是 `entity instanceof Container && isAlive()`。
+        // 满足它的只有两条继承线：AbstractMinecartContainer（MinecartChest 27 槽 / MinecartHopper 5 槽）
+        // 与 AbstractChestBoat（ChestBoat / ChestRaft，getContainerSize()=27，两个子类都不覆写）。
+        // 木头种类各自是独立的 EntityType（EntityTypeIds.*_CHEST_BOAT / BAMBOO_CHEST_RAFT），共 10 个 ID。
+        // 注意：**船这一支尚无原版差分**，下面全是内核内部一致性回归。
+        // 船的运动/浮力/乘骑一律不建模，与矿车同一个约定：位置是输入，停在格中心。
+        auto stone = [](int slot, int count) { return Json{{"slot", slot}, {"item", "minecraft:stone"}, {"count", count}}; };
+        Simulator s(r); floor(s);
+        const BlockPos cell{0, 2, 0};
+        auto rejects = [&](BlockPos pos, const Json& input) {
+            bool threw = false; try { s.stimulate(pos, input); } catch (...) { threw = true; }
+            return threw;
+        };
+        auto declares = [&](const std::string& type, int slot) {
+            return Json{{"containerEntities", Json::array({{{"type", type}, {"inventory", Json::array({stone(slot, 1)})}}})}};
+        };
+        // 槽位数逐个断言：最后一格可用、再往后一格拒绝，这样就不必把私有的
+        // containerEntitySize 暴露出来也能钉死每个类型的 getContainerSize()。
+        const std::vector<std::pair<std::string, int>> sizes{
+            {"chest_minecart", 27}, {"hopper_minecart", 5},
+            {"oak_chest_boat", 27}, {"spruce_chest_boat", 27}, {"birch_chest_boat", 27}, {"jungle_chest_boat", 27},
+            {"acacia_chest_boat", 27}, {"dark_oak_chest_boat", 27}, {"mangrove_chest_boat", 27},
+            {"cherry_chest_boat", 27}, {"pale_oak_chest_boat", 27}, {"bamboo_chest_raft", 27}};
+        for (const auto& [type, size] : sizes) {
+            expect(!rejects(cell, declares(type, size - 1)), type + " rejected its own last slot " + std::to_string(size - 1));
+            expect(s.containerEntitiesJson(cell).at(0).at("inventory") == Json::array({stone(size - 1, 1)}),
+                   type + " lost its last slot");
+            expect(rejects(cell, declares(type, size)), type + " accepted a slot past " + std::to_string(size - 1));
+            expect(s.containerEntitiesJson(cell).at(0).at("type") == type, "a rejected declaration changed " + type);
+        }
+        // 拒绝路径保持严格：普通船/竹筏不带箱子（不是 Container），驴/骡/羊驼只有
+        // HasCustomInventoryScreen，玩家与铜傀儡实现的是 ContainerUser。类名不是注册 ID，也拒。
+        for (const char* bad : {"oak_boat", "bamboo_raft", "donkey", "mule", "llama", "player", "copper_golem",
+                                "minecart", "furnace_minecart", "tnt_minecart", "chest_boat", "chest_raft",
+                                "minecraft:oak_chest_boat", "warped_chest_boat", ""})
+            expect(rejects(cell, {{"containerEntities", Json::array({{{"type", bad}, {"inventory", Json::array()}}})}}),
+                   std::string("a non-container entity type was accepted: ") + bad);
+        s.stimulate(cell, {{"containerEntities", Json::array({{{"type", "bamboo_chest_raft"}, {"inventory", Json::array({stone(26, 1)})}}})}});
+        // 快照往返：工程与检查点都要带上船的声明，破坏后的快照要被拒。
+        s.stimulate(cell, {{"containerEntities", Json::array({{{"type", "cherry_chest_boat"}, {"inventory", Json::array({stone(0, 3), stone(26, 1)})}}})}});
+        for (bool checkpoint : {false, true}) {
+            auto saved = s.saveProject("boats", checkpoint); Simulator restored(r); restored.loadProject(saved);
+            expect(restored.containerEntitiesJson(cell) == s.containerEntitiesJson(cell),
+                   std::string(checkpoint ? "checkpoint" : "project") + " lost the chest boat declaration");
+        }
+        auto broken = s.saveProject("boats", true);
+        for (auto& row : broken["blockData"]) if (row["values"].contains("containerEntities")) row["values"]["containerEntities"].at(0)["type"] = "oak_boat";
+        Simulator target(r); bool threw = false;
+        try { target.loadProject(broken); } catch (...) { threw = true; }
+        expect(threw, "a snapshot with a non-container boat was accepted");
+
+        // 漏斗从运输船拉取，与从运输矿车拉取逐条一致（同一条 getEntityContainer 路径）。
+        Simulator pull(r); floor(pull);
+        const BlockPos puller{0, 1, 0}, above{0, 2, 0};
+        pull.place(puller, r.state("hopper", {{"facing", "down"}}));
+        pull.stimulate(above, {{"containerEntities", Json::array({{{"type", "oak_chest_boat"}, {"inventory", Json::array({stone(0, 2)})}}})}});
+        const auto beforeDraw = pull.randomState();
+        pull.advanceTo(4);
+        expect(pull.randomState() != beforeDraw, "a single chest boat candidate consumed no random draw");
+        expect(pull.inventoryJson(puller, false) == Json::array({{{"slot", 0}, {"item", "minecraft:stone"}, {"count", 1}}}),
+               "the hopper did not pull from the chest boat: " + pull.inventoryJson(puller, false).dump());
+        expect(pull.containerEntitiesJson(above).at(0).at("inventory") == Json::array({stone(0, 1)}),
+               "the chest boat slot was not decremented");
+        pull.advanceTo(20);
+        expect(pull.containerEntitiesJson(above).at(0).at("inventory").empty(), "the second pull did not empty the chest boat");
+        // 向运输船推入：船不是方块实体，写入不通知比较器；27 槽从 slot 0 起填。
+        // 几何刻意选成「漏斗朝下、船在正下方」（与原版差分 java26_2BoatContainers 的
+        // 11/32 号工位同一个形状）：船横向探出 0.1875 格，如果改成朝东推进旁边那一格，
+        // 船会同时探进漏斗**自己上面那一格**，于是同一刻里推出去的东西又被吸回来——
+        // 那是跨格可见性本身的效果，另有专门的用例，这里要的是干净的推入。
+        Simulator push(r); floor(push);
+        const BlockPos pusher{0, 2, 0}, front{0, 1, 0};
+        push.place(pusher, r.state("hopper", {{"facing", "down"}}));
+        push.stimulate(front, {{"containerEntities", Json::array({{{"type", "bamboo_chest_raft"}, {"inventory", Json::array()}}})}});
+        push.stimulate(pusher, {{"inventory", Json::array({stone(0, 1)})}});
+        push.advanceTo(4);
+        expect(push.inventoryJson(pusher, false).empty(), "the hopper kept the item instead of pushing it into the raft");
+        expect(push.containerEntitiesJson(front).at(0).at("inventory") == Json::array({stone(0, 1)}),
+               "the chest raft did not receive the pushed item: " + push.containerEntitiesJson(front).dump());
+        // 船装满 27 槽时推不进去，但候选非空仍然每刻抽一次（tryMoveItems 失败不设冷却）。
+        auto draws = [](const Simulator& world) {
+            return std::stoull(world.saveProject("draws", true).at("randomSource").at("draws").get<std::string>());
+        };
+        Simulator blocked(r); floor(blocked);
+        blocked.place(pusher, r.state("hopper", {{"facing", "down"}}));
+        Json full = Json::array();
+        for (int slot = 0; slot < 27; ++slot) full.push_back(stone(slot, 64));
+        blocked.stimulate(front, {{"containerEntities", Json::array({{{"type", "spruce_chest_boat"}, {"inventory", full}}})}});
+        blocked.stimulate(pusher, {{"inventory", Json::array({{{"slot", 0}, {"item", "minecraft:dirt"}, {"count", 1}}})}});
+        blocked.advanceTo(10); const auto atTen = draws(blocked);
+        blocked.advanceTo(20);
+        expect(draws(blocked) - atTen == 10, "a hopper blocked by a full chest boat stopped drawing: "
+               + std::to_string(draws(blocked) - atTen) + " draws over 10 ticks");
+        expect(blocked.containerEntitiesJson(front).at(0).at("inventory").size() == 27, "the full chest boat changed");
+        // 船与矿车混放：候选集合按声明顺序，nextInt(2) 决定这一刻搬谁；
+        // 同一格里的两个候选与「两辆矿车」那组走完全同一条代码路径。
+        Simulator mixed(r); floor(mixed);
+        mixed.place(puller, r.state("hopper", {{"facing", "down"}}));
+        mixed.stimulate(above, {{"containerEntities", Json::array({
+            {{"type", "chest_minecart"}, {"inventory", Json::array({stone(0, 1)})}},
+            {{"type", "oak_chest_boat"}, {"inventory", Json::array({{{"slot", 0}, {"item", "minecraft:dirt"}, {"count", 1}}})}}})}});
+        expect(mixed.containerEntitiesJson(above).size() == 2, "the mixed cart/boat declaration was not stored");
+        // 与不带船的两候选场景相比，抽取序列与搬运结果必须逐刻完全一致。
+        Simulator carts(r); floor(carts);
+        carts.place(puller, r.state("hopper", {{"facing", "down"}}));
+        carts.stimulate(above, {{"containerEntities", Json::array({
+            {{"type", "chest_minecart"}, {"inventory", Json::array({stone(0, 1)})}},
+            {{"type", "chest_minecart"}, {"inventory", Json::array({{{"slot", 0}, {"item", "minecraft:dirt"}, {"count", 1}}})}}})}});
+        for (int tick = 1; tick <= 40; ++tick) {
+            mixed.advanceTo(static_cast<Tick>(tick));
+            carts.advanceTo(static_cast<Tick>(tick));
+            expect(mixed.randomState() == carts.randomState(),
+                   "a chest boat candidate drew differently from a chest minecart at tick " + std::to_string(tick));
+            expect(mixed.inventoryJson(puller, false) == carts.inventoryJson(puller, false),
+                   "a chest boat candidate transferred differently at tick " + std::to_string(tick));
+        }
+        expect(mixed.inventoryJson(puller, false).size() == 2, "the mixed candidates were not both drained: "
+               + mixed.inventoryJson(puller, false).dump());
+        for (int entity = 0; entity < 2; ++entity)
+            expect(mixed.containerEntitiesJson(above).at(static_cast<std::size_t>(entity)).at("inventory").empty(),
+                   "candidate " + std::to_string(entity) + " kept its item");
+    });
+    test("hoppers pull from and push into declared container minecarts", [&] {
+        auto stone = [](int slot, int count) { return Json{{"slot", slot}, {"item", "minecraft:stone"}, {"count", count}}; };
+        // 拉取：上方没有方块容器，改用实体容器；候选只有一个时原版仍然调用 nextInt(1)。
+        Simulator s(r); floor(s);
+        const BlockPos puller{0, 1, 0}, above{0, 2, 0};
+        s.place(puller, r.state("hopper", {{"facing", "down"}}));
+        s.stimulate(above, {{"containerEntities", Json::array({{{"type", "chest_minecart"}, {"inventory", Json::array({stone(0, 2)})}}})}});
+        const auto beforeDraw = s.randomState();
+        s.advanceTo(4);
+        expect(s.randomState() != beforeDraw, "getEntityContainer with one candidate consumed no random draw");
+        expect(s.inventoryJson(puller, false) == Json::array({{{"slot", 0}, {"item", "minecraft:stone"}, {"count", 1}}}),
+               "hopper did not pull a single item from the chest minecart: " + s.inventoryJson(puller, false).dump());
+        expect(s.containerEntitiesJson(above).at(0).at("inventory") == Json::array({stone(0, 1)}),
+               "the minecart slot was not decremented: " + s.containerEntitiesJson(above).dump());
+        s.advanceTo(20);
+        expect(s.containerEntitiesJson(above).at(0).at("inventory").empty(), "the second pull did not empty the minecart");
+        expect(s.inventoryJson(puller, false).at(0).at("count") == 2, "the hopper did not keep both pulled items");
+        // 原版 suckInItems：容器分支（含实体容器）一旦命中就直接返回，根本不看掉落物，
+        // 空的容器实体同样会把掉落物挡在外面。
+        Simulator both(r); floor(both);
+        both.place(puller, r.state("hopper", {{"facing", "down"}}));
+        both.stimulate(puller, {{"groundItems", Json::array({{{"item", "minecraft:dirt"}, {"count", 1}, {"y", 1.2}}})}});
+        both.stimulate(above, {{"containerEntities", Json::array({{{"type", "chest_minecart"}, {"inventory", Json::array({stone(0, 1)})}}})}});
+        both.advanceTo(4);
+        expect(both.inventoryJson(puller, false).at(0).at("item") == "minecraft:stone", "the hopper preferred the dropped item over the container entity");
+        both.advanceTo(40);
+        expect(both.suckableItems(puller).size() == 1, "an emptied container entity stopped shadowing the dropped item");
+        // 方块容器优先：同一格既有箱子又有声明的矿车时，只看箱子，也不消耗随机数。
+        Simulator shadowed(r); floor(shadowed);
+        shadowed.place(puller, r.state("hopper", {{"facing", "down"}}));
+        shadowed.place(above, r.state("chest"));
+        shadowed.stimulate(above, {{"inventory", Json::array({{{"slot", 0}, {"item", "minecraft:dirt"}, {"count", 1}}})}});
+        shadowed.stimulate(above, {{"containerEntities", Json::array({{{"type", "chest_minecart"}, {"inventory", Json::array({stone(0, 1)})}}})}});
+        const auto shadowedDraw = shadowed.randomState();
+        shadowed.advanceTo(4);
+        expect(shadowed.randomState() == shadowedDraw, "a block container above still consulted the entity container");
+        expect(shadowed.inventoryJson(puller, false).at(0).at("item") == "minecraft:dirt", "the hopper took from the shadowed minecart");
+        expect(shadowed.containerEntitiesJson(above).at(0).at("inventory") == Json::array({stone(0, 1)}), "the shadowed minecart was modified");
+        // 推出：朝向格没有方块容器时改用实体容器；矿车不是方块实体，写入不通知比较器。
+        Simulator push(r); floor(push);
+        const BlockPos pusher{0, 1, 0}, front{1, 1, 0};
+        push.place(pusher, r.state("hopper", {{"facing", "east"}}));
+        push.stimulate(front, {{"containerEntities", Json::array({{{"type", "hopper_minecart"}, {"inventory", Json::array()}}})}});
+        push.stimulate(pusher, {{"inventory", Json::array({stone(0, 1)})}});
+        push.advanceTo(4);
+        expect(push.inventoryJson(pusher, false).empty(), "the hopper kept the item instead of pushing it into the minecart");
+        expect(push.containerEntitiesJson(front).at(0).at("inventory") == Json::array({stone(0, 1)}),
+               "the hopper minecart did not receive the pushed item: " + push.containerEntitiesJson(front).dump());
+        auto saved = push.saveProject("push", true); Simulator restored(r); restored.loadProject(saved);
+        expect(restored.containerEntitiesJson(front) == push.containerEntitiesJson(front), "transferred cart inventory lost across checkpoint");
+        expect(restored.saveProject("push", true) == saved, "container entity checkpoint diverged");
+    });
+    test("a hopper blocked by a container entity keeps drawing every tick", [&] {
+        // 原版 tryMoveItems 搬不动东西时**不设冷却**，下一刻整套重跑一遍。内核为省事在空转之后
+        // 就不再排程，靠库存/拓扑/信号变化唤醒——只要空转确实没有可观测效果，这是等价的。
+        // 容器实体打破了这个前提：只要那一格有矿车，getEntityContainer 每刻都消耗一次
+        // nextInt，哪怕一件也搬不动。少抽的那些会让世界随机源整体错位，
+        // 进而改变之后任何一次抽取（投掷器选槽等）的结果。
+        auto stone = [](int slot, int count) { return Json{{"slot", slot}, {"item", "minecraft:stone"}, {"count", count}}; };
+        auto dirt = Json::array({{{"slot", 0}, {"item", "minecraft:dirt"}, {"count", 1}}});
+        auto draws = [](const Simulator& world) {
+            return std::stoull(world.saveProject("draws", true).at("randomSource").at("draws").get<std::string>());
+        };
+        const BlockPos pusher{0, 1, 0}, front{1, 1, 0};
+        // 推出侧：朝向格里是一辆装满的漏斗矿车，每刻都抽一次、每刻都搬不动。
+        Simulator s(r); floor(s);
+        s.place(pusher, r.state("hopper", {{"facing", "east"}}));
+        Json full = Json::array();
+        for (int slot = 0; slot < 5; ++slot) full.push_back(stone(slot, 64));
+        s.stimulate(front, {{"containerEntities", Json::array({{{"type", "hopper_minecart"}, {"inventory", full}}})}});
+        s.stimulate(pusher, {{"inventory", dirt}});
+        s.advanceTo(10); const auto atTen = draws(s);
+        s.advanceTo(20);
+        expect(draws(s) - atTen == 10, "a hopper blocked by a full container entity stopped drawing: "
+               + std::to_string(draws(s) - atTen) + " draws over 10 ticks");
+        expect(s.inventoryJson(pusher, false) == dirt, "an item moved into a full minecart");
+        expect(s.containerEntitiesJson(front).at(0).at("inventory").size() == 5, "the full minecart changed");
+        // 拉取侧：上方是一辆空的运输矿车，同样每刻抽一次。
+        Simulator pull(r); floor(pull);
+        const BlockPos puller{0, 1, 0}, above{0, 2, 0};
+        pull.place(puller, r.state("hopper", {{"facing", "down"}}));
+        pull.stimulate(above, {{"containerEntities", Json::array({{{"type", "chest_minecart"}, {"inventory", Json::array()}}})}});
+        pull.advanceTo(10); const auto pullTen = draws(pull);
+        pull.advanceTo(20);
+        expect(draws(pull) - pullTen == 10, "a hopper pulling from an empty container entity stopped drawing");
+        // 对照一：那一格没有容器实体时不该有任何抽取，空转仍然可以休眠。
+        Simulator idle(r); floor(idle);
+        idle.place(pusher, r.state("hopper", {{"facing", "east"}}));
+        idle.stimulate(pusher, {{"inventory", dirt}});
+        idle.advanceTo(10); const auto idleTen = draws(idle);
+        idle.advanceTo(20);
+        expect(draws(idle) == idleTen, "an idle hopper with no container entity consumed randomness");
+        // 对照二：搬成功那一刻起 8 gt 冷却，原版 isOnCooldown 期间根本走不到 getEntityContainer，
+        // 所以冷却里的那几刻**不**抽——每 8 刻只有一次。
+        Simulator moving(r); floor(moving);
+        moving.place(pusher, r.state("hopper", {{"facing", "east"}}));
+        moving.stimulate(front, {{"containerEntities", Json::array({{{"type", "chest_minecart"}, {"inventory", Json::array()}}})}});
+        Json many = Json::array();
+        for (int slot = 0; slot < 5; ++slot) many.push_back(stone(slot, 64));
+        moving.stimulate(pusher, {{"inventory", many}});
+        moving.advanceTo(10); const auto movingTen = draws(moving);
+        moving.advanceTo(26);
+        expect(draws(moving) - movingTen == 2, "a transferring hopper drew during its 8 gt cooldown: "
+               + std::to_string(draws(moving) - movingTen) + " draws over 16 ticks");
+    });
+    test("hopper minecarts suck from the second block above them", [&] {
+        // 反过来那半边：MinecartHopper 自己每刻吸一次。
+        // 源码核实（26.2 反编译）：MinecartHopper.java:84-88 tick() -> :97-102 tryConsumeItems()
+        // （**没有任何冷却字段**）-> :104-117 suckInItems() -> HopperBlockEntity.java:218-246，
+        // 查询格是 BlockPos.containing(levelX, levelY + 1.0, levelZ)，而
+        // MinecartHopper.getLevelY()（:69-71）= getY() + 0.5、isGridAligned()（:78-81）为 false。
+        // 本协议约定矿车停在格中心，于是查的是**上面第二格**；停在铁轨高度（格底 + 0.0625）
+        // 的矿车查的是正上方那一格，而那个 y 目前无法声明。
+        // 刻内顺序来自 ServerLevel.java:426（实体）先于 :450（方块实体）。
+        // **以下全部是内核单元回归，没有原版差分**：本轮参考捕获资源被独占。
+        auto stone = [](int slot, int count) { return Json{{"slot", slot}, {"item", "minecraft:stone"}, {"count", count}}; };
+        auto draws = [](const Simulator& world) {
+            return std::stoull(world.saveProject("draws", true).at("randomSource").at("draws").get<std::string>());
+        };
+        const BlockPos cart{0, 1, 0}, justAbove{0, 2, 0}, source{0, 3, 0};
+        const Json cartOnly{{"containerEntities", Json::array({{{"type", "hopper_minecart"}, {"inventory", Json::array()}}})}};
+        auto cargo = [&](const Simulator& world) { return world.containerEntitiesJson(cart).at(0).at("inventory"); };
+
+        // 1) 从上面第二格的方块漏斗里逐刻各掏一件，**没有冷却**。
+        // 源漏斗朝北（推向空气）而不是朝下：漏斗矿车盒高 0.7、脚在格中心，会向上探进
+        // **正上方那一格** 0.2 格，朝下的源漏斗因此会顺手往矿车里推东西，
+        // 一刻就变成「自己吸一件 + 被推一件」，把这里要钉的「每刻恰好一件」搅浑。
+        // 漏斗不是 WorldlyContainer，朝向不影响矿车能从它身上取出什么。
+        Simulator s(r); floor(s);
+        s.place(source, r.state("hopper", {{"facing", "north"}}));
+        s.stimulate(source, {{"inventory", Json::array({stone(0, 3)})}});
+        s.stimulate(cart, cartOnly);
+        const auto beforeDraws = draws(s);
+        for (int tick = 1; tick <= 3; ++tick) {
+            s.advanceTo(static_cast<Tick>(tick));
+            expect(cargo(s) == Json::array({stone(0, tick)}),
+                   "the hopper minecart did not take exactly one item on tick " + std::to_string(tick) + ": " + cargo(s).dump());
+            expect(s.inventoryJson(source, false) == (tick == 3 ? Json::array() : Json::array({stone(0, 3 - tick)})),
+                   "the source hopper lost the wrong amount on tick " + std::to_string(tick));
+        }
+        expect(draws(s) == beforeDraws, "pulling from a block container consumed world randomness");
+        // 对照：同一个源换成方块漏斗在下面接，8 gt 冷却下 3 刻只搬得动一件。
+        Simulator slow(r); floor(slow);
+        slow.place(source, r.state("hopper", {{"facing", "down"}}));
+        slow.place(justAbove, r.state("hopper", {{"facing", "down"}}));
+        slow.stimulate(source, {{"inventory", Json::array({stone(0, 3)})}});
+        slow.advanceTo(3);
+        expect(slow.inventoryJson(justAbove, false) == Json::array({stone(0, 1)}),
+               "the block hopper control moved more than one item in three ticks: " + slow.inventoryJson(justAbove, false).dump());
+
+        // 2) 从上面第二格的箱子里吸，同样每刻一件、同样不抽随机数。
+        Simulator chest(r); floor(chest);
+        chest.place(source, r.state("chest"));
+        chest.stimulate(source, {{"inventory", Json::array({stone(0, 5)})}});
+        chest.stimulate(cart, cartOnly);
+        const auto chestDraws = draws(chest);
+        chest.advanceTo(5);
+        expect(cargo(chest) == Json::array({stone(0, 5)}), "five ticks did not drain the chest into the cart: " + cargo(chest).dump());
+        expect(chest.inventoryJson(source, false).empty(), "the chest kept items the cart should have taken");
+        expect(draws(chest) == chestDraws, "a block chest source consumed world randomness");
+
+        // 3) 正上方那一格**不是**查询格：装满的箱子放在矿车正上方时一件都掏不走。
+        Simulator wrong(r); floor(wrong);
+        wrong.place(justAbove, r.state("chest"));
+        wrong.stimulate(justAbove, {{"inventory", Json::array({stone(0, 5)})}});
+        wrong.stimulate(cart, cartOnly);
+        wrong.advanceTo(20);
+        expect(cargo(wrong).empty(), "the cart read the block directly above instead of the second one: " + cargo(wrong).dump());
+        expect(wrong.inventoryJson(justAbove, false) == Json::array({stone(0, 5)}), "the chest directly above the cart lost items");
+
+        // 4) 空气 / 实心方块 / 非容器：什么也不做，也不抽随机数，而且能安静下来。
+        for (const char* above : {"", "stone", "redstone_block"}) {
+            Simulator quiet(r); floor(quiet);
+            if (*above) quiet.place(source, r.state(above));
+            quiet.stimulate(cart, cartOnly);
+            const auto quietDraws = draws(quiet);
+            quiet.advanceTo(30);
+            expect(cargo(quiet).empty(), std::string("the cart picked something up below ") + (*above ? above : "air"));
+            expect(draws(quiet) == quietDraws, std::string("an idle hopper minecart below ") + (*above ? above : "air") + " drew randomness");
+        }
+
+        // 5) 实体容器那一侧走 getEntityContainer，候选非空就每刻抽一次 nextInt，
+        //    一件都搬不动也照抽（与方块漏斗那一侧完全同一条理由）。
+        //    **查询格与方块那一侧不同**：方块查的是 BlockPos.containing(levelY+1.0)＝上面第二格，
+        //    实体查的是那一点周围 ±0.5 的盒子＝[Y+1.5, Y+2.5]，停在格中心的实体脚在格底+0.5，
+        //    第二格里的脚正好落在 Y+2.5 这条边上、被 AABB 的严格不等号排除，
+        //    真正落进盒子的是**正上方那一格**里的实体。见 cartEntityQueryBox 的注释。
+        //    以下几条是这一轮跨格改造的结果，**只有源码推导，没有原版差分**。
+        Simulator entity(r); floor(entity);
+        entity.stimulate(justAbove, {{"containerEntities", Json::array({{{"type", "chest_minecart"}, {"inventory", Json::array()}}})}});
+        entity.stimulate(cart, cartOnly);
+        entity.advanceTo(10); const auto entityTen = draws(entity);
+        entity.advanceTo(20);
+        expect(draws(entity) - entityTen == 10, "a hopper minecart below an empty container entity stopped drawing: "
+               + std::to_string(draws(entity) - entityTen) + " draws over 10 ticks");
+        // 对照：同一个声明挪到上面**第二**格就一次也不抽——那里的实体脚在盒子的边界上。
+        Simulator offBox(r); floor(offBox);
+        offBox.stimulate(source, {{"containerEntities", Json::array({{{"type", "chest_minecart"}, {"inventory", Json::array()}}})}});
+        offBox.stimulate(cart, cartOnly);
+        const auto offBoxDraws = draws(offBox);
+        offBox.advanceTo(20);
+        expect(draws(offBox) == offBoxDraws, "a container entity two cells above the hopper minecart entered its query box: "
+               + std::to_string(draws(offBox) - offBoxDraws) + " draws");
+        // 同一格里两辆漏斗矿车，各自吸一次，因此每刻抽两次。
+        Simulator pair(r); floor(pair);
+        pair.stimulate(justAbove, {{"containerEntities", Json::array({{{"type", "chest_minecart"}, {"inventory", Json::array()}}})}});
+        pair.stimulate(cart, {{"containerEntities", Json::array({{{"type", "hopper_minecart"}, {"inventory", Json::array()}},
+                                                                 {{"type", "hopper_minecart"}, {"inventory", Json::array()}}})}});
+        pair.advanceTo(10); const auto pairTen = draws(pair);
+        pair.advanceTo(20);
+        expect(draws(pair) - pairTen == 20, "two hopper minecarts in one cell did not draw twice per tick: "
+               + std::to_string(draws(pair) - pairTen) + " draws over 10 ticks");
+        // 同一格里的运输矿车不会吸，只有漏斗矿车会。
+        Simulator passive(r); floor(passive);
+        passive.place(source, r.state("chest"));
+        passive.stimulate(source, {{"inventory", Json::array({stone(0, 4)})}});
+        passive.stimulate(cart, {{"containerEntities", Json::array({{{"type", "chest_minecart"}, {"inventory", Json::array()}},
+                                                                    {{"type", "hopper_minecart"}, {"inventory", Json::array()}}})}});
+        passive.advanceTo(4);
+        expect(passive.containerEntitiesJson(cart).at(0).at("inventory").empty(), "a chest minecart sucked items on its own");
+        expect(passive.containerEntitiesJson(cart).at(1).at("inventory") == Json::array({stone(0, 4)}),
+               "the hopper minecart did not drain the chest: " + passive.containerEntitiesJson(cart).dump());
+
+        // 6) 同刻顺序：实体阶段早于方块实体阶段，所以源漏斗里最后一件被矿车抢走，
+        //    源漏斗自己朝下推出的那一次什么都推不出去。
+        Simulator race(r); floor(race);
+        race.place(source, r.state("hopper", {{"facing", "down"}}));
+        race.place(justAbove, r.state("chest"));
+        race.stimulate(source, {{"inventory", Json::array({stone(0, 1)})}});
+        race.stimulate(cart, cartOnly);
+        race.advanceTo(1);
+        expect(cargo(race) == Json::array({stone(0, 1)}), "the minecart lost the same-tick race to the block hopper: " + cargo(race).dump());
+        expect(race.inventoryJson(justAbove, false).empty(), "the block hopper ejected before the entity phase ran");
+        expect(race.inventoryJson(source, false).empty(), "the source hopper kept its item");
+
+        // 7) 休眠后要被唤醒：先放空箱子，10 刻后才装东西；再看方块本身晚到的情况。
+        Simulator late(r); floor(late);
+        late.place(source, r.state("chest"));
+        late.stimulate(cart, cartOnly);
+        late.advanceTo(10);
+        expect(cargo(late).empty(), "the cart took something out of an empty chest");
+        late.stimulate(source, {{"inventory", Json::array({stone(0, 1)})}});
+        late.advanceTo(12);
+        expect(cargo(late) == Json::array({stone(0, 1)}), "a dormant hopper minecart missed a later inventory change: " + cargo(late).dump());
+        // 装满的堆肥桶是 WorldlyContainerHolder，算方块容器，而放置它**不写任何器件数据**，
+        // 所以这一格只能走 setBlock 那条唤醒路径。顺带钉住堆肥桶这个源：原版
+        // ComposterBlock.OutputContainer.canTakeItemThroughFace（ComposterBlock.java:471-473）
+        // 只检查方向是 DOWN、物品是骨粉，与取用者离得多远无关，因此隔了一格的矿车照样掏得到。
+        Simulator later(r); floor(later);
+        later.stimulate(cart, cartOnly);
+        later.advanceTo(10);
+        later.place(source, r.state("composter", {{"level", "8"}}));
+        later.advanceTo(12);
+        expect(cargo(later) == Json::array({{{"slot", 0}, {"item", "minecraft:bone_meal"}, {"count", 1}}}),
+               "a dormant hopper minecart missed a later block placement: " + cargo(later).dump());
+        expect(r.property(later.world.get(source), "level") == "0", "the hopper minecart did not empty the composter above it");
+
+        // 8) 快照往返：吸取途中存盘、重载，队列与后续行为都必须一致。
+        Simulator live(r); floor(live);
+        live.place(source, r.state("chest"));
+        live.stimulate(source, {{"inventory", Json::array({stone(0, 5)})}});
+        live.stimulate(cart, cartOnly);
+        live.advanceTo(2);
+        auto saved = live.saveProject("cartSuction", true);
+        Simulator restored(r); restored.loadProject(saved);
+        expect(restored.saveProject("cartSuction", true) == saved, "hopper minecart checkpoint diverged");
+        live.advanceTo(5); restored.advanceTo(5);
+        expect(restored.containerEntitiesJson(cart) == live.containerEntitiesJson(cart),
+               "a restored hopper minecart sucked differently: " + restored.containerEntitiesJson(cart).dump());
+        expect(restored.inventoryJson(source, false) == live.inventoryJson(source, false), "a restored source chest diverged");
+        // 电路工程不带运行队列，重新加载后矿车必须自己起跑。
+        Simulator circuit(r); floor(circuit);
+        circuit.place(source, r.state("chest"));
+        circuit.stimulate(source, {{"inventory", Json::array({stone(0, 3)})}});
+        circuit.stimulate(cart, cartOnly);
+        Simulator reopened(r); reopened.loadProject(circuit.saveProject("cartCircuit", false));
+        reopened.advanceTo(3);
+        expect(reopened.containerEntitiesJson(cart).at(0).at("inventory") == Json::array({stone(0, 3)}),
+               "a hopper minecart loaded from a circuit never started sucking: "
+               + reopened.containerEntitiesJson(cart).dump());
+    });
+    test("container entities are seen from every cell their bounding box touches", [&] {
+        // ---- 跨格实体身份（issue #12）----
+        // 容器实体**不属于**它被声明的那一格。声明格只决定位置（协议：停在格中心、
+        // 脚 y = 格底 + 0.5），能不能被看见完全由包围盒与查询盒是否相交决定。
+        //
+        // 26.2 反编译源码核实（simulator/.cache/reference/sources）：
+        //   * `world/entity/EntityTypes.java:284-286` / `:525-527`：运输矿车与漏斗矿车
+        //     都是 `.sized(0.98F, 0.7F)`；`:157-164`（ACACIA_CHEST_BOAT）等十个运输船/竹筏
+        //     EntityType 与 `:192-199` BAMBOO_CHEST_RAFT 都是 `.sized(1.375F, 0.5625F)`。
+        //   * `world/entity/EntityDimensions.java:19-23`：`float w = width/2` 之后
+        //     `new AABB(x-w, y, z-w, x+w, y+h, z+w)`——**y 是脚**，盒子从脚往上长 height。
+        //   * `world/entity/Entity.java:477-487`：`setPos` 把位置写进去后重算包围盒。
+        //   * `world/phys/AABB.java:245-247`：六个方向全是**严格**不等号，相切不算相交。
+        //   * `world/level/block/entity/HopperBlockEntity.java:393-398` `getEntityContainer`：
+        //     查询盒是 `new AABB(x-0.5, y-0.5, z-0.5, x+0.5, y+0.5, z+0.5)`，边长 1；
+        //     `:350-352 → :363-365`（推出＝朝向格格心）与 `:354-356 + :403-415`
+        //     （吸取＝ getLevelY()+1.0，方块漏斗就是上一格格心）代进去正好是**那一格**。
+        //
+        // 于是：矿车盒 [X+0.01,X+0.99]×[Y+0.5,Y+1.2]×[Z+0.01,Z+0.99] 覆盖 **2** 格；
+        // 船盒 [X-0.1875,X+1.1875]×[Y+0.5,Y+1.0625]×[Z-0.1875,Z+1.1875] 覆盖 **3×2×3=18** 格。
+        //
+        // **实测旁证（上一轮 reference-builder，真实服务器）**：用同一条 getEntityContainer
+        // 查询扫 5×3×5 邻域，船在 18 格上报、第 19 格没有；矿车 2 格，且当时的内核在
+        // 矿车正上方那一格报空。本轮**没有跑原版捕获**（资源被另一个 agent 独占），
+        // 下面全部是内核回归，几何本身按上面的源码行号核实过。
+        auto stone = [](int slot, int count) { return Json{{"slot", slot}, {"item", "minecraft:stone"}, {"count", count}}; };
+        auto draws = [](const Simulator& world) {
+            return std::stoull(world.saveProject("draws", true).at("randomSource").at("draws").get<std::string>());
+        };
+        auto declare = [&](const std::string& type, const Json& inventory) {
+            return Json{{"containerEntities", Json::array({{{"type", type}, {"inventory", inventory}}})}};
+        };
+        // 探针：在 C 正下方放一个**空**漏斗。空漏斗不走 ejectItems（tickHopper 里
+        // `!inventoryEmpty` 才推出），只走 suckInItems，而它的查询盒正好是 C。
+        // 「这一刻抽了随机数」＝「C 这一格看得见容器实体」，与原版探针同一个判据。
+        const BlockPos declared{5, 5, 0};
+        auto sees = [&](const std::string& type, BlockPos cell) {
+            Simulator s(r); floor(s);
+            s.place({cell.x, cell.y - 1, cell.z}, r.state("hopper", {{"facing", "down"}}));
+            s.stimulate(declared, declare(type, Json::array()));
+            const auto before = s.randomState();
+            s.advanceTo(1);
+            return s.randomState() != before;
+        };
+        for (const auto& [type, boat] : std::vector<std::pair<std::string, bool>>{{"chest_minecart", false}, {"oak_chest_boat", true}}) {
+            int reported = 0;
+            for (int dx = -2; dx <= 2; ++dx) for (int dy = -1; dy <= 1; ++dy) for (int dz = -2; dz <= 2; ++dz) {
+                const BlockPos cell{declared.x + dx, declared.y + dy, declared.z + dz};
+                const bool expected = (dy == 0 || dy == 1) && (boat ? (dx >= -1 && dx <= 1 && dz >= -1 && dz <= 1) : (dx == 0 && dz == 0));
+                const bool actual = sees(type, cell);
+                reported += actual ? 1 : 0;
+                expect(actual == expected, type + (expected ? " was not reported at " : " was wrongly reported at ")
+                       + std::to_string(dx) + "," + std::to_string(dy) + "," + std::to_string(dz));
+            }
+            expect(reported == (boat ? 18 : 2), type + " covered " + std::to_string(reported) + " cells");
+        }
+        // 逐条钉住最要紧的两格：矿车**正上方**那一格看得见（这一条原版实测过、旧内核报空），
+        // 矿车**正下方**那一格看不见（盒子的脚在格中心，向下不出格）。
+        expect(sees("chest_minecart", {declared.x, declared.y + 1, declared.z}), "the cell directly above a minecart did not report it");
+        expect(!sees("chest_minecart", {declared.x, declared.y - 1, declared.z}), "the cell directly below a minecart reported it");
+        expect(!sees("oak_chest_boat", {declared.x, declared.y - 1, declared.z}), "the cell directly below a chest boat reported it");
+
+        // 端到端：矿车正上方那一格的漏斗真的能把东西掏出来，不只是「看得见」。
+        Simulator above(r); floor(above);
+        above.place(declared, r.state("hopper", {{"facing", "down"}}));
+        above.stimulate(declared, declare("chest_minecart", Json::array({stone(0, 1)})));
+        above.advanceTo(2);
+        expect(above.inventoryJson(declared, false) == Json::array({{{"slot", 0}, {"item", "minecraft:stone"}, {"count", 1}}}),
+               "a hopper did not pull through the 0.2 block the minecart pokes into the cell above it: "
+               + above.inventoryJson(declared, false).dump());
+
+        // 声明格里空无一物、只有邻格的船探进来：候选表从**空**变成 1，于是这个漏斗
+        // 从「一次也不抽」变成「每刻抽一次」——随机源的消耗本身就是可观测的分歧。
+        const BlockPos probe{5, 4, 0}, queried{5, 5, 0};
+        Simulator reach(r); floor(reach);
+        reach.place(probe, r.state("hopper", {{"facing", "down"}}));
+        reach.stimulate({queried.x + 1, queried.y, queried.z}, declare("oak_chest_boat", Json::array()));
+        reach.advanceTo(10); const auto reachTen = draws(reach);
+        reach.advanceTo(20);
+        expect(draws(reach) - reachTen == 10, "a chest boat one cell away was not a candidate: "
+               + std::to_string(draws(reach) - reachTen) + " draws over 10 ticks");
+        expect(reach.containerEntitiesJson(queried).empty(), "the queried cell grew a declaration of its own");
+        // 对照：隔两格就够不着了，一次也不抽。
+        Simulator far(r); floor(far);
+        far.place(probe, r.state("hopper", {{"facing", "down"}}));
+        far.stimulate({queried.x + 2, queried.y, queried.z}, declare("oak_chest_boat", Json::array()));
+        const auto farStart = draws(far);
+        far.advanceTo(20);
+        expect(draws(far) == farStart, "a chest boat two cells away became a candidate: "
+               + std::to_string(draws(far) - farStart) + " draws");
+
+        // 声明之后在同一格换掉方块：原版 setBlock 换方块类型时会连带清掉这一格的器件数据
+        // （协议既有行为，与跨格无关），跨格索引必须跟着清干净，
+        // 否则候选枚举会去查一条已经不存在的运行时记录。
+        Simulator wiped(r); floor(wiped);
+        wiped.place(probe, r.state("hopper", {{"facing", "down"}}));
+        wiped.stimulate(queried, declare("oak_chest_boat", Json::array({stone(0, 1)})));
+        wiped.place(queried, r.state("stone"));
+        expect(wiped.containerEntitiesJson(queried).empty(), "replacing the block did not clear the declaration");
+        const auto wipedStart = draws(wiped);
+        wiped.advanceTo(20);
+        expect(draws(wiped) == wipedStart, "a wiped declaration was still a candidate: "
+               + std::to_string(draws(wiped) - wipedStart) + " draws");
+        expect(wiped.inventoryJson(probe, false).empty(), "the hopper pulled from a wiped declaration");
+
+        // 两条隔一格声明的船进**同一张**候选表：nextInt 的参数是 2，不是各自那一格的 1。
+        // nextInt(1) 与 nextInt(2) 消耗的随机数一样多（都只取一次 next(31)，
+        // legacyRandom.hpp:23），所以「候选数」只能从**选中了谁**看出来。
+        const std::uint64_t seed = 20260910;
+        LegacyRandom expectedPick(seed);
+        const int picked = expectedPick.nextInt(2);
+        auto twoBoats = [&](const char* low, const char* high) {
+            auto world = std::make_unique<Simulator>(r); floor(*world); world->setRandomSeed(seed);
+            world->place(probe, r.state("hopper", {{"facing", "down"}}));
+            world->stimulate(queried, declare("oak_chest_boat", Json::array({{{"slot", 0}, {"item", low}, {"count", 1}}})));
+            world->stimulate({queried.x + 1, queried.y, queried.z},
+                             declare("bamboo_chest_raft", Json::array({{{"slot", 0}, {"item", high}, {"count", 1}}})));
+            return world;
+        };
+        auto pair = twoBoats("minecraft:stone", "minecraft:dirt");
+        pair->advanceTo(1);
+        expect(draws(*pair) == 1, "one getEntityContainer call did not draw exactly once: " + std::to_string(draws(*pair)));
+        // 候选顺序是显式约定：先按 (x, z, y) 排声明格，再按格内声明顺序。
+        // 原版跨分区那一层的顺序确实是 x→z→y（EntitySectionStorage.java:37-61 +
+        // SectionPos.java:217-222），但**同一个 16³ 分区内部**是生成顺序
+        // （EntitySection.java:30-37），器件层协议不建模生成顺序，给不出来。
+        // 这一条只影响 nextInt 选中了谁，不影响候选个数，因此不改变随机源的消耗。
+        const std::string first = pair->inventoryJson(probe, false).at(0).at("item");
+        expect(first == (picked == 0 ? "minecraft:stone" : "minecraft:dirt"),
+               "the cross-cell candidate order changed: nextInt picked " + std::to_string(picked) + " but the hopper got " + first);
+        auto swapped = twoBoats("minecraft:dirt", "minecraft:stone");
+        swapped->advanceTo(1);
+        expect(swapped->inventoryJson(probe, false).at(0).at("item") == (picked == 0 ? "minecraft:dirt" : "minecraft:stone"),
+               "the candidate order followed the contents instead of the cell order");
+        // 跑久一点：两条船最后都会被掏空，证明它们确实在同一张表里轮换。
+        pair->advanceTo(400);
+        expect(pair->containerEntitiesJson(queried).at(0).at("inventory").empty(), "the declared cell's boat kept its item");
+        expect(pair->containerEntitiesJson({queried.x + 1, queried.y, queried.z}).at(0).at("inventory").empty(),
+               "the neighbouring boat never became a candidate: "
+               + pair->containerEntitiesJson({queried.x + 1, queried.y, queried.z}).dump());
+
+        // 快照往返：跨格候选索引不进文件，靠 rebuildEntityCells 从 containerEntities 重建，
+        // 因此旧工程与旧快照原样可读，续跑也必须逐条一致。
+        auto live = twoBoats("minecraft:stone", "minecraft:dirt");
+        live->advanceTo(3);
+        auto saved = live->saveProject("crossCell", true);
+        Simulator restored(r); restored.loadProject(saved);
+        expect(restored.saveProject("crossCell", true) == saved, "a cross-cell checkpoint diverged");
+        live->advanceTo(60); restored.advanceTo(60);
+        expect(restored.randomState() == live->randomState(), "a restored cross-cell candidate table drew differently");
+        expect(restored.inventoryJson(probe, false) == live->inventoryJson(probe, false), "a restored cross-cell hopper moved different items");
+        for (BlockPos cell : {queried, BlockPos{queried.x + 1, queried.y, queried.z}})
+            expect(restored.containerEntitiesJson(cell) == live->containerEntitiesJson(cell),
+                   "a restored cross-cell boat diverged at " + std::to_string(cell.x));
+        // 电路工程（不带运行队列）重开之后跨格可见性同样成立。
+        auto circuit = twoBoats("minecraft:stone", "minecraft:dirt");
+        Simulator reopened(r); reopened.setRandomSeed(seed); reopened.loadProject(circuit->saveProject("crossCellCircuit", false));
+        reopened.advanceTo(400);
+        expect(reopened.containerEntitiesJson({queried.x + 1, queried.y, queried.z}).at(0).at("inventory").empty(),
+               "a circuit reload lost the cross-cell candidate: "
+               + reopened.containerEntitiesJson({queried.x + 1, queried.y, queried.z}).dump());
+    });
+    test("full 26.2 sine table and daylight index boundaries", [&] {
+        std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/../tests/fixtures/java26_2SineTable.json");
+        expect(static_cast<bool>(file), "missing vanilla sine table fixture");
+        auto fixture = Json::parse(file);
+        const auto& bits = fixture.at("sineBits");
+        const auto& table = daylightSineTable();
+        expect(bits.size() == table.size(), "sine table size differs");
+        for (std::size_t i = 0; i < table.size(); ++i) {
+            std::int32_t actual{}; std::memcpy(&actual, &table[i], sizeof actual);
+            expect(actual == bits[i].get<std::int32_t>(), "sine table entry " + std::to_string(i) + " differs: expected bits "
+                + std::to_string(bits[i].get<std::int32_t>()) + " got " + std::to_string(actual));
+        }
+        Simulator s(r); BlockPos pos{0, 0, 0}; s.place(pos, r.state("daylight_detector"));
+        for (const auto& sample : fixture.at("cosSamples")) for (int sky = 0; sky <= 15; ++sky) {
+            // stimulate only schedules the next 20 gt poll; two interacts recompute in place.
+            s.stimulate(pos, {{"skyBrightness", sky}, {"sunAngle", sample.at("degrees")}});
+            s.interact(pos); s.interact(pos);
+            expect(s.at(pos).power == sample.at("strengths").at(static_cast<std::size_t>(sky)).get<int>(),
+                "daylight strength differs at " + sample.at("degrees").dump() + " sky " + std::to_string(sky));
+        }
+    });
     test("daylight numerical agreement and dirty-only polling", [&] {
         std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/../tests/fixtures/java26_2Daylight.json");
         auto fixture = Json::parse(file); Simulator s(r); BlockPos pos{0,0,0}; s.place(pos, r.state("daylight_detector"));

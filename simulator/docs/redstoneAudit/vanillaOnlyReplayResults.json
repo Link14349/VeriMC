@@ -1,0 +1,1764 @@
+[
+  {
+    "fixture": "java26_2Bells",
+    "origin": [
+      1361938,
+      -58,
+      10122803
+    ],
+    "gameTestEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:trade_rebalance",
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "file/simulator",
+        "minecart_improvements",
+        "redstone_experiments",
+        "trade_rebalance",
+        "vanilla"
+      ],
+      "gameTime": 21,
+      "clockTicks": 21
+    },
+    "vanillaEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "vanilla"
+      ],
+      "gameTime": 21,
+      "clockTicks": 21
+    },
+    "clockAligned": true,
+    "firstDifferenceAgainstGameTest": null,
+    "sha256": "a2213ab68fd7653f3dfc3ee126b757e6f9efcdb01ed546a023dedbb1938e3e89",
+    "checkerExitCode": 0,
+    "checkerStatus": "match"
+  },
+  {
+    "fixture": "java26_2Bookshelves",
+    "origin": [
+      13316735,
+      -58,
+      11385218
+    ],
+    "gameTestEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:trade_rebalance",
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "file/simulator",
+        "minecart_improvements",
+        "redstone_experiments",
+        "trade_rebalance",
+        "vanilla"
+      ],
+      "gameTime": 5,
+      "clockTicks": 5
+    },
+    "vanillaEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "vanilla"
+      ],
+      "gameTime": 5,
+      "clockTicks": 5
+    },
+    "clockAligned": true,
+    "firstDifferenceAgainstGameTest": null,
+    "sha256": "fc3a411ed56fd717c6754425276dce2086025ae65200b41ccd5a468e21103b15",
+    "checkerExitCode": 0,
+    "checkerStatus": "match"
+  },
+  {
+    "fixture": "java26_2Buttons",
+    "origin": [
+      -3647244,
+      -58,
+      3560801
+    ],
+    "gameTestEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:trade_rebalance",
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "file/simulator",
+        "minecart_improvements",
+        "redstone_experiments",
+        "trade_rebalance",
+        "vanilla"
+      ],
+      "gameTime": 10,
+      "clockTicks": 10
+    },
+    "vanillaEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "vanilla"
+      ],
+      "gameTime": 10,
+      "clockTicks": 10
+    },
+    "clockAligned": true,
+    "firstDifferenceAgainstGameTest": null,
+    "sha256": "b6dbab809193b0f5cedc97cb79f29a3e00533680418a200078cc48db073cb0f1",
+    "checkerExitCode": 0,
+    "checkerStatus": "match"
+  },
+  {
+    "fixture": "java26_2ChunkLifecycle",
+    "origin": [
+      16,
+      -59,
+      32
+    ],
+    "gameTestEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "vanilla"
+      ],
+      "gameTime": 22,
+      "clockTicks": 22
+    },
+    "vanillaEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "vanilla"
+      ],
+      "gameTime": 22,
+      "clockTicks": 22
+    },
+    "clockAligned": true,
+    "firstDifferenceAgainstGameTest": null,
+    "sha256": "7e076019fe219bed20eadae8d1fba31e27fe53141aa984e6db722dd4b461f3f1",
+    "checkerExitCode": 0,
+    "checkerStatus": "match"
+  },
+  {
+    "fixture": "java26_2ChunkLifecycleNegative",
+    "origin": [
+      -64,
+      -59,
+      -80
+    ],
+    "gameTestEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "vanilla"
+      ],
+      "gameTime": 22,
+      "clockTicks": 22
+    },
+    "vanillaEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "vanilla"
+      ],
+      "gameTime": 22,
+      "clockTicks": 22
+    },
+    "clockAligned": true,
+    "firstDifferenceAgainstGameTest": null,
+    "sha256": "561d49f42f1219d9f96fd778d7f788ec510660719a8fde746960ca30b280b4e4",
+    "checkerExitCode": 0,
+    "checkerStatus": "match"
+  },
+  {
+    "fixture": "java26_2Composters",
+    "origin": [
+      -5583576,
+      -58,
+      -7118755
+    ],
+    "gameTestEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:trade_rebalance",
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "file/simulator",
+        "minecart_improvements",
+        "redstone_experiments",
+        "trade_rebalance",
+        "vanilla"
+      ],
+      "gameTime": 12,
+      "clockTicks": 12
+    },
+    "vanillaEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "vanilla"
+      ],
+      "gameTime": 12,
+      "clockTicks": 12
+    },
+    "clockAligned": true,
+    "firstDifferenceAgainstGameTest": null,
+    "sha256": "d3e7fa6f0c0a76ee466e8c89cf54707d3f736caf7b81cab9dd012b8b70f02ee2",
+    "checkerExitCode": 0,
+    "checkerStatus": "match"
+  },
+  {
+    "fixture": "java26_2Containers",
+    "origin": [
+      5349648,
+      -58,
+      -7737813
+    ],
+    "gameTestEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:trade_rebalance",
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "file/simulator",
+        "minecart_improvements",
+        "redstone_experiments",
+        "trade_rebalance",
+        "vanilla"
+      ],
+      "gameTime": 6,
+      "clockTicks": 6
+    },
+    "vanillaEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "vanilla"
+      ],
+      "gameTime": 6,
+      "clockTicks": 6
+    },
+    "clockAligned": true,
+    "firstDifferenceAgainstGameTest": null,
+    "sha256": "841170442000e76fbb2a47fa9ec5f1dc5bd3e0713fce3e466395a522541915b7",
+    "checkerExitCode": 0,
+    "checkerStatus": "match"
+  },
+  {
+    "fixture": "java26_2CopperChests",
+    "origin": [
+      2516412,
+      -58,
+      -4681624
+    ],
+    "gameTestEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:trade_rebalance",
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "file/simulator",
+        "minecart_improvements",
+        "redstone_experiments",
+        "trade_rebalance",
+        "vanilla"
+      ],
+      "gameTime": 11,
+      "clockTicks": 11
+    },
+    "vanillaEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "vanilla"
+      ],
+      "gameTime": 11,
+      "clockTicks": 11
+    },
+    "clockAligned": true,
+    "firstDifferenceAgainstGameTest": null,
+    "sha256": "78d9fc8aa8d8b545e824bf86155dc7b77e7478bff8f1039517cf3ebed7b15c7f",
+    "checkerExitCode": 0,
+    "checkerStatus": "match"
+  },
+  {
+    "fixture": "java26_2DaylightVibration",
+    "origin": [
+      -410961,
+      -58,
+      10281262
+    ],
+    "gameTestEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:trade_rebalance",
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "file/simulator",
+        "minecart_improvements",
+        "redstone_experiments",
+        "trade_rebalance",
+        "vanilla"
+      ],
+      "gameTime": 5,
+      "clockTicks": 5
+    },
+    "vanillaEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "vanilla"
+      ],
+      "gameTime": 5,
+      "clockTicks": 5
+    },
+    "clockAligned": true,
+    "firstDifferenceAgainstGameTest": null,
+    "sha256": "003df8d789d1d813d7bed614a07461fa5c56fef25d67e66782a4bc4bbaac2453",
+    "checkerExitCode": 0,
+    "checkerStatus": "match"
+  },
+  {
+    "fixture": "java26_2DeviceVibrations",
+    "origin": [
+      -13562758,
+      -58,
+      -5094967
+    ],
+    "gameTestEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:trade_rebalance",
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "file/simulator",
+        "minecart_improvements",
+        "redstone_experiments",
+        "trade_rebalance",
+        "vanilla"
+      ],
+      "gameTime": 10,
+      "clockTicks": 10
+    },
+    "vanillaEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "vanilla"
+      ],
+      "gameTime": 10,
+      "clockTicks": 10
+    },
+    "clockAligned": true,
+    "firstDifferenceAgainstGameTest": null,
+    "sha256": "68172a8c164245f104383125f7eddb24c3e66b8fb41b116fe191e3ecad64bc1a",
+    "checkerExitCode": 0,
+    "checkerStatus": "match"
+  },
+  {
+    "fixture": "java26_2Devices",
+    "origin": [
+      -375098,
+      -58,
+      11362812
+    ],
+    "gameTestEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:trade_rebalance",
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "file/simulator",
+        "minecart_improvements",
+        "redstone_experiments",
+        "trade_rebalance",
+        "vanilla"
+      ],
+      "gameTime": 11,
+      "clockTicks": 11
+    },
+    "vanillaEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "vanilla"
+      ],
+      "gameTime": 11,
+      "clockTicks": 11
+    },
+    "clockAligned": true,
+    "firstDifferenceAgainstGameTest": null,
+    "sha256": "0a49960cd5d59324545387932a14c05ba6a9dcc951747418ae409fa5148755ed",
+    "checkerExitCode": 0,
+    "checkerStatus": "match"
+  },
+  {
+    "fixture": "java26_2DiodeSupportBreak",
+    "origin": [
+      -3772708,
+      -58,
+      -7464196
+    ],
+    "gameTestEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:trade_rebalance",
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "file/simulator",
+        "minecart_improvements",
+        "redstone_experiments",
+        "trade_rebalance",
+        "vanilla"
+      ],
+      "gameTime": 9,
+      "clockTicks": 9
+    },
+    "vanillaEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "vanilla"
+      ],
+      "gameTime": 9,
+      "clockTicks": 9
+    },
+    "clockAligned": true,
+    "firstDifferenceAgainstGameTest": null,
+    "sha256": "81347bdbbf3b7e991f7149dc3a1da7daa4ffcc834204f382b1bbc2d46235ed0a",
+    "checkerExitCode": 0,
+    "checkerStatus": "match"
+  },
+  {
+    "fixture": "java26_2Droppers",
+    "origin": [
+      13569991,
+      -58,
+      -4951011
+    ],
+    "gameTestEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:trade_rebalance",
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "file/simulator",
+        "minecart_improvements",
+        "redstone_experiments",
+        "trade_rebalance",
+        "vanilla"
+      ],
+      "gameTime": 12,
+      "clockTicks": 12
+    },
+    "vanillaEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "vanilla"
+      ],
+      "gameTime": 12,
+      "clockTicks": 12
+    },
+    "clockAligned": true,
+    "firstDifferenceAgainstGameTest": null,
+    "sha256": "a2e8dcb5d384956c5d3f03d67b3ef717a60eaf4a5f0985fe878e8bbd554948d2",
+    "checkerExitCode": 0,
+    "checkerStatus": "match"
+  },
+  {
+    "fixture": "java26_2FenceGateInWall",
+    "origin": [
+      -8937461,
+      -58,
+      12192548
+    ],
+    "gameTestEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:trade_rebalance",
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "file/simulator",
+        "minecart_improvements",
+        "redstone_experiments",
+        "trade_rebalance",
+        "vanilla"
+      ],
+      "gameTime": 7,
+      "clockTicks": 7
+    },
+    "vanillaEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "vanilla"
+      ],
+      "gameTime": 7,
+      "clockTicks": 7
+    },
+    "clockAligned": true,
+    "firstDifferenceAgainstGameTest": null,
+    "sha256": "c83a96b996e907f7359574fbe6558b96d1e5bee5e1c5efe604a683843927f45b",
+    "checkerExitCode": 0,
+    "checkerStatus": "match"
+  },
+  {
+    "fixture": "java26_2HopperPickup",
+    "origin": [
+      -1894343,
+      -58,
+      -10939348
+    ],
+    "gameTestEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:trade_rebalance",
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "file/simulator",
+        "minecart_improvements",
+        "redstone_experiments",
+        "trade_rebalance",
+        "vanilla"
+      ],
+      "gameTime": 12,
+      "clockTicks": 12
+    },
+    "vanillaEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "vanilla"
+      ],
+      "gameTime": 12,
+      "clockTicks": 12
+    },
+    "clockAligned": true,
+    "firstDifferenceAgainstGameTest": null,
+    "sha256": "8df80b45161777e2ad045a50d5a3c9dd35af6001f5bc23a3acd8ec5b709c1d09",
+    "checkerExitCode": 0,
+    "checkerStatus": "match"
+  },
+  {
+    "fixture": "java26_2Hoppers",
+    "origin": [
+      -2233529,
+      -58,
+      10824451
+    ],
+    "gameTestEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:trade_rebalance",
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "file/simulator",
+        "minecart_improvements",
+        "redstone_experiments",
+        "trade_rebalance",
+        "vanilla"
+      ],
+      "gameTime": 7,
+      "clockTicks": 7
+    },
+    "vanillaEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "vanilla"
+      ],
+      "gameTime": 7,
+      "clockTicks": 7
+    },
+    "clockAligned": true,
+    "firstDifferenceAgainstGameTest": null,
+    "sha256": "0dad2391d5ea363226e52a0ab2b6f9e446c216600f5ec29736051f365fea5583",
+    "checkerExitCode": 0,
+    "checkerStatus": "match"
+  },
+  {
+    "fixture": "java26_2ItemFrameComparator",
+    "origin": [
+      12452488,
+      -58,
+      12963420
+    ],
+    "gameTestEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:trade_rebalance",
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "file/simulator",
+        "minecart_improvements",
+        "redstone_experiments",
+        "trade_rebalance",
+        "vanilla"
+      ],
+      "gameTime": 70,
+      "clockTicks": 70
+    },
+    "vanillaEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "vanilla"
+      ],
+      "gameTime": 70,
+      "clockTicks": 70
+    },
+    "clockAligned": true,
+    "firstDifferenceAgainstGameTest": null,
+    "sha256": "82c00aacc9f3969ee5ff6d57916d1bbaaa34b85ec7584d3923e8000657da0d12",
+    "checkerExitCode": 0,
+    "checkerStatus": "match"
+  },
+  {
+    "fixture": "java26_2JukeboxHoppers",
+    "origin": [
+      -3585119,
+      -58,
+      2892422
+    ],
+    "gameTestEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:trade_rebalance",
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "file/simulator",
+        "minecart_improvements",
+        "redstone_experiments",
+        "trade_rebalance",
+        "vanilla"
+      ],
+      "gameTime": 6,
+      "clockTicks": 6
+    },
+    "vanillaEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "vanilla"
+      ],
+      "gameTime": 6,
+      "clockTicks": 6
+    },
+    "clockAligned": true,
+    "firstDifferenceAgainstGameTest": null,
+    "sha256": "7ea5356a8262042b3409249addeba01b8ddc8e52ff6ca1601b6c12f1d95982d0",
+    "checkerExitCode": 0,
+    "checkerStatus": "match"
+  },
+  {
+    "fixture": "java26_2Jukeboxes",
+    "origin": [
+      5951528,
+      -58,
+      -10663918
+    ],
+    "gameTestEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:trade_rebalance",
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "file/simulator",
+        "minecart_improvements",
+        "redstone_experiments",
+        "trade_rebalance",
+        "vanilla"
+      ],
+      "gameTime": 7,
+      "clockTicks": 7
+    },
+    "vanillaEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "vanilla"
+      ],
+      "gameTime": 7,
+      "clockTicks": 7
+    },
+    "clockAligned": true,
+    "firstDifferenceAgainstGameTest": null,
+    "sha256": "762552e6babba04d9856b11df0d0e7ee960e7fa1289629c830a52e1494bd746a",
+    "checkerExitCode": 0,
+    "checkerStatus": "match"
+  },
+  {
+    "fixture": "java26_2MachineMatrix",
+    "origin": [
+      -14988735,
+      -58,
+      -9297487
+    ],
+    "gameTestEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:trade_rebalance",
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "file/simulator",
+        "minecart_improvements",
+        "redstone_experiments",
+        "trade_rebalance",
+        "vanilla"
+      ],
+      "gameTime": 12,
+      "clockTicks": 12
+    },
+    "vanillaEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "vanilla"
+      ],
+      "gameTime": 12,
+      "clockTicks": 12
+    },
+    "clockAligned": true,
+    "firstDifferenceAgainstGameTest": null,
+    "sha256": "3b957c728ab502dd2f34f16f68b240af17dddb603a7d7c0cc7a057224016f027",
+    "checkerExitCode": 0,
+    "checkerStatus": "match",
+    "traceFreeRerunDifference": null,
+    "traceFreeRerunSameOrigin": true
+  },
+  {
+    "fixture": "java26_2Notes",
+    "origin": [
+      -5863760,
+      -58,
+      9437365
+    ],
+    "gameTestEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:trade_rebalance",
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "file/simulator",
+        "minecart_improvements",
+        "redstone_experiments",
+        "trade_rebalance",
+        "vanilla"
+      ],
+      "gameTime": 5,
+      "clockTicks": 5
+    },
+    "vanillaEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "vanilla"
+      ],
+      "gameTime": 5,
+      "clockTicks": 5
+    },
+    "clockAligned": true,
+    "firstDifferenceAgainstGameTest": null,
+    "sha256": "d371b9826c1fae00b970c7c15900510b8f1b3944c9eab053ddbe08436ffbd70a",
+    "checkerExitCode": 0,
+    "checkerStatus": "match"
+  },
+  {
+    "fixture": "java26_2ObserverRemoval",
+    "origin": [
+      3917673,
+      -58,
+      4714124
+    ],
+    "gameTestEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:trade_rebalance",
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "file/simulator",
+        "minecart_improvements",
+        "redstone_experiments",
+        "trade_rebalance",
+        "vanilla"
+      ],
+      "gameTime": 11,
+      "clockTicks": 11
+    },
+    "vanillaEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "vanilla"
+      ],
+      "gameTime": 11,
+      "clockTicks": 11
+    },
+    "clockAligned": true,
+    "firstDifferenceAgainstGameTest": null,
+    "sha256": "a11ceff9abdc62da1501ab30f1cd2c8fe0488183188a8d14d6ecba359f65716b",
+    "checkerExitCode": 0,
+    "checkerStatus": "match"
+  },
+  {
+    "fixture": "java26_2PistonLandingShape",
+    "origin": [
+      10126723,
+      -58,
+      -4127906
+    ],
+    "gameTestEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:trade_rebalance",
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "file/simulator",
+        "minecart_improvements",
+        "redstone_experiments",
+        "trade_rebalance",
+        "vanilla"
+      ],
+      "gameTime": 6,
+      "clockTicks": 6
+    },
+    "vanillaEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "vanilla"
+      ],
+      "gameTime": 6,
+      "clockTicks": 6
+    },
+    "clockAligned": true,
+    "firstDifferenceAgainstGameTest": null,
+    "sha256": "db3809270dbf6740afd16fe54cfb777ebcc777f8e83f0a19782589de76c6f68a",
+    "checkerExitCode": 0,
+    "checkerStatus": "match"
+  },
+  {
+    "fixture": "java26_2PistonPushability",
+    "origin": [
+      5148333,
+      -58,
+      -11535496
+    ],
+    "gameTestEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:trade_rebalance",
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "file/simulator",
+        "minecart_improvements",
+        "redstone_experiments",
+        "trade_rebalance",
+        "vanilla"
+      ],
+      "gameTime": 9,
+      "clockTicks": 9
+    },
+    "vanillaEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "vanilla"
+      ],
+      "gameTime": 9,
+      "clockTicks": 9
+    },
+    "clockAligned": true,
+    "firstDifferenceAgainstGameTest": null,
+    "sha256": "e08178d1eb1810df3250ba7f4f290bbe6d00c432c4a569ecad892d4620532966",
+    "checkerExitCode": 0,
+    "checkerStatus": "match"
+  },
+  {
+    "fixture": "java26_2PistonRemovalCallback",
+    "origin": [
+      -11651629,
+      -58,
+      2132008
+    ],
+    "gameTestEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:trade_rebalance",
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "file/simulator",
+        "minecart_improvements",
+        "redstone_experiments",
+        "trade_rebalance",
+        "vanilla"
+      ],
+      "gameTime": 12,
+      "clockTicks": 12
+    },
+    "vanillaEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "vanilla"
+      ],
+      "gameTime": 12,
+      "clockTicks": 12
+    },
+    "clockAligned": true,
+    "firstDifferenceAgainstGameTest": null,
+    "sha256": "3498afd29da38472c0d7fb63a3cba0e890dc9cef84f3d323978500ceb25eaa7e",
+    "checkerExitCode": 0,
+    "checkerStatus": "match"
+  },
+  {
+    "fixture": "java26_2Pots",
+    "origin": [
+      14332468,
+      -58,
+      5210710
+    ],
+    "gameTestEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:trade_rebalance",
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "file/simulator",
+        "minecart_improvements",
+        "redstone_experiments",
+        "trade_rebalance",
+        "vanilla"
+      ],
+      "gameTime": 7,
+      "clockTicks": 7
+    },
+    "vanillaEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "vanilla"
+      ],
+      "gameTime": 7,
+      "clockTicks": 7
+    },
+    "clockAligned": true,
+    "firstDifferenceAgainstGameTest": null,
+    "sha256": "0925a7f3ba1e6395374aed74b55b1214b69ae3f605bd134a656424e8bc9dc4a1",
+    "checkerExitCode": 0,
+    "checkerStatus": "match"
+  },
+  {
+    "fixture": "java26_2RailNotificationSource",
+    "origin": [
+      -2286809,
+      -58,
+      -2883712
+    ],
+    "gameTestEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:trade_rebalance",
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "file/simulator",
+        "minecart_improvements",
+        "redstone_experiments",
+        "trade_rebalance",
+        "vanilla"
+      ],
+      "gameTime": 5,
+      "clockTicks": 5
+    },
+    "vanillaEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "vanilla"
+      ],
+      "gameTime": 5,
+      "clockTicks": 5
+    },
+    "clockAligned": true,
+    "firstDifferenceAgainstGameTest": null,
+    "sha256": "7a1ddc792db28db35157a462b1a44f74940f95f7e2d4e7bbfa15aaebab8f0749",
+    "checkerExitCode": 0,
+    "checkerStatus": "match"
+  },
+  {
+    "fixture": "java26_2Rails",
+    "origin": [
+      14451196,
+      -58,
+      -9540035
+    ],
+    "gameTestEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:trade_rebalance",
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "file/simulator",
+        "minecart_improvements",
+        "redstone_experiments",
+        "trade_rebalance",
+        "vanilla"
+      ],
+      "gameTime": 7,
+      "clockTicks": 7
+    },
+    "vanillaEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "vanilla"
+      ],
+      "gameTime": 7,
+      "clockTicks": 7
+    },
+    "clockAligned": true,
+    "firstDifferenceAgainstGameTest": null,
+    "sha256": "3c7738ba32c44784eba61228d1ad8531bf587a49770b2385624154a54bb16821",
+    "checkerExitCode": 0,
+    "checkerStatus": "match"
+  },
+  {
+    "fixture": "java26_2Redstone",
+    "origin": [
+      -13216258,
+      -58,
+      4259559
+    ],
+    "gameTestEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:trade_rebalance",
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "file/simulator",
+        "minecart_improvements",
+        "redstone_experiments",
+        "trade_rebalance",
+        "vanilla"
+      ],
+      "gameTime": 9,
+      "clockTicks": 9
+    },
+    "vanillaEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "vanilla"
+      ],
+      "gameTime": 9,
+      "clockTicks": 9
+    },
+    "clockAligned": true,
+    "firstDifferenceAgainstGameTest": null,
+    "sha256": "9118144b9c19e6c618a08dcb004e6ddd1f76337806d3ab63c9a74bc367e031e7",
+    "checkerExitCode": 0,
+    "checkerStatus": "match"
+  },
+  {
+    "fixture": "java26_2RemovalNotifySource",
+    "origin": [
+      -12007783,
+      -58,
+      9606321
+    ],
+    "gameTestEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:trade_rebalance",
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "file/simulator",
+        "minecart_improvements",
+        "redstone_experiments",
+        "trade_rebalance",
+        "vanilla"
+      ],
+      "gameTime": 5,
+      "clockTicks": 5
+    },
+    "vanillaEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "vanilla"
+      ],
+      "gameTime": 5,
+      "clockTicks": 5
+    },
+    "clockAligned": true,
+    "firstDifferenceAgainstGameTest": null,
+    "sha256": "4290527a258db3f2d5f427d51b054ced68bc659cba0c0b4db0d7e5348b5d8dfa",
+    "checkerExitCode": 0,
+    "checkerStatus": "match"
+  },
+  {
+    "fixture": "java26_2RepeaterLockRefresh",
+    "origin": [
+      7442207,
+      -58,
+      -8545382
+    ],
+    "gameTestEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:trade_rebalance",
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "file/simulator",
+        "minecart_improvements",
+        "redstone_experiments",
+        "trade_rebalance",
+        "vanilla"
+      ],
+      "gameTime": 12,
+      "clockTicks": 12
+    },
+    "vanillaEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "vanilla"
+      ],
+      "gameTime": 12,
+      "clockTicks": 12
+    },
+    "clockAligned": true,
+    "firstDifferenceAgainstGameTest": null,
+    "sha256": "7eef1512a4c2059a896af3f2feb2218dadde5430f60473c70789a13857fe5a71",
+    "checkerExitCode": 0,
+    "checkerStatus": "match"
+  },
+  {
+    "fixture": "java26_2StairShapes",
+    "origin": [
+      6349915,
+      -58,
+      11571517
+    ],
+    "gameTestEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:trade_rebalance",
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "file/simulator",
+        "minecart_improvements",
+        "redstone_experiments",
+        "trade_rebalance",
+        "vanilla"
+      ],
+      "gameTime": 6,
+      "clockTicks": 6
+    },
+    "vanillaEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "vanilla"
+      ],
+      "gameTime": 6,
+      "clockTicks": 6
+    },
+    "clockAligned": true,
+    "firstDifferenceAgainstGameTest": null,
+    "sha256": "7813f96bc601ba879f7d19aa4a16834c29944172dea7dd3c27bf6fc64d201794",
+    "checkerExitCode": 0,
+    "checkerStatus": "match"
+  },
+  {
+    "fixture": "java26_2SupportDirection",
+    "origin": [
+      -14717965,
+      -58,
+      12661676
+    ],
+    "gameTestEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:trade_rebalance",
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "file/simulator",
+        "minecart_improvements",
+        "redstone_experiments",
+        "trade_rebalance",
+        "vanilla"
+      ],
+      "gameTime": 10,
+      "clockTicks": 10
+    },
+    "vanillaEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "vanilla"
+      ],
+      "gameTime": 10,
+      "clockTicks": 10
+    },
+    "clockAligned": true,
+    "firstDifferenceAgainstGameTest": null,
+    "sha256": "a932466c6c86bb4627a875f66774ef736a1e152ec9fa4830dd133819be3fd75e",
+    "checkerExitCode": 0,
+    "checkerStatus": "match",
+    "traceFreeRerunDifference": null,
+    "traceFreeRerunSameOrigin": true
+  },
+  {
+    "fixture": "java26_2Targets",
+    "origin": [
+      -12012170,
+      -58,
+      -14643673
+    ],
+    "gameTestEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:trade_rebalance",
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "file/simulator",
+        "minecart_improvements",
+        "redstone_experiments",
+        "trade_rebalance",
+        "vanilla"
+      ],
+      "gameTime": 12,
+      "clockTicks": 12
+    },
+    "vanillaEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "vanilla"
+      ],
+      "gameTime": 12,
+      "clockTicks": 12
+    },
+    "clockAligned": true,
+    "firstDifferenceAgainstGameTest": null,
+    "sha256": "6a61767e40fd2830141c0b25bf2cb341ef2174abde0ce3053784ba448e0ed0a9",
+    "checkerExitCode": 0,
+    "checkerStatus": "match"
+  },
+  {
+    "fixture": "java26_2TickBatches",
+    "origin": [
+      1865056,
+      -58,
+      -12918106
+    ],
+    "gameTestEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:trade_rebalance",
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "file/simulator",
+        "minecart_improvements",
+        "redstone_experiments",
+        "trade_rebalance",
+        "vanilla"
+      ],
+      "gameTime": 5,
+      "clockTicks": 5
+    },
+    "vanillaEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "vanilla"
+      ],
+      "gameTime": 5,
+      "clockTicks": 5
+    },
+    "clockAligned": true,
+    "firstDifferenceAgainstGameTest": null,
+    "sha256": "958e4323f79609aead5838f83af399f9f1486d68d8b10799c84cc2a6efa37773",
+    "checkerExitCode": 0,
+    "checkerStatus": "match"
+  },
+  {
+    "fixture": "java26_2Torches",
+    "origin": [
+      5701434,
+      -58,
+      -10214568
+    ],
+    "gameTestEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:trade_rebalance",
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "file/simulator",
+        "minecart_improvements",
+        "redstone_experiments",
+        "trade_rebalance",
+        "vanilla"
+      ],
+      "gameTime": 7,
+      "clockTicks": 7
+    },
+    "vanillaEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "vanilla"
+      ],
+      "gameTime": 7,
+      "clockTicks": 7
+    },
+    "clockAligned": true,
+    "firstDifferenceAgainstGameTest": null,
+    "sha256": "45a971d7b18ce4a7fd1981bbd72d5f6f675114e072ebd6e410961a4dc303f542",
+    "checkerExitCode": 0,
+    "checkerStatus": "match"
+  },
+  {
+    "fixture": "java26_2Tripwire",
+    "origin": [
+      9977965,
+      -58,
+      11893498
+    ],
+    "gameTestEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:trade_rebalance",
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "file/simulator",
+        "minecart_improvements",
+        "redstone_experiments",
+        "trade_rebalance",
+        "vanilla"
+      ],
+      "gameTime": 11,
+      "clockTicks": 11
+    },
+    "vanillaEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "vanilla"
+      ],
+      "gameTime": 11,
+      "clockTicks": 11
+    },
+    "clockAligned": true,
+    "firstDifferenceAgainstGameTest": null,
+    "sha256": "d994adef55ec501f0ef0b0d5212e0efeb4bac1d8f5c65a5e1fe97c1fee351bd0",
+    "checkerExitCode": 0,
+    "checkerStatus": "match"
+  },
+  {
+    "fixture": "java26_2UpdateSource",
+    "origin": [
+      904103,
+      -58,
+      -13366918
+    ],
+    "gameTestEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:trade_rebalance",
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "file/simulator",
+        "minecart_improvements",
+        "redstone_experiments",
+        "trade_rebalance",
+        "vanilla"
+      ],
+      "gameTime": 11,
+      "clockTicks": 11
+    },
+    "vanillaEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "vanilla"
+      ],
+      "gameTime": 11,
+      "clockTicks": 11
+    },
+    "clockAligned": true,
+    "firstDifferenceAgainstGameTest": null,
+    "sha256": "21eb2bd449d117169880d83b1e42efef936da827436ae25cd6f613fff0f54a85",
+    "checkerExitCode": 0,
+    "checkerStatus": "match",
+    "traceFreeRerunDifference": null,
+    "traceFreeRerunSameOrigin": true
+  },
+  {
+    "fixture": "java26_2UpdateTrace",
+    "origin": [
+      -4637311,
+      -58,
+      8902688
+    ],
+    "gameTestEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:trade_rebalance",
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "file/simulator",
+        "minecart_improvements",
+        "redstone_experiments",
+        "trade_rebalance",
+        "vanilla"
+      ],
+      "gameTime": 6,
+      "clockTicks": 6
+    },
+    "vanillaEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "vanilla"
+      ],
+      "gameTime": 6,
+      "clockTicks": 6
+    },
+    "clockAligned": true,
+    "firstDifferenceAgainstGameTest": null,
+    "sha256": "ec08d791b6964d742126b3df1388e447ba7cf519bd48f43ff6630d654f21cf17",
+    "checkerExitCode": 0,
+    "checkerStatus": "match",
+    "traceFreeRerunDifference": null,
+    "traceFreeRerunSameOrigin": true
+  },
+  {
+    "fixture": "java26_2Vibrations",
+    "origin": [
+      6363378,
+      -58,
+      -4638309
+    ],
+    "gameTestEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:trade_rebalance",
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "file/simulator",
+        "minecart_improvements",
+        "redstone_experiments",
+        "trade_rebalance",
+        "vanilla"
+      ],
+      "gameTime": 6,
+      "clockTicks": 6
+    },
+    "vanillaEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "vanilla"
+      ],
+      "gameTime": 6,
+      "clockTicks": 6
+    },
+    "clockAligned": true,
+    "firstDifferenceAgainstGameTest": null,
+    "sha256": "094440cef85876539a6457e00d1e2b1c96594e28ec3f26c151a04d25358202f7",
+    "checkerExitCode": 0,
+    "checkerStatus": "match"
+  },
+  {
+    "fixture": "java26_2WireGeometry",
+    "origin": [
+      -2015056,
+      -58,
+      8982754
+    ],
+    "gameTestEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:trade_rebalance",
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "file/simulator",
+        "minecart_improvements",
+        "redstone_experiments",
+        "trade_rebalance",
+        "vanilla"
+      ],
+      "gameTime": 7,
+      "clockTicks": 7
+    },
+    "vanillaEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "vanilla"
+      ],
+      "gameTime": 7,
+      "clockTicks": 7
+    },
+    "clockAligned": true,
+    "firstDifferenceAgainstGameTest": null,
+    "sha256": "95a3374a4d3d013468e93932a09035113452b09b3ced8db5e2b24ee76a56e616",
+    "checkerExitCode": 0,
+    "checkerStatus": "match"
+  },
+  {
+    "fixture": "java26_2WireShapeToggle",
+    "origin": [
+      -11769289,
+      -58,
+      10692884
+    ],
+    "gameTestEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:trade_rebalance",
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "file/simulator",
+        "minecart_improvements",
+        "redstone_experiments",
+        "trade_rebalance",
+        "vanilla"
+      ],
+      "gameTime": 5470,
+      "clockTicks": 5470
+    },
+    "vanillaEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "vanilla"
+      ],
+      "gameTime": 5470,
+      "clockTicks": 5470
+    },
+    "clockAligned": true,
+    "firstDifferenceAgainstGameTest": null,
+    "sha256": "4b66a9d15ed5aedc9c92c0de76abc2eec0aef2f4c2ef662dab9859853413f872",
+    "checkerExitCode": 0,
+    "checkerStatus": "match"
+  }
+]

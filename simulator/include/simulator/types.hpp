@@ -17,6 +17,12 @@ constexpr std::array<Direction, 4> horizontal{Direction::north, Direction::east,
 constexpr std::array<const char*, 6> directionNames{"down", "up", "north", "south", "west", "east"};
 constexpr Direction opposite(Direction d) { return static_cast<Direction>(static_cast<unsigned>(d) ^ 1u); }
 constexpr unsigned axis(Direction d) { return static_cast<unsigned>(d) / 2; }
+// 只对水平方向有意义，竖直方向原样返回；调用方负责先判断轴。
+constexpr Direction clockWise(Direction d) {
+    return d == Direction::north ? Direction::east : d == Direction::east ? Direction::south
+         : d == Direction::south ? Direction::west : d == Direction::west ? Direction::north : d;
+}
+constexpr Direction counterClockWise(Direction d) { return clockWise(clockWise(clockWise(d))); }
 struct BlockPos {
     std::int32_t x{}, y{}, z{};
     auto operator<=>(const BlockPos&) const = default;

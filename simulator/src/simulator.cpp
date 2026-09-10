@@ -71,6 +71,182 @@ int Simulator::displayValue(BlockPos pos) const {
     int value = 0; for (auto d : directions) value = std::max(value, signal(pos, d));
     return value;
 }
+BlockPos Simulator::chunkOf(BlockPos pos) { return BlockTicks::chunkAt(pos); }
+Simulator::ChunkState Simulator::chunkState(BlockPos pos) const {
+    auto found = chunkStates.find(chunkOf(pos));
+    return found == chunkStates.end() ? ChunkState::entityTicking : found->second.state;
+}
+// 原版可 ticking 的区块，其周围八个区块的票据等级必然至少是已加载，因此 ticking 区块的
+// 逻辑永远读不到未加载的方块。这里把它作为**输入约束**强制执行，读路径因此不需要额外判断。
+void Simulator::setChunkState(int chunkX, int chunkZ, ChunkState state, std::optional<Tick> stalledSince) {
+    if (faulted) throw std::runtime_error("当前执行已中止，请从有效快照恢复");
+    if (chunkX < INT32_MIN / 16 || chunkX > INT32_MAX / 16 || chunkZ < INT32_MIN / 16 || chunkZ > INT32_MAX / 16)
+        throw std::invalid_argument("区块坐标越界");
+    const BlockPos chunk{chunkX, 0, chunkZ};
+    auto previous = chunkStates;
+    const bool wasTicking = chunkBlockTicking({chunkX * 16, 0, chunkZ * 16});
+    const bool wasEntityTicking = chunkEntityTicking({chunkX * 16, 0, chunkZ * 16});
+    const Tick previousStall = wasTicking ? currentTick : previous.at(chunk).stalledSince;
+    if (state == ChunkState::entityTicking && !stalledSince) chunkStates.erase(chunk);
+    else chunkStates[chunk] = {state, stalledSince.value_or(wasTicking ? currentTick : previousStall)};
+    auto level = [&](BlockPos c) {
+        auto found = chunkStates.find(c);
+        return found == chunkStates.end() ? ChunkState::entityTicking : found->second.state;
+    };
+    auto valid = [&](BlockPos c) {
+        if (level(c) < ChunkState::blockTicking) return true;
+        for (int dx = -1; dx <= 1; ++dx) for (int dz = -1; dz <= 1; ++dz)
+            if (level({c.x + dx, 0, c.z + dz}) == ChunkState::unloaded) return false;
+        return true;
+    };
+    for (int dx = -1; dx <= 1; ++dx) for (int dz = -1; dz <= 1; ++dz)
+        if (!valid({chunkX + dx, 0, chunkZ + dz})) {
+            chunkStates = std::move(previous);
+            throw std::invalid_argument("可 ticking 的区块周围八格不能是未加载区块");
+        }
+    // 恢复执行时，把停摆期间本该递减却没有递减的倒计时整体后移，等价于原版
+    // 「区块不 ticking 时方块实体根本不 tick」。方块计划刻不移动：原版保留原触发时刻，
+    // 恢复后把过期的一并执行。
+    if (!wasTicking && state >= ChunkState::blockTicking && !stalledSince && currentTick > previousStall) {
+        shiftBlockEntityTimers(chunk, currentTick - previousStall);
+    }
+    // blockTicking -> entityTicking 只恢复实体接触，不移动方块实体倒计时，
+    // 但它同样可能让停在过去的阶段 3 事件变为可执行，须先恢复快照队列不变量。
+    if (!stalledSince && ((!wasTicking && state >= ChunkState::blockTicking)
+        || (!wasEntityTicking && state == ChunkState::entityTicking))) liftStaleEvents(chunk);
+    ++revision;
+}
+// 只移动「倒计时/进度」类的时刻。wakeAt 与被延后的事件保持同步，由事件处理器在恢复后
+// 按新的 readyAt 重新排期，因此这里不动它。
+// 停摆期间最后一批事件被放回**当刻**，随后空闲推进把 currentTick 直接跳到目标刻，
+// 于是这些事件停在过去。它们本来就会在恢复后的第一次推进里立刻执行，把触发时刻抬到
+// currentTick 完全等价；但留在过去会让快照违反「运行队列里的事件不早于当前刻」这条不变量，
+// 使得「恢复之后、下一次推进之前」存出来的快照读不回来。抬升的同时同步各方块实体的 wakeAt。
+void Simulator::liftStaleEvents(BlockPos chunk) {
+    std::vector<ScheduledEvent> kept;
+    kept.reserve(scheduled.size());
+    bool changed = false;
+    while (!scheduled.empty()) {
+        auto event = scheduled.top(); scheduled.pop();
+        if (event.phase != 0 && event.tick < currentTick && chunkOf(event.pos) == chunk) { event.tick = currentTick; changed = true; }
+        kept.push_back(event);
+    }
+    for (const auto& event : kept) scheduled.push(event);
+    if (!changed) return;
+    const auto sync = [&](auto& table) {
+        for (auto& [pos, entry] : table)
+            if (chunkOf(pos) == chunk && entry.wakeAt != UINT64_MAX && entry.wakeAt < currentTick) entry.wakeAt = currentTick;
+    };
+    sync(hoppers); sync(jukeboxes); sync(sensors);
+}
+void Simulator::shiftBlockEntityTimers(BlockPos chunk, Tick delta) {
+    const auto inChunk = [&](BlockPos pos) { return chunkOf(pos) == chunk; };
+    const auto shift = [&](Tick& value) { if (value != UINT64_MAX) value += delta; };
+    for (auto& [pos, hopper] : hoppers) if (inChunk(pos)) { shift(hopper.readyAt); shift(hopper.firstTick); }
+    for (auto& [pos, player] : jukeboxes) if (inChunk(pos)) shift(player.firstTick);
+    for (auto& [pos, sensor] : sensors) if (inChunk(pos)) shift(sensor.candidateTick);
+    // 钟的 bellWakeAt 是「摆动还剩多久」的倒计时，和漏斗冷却同类，停摆期间必须冻结。
+    // 它同时又是那个方块实体事件的触发时刻，因此恢复后由 finishBell 按新值重排。
+    for (auto& [pos, data] : runtime)
+        if (inChunk(pos) && data.values.contains("bellWakeAt"))
+            data.values["bellWakeAt"] = data.values.at("bellWakeAt").get<Tick>() + delta;
+}
+bool Simulator::runnable() const {
+    if (blockTicks.hasBatch() || blockTicks.nextTick(blockTickCheck())) return true;
+    if (chunkStates.empty()) return !scheduledKeys.empty();
+    auto queue = scheduled;
+    while (!queue.empty()) {
+        const auto event = queue.top(); queue.pop();
+        if (!scheduledKeys.contains({event.pos, event.type, event.phase, event.data})) continue;
+        const bool needsEntities = event.phase == 3;
+        if (event.phase == 0 || (needsEntities ? chunkEntityTicking(event.pos) : chunkBlockTicking(event.pos))) return true;
+    }
+    return false;
+}
+Json Simulator::blockEntityOrderJson() const {
+    std::vector<std::pair<std::uint64_t, BlockPos>> rows;
+    for (const auto& [pos, rank] : entityOrders) if (world.get(pos) != 0) rows.push_back({rank, pos});
+    std::sort(rows.begin(), rows.end());
+    Json result = Json::array();
+    for (const auto& [rank, pos] : rows) {
+        (void)rank;
+        result.push_back(Json::array({pos.x, pos.y, pos.z, registry.type(world.get(pos)).name}));
+    }
+    return result;
+}
+Json Simulator::pendingBlockTicksJson() const {
+    auto events = blockTicks.queuedEvents();
+    Json result = Json::array();
+    for (const auto& event : events)
+        result.push_back(Json::array({event.pos.x, event.pos.y, event.pos.z, registry.typeAt(event.type).name,
+                                      static_cast<std::int64_t>(event.tick) - static_cast<std::int64_t>(currentTick), event.priority}));
+    return result;
+}
+Json Simulator::pendingBlockEventsJson() const {
+    std::vector<ScheduledEvent> events;
+    auto queue = scheduled;
+    while (!queue.empty()) {
+        const auto event = queue.top(); queue.pop();
+        if (event.phase == 1 && scheduledKeys.contains({event.pos, event.type, event.phase, event.data})) events.push_back(event);
+    }
+    std::sort(events.begin(), events.end(), [](const ScheduledEvent& a, const ScheduledEvent& b) { return a.order < b.order; });
+    Json result = Json::array();
+    for (const auto& event : events)
+        result.push_back(Json::array({event.pos.x, event.pos.y, event.pos.z, registry.typeAt(event.type).name,
+                                      static_cast<int>(event.data & 3u), static_cast<int>(event.data >> 2)}));
+    return result;
+}
+Json Simulator::chunkStatesJson() const {
+    static constexpr const char* names[]{"unloaded", "loaded", "blockTicking", "entityTicking"};
+    std::vector<std::pair<BlockPos, ChunkRecord>> rows(chunkStates.begin(), chunkStates.end());
+    std::sort(rows.begin(), rows.end(), [](const auto& a, const auto& b) {
+        return std::pair(a.first.x, a.first.z) < std::pair(b.first.x, b.first.z);
+    });
+    Json result = Json::array();
+    for (const auto& [chunk, record] : rows)
+        result.push_back({{"chunk", Json::array({chunk.x, chunk.z})}, {"state", names[static_cast<unsigned>(record.state)]},
+                          {"stalledSince", record.stalledSince}});
+    return result;
+}
+void Simulator::appendUpdateTrace(Json entry) {
+    if (updateTrace.size() >= updateTraceLimit) { updateTraceTruncated = true; return; }
+    updateTrace.push_back(std::move(entry));
+}
+// 每次“取栈顶”记一条，描述原版即将执行的是哪一种更新以及它来自哪里：
+// "m" 多向更新（来源格、跳过方向、已推进下标、来源方块），
+// "s" 形状更新（目标格、邻居格、方向、标志），
+// "n" 简单邻居更新（目标格、来源方块），
+// "f" 带状态快照的邻居更新（另记快照 stateId 与 movedByPiston）。
+// 坐标写绝对值，checkReference 按种类换算成相对坐标再比较。
+void Simulator::recordUpdateTrace(const Update& update) {
+    Json entry = Json::array();
+    const auto addPos = [&](BlockPos p) { entry.push_back(p.x); entry.push_back(p.y); entry.push_back(p.z); };
+    switch (update.kind) {
+    case UpdateKind::multi:
+        entry.push_back("m"); addPos(update.pos);
+        if (update.skip < 0) entry.push_back(nullptr); else entry.push_back(directionNames[static_cast<unsigned>(update.skip)]);
+        entry.push_back(update.index);
+        entry.push_back(registry.type(update.neighborState).name);
+        break;
+    case UpdateKind::shape:
+        entry.push_back("s"); addPos(update.pos); addPos(update.pos.relative(update.direction));
+        entry.push_back(directionNames[static_cast<unsigned>(update.direction)]);
+        entry.push_back(update.flags);
+        break;
+    default:
+        if (update.snapshot == noSnapshot) {
+            entry.push_back("n"); addPos(update.pos);
+            entry.push_back(registry.type(update.neighborState).name);
+        } else {
+            entry.push_back("f"); addPos(update.pos);
+            entry.push_back(registry.type(update.neighborState).name);
+            entry.push_back(update.snapshot);
+            entry.push_back(update.movedByPiston);
+        }
+        break;
+    }
+    appendUpdateTrace(std::move(entry));
+}
 void Simulator::enqueue(Update update) {
     if (++updateCount > updateBudget) {
         breakRequested = true; faulted = true; pauseReason = "邻居更新超过预算，电路状态已停止；请从快照恢复或撤销本次操作";
@@ -79,19 +255,28 @@ void Simulator::enqueue(Update update) {
     if (updating) { addedUpdates.push_back(update); return; }
     updating = true; updateStack.push_back(update);
     try {
+        // 原版在每次“取栈顶”时调用 debugListener；只有换了栈顶对象才算新的一次取出。
+        bool peeked = false;
         while (!updateStack.empty() || !addedUpdates.empty()) {
+            if (!addedUpdates.empty()) peeked = false;
             for (auto it = addedUpdates.rbegin(); it != addedUpdates.rend(); ++it) updateStack.push_back(*it);
             addedUpdates.clear();
             auto current = updateStack.back();
+            if (updateTraceLimit && !peeked) recordUpdateTrace(current);
+            peeked = true;
             if (current.kind == UpdateKind::multi) {
-                while (current.index < 6 && static_cast<int>(updateOrder[static_cast<std::size_t>(current.index)]) == current.skip) ++current.index;
-                if (current.index >= 6) { updateStack.pop_back(); continue; }
-                auto d = updateOrder[static_cast<std::size_t>(current.index++)];
-                updateStack.back().index = current.index;
+                // 与原版 MultiNeighborUpdate.runNext 一致：先取当前方向，再跳过被排除的方向，
+                // 用推进后的下标判断是否还有剩余；耗尽时**当场**出栈，不多留一轮。
+                auto index = static_cast<std::size_t>(current.index);
+                auto d = updateOrder[index++];
+                if (index < 6 && static_cast<int>(updateOrder[index]) == current.skip) ++index;
+                updateStack.back().index = static_cast<int>(index);
+                const bool exhausted = index >= 6;
                 executeNeighbor(current.pos.relative(d), current.neighborState);
+                if (exhausted) { updateStack.pop_back(); peeked = false; }
             } else {
-                updateStack.pop_back();
-                if (current.kind == UpdateKind::shape) executeShape(current); else executeNeighbor(current.pos, current.neighborState);
+                updateStack.pop_back(); peeked = false;
+                if (current.kind == UpdateKind::shape) executeShape(current); else executeNeighbor(current.pos, current.neighborState, current.snapshot);
             }
             ++statistics.updates;
         }
@@ -102,12 +287,29 @@ void Simulator::enqueue(Update update) {
         breakRequested = true; faulted = true; throw;
     }
 }
-void Simulator::updateNeighbors(BlockPos p, int skip, StateId source) { Update u{UpdateKind::multi, p}; u.skip = skip; u.neighborState = source == UINT32_MAX ? world.get(p) : source; enqueue(u); }
+void Simulator::updateNeighbors(BlockPos p, int skip, StateId source) {
+    Update u{UpdateKind::multi, p}; u.skip = skip; u.neighborState = source == UINT32_MAX ? world.get(p) : source;
+    // 原版构造 MultiNeighborUpdate 时就跳过首个被排除的方向。
+    if (static_cast<int>(updateOrder[0]) == skip) u.index = 1;
+    enqueue(u);
+}
 void Simulator::neighborChanged(BlockPos p, StateId source) { Update u{UpdateKind::neighbor, p}; u.neighborState = source; enqueue(u); }
-void Simulator::notifyFront(BlockPos p, Direction facing) { auto out = p.relative(opposite(facing)); neighborChanged(out, world.get(p)); updateNeighbors(out, static_cast<int>(facing), world.get(p)); }
-void Simulator::notifyAttached(BlockPos p, Direction connected) { updateNeighbors(p); updateNeighbors(p.relative(opposite(connected)), -1, world.get(p)); }
+// 原版 Level.neighborChanged(BlockState, ...) 走 FullNeighborUpdate：入队时就固定目标状态。
+void Simulator::neighborChangedSnapshot(BlockPos p, StateId snapshot, StateId source, bool movedByPiston) {
+    Update u{UpdateKind::neighbor, p}; u.neighborState = source; u.snapshot = snapshot; u.movedByPiston = movedByPiston; enqueue(u);
+}
+void Simulator::notifyFront(BlockPos p, Direction facing, StateId source) {
+    auto out = p.relative(opposite(facing)); auto block = source == UINT32_MAX ? world.get(p) : source;
+    neighborChanged(out, block); updateNeighbors(out, static_cast<int>(facing), block);
+}
+void Simulator::notifyAttached(BlockPos p, Direction connected, StateId source) {
+    auto block = source == UINT32_MAX ? world.get(p) : source;
+    updateNeighbors(p, -1, block); updateNeighbors(p.relative(opposite(connected)), -1, block);
+}
 void Simulator::setBlock(BlockPos p, StateId id, unsigned flags, int depth) {
     if (faulted) throw std::runtime_error("当前执行已中止，请撤销、加载快照或新建电路");
+    // 原版对未加载区块的写入会先把区块加载进来；本项目不做自动加载，明确报错而不是静默成功。
+    if (!chunkStates.empty() && !chunkLoaded(p)) throw std::invalid_argument("不能修改未加载区块内的方块");
     const auto old = world.get(p);
     if (old == id) return;
     const auto& state = registry[id]; const auto& oldState = registry[old];
@@ -117,7 +319,11 @@ void Simulator::setBlock(BlockPos p, StateId id, unsigned flags, int depth) {
         if(oldState.device==Device::bell && runtime.contains(p) && runtime.at(p).values.contains("bellGeneration"))scheduledKeys.erase({p,oldState.type,2,runtime.at(p).values.at("bellGeneration")});
         if(oldState.device==Device::jukebox)removeJukebox(p,oldState.type);
         if(isSensor(oldState.device)) removeSensor(p,oldState.type);
-        if (!(oldState.device==Device::container && state.device==Device::container && isCopperChest(old) && isCopperChest(id))) runtime.erase(p);
+        if (!(oldState.device==Device::container && state.device==Device::container && isCopperChest(old) && isCopperChest(id))) {
+            runtime.erase(p);
+            entityCells.erase(p);
+            cartCells.erase(p);
+        }
         scheduledKeys.erase({p, oldState.type, 3, 0});
         if (auto motion = motions.find(p); motion != motions.end()) {
             scheduledKeys.erase({p, oldState.type, 2, motion->second.generation});
@@ -130,7 +336,8 @@ void Simulator::setBlock(BlockPos p, StateId id, unsigned flags, int depth) {
         }
         entityOrders.erase(p);
     }
-    if ((oldState.type != state.type || isRail(state.device)) && (flags & 1u) != 0 && (flags & 64u) == 0) onRemove(p, old);
+    // 原版在 movedByPiston 为真时仍然调用，由各方块自行决定是否跳过。
+    if ((oldState.type != state.type || isRail(state.device)) && ((flags & 1u) != 0 || (flags & 64u) != 0)) onRemove(p, old, (flags & 64u) != 0);
     if(oldState.type!=state.type && isSensor(state.device))startSensor(p);
     if(oldState.type!=state.type && state.device==Device::bell)registerEntity(p);
     if(oldState.type!=state.type && state.device==Device::jukebox)startJukebox(p);
@@ -145,6 +352,7 @@ void Simulator::setBlock(BlockPos p, StateId id, unsigned flags, int depth) {
         indirectShapes(p, id, nextFlags, depth - 1);
     }
     if (!hoppers.empty()) wakeHoppers(p);
+    wakeCartHoppers(p);
     if (state.device == Device::button && at(p).device == Device::button && !at(p).powered) {
         auto contact = runtime.find(p);
         const auto& name = registry.type(world.get(p)).name;
@@ -198,7 +406,14 @@ void Simulator::place(BlockPos p, StateId id) {
     if ((registry[id].device == Device::trapdoor || registry[id].device == Device::fenceGate) && at(p).type != registry[id].type) {
         bool powered = bestSignal(p) > 0;
         id = registry.withBool(registry.withBool(id, "powered", powered), "open", powered);
+        // 原版 FenceGateBlock.getStateForPlacement 按垂直于朝向的两侧是否是墙决定 IN_WALL。
+        if (registry[id].device == Device::fenceGate) {
+            const auto side = clockWise(registry[id].facing);
+            id = registry.withBool(id, "in_wall", registry.type(world.get(p.relative(side))).wall || registry.type(world.get(p.relative(opposite(side)))).wall);
+        }
     }
+    // 原版 StairBlock.getStateForPlacement 在放置时就算出连接形状。
+    if (registry.type(id).stairs) id = stairsShape(p, id);
     if (registry[id].device == Device::container && at(p).type != registry[id].type) id = placedChest(p, id);
     if (registry[id].device == Device::lamp) id = registry.withBool(id, "lit", bestSignal(p) != 0);
     setBlock(p, id);
@@ -209,7 +424,7 @@ void Simulator::onPlace(BlockPos p, StateId id, StateId old) {
     const auto& s = registry[id];
     if(s.device==Device::composter && s.staticAnalog==7)schedule(p,20);
     if (isDiode(s.device)) { notifyFront(p, s.facing); return; }
-    if (s.device == Device::torch || s.device == Device::wallTorch) { for (auto d : directions) updateNeighbors(p.relative(d)); return; }
+    if (s.device == Device::torch || s.device == Device::wallTorch) { for (auto d : directions) updateNeighbors(p.relative(d), -1, id); return; }
     if (registry[old].type == s.type) return;
     switch (s.device) {
     case Device::jukebox: startJukebox(p);break;
@@ -217,8 +432,10 @@ void Simulator::onPlace(BlockPos p, StateId id, StateId old) {
     case Device::sculkSensor: case Device::calibratedSensor:
         startSensor(p);if(s.power && !hasScheduled(p))setBlock(p,registry.with(id,"power",0),18);break;
     case Device::target: if (s.power && !hasScheduled(p)) setBlock(p, registry.with(id, "power", 0), 18); break;
-    case Device::wire: updateWire(p, id); updateNeighbors(p.relative(Direction::up)); updateNeighbors(p.relative(Direction::down)); wireCorners(p); break;
+    case Device::wire: updateWire(p, id); updateNeighbors(p.relative(Direction::up), -1, id); updateNeighbors(p.relative(Direction::down), -1, id); wireCorners(p); break;
     case Device::observer: if (s.powered && !hasScheduled(p)) { setBlock(p, registry.withBool(id, "powered", false), 18); notifyFront(p, s.facing); } break;
+    // 原版 LightningRodBlock.onPlace 会为仍处于供电状态的避雷针补排 8 gt 的熄灭刻。
+    case Device::lightningRod: if (s.powered && !hasScheduled(p)) schedule(p, 8); break;
     case Device::bulb: executeNeighbor(p); break;
     case Device::daylight: schedulePhase(p, currentTick + 20 - currentTick % 20, 2, 0); break;
     case Device::hopper: executeNeighbor(p); startHopper(p); break;
@@ -231,24 +448,27 @@ void Simulator::onPlace(BlockPos p, StateId id, StateId old) {
     default: break;
     }
 }
-void Simulator::onRemove(BlockPos p, StateId old) {
+void Simulator::onRemove(BlockPos p, StateId old, bool movedByPiston) {
     const auto& s = registry[old];
+    // 原版只有下列方块在 affectNeighborsAfterRemoval 里检查 movedByPiston 并跳过；
+    // 侦测器、避雷针、讲台、容器、活塞头等不检查，被活塞移动时同样发出通知。
     switch (s.device) {
     case Device::sculkSensor: case Device::calibratedSensor:
         if(registry.property(old,"sculk_sensor_phase")=="active") {updateNeighbors(p,-1,old);updateNeighbors(p.relative(Direction::down),-1,old);}break;
-    case Device::wire: for (auto d : directions) updateNeighbors(p.relative(d)); updateWire(p, old); wireCorners(p); break;
-    case Device::torch: case Device::wallTorch: for (auto d : directions) updateNeighbors(p.relative(d)); break;
-    case Device::lever: case Device::button: if (s.powered) notifyAttached(p, s.connectedDirection); break;
-    case Device::repeater: case Device::comparator: notifyFront(p, s.facing); break;
-    case Device::observer: if (s.powered) notifyFront(p, s.facing); break;
-    case Device::pressurePlate: case Device::weightedPlate: if (s.powered || s.power > 0) { updateNeighbors(p, -1, old); updateNeighbors(p.relative(Direction::down), -1, old); } break;
+    case Device::wire: if (movedByPiston) break; for (auto d : directions) updateNeighbors(p.relative(d), -1, old); updateWire(p, old); wireCorners(p); break;
+    case Device::torch: case Device::wallTorch: if (movedByPiston) break; for (auto d : directions) updateNeighbors(p.relative(d), -1, old); break;
+    case Device::lever: case Device::button: if (!movedByPiston && s.powered) notifyAttached(p, s.connectedDirection, old); break;
+    case Device::repeater: case Device::comparator: if (!movedByPiston) notifyFront(p, s.facing, old); break;
+    // 原版还要求 hasScheduledTick，且必须按被移除的旧类型查询：此时世界上已经是新方块。
+    case Device::observer: if (s.powered && blockTicks.hasScheduled(p, s.type)) notifyFront(p, s.facing, old); break;
+    case Device::pressurePlate: case Device::weightedPlate: if (!movedByPiston && (s.powered || s.power > 0)) { updateNeighbors(p, -1, old); updateNeighbors(p.relative(Direction::down), -1, old); } break;
     case Device::lightningRod: if (s.powered) updateNeighbors(p.relative(opposite(s.facing)), -1, old); break;
     case Device::lectern: if (s.powered) updateNeighbors(p.relative(Direction::down), -1, old); break;
     case Device::container: case Device::hopper: case Device::dropper: updateComparatorNeighbors(p); break;
     case Device::analog: if(isBookshelf(old) || isDecoratedPot(old)) updateComparatorNeighbors(p); break;
-    case Device::rail: case Device::poweredRail: case Device::activatorRail: case Device::detectorRail: removeRail(p, old); break;
-    case Device::tripwire: updateTripwireSource(p, registry.withBool(old, "powered", true)); break;
-    case Device::tripwireHook: removeTripwireHook(p, old); break;
+    case Device::rail: case Device::poweredRail: case Device::activatorRail: case Device::detectorRail: if (!movedByPiston) removeRail(p, old); break;
+    case Device::tripwire: if (!movedByPiston) updateTripwireSource(p, registry.withBool(old, "powered", true)); break;
+    case Device::tripwireHook: if (!movedByPiston) removeTripwireHook(p, old); break;
     case Device::pistonHead: { auto base = p.relative(opposite(s.facing)); if (at(base).device == Device::piston && at(base).extended && at(base).facing == s.facing) setBlock(base, 0); break; }
     default: break;
     }
@@ -284,6 +504,29 @@ StateId Simulator::wireConnections(BlockPos p, StateId id) const {
     for (std::size_t i = 0; i < 4; ++i) id = registry.with(id, directionNames[static_cast<unsigned>(horizontal[i])], std::string(sides[i] == 2 ? "up" : sides[i] == 1 ? "side" : "none"));
     return id;
 }
+// 对应原版 StairBlock.getStairsShape：先看朝向前方的楼梯给出外角，再看背后的楼梯给出内角。
+StateId Simulator::stairsShape(BlockPos p, StateId id) const {
+    const auto facing = registry[id].facing;
+    const auto half = registry.property(id, "half");
+    auto isStairs = [&](StateId other) { return registry.type(other).stairs; };
+    auto canTakeShape = [&](Direction neighbor) {
+        const auto other = world.get(p.relative(neighbor));
+        return !isStairs(other) || registry[other].facing != facing || registry.property(other, "half") != half;
+    };
+    const auto behind = world.get(p.relative(facing));
+    if (isStairs(behind) && registry.property(behind, "half") == half) {
+        const auto behindFacing = registry[behind].facing;
+        if (axis(behindFacing) != axis(facing) && canTakeShape(opposite(behindFacing)))
+            return registry.with(id, "shape", std::string(behindFacing == counterClockWise(facing) ? "outer_left" : "outer_right"));
+    }
+    const auto front = world.get(p.relative(opposite(facing)));
+    if (isStairs(front) && registry.property(front, "half") == half) {
+        const auto frontFacing = registry[front].facing;
+        if (axis(frontFacing) != axis(facing) && canTakeShape(frontFacing))
+            return registry.with(id, "shape", std::string(frontFacing == counterClockWise(facing) ? "inner_left" : "inner_right"));
+    }
+    return registry.with(id, "shape", std::string("straight"));
+}
 void Simulator::updateWire(BlockPos p, StateId id) {
     int power = bestSignal(p, false), neighborPower = 0;
     if (power < 15) for (auto d : horizontal) {
@@ -300,10 +543,11 @@ void Simulator::updateWire(BlockPos p, StateId id) {
     // Java 26.2's seven-entry HashSet iteration affects locational redstone.
     std::array<BlockPos, 7> affected{p}; for (std::size_t i = 0; i < 6; ++i) affected[i + 1] = p.relative(directions[i]);
     std::stable_sort(affected.begin(), affected.end(), [](BlockPos a, BlockPos b) { return javaPosBucket(a) < javaPosBucket(b); });
-    for (auto q : affected) updateNeighbors(q);
+    // 原版把红石粉方块本身作为 sourceBlock 传给集合里每个位置的通知。
+    for (auto q : affected) updateNeighbors(q, -1, id);
 }
 void Simulator::wireCorners(BlockPos p) {
-    auto check = [&](BlockPos q) { if (at(q).device == Device::wire) { updateNeighbors(q); for (auto d : directions) updateNeighbors(q.relative(d)); } };
+    auto check = [&](BlockPos q) { if (at(q).device == Device::wire) { const auto wire = world.get(q); updateNeighbors(q, -1, wire); for (auto d : directions) updateNeighbors(q.relative(d), -1, wire); } };
     for (auto d : horizontal) check(p.relative(d));
     for (auto d : horizontal) { auto q = p.relative(d); check(q.relative(at(q).conductor ? Direction::up : Direction::down)); }
 }
@@ -318,40 +562,73 @@ void Simulator::indirectShapes(BlockPos p, StateId id, unsigned flags, int depth
         }
     }
 }
+// 原版 BlockBehaviour.updateShape 的纯状态形式：只返回新状态，副作用限于原版同样会做的排刻。
+// 钟和箱子带方块实体、不可被活塞移动，仍由 executeShape 用各自的辅助函数处理。
+// 支撑丢失并不是所有方向的形状更新都检查：26.2 每个方块类在 updateShape 里
+// 各自写死了检查哪一个方向。地毯是唯一没有方向条件的（CarpetBlock 直接判 canSurvive）。
+bool Simulator::supportChecked(StateId id, Direction direction) const {
+    const auto& s = registry[id];
+    switch (s.device) {
+    case Device::wire: case Device::repeater: case Device::comparator: case Device::torch:
+    case Device::pressurePlate: case Device::weightedPlate:
+        return direction == Direction::down;
+    case Device::wallTorch: case Device::pistonHead: case Device::tripwireHook:
+        return direction == opposite(s.facing);
+    case Device::lever: case Device::button:
+        return direction == opposite(s.connectedDirection);
+    case Device::door:
+        return registry.property(id, "half") == "lower" && direction == Direction::down;
+    case Device::solid:
+        return registry.type(id).className == "WoolCarpetBlock";
+    default:
+        // 钟由 updateBellShape 单独处理；其余器件的 survives 恒为真。
+        return false;
+    }
+}
+StateId Simulator::shapeUpdated(BlockPos p, StateId id, Direction direction, StateId neighborState) {
+    const auto& s = registry[id];
+    if (s.device == Device::noteBlock) return axis(direction) == 0 ? noteInstrument(p, id) : id;
+    if (isRail(s.device)) return id; // Rail support is checked by neighborChanged.
+    if (s.device == Device::tripwireHook) return opposite(direction) == s.facing && !survives(p, id) ? 0 : id;
+    if (s.device == Device::tripwire)
+        return axis(direction) != 0 ? registry.withBool(id, directionNames[static_cast<unsigned>(direction)], connectsTripwire(neighborState, direction)) : id;
+    if (s.device == Device::door && axis(direction) == 0 && ((registry.property(id, "half") == "lower") == (direction == Direction::up))) {
+        bool fits = registry[neighborState].device == Device::door && registry.property(neighborState, "half") != registry.property(id, "half");
+        return fits ? registry.with(neighborState, "half", registry.property(id, "half")) : 0;
+    }
+    // 原版只在水平方向的形状更新里重算楼梯 SHAPE，竖直方向落到基类的空实现。
+    if (registry.type(id).stairs) return axis(direction) != 0 ? stairsShape(p, id) : id;
+    // 原版 FenceGateBlock：垂直于朝向的那条轴上的形状更新会重算 IN_WALL。
+    if (s.device == Device::fenceGate && axis(direction) == axis(clockWise(s.facing)))
+        return registry.withBool(id, "in_wall", registry.type(neighborState).wall || registry.type(world.get(p.relative(opposite(direction)))).wall);
+    if (supportChecked(id, direction) && !survives(p, id)) return 0;
+    if (s.device == Device::observer && direction == s.facing && !s.powered && !blockTicks.hasScheduled(p, s.type)) schedule(p, 2, 0, s.type);
+    // 原版只比较轴：Y 轴与水平朝向轴必然不同，因此竖直形状更新同样刷新 LOCKED。
+    if (s.device == Device::repeater && axis(direction) != axis(s.facing)) return registry.withBool(id, "locked", diodeSideInput(p) > 0);
+    if (s.device == Device::wire && direction != Direction::down) {
+        StateId next = id;
+        if (direction == Direction::up) next = wireConnections(p, id);
+        else {
+            auto side = wireSide(p, direction); auto index = sideIndex(direction);
+            const bool cross = std::all_of(s.wireSides.begin(), s.wireSides.end(), [](auto value) { return value != 0; });
+            if ((side != 0) == (s.wireSides[index] != 0) && !cross) next = registry.with(id, directionNames[static_cast<unsigned>(direction)], std::string(side == 2 ? "up" : side == 1 ? "side" : "none"));
+            else { for (auto d : horizontal) next = registry.with(next, directionNames[static_cast<unsigned>(d)], std::string("side")); next = wireConnections(p, next); }
+        }
+        return next;
+    }
+    return id;
+}
+// 原版 Block.updateFromNeighbourShapes：按形状更新顺序折叠六次 updateShape，中途不写世界。
+StateId Simulator::updateFromNeighborShapes(BlockPos p, StateId id) {
+    for (auto d : shapeOrder) id = shapeUpdated(p, id, d, world.get(p.relative(d)));
+    return id;
+}
 void Simulator::executeShape(const Update& u) {
     auto id = world.get(u.pos); const auto& s = registry[id];
-    if(s.device==Device::bell){updateBellShape(u);return;}
-    if(s.device==Device::noteBlock && axis(u.direction)==0) {setBlock(u.pos,noteInstrument(u.pos,id),u.flags,u.depth);return;}
-    if (isRail(s.device)) return; // Rail support is checked by neighborChanged.
-    if (s.device == Device::tripwireHook) {
-        if (opposite(u.direction) == s.facing && !survives(u.pos, id)) setBlock(u.pos, 0, 3, u.depth);
-        return;
-    }
-    if (s.device == Device::tripwire) {
-        if (axis(u.direction) != 0) setBlock(u.pos, registry.withBool(id, directionNames[static_cast<unsigned>(u.direction)], connectsTripwire(u.neighborState, u.direction)), u.flags, u.depth);
-        return;
-    }
-    if (s.device == Device::door && axis(u.direction) == 0 && ((registry.property(id, "half") == "lower") == (u.direction == Direction::up))) {
-        bool fits = registry[u.neighborState].device == Device::door && registry.property(u.neighborState, "half") != registry.property(id, "half");
-        auto next = fits ? registry.with(u.neighborState, "half", registry.property(id, "half")) : 0;
-        setBlock(u.pos, next, next == 0 ? 3 : u.flags, u.depth);
-        return;
-    }
+    if (s.device == Device::bell) { updateBellShape(u); return; }
     if (s.device == Device::container && registry.has(id, "type")) { updateChestShape(u); return; }
-    if (!survives(u.pos, id)) { setBlock(u.pos, 0, 3, u.depth); return; }
-    if (s.device == Device::observer && u.direction == s.facing && !s.powered && !hasScheduled(u.pos)) schedule(u.pos, 2);
-    if (s.device == Device::repeater && axis(u.direction) != 0 && axis(u.direction) != axis(s.facing)) setBlock(u.pos, registry.withBool(id, "locked", diodeSideInput(u.pos) > 0), u.flags, u.depth);
-    if (s.device == Device::wire && u.direction != Direction::down) {
-        StateId next = id;
-        if (u.direction == Direction::up) next = wireConnections(u.pos, id);
-        else {
-            auto side = wireSide(u.pos, u.direction); auto index = sideIndex(u.direction);
-            const bool cross = std::all_of(s.wireSides.begin(), s.wireSides.end(), [](auto value) { return value != 0; });
-            if ((side != 0) == (s.wireSides[index] != 0) && !cross) next = registry.with(id, directionNames[static_cast<unsigned>(u.direction)], std::string(side == 2 ? "up" : side == 1 ? "side" : "none"));
-            else { for (auto d : horizontal) next = registry.with(next, directionNames[static_cast<unsigned>(d)], std::string("side")); next = wireConnections(u.pos, next); }
-        }
-        setBlock(u.pos, next, u.flags, u.depth);
-    }
+    auto next = shapeUpdated(u.pos, id, u.direction, u.neighborState);
+    if (next != id) setBlock(u.pos, next, next == 0 ? 3 : u.flags, u.depth);
 }
 int Simulator::diodeInput(BlockPos p) const { auto d = at(p).facing; auto q = p.relative(d); return std::max(signal(q, d), at(q).device == Device::wire ? static_cast<int>(at(q).power) : 0); }
 int Simulator::diodeSideInput(BlockPos p) const {
@@ -369,7 +646,14 @@ bool Simulator::torchInput(BlockPos p) const { const auto& s = at(p); auto d = s
 int Simulator::comparatorInput(BlockPos p) const {
     auto d = at(p).facing; auto q = p.relative(d); int input = diodeInput(p);
     if (at(q).analogSource) return analogOutput(q);
-    if (input < 15 && at(q).conductor && at(q.relative(d)).analogSource) return analogOutput(q.relative(d));
+    if (input < 15 && at(q).conductor) {
+        // 原版取展示框读数与第二格模拟量的较大者；两者都不存在时保留直接输入。
+        const auto far = q.relative(d);
+        int best = std::numeric_limits<int>::min();
+        if (auto frame = itemFrameSignal(q, d)) best = *frame;
+        if (at(far).analogSource) best = std::max(best, analogOutput(far));
+        if (best != std::numeric_limits<int>::min()) return best;
+    }
     return input;
 }
 void Simulator::refreshComparator(BlockPos p) {
@@ -382,8 +666,9 @@ void Simulator::refreshComparator(BlockPos p) {
         ++sequence; sampleAffected(p); changes[p] = world.get(p); notifyFront(p, s.facing);
     }
 }
-void Simulator::executeNeighbor(BlockPos p, StateId source) {
-    const auto id = world.get(p);
+void Simulator::executeNeighbor(BlockPos p, StateId source, StateId snapshot) {
+    // 快照形式使用入队时记下的状态；简单形式在这里才读世界。
+    const auto id = snapshot == noSnapshot ? world.get(p) : snapshot;
     // These classes have no neighborChanged behavior. Their shape updates
     // still run separately, and enqueue still counts every notification.
     // Keep this common path outside the large reactive handler's stack frame.
@@ -395,6 +680,16 @@ void Simulator::executeNeighbor(BlockPos p, StateId source) {
 }
 void Simulator::executeReactiveNeighbor(BlockPos p, StateId id, StateId source) {
     const auto& s = registry[id];
+    // DiodeBlock.neighborChanged first checks the live block identity, even
+    // when FullNeighborUpdate supplies an older state of that block.
+    if (isDiode(s.device) && at(p).type != s.type) return;
+    if (isDiode(s.device) && !survives(p, id)) {
+        // 原版 DiodeBlock.neighborChanged 在邻居通知阶段就掉落并移除二极管，
+        // 随后对六个邻居各发一次 updateNeighborsAt(pos.relative(d), this)。
+        setBlock(p, 0, 3);
+        for (auto d : directions) updateNeighbors(p.relative(d), -1, id);
+        return;
+    }
     switch (s.device) {
     case Device::dropper: {
         bool powered = bestSignal(p) > 0 || bestSignal(p.relative(Direction::up)) > 0;
@@ -433,8 +728,10 @@ void Simulator::executeReactiveNeighbor(BlockPos p, StateId id, StateId source) 
     case Device::bell: {bool powered=bestSignal(p)>0;if(powered!=s.powered){if(powered)ringBell(p,s.facing);setBlock(p,registry.withBool(id,"powered",powered));}break;}
     case Device::noteBlock: {bool powered=bestSignal(p)>0;if(powered!=s.powered){if(powered)playNote(p,id);setBlock(p,registry.withBool(id,"powered",powered));}break;}
     case Device::piston: checkPiston(p); break;
-    case Device::pistonHead: if (survives(p, id)) neighborChanged(p.relative(opposite(s.facing))); break;
-    case Device::rail: case Device::poweredRail: case Device::activatorRail: case Device::detectorRail: updateRail(p, source); break;
+    // 原版 PistonHeadBlock.neighborChanged 把**收到的来源方块**原样转发给活塞本体，
+    // 不是用空气或活塞头自己。
+    case Device::pistonHead: if (survives(p, id)) neighborChanged(p.relative(opposite(s.facing)), source); break;
+    case Device::rail: case Device::poweredRail: case Device::activatorRail: case Device::detectorRail: updateRail(p, id, source); break;
     case Device::hopper: {
         bool enabled = bestSignal(p) == 0;
         if ((registry.property(id, "enabled") == "true") != enabled) setBlock(p, registry.withBool(id, "enabled", enabled), 2);
@@ -443,11 +740,11 @@ void Simulator::executeReactiveNeighbor(BlockPos p, StateId id, StateId source) 
     default: break;
     }
 }
-void Simulator::schedule(BlockPos p, Tick delay, int priority) {
-    auto type = at(p).type;
+void Simulator::schedule(BlockPos p, Tick delay, int priority, std::uint16_t type) {
+    auto blockType = type == 0xFFFFu ? at(p).type : type;
     if (delay > std::numeric_limits<Tick>::max() - currentTick) throw std::invalid_argument("计划时间超出范围");
     // Vanilla allocates subTickOrder even when the chunk rejects a duplicate.
-    blockTicks.schedule({currentTick + delay, priority, nextOrder++, p, type});
+    blockTicks.schedule({currentTick + delay, priority, nextOrder++, p, blockType});
 }
 bool Simulator::hasScheduled(BlockPos p) const { return blockTicks.hasScheduled(p, at(p).type); }
 void Simulator::executeTick(const ScheduledEvent& event) {
@@ -501,24 +798,56 @@ bool Simulator::stepEvent() {
     pruneEvents();
     if (pendingEvents() == 0 || breakRequested) return false;
     ScheduledEvent event;
-    auto nextBlockTick = blockTicks.nextTick();
+    const auto tickable = blockTickCheck();
+    auto nextBlockTick = blockTicks.nextTick(tickable);
+    // 只剩下不可 ticking 区块里的计划刻时没有任何可执行事件，直接停在这里而不是空转。
+    if (!nextBlockTick && scheduled.empty()) return false;
     if (nextBlockTick && (scheduled.empty() || *nextBlockTick <= scheduled.top().tick)) {
-        if (!blockTicks.hasBatch()) blockTicks.collect(std::max(currentTick, *nextBlockTick));
+        if (!blockTicks.hasBatch()) blockTicks.collect(std::max(currentTick, *nextBlockTick), tickable);
         currentTick = blockTicks.batchTick();
         event = blockTicks.pop();
     } else {
         event = scheduled.top(); scheduled.pop(); scheduledKeys.erase({event.pos, event.type, event.phase, event.data});
         currentTick = std::max(currentTick, event.tick);
-        blockTicks.finishThrough(currentTick);
+        blockTicks.finishThrough(currentTick, tickable);
+    }
+    // 原版 runBlockEvents 在区块不可 ticking 时把方块事件**改排到下一刻**而不是丢弃；
+    // 方块实体与实体阶段则等区块恢复后照常执行。两者都不是「丢事件继续」。
+    if (!chunkStates.empty() && event.phase != 0) {
+        // LevelChunk.isTicking: BLOCK_TICKING + 已加载实体数据即可执行方块实体。
+        // 显式区块输入假定实体数据已加载；只有实体接触阶段要求 ENTITY_TICKING。
+        const bool needsEntities = event.phase == 3;
+        if (needsEntities ? !chunkEntityTicking(event.pos) : !chunkBlockTicking(event.pos)) {
+            // 还有别的事件可跑时逐刻顺延，对应原版 runBlockEvents 的重排；
+            // 剩下的全都停摆时就放回**当前刻**并停下，避免逐刻空转，
+            // 由调用方的空闲推进直接跳到目标刻。事件永远不会落到过去。
+            const bool anyRunnable = runnable();
+            auto deferred = event; deferred.tick = anyRunnable ? currentTick + 1 : currentTick;
+            // 方块实体的唤醒时刻要跟着走，否则快照校验会看到队列与状态不一致。
+            if (event.phase == 2) {
+                if (auto found = hoppers.find(event.pos); found != hoppers.end() && found->second.generation == event.data) found->second.wakeAt = deferred.tick;
+                if (auto found = jukeboxes.find(event.pos); found != jukeboxes.end() && found->second.generation == event.data) found->second.wakeAt = deferred.tick;
+                if (auto found = sensors.find(event.pos); found != sensors.end() && found->second.generation == event.data) found->second.wakeAt = deferred.tick;
+            }
+            scheduled.push(deferred);
+            scheduledKeys.insert({deferred.pos, deferred.type, deferred.phase, deferred.data});
+            return anyRunnable;
+        }
     }
     ++sequence;
     currentPhase = event.phase;
     currentEntityOrder = event.entityOrder;
     try {
-        if (at(event.pos).type == event.type) {
+        // 漏斗矿车的吸取事件挂在「矿车所在的那一格」上，那一格的方块与事件无关，
+        // 因此不做 at(pos).type 校验；事件记录的类型固定是 0。
+        if (event.phase == 3 && event.data == cartSuctionEvent) {
+            tickCartHoppers(event.pos);
+            ++statistics.scheduledEvents;
+        } else if (at(event.pos).type == event.type) {
             if (event.phase == 1) {if(at(event.pos).device==Device::noteBlock)noteEvent(event.pos);else if(at(event.pos).device==Device::bell)bellEvent(event);else pistonEvent(event);}
             else if (event.phase == 3) {
                 if (at(event.pos).device == Device::button) buttonContact(event.pos);
+                else if (at(event.pos).device == Device::hopper) hopperEntityContact(event.pos);
                 else tripwireContact(event.pos);
             }
             else if (event.phase == 2) {
@@ -537,7 +866,7 @@ bool Simulator::stepEvent() {
 }
 Tick Simulator::nextTick() {
     pruneEvents();
-    auto blockTick = blockTicks.nextTick();
+    auto blockTick = blockTicks.nextTick(blockTickCheck());
     if (scheduled.empty()) return blockTick.value_or(currentTick);
     return std::max(currentTick, blockTick ? std::min(*blockTick, scheduled.top().tick) : scheduled.top().tick);
 }
@@ -563,13 +892,16 @@ std::size_t Simulator::advance(Tick target, std::size_t eventBudget, std::chrono
     pruneEvents();
     while (pendingEvents() != 0 && nextTick() <= target && !breakRequested && count < eventBudget) {
         if ((count & 63u) == 0 && std::chrono::steady_clock::now() - start >= wallBudget) break;
-        stepEvent(); ++count; pruneEvents();
+        if (!stepEvent()) break;
+        ++count; pruneEvents();
     }
-    if (fillIdle && !breakRequested && (pendingEvents() == 0 || nextTick() > target)) { currentTick = target; blockTicks.finishThrough(target); }
+    // 只剩不可 ticking 区块里的事件时同样属于「本刻无事可做」，时间照常推进。
+    const bool idle = pendingEvents() == 0 || nextTick() > target || !runnable();
+    if (fillIdle && !breakRequested && idle) { currentTick = target; blockTicks.finishThrough(target, blockTickCheck()); }
     statistics.simulationMicros += static_cast<std::uint64_t>(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - start).count());
     return count;
 }
-void Simulator::interact(BlockPos p) {
+void Simulator::interact(BlockPos p, std::optional<Direction> playerFacing) {
     if (faulted) throw std::runtime_error("当前执行已中止，请从有效快照恢复");
     auto id = world.get(p); const auto& s = registry[id];
     switch (s.device) {
@@ -582,16 +914,30 @@ void Simulator::interact(BlockPos p) {
     case Device::wire: {
         bool dot = std::all_of(s.wireSides.begin(), s.wireSides.end(), [](auto x) { return x == 0; });
         bool cross = std::all_of(s.wireSides.begin(), s.wireSides.end(), [](auto x) { return x != 0; });
-        if (dot || cross) { auto next = id; for (auto d : horizontal) next = registry.with(next, directionNames[static_cast<unsigned>(d)], std::string(dot ? "side" : "none")); setBlock(p, wireConnections(p, next)); for (auto d : horizontal) if (at(p.relative(d)).conductor) updateNeighbors(p.relative(d), static_cast<int>(opposite(d))); }
+        if (dot || cross) {
+            auto base = id;
+            for (auto d : horizontal) base = registry.with(base, directionNames[static_cast<unsigned>(d)], std::string(dot ? "side" : "none"));
+            const auto next = wireConnections(p, base);
+            // 原版在新旧状态相同时直接 PASS，且只通知“连接性确实变化”且邻居是导体的方向。
+            if (next != id) {
+                setBlock(p, next);
+                for (auto d : horizontal) {
+                    const auto index = sideIndex(d);
+                    if ((registry[id].wireSides[index] != 0) != (registry[next].wireSides[index] != 0) && at(p.relative(d)).conductor)
+                        updateNeighbors(p.relative(d), static_cast<int>(opposite(d)), next);
+                }
+            }
+        }
         break;
     }
-    default: if (!interactDevice(p)) throw std::invalid_argument("该器件没有直接点击操作；请编辑属性或使用环境刺激");
+    default: if (!interactDevice(p, playerFacing)) throw std::invalid_argument("该器件没有直接点击操作；请编辑属性或使用环境刺激");
     }
 }
 void Simulator::stimulate(BlockPos p, const Json& input) {
     if (faulted) throw std::runtime_error("当前执行已中止，请从有效快照恢复");
     if(input.contains("gameEvent")) {stimulateVibration(p,input);return;}
     if (!input.is_object())throw std::invalid_argument("环境输入必须是对象");
+    if (input.contains("itemFrames")) { stimulateItemFrames(p, input); return; }
     if(stimulateNote(p,input) || stimulateBell(p,input))return;
     if (stimulateDevice(p, input)) return;
     throw std::invalid_argument("该器件尚不支持这类环境刺激");
@@ -601,8 +947,9 @@ void Simulator::clear() {
     environmentActions.clear(); pendingActionIds.clear(); nextActionId = 1; actionsDropped = 0;
     recentTorchToggles.clear(); torchToggleCounts.clear();
     sensors.clear();sensorSections.clear();jukeboxes.clear();
-    world.clear(); runtime.clear(); motions.clear(); hoppers.clear(); entityOrders.clear(); nextEntityOrder = 0; scheduled = {}; scheduledKeys.clear(); blockTicks = {}; changes.clear(); currentTick = 0; nextOrder = 0; sequence = 0; currentPhase = 4;
+    world.clear(); runtime.clear(); motions.clear(); chunkStates.clear(); hoppers.clear(); cartCells.clear(); entityCells.clear(); entityOrders.clear(); nextEntityOrder = 0; scheduled = {}; scheduledKeys.clear(); blockTicks = {}; changes.clear(); currentTick = 0; nextOrder = 0; sequence = 0; currentPhase = 4;
     probes.clear(); probeDependencies.clear(); nextProbeId = 1; trace.clear(); traceDropped = 0; statistics = {}; breakRequested = false; faulted = false; pauseReason.clear(); ++revision;
+    updateTrace = Json::array(); updateTraceTruncated = false;
     if (retainedTrace) retainedTrace = 0;
 }
 std::vector<Cell> Simulator::takeChanges() { std::vector<Cell> result; result.reserve(changes.size()); for (const auto& [p, id] : changes) result.push_back({p, id}); changes.clear(); return result; }

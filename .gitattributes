@@ -1,0 +1,6 @@
+# 在 WSL 里执行的脚本必须保持 LF。仓库设了 core.autocrlf=true，
+# 检出时会把它们改成 CRLF，于是 `wsl bash foo.sh` 报「command not found」——
+# 行尾的回车被当成命令名的一部分。
+# 这些规则只控制脚本；JSON 证据哈希仍须注明是工作树原始字节还是 Git blob。
+*.sh text eol=lf
+*.py text eol=lf

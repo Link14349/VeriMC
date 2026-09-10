@@ -16,13 +16,16 @@ bool Simulator::pushable(BlockPos pos, Direction movement, bool allowDestroy, Di
     auto id = world.get(pos); const auto& state = registry[id];
     if (id == 0) return true;
     const auto& name = registry.type(id).name;
-    if (name == "minecraft:bedrock" || name == "minecraft:obsidian" || name == "minecraft:crying_obsidian" || name == "minecraft:respawn_anchor" || name == "minecraft:reinforced_deepslate") return false;
+    if (name == "minecraft:obsidian" || name == "minecraft:crying_obsidian" || name == "minecraft:respawn_anchor" || name == "minecraft:reinforced_deepslate") return false;
     if ((movement == Direction::down && pos.y == -64) || (movement == Direction::up && pos.y == 319)) return false;
     if (state.device == Device::piston) { if (state.extended) return false; }
     else {
+        // 原版按 getDestroySpeed()==-1 拒绝，基岩、末地传送门框等由注册表属性决定，不再列举名字。
+        if (state.indestructible) return false;
         if (state.pushReaction == 2) return false;
         if (state.pushReaction == 1) return allowDestroy;
-        if (state.pushReaction == 3 && movement != connection) return false;
+        // PUSH_ONLY 在原版直接返回，不再判断方块实体。
+        if (state.pushReaction == 3) return movement == connection;
     }
     return !state.blockEntity;
 }
@@ -126,9 +129,10 @@ bool Simulator::movePistonBlocks(BlockPos pos, Direction facing, bool extending)
         indirectShapes(cell.pos, cell.state, 2, 512);
         for (auto d : shapeOrder) enqueue({UpdateKind::shape, cell.pos.relative(d), opposite(d), 0});
     }
-    for (const auto& cell : removed) { onRemove(cell.pos, cell.state); indirectShapes(cell.pos, cell.state, 2, 512); updateNeighbors(cell.pos); }
-    for (auto it = originals.rbegin(); it != originals.rend(); ++it) updateNeighbors(it->pos);
-    if (extending) updateNeighbors(arm);
+    // 原版用被破坏/被推走方块的原状态和活塞头作为 sourceBlock，而不是清空后的方块。
+    for (const auto& cell : removed) { onRemove(cell.pos, cell.state); indirectShapes(cell.pos, cell.state, 2, 512); updateNeighbors(cell.pos, -1, cell.state); }
+    for (auto it = originals.rbegin(); it != originals.rend(); ++it) updateNeighbors(it->pos, -1, it->state);
+    if (extending) updateNeighbors(arm, -1, registry.state("piston_head"));
     return true;
 }
 void Simulator::pistonEvent(const ScheduledEvent& event) {
@@ -168,11 +172,12 @@ void Simulator::finishMotion(BlockPos pos, bool force) {
     motions.erase(pos);
     if (at(pos).device != Device::movingPiston) return;
     auto next = force && motion.source ? 0 : motion.movedState;
-    if (next && !survives(pos, next)) next = 0;
-    if (registry[next].device == Device::wire) next = wireConnections(pos, next);
+    // 原版 finalTick 先做完整的 Block.updateFromNeighbourShapes，再决定放置或销毁。
+    if (next) next = updateFromNeighborShapes(pos, next);
     if (next && registry.has(next, "waterlogged")) next = registry.withBool(next, "waterlogged", false);
     if (next == 0 && !force) { setBlock(pos, motion.movedState, 340); setBlock(pos, 0); }
-    else { setBlock(pos, next, force ? 3 : 67); neighborChanged(pos); }
+    // 原版 finalTick 用刚落地的方块作为 sourceBlock。
+    else { setBlock(pos, next, force ? 3 : 67); neighborChanged(pos, world.get(pos)); }
 }
 void Simulator::tickMotion(const ScheduledEvent& event) {
     auto found = motions.find(event.pos); if (found == motions.end() || found->second.generation != event.data) return;

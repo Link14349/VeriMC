@@ -1009,10 +1009,27 @@
   "forceLoadedNeighborhood": true,
   "discardDrops": true,
   "reference": "Minecraft Java 26.2 GameTest, nonexperimental redstone",
+  "referenceEnvironment": {
+    "javaVersion": "25.0.4.1",
+    "randomTickSpeed": 0,
+    "featureFlags": [
+      "minecraft:trade_rebalance",
+      "minecraft:vanilla"
+    ],
+    "dataPacks": [
+      "file/simulator",
+      "minecart_improvements",
+      "redstone_experiments",
+      "trade_rebalance",
+      "vanilla"
+    ],
+    "gameTime": 6,
+    "clockTicks": 6
+  },
   "origin": [
-    -9988743,
+    1820430,
     -58,
-    -14643685
+    -12403104
   ],
   "frames": [
     {

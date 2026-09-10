@@ -63,4 +63,19 @@ for x, cartType, size in [(3, 'minecart', 0), (15, 'chest_minecart', 27), (27, '
     commands.append({'tick': 25 if size else 5, 'pos': pos, 'stimulus': {'carts': []}})
     watch += [pos, [x, 2, 39]]
 
+# 命令方块矿车的比较器读数是它内部命令方块的 successCount，且**优先于**容器矿车。
+# 本项目没有命令解释器，该计数是显式外部输入。
+for x, counts in [(39, [7, 0, 15])]:
+    pos = [x, 2, 38]
+    setBlock(0, pos, 'detector_rail', shape='east_west')
+    setBlock(0, (x, 2, 39), 'comparator', facing='north')
+    watch += [pos, [x, 2, 39]]
+    for index, count in enumerate(counts):
+        # 第三次同时放一辆装满的运输矿车，验证命令方块矿车优先。
+        carts = [{'type': 'command_block_minecart', 'successCount': count}]
+        if index == 2:
+            carts.append({'type': 'chest_minecart', 'inventory': [{'slot': 0, 'item': 'minecraft:stone', 'count': 64}]})
+        commands.append({'tick': 1 + index * 8, 'pos': pos, 'stimulus': {'carts': carts}})
+    commands.append({'tick': 1 + len(counts) * 8, 'pos': pos, 'stimulus': {'carts': []}})
+
 runCapture(commands, watch, endTick=44, fixtureName='java26_2Rails')

@@ -3,6 +3,7 @@
 #include <fstream>
 #include <filesystem>
 #include <algorithm>
+#include <unordered_set>
 
 namespace simulator {
 namespace {
@@ -71,6 +72,13 @@ BlockRegistry::BlockRegistry(const std::string& path) {
         gameEventNames.emplace(row.at("name").get<std::string>(),static_cast<std::uint16_t>(gameEvents.size()));
         gameEvents.push_back({row.at("name"),row.at("radius"),row.at("frequency"),row.at("listenable"),row.at("ignoreSneaking")});
     }
+    std::ifstream tagFile(std::filesystem::path(path).parent_path() / "blockTags.json");
+    if (!tagFile) throw std::runtime_error("找不到方块标签 blockTags.json");
+    const auto tagData = Json::parse(tagFile);
+    if (tagData.at("version") != "26.2") throw std::runtime_error("Block tag registry version mismatch");
+    std::unordered_set<std::string> wallNames, hopperTransparentNames;
+    for (const auto& name : tagData.at("walls")) wallNames.insert(name.get<std::string>());
+    for (const auto& name : tagData.at("does_not_block_hoppers")) hopperTransparentNames.insert(name.get<std::string>());
     const Json data = Json::parse(file);
     std::ifstream noteFile(std::filesystem::path(path).parent_path()/"noteRules.json");
     if(!noteFile)throw std::runtime_error("找不到音符盒规则 noteRules.json");
@@ -83,6 +91,9 @@ BlockRegistry::BlockRegistry(const std::string& path) {
         BlockType typeInfo;
         typeInfo.name = b.at("name"); typeInfo.className = b.at("className");
         typeInfo.defaultState = b.at("defaultState"); typeInfo.firstState = b.at("states")[0].at("id");
+        typeInfo.stairs = b.at("stairs");
+        typeInfo.wall = wallNames.contains(typeInfo.name);
+        typeInfo.doesNotBlockHoppers = hopperTransparentNames.contains(typeInfo.name);
         typeInfo.device = classify(typeInfo.name, typeInfo.className);
         typeInfo.instrument=instrumentId(noteData.at("blocks").at(typeInfo.name));
         for(const auto& name:vibrationData.at("occludes_vibration_signals")) if(name==typeInfo.name) typeInfo.occludesVibrations=true;
@@ -108,6 +119,11 @@ BlockRegistry::BlockRegistry(const std::string& path) {
         if (typeInfo.device == Device::detectorRail) typeInfo.supportLevel = "externalStimulus";
         if (typeInfo.device == Device::tripwire) typeInfo.supportLevel = "externalStimulus";
         if (typeInfo.device == Device::tripwireHook) typeInfo.supportLevel = "implemented";
+        // R14 门禁：发射器/合成器/熔炉只有占位枚举和容量，行为表尚未实现。
+        // 谁想放开 supportLevel，必须先实现分发表、槽位禁用和分面槽位，否则这里立刻失败。
+        if ((typeInfo.device == Device::dispenser || typeInfo.device == Device::crafter || typeInfo.device == Device::furnace)
+            && typeInfo.supportLevel != "unimplemented")
+            throw std::runtime_error("该器件的行为尚未实现，不能标记为可用：" + typeInfo.name);
         auto typeId = static_cast<std::uint16_t>(types.size());
         names.emplace(typeInfo.name, typeId);
         for (const auto& s : b.at("states")) for (const auto& [key, value] : s.at("properties").items()) {
@@ -132,6 +148,7 @@ BlockRegistry::BlockRegistry(const std::string& path) {
             st.weak = s.at("weakSignal").get<decltype(st.weak)>(); st.strong = s.at("strongSignal").get<decltype(st.strong)>();
             auto reaction = s.at("pushReaction").get<std::string>();
             st.pushReaction = reaction == "NORMAL" ? 0 : reaction == "DESTROY" ? 1 : reaction == "BLOCK" ? 2 : reaction == "PUSH_ONLY" ? 3 : 4;
+            st.indestructible = s.at("destroySpeed").get<float>() == -1.0f;
             const auto& p = s.at("properties");
             auto val = [&](const char* key, const char* fallback) { return p.value(key, std::string(fallback)); };
             st.facing = parseDirection(val("facing", "north"));

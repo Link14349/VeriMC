@@ -1,0 +1,1093 @@
+{
+  "schemaVersion": 1,
+  "targetVersion": "26.2",
+  "experimentalRedstone": false,
+  "referenceJarSha256": "183c0499c5f855570ee487dd38e141a53f0121f83a0b07a3bac2d8b6698823e8",
+  "simulatorCommit": "cc6b156",
+  "auditRanReferenceGame": true,
+  "auditRanCtest": true,
+  "evidenceLevels": {
+    "L0": "仅定位",
+    "L1": "本次静态核对",
+    "L2": "已有差分记录",
+    "L3": "主代理实际复跑的具体场景；22 组通过，R6/R7/R10 失败，不代表整类器件等价"
+  },
+  "regions": [
+    {
+      "id": "levelSetBlock",
+      "area": "世界写入与更新框架",
+      "java": [
+        "Level.java:222-268",
+        "LevelChunk.java:296-353",
+        "Block.java:88-102",
+        "Block.java:200-235"
+      ],
+      "cpp": [
+        "src/simulator.cpp:109-154",
+        "src/simulator.cpp:141-146"
+      ],
+      "supportLevel": "implemented",
+      "evidence": "L1",
+      "findings": [
+        "R2"
+      ],
+      "gaps": [
+        "无区块加载卸载",
+        "无 sendBlockUpdated",
+        "无 POI",
+        "无光照"
+      ]
+    },
+    {
+      "id": "neighborUpdater",
+      "area": "邻居更新调度",
+      "java": [
+        "CollectingNeighborUpdater.java:68-180",
+        "NeighborUpdater.java:18-93",
+        "ServerLevel.java:1165-1191"
+      ],
+      "cpp": [
+        "src/simulator.cpp:74-108",
+        "include/simulator/types.hpp:14-15"
+      ],
+      "supportLevel": "implemented",
+      "evidence": "L1",
+      "findings": [
+        "R1",
+        "R11"
+      ],
+      "gaps": [
+        "Block.UPDATE_SKIP_SHAPE_UPDATE_ON_WIRE(128) 未实现；本次未定位到主线调用，不构成完整不可达证明"
+      ]
+    },
+    {
+      "id": "outputSignalNotify",
+      "area": "比较器输出通知",
+      "java": [
+        "Level.java:1004-1020"
+      ],
+      "cpp": [
+        "src/devices.cpp:30-39"
+      ],
+      "supportLevel": "implemented",
+      "evidence": "L1",
+      "findings": [
+        "R13"
+      ],
+      "gaps": []
+    },
+    {
+      "id": "signalRead",
+      "area": "信号读取",
+      "java": [
+        "SignalGetter.java:13-105"
+      ],
+      "cpp": [
+        "src/simulator.cpp:15-39",
+        "src/simulator.cpp:356-366"
+      ],
+      "supportLevel": "implemented",
+      "evidence": "L1",
+      "findings": [],
+      "gaps": [
+        "weak/strong 逐状态值由 tools/reference/ExportReference.java 导出，依赖世界的粉线、比较器、陷阱箱及唱片机等另行处理"
+      ]
+    },
+    {
+      "id": "redstoneWire",
+      "area": "红石粉与默认 evaluator",
+      "java": [
+        "DefaultRedstoneWireEvaluator.java:18-43",
+        "RedstoneWireEvaluator.java:29-47",
+        "RedStoneWireBlock.java:124-524"
+      ],
+      "cpp": [
+        "src/simulator.cpp:256-320",
+        "src/simulator.cpp:344-354",
+        "src/simulator.cpp:582-587"
+      ],
+      "supportLevel": "implemented",
+      "evidence": "L1+L2",
+      "fixtures": [
+        "tests/fixtures/java26_2Redstone.json"
+      ],
+      "findings": [
+        "R1",
+        "R9"
+      ],
+      "gaps": []
+    },
+    {
+      "id": "experimentalWire",
+      "area": "实验性 evaluator",
+      "java": [
+        "ExperimentalRedstoneWireEvaluator.java",
+        "ExperimentalRedstoneUtils.java",
+        "Orientation.java"
+      ],
+      "cpp": [],
+      "supportLevel": "excluded",
+      "evidence": "L0",
+      "findings": [],
+      "gaps": [
+        "目标为非实验版；C++ 完全不建模 Orientation"
+      ]
+    },
+    {
+      "id": "blockTicks",
+      "area": "计划刻",
+      "java": [
+        "ServerLevel.java:353-452",
+        "DiodeBlock.java:88-103"
+      ],
+      "cpp": [
+        "include/simulator/blockTicks.hpp",
+        "src/blockTicks.cpp"
+      ],
+      "supportLevel": "implemented",
+      "evidence": "L2",
+      "fixtures": [
+        "tests/fixtures/java26_2Scheduler.json",
+        "tests/fixtures/java26_2TickBatches.json"
+      ],
+      "findings": [],
+      "gaps": [
+        "无流体刻",
+        "无区块加载卸载导致的容器创建销毁"
+      ]
+    },
+    {
+      "id": "blockEvents",
+      "area": "方块事件与阶段序",
+      "java": [
+        "ServerLevel.java:389-450"
+      ],
+      "cpp": [
+        "include/simulator/blockTicks.hpp:19",
+        "src/simulator.cpp:497-537",
+        "src/pistons.cpp:72-75"
+      ],
+      "supportLevel": "implemented",
+      "evidence": "L1+L2",
+      "findings": [],
+      "gaps": [
+        "仅建模活塞、音符盒、钟三类 triggerEvent"
+      ]
+    },
+    {
+      "id": "repeater",
+      "area": "中继器",
+      "java": [
+        "DiodeBlock.java:53-186",
+        "RepeaterBlock.java:39-90"
+      ],
+      "cpp": [
+        "src/simulator.cpp:356-367",
+        "src/simulator.cpp:408",
+        "src/simulator.cpp:457-463"
+      ],
+      "supportLevel": "implemented",
+      "evidence": "L1+L2",
+      "findings": [
+        "R3",
+        "R5"
+      ],
+      "gaps": []
+    },
+    {
+      "id": "comparator",
+      "area": "比较器",
+      "java": [
+        "ComparatorBlock.java:66-190"
+      ],
+      "cpp": [
+        "src/simulator.cpp:369-384",
+        "src/simulator.cpp:409-414",
+        "src/simulator.cpp:464"
+      ],
+      "supportLevel": "implemented",
+      "evidence": "L1+L2",
+      "findings": [
+        "R3"
+      ],
+      "gaps": [
+        "物品展示框输入未实现",
+        "ComparatorBlock.triggerEvent 未实现"
+      ]
+    },
+    {
+      "id": "torch",
+      "area": "红石火把",
+      "java": [
+        "RedstoneTorchBlock.java:43-150"
+      ],
+      "cpp": [
+        "src/simulator.cpp:407",
+        "src/simulator.cpp:468-484"
+      ],
+      "supportLevel": "implemented",
+      "evidence": "L1+L2",
+      "fixtures": [
+        "tests/fixtures/java26_2Torches.json"
+      ],
+      "findings": [],
+      "gaps": [
+        "RedstoneWallTorchBlock 本次仅定位"
+      ]
+    },
+    {
+      "id": "leverButton",
+      "area": "拉杆与按钮",
+      "java": [
+        "ButtonBlock.java:108-187",
+        "LeverBlock.java",
+        "Blocks.java:1930",
+        "Blocks.java:2724-2733",
+        "Blocks.java:4938"
+      ],
+      "cpp": [
+        "src/simulator.cpp:578-579",
+        "src/devices.cpp:74-95"
+      ],
+      "supportLevel": "externalStimulus",
+      "evidence": "L1+L2",
+      "fixtures": [
+        "tests/fixtures/java26_2Buttons.json"
+      ],
+      "findings": [],
+      "gaps": [
+        "箭矢数量由外部输入提供"
+      ]
+    },
+    {
+      "id": "pressurePlate",
+      "area": "压力板与重量压力板",
+      "java": [
+        "BasePressurePlateBlock.java:75-129",
+        "PressurePlateBlock.java:42-49",
+        "BlockSetType.java:85-111"
+      ],
+      "cpp": [
+        "src/devices.cpp:50-72"
+      ],
+      "supportLevel": "externalStimulus",
+      "evidence": "L1+L2",
+      "fixtures": [
+        "tests/fixtures/java26_2Devices.json"
+      ],
+      "findings": [],
+      "gaps": [
+        "实体占用由外部输入提供"
+      ]
+    },
+    {
+      "id": "observer",
+      "area": "侦测器",
+      "java": [
+        "ObserverBlock.java:50-130"
+      ],
+      "cpp": [
+        "src/simulator.cpp:221",
+        "src/simulator.cpp:243",
+        "src/simulator.cpp:342",
+        "src/simulator.cpp:466"
+      ],
+      "supportLevel": "implemented",
+      "evidence": "L1+L2",
+      "findings": [
+        "R4",
+        "R2"
+      ],
+      "gaps": []
+    },
+    {
+      "id": "lampBulb",
+      "area": "红石灯与铜灯",
+      "java": [
+        "RedstoneLampBlock.java:35-56",
+        "CopperBulbBlock.java:33-75"
+      ],
+      "cpp": [
+        "src/simulator.cpp:415-416",
+        "src/simulator.cpp:222",
+        "src/simulator.cpp:44",
+        "src/simulator.cpp:467"
+      ],
+      "supportLevel": "implemented",
+      "evidence": "L1+L2",
+      "findings": [],
+      "gaps": [
+        "铜的氧化/上蜡随机刻不建模"
+      ]
+    },
+    {
+      "id": "piston",
+      "area": "活塞",
+      "java": [
+        "PistonBaseBlock.java:104-372",
+        "PistonStructureResolver.java",
+        "PistonMovingBlockEntity.java:275-340"
+      ],
+      "cpp": [
+        "src/pistons.cpp"
+      ],
+      "supportLevel": "implemented",
+      "evidence": "L1+L2",
+      "findings": [
+        "R1",
+        "R2",
+        "R8",
+        "R10"
+      ],
+      "gaps": [
+        "实体推动不建模",
+        "PistonMath 不建模",
+        "MovingPistonBlock/PistonHeadBlock 仅定位"
+      ]
+    },
+    {
+      "id": "hopper",
+      "area": "漏斗",
+      "java": [
+        "HopperBlockEntity.java:97-348",
+        "HopperBlock.java:99-145"
+      ],
+      "cpp": [
+        "src/hoppers.cpp"
+      ],
+      "supportLevel": "implemented",
+      "evidence": "L1+L2",
+      "fixtures": [
+        "tests/fixtures/java26_2Hoppers.json",
+        "tests/fixtures/java26_2JukeboxHoppers.json"
+      ],
+      "findings": [],
+      "gaps": [
+        "物品实体吸取缺失",
+        "实体容器缺失",
+        "getEntityContainer 的 nextInt 抽取缺失"
+      ]
+    },
+    {
+      "id": "containers",
+      "area": "容器与比较器读数",
+      "java": [
+        "ChestBlock.java",
+        "HopperBlockEntity.java:378-391",
+        "AbstractContainerMenu.getRedstoneSignalFromContainer"
+      ],
+      "cpp": [
+        "src/containers.cpp:102-218"
+      ],
+      "supportLevel": "implemented",
+      "evidence": "L1+L2",
+      "fixtures": [
+        "tests/fixtures/java26_2Containers.json",
+        "tests/fixtures/java26_2CopperChests.json"
+      ],
+      "findings": [],
+      "gaps": [
+        "猫坐箱子不建模",
+        "潜影盒/熔炉/酿造台未实现"
+      ]
+    },
+    {
+      "id": "dropper",
+      "area": "投掷器",
+      "java": [
+        "DropperBlock.java:47-79"
+      ],
+      "cpp": [
+        "src/droppers.cpp"
+      ],
+      "supportLevel": "partial",
+      "evidence": "L1+L2",
+      "fixtures": [
+        "tests/fixtures/java26_2Droppers.json",
+        "tests/fixtures/java26_2DropperSlots.json",
+        "tests/fixtures/java26_2DropperMotion.json"
+      ],
+      "findings": [],
+      "gaps": [
+        "抛出物转为外部动作 itemEjected"
+      ]
+    },
+    {
+      "id": "composter",
+      "area": "堆肥桶",
+      "java": [
+        "ComposterBlock.java:285-480"
+      ],
+      "cpp": [
+        "src/composters.cpp"
+      ],
+      "supportLevel": "partial",
+      "evidence": "L1+L2",
+      "fixtures": [
+        "tests/fixtures/java26_2Composters.json",
+        "tests/fixtures/java26_2Composting.json"
+      ],
+      "findings": [],
+      "gaps": [
+        "骨粉产物不生成实体"
+      ]
+    },
+    {
+      "id": "jukebox",
+      "area": "唱片机",
+      "java": [
+        "JukeboxBlockEntity.java:36-130",
+        "JukeboxSongPlayer.java:45-88",
+        "JukeboxSong.java:46-52"
+      ],
+      "cpp": [
+        "src/jukeboxes.cpp"
+      ],
+      "supportLevel": "partial",
+      "evidence": "L1+L2",
+      "fixtures": [
+        "tests/fixtures/java26_2Jukeboxes.json",
+        "tests/fixtures/java26_2JukeboxPlayback.json"
+      ],
+      "findings": [],
+      "gaps": [
+        "弹出唱片不生成实体"
+      ]
+    },
+    {
+      "id": "bookshelfPot",
+      "area": "雕纹书架与陶罐",
+      "java": [
+        "ChiseledBookShelfBlock.java:158-197",
+        "DecoratedPotBlock.java"
+      ],
+      "cpp": [
+        "src/containers.cpp:26-54",
+        "src/hoppers.cpp:65"
+      ],
+      "supportLevel": "partial",
+      "evidence": "L1+L2",
+      "fixtures": [
+        "tests/fixtures/java26_2Bookshelves.json",
+        "tests/fixtures/java26_2Pots.json"
+      ],
+      "findings": [],
+      "gaps": [
+        "破罐掉落不建模"
+      ]
+    },
+    {
+      "id": "doors",
+      "area": "门 / 活板门 / 栅栏门",
+      "java": [
+        "DoorBlock.java:224-245",
+        "TrapDoorBlock.java:108-143",
+        "FenceGateBlock.java:142-202"
+      ],
+      "cpp": [
+        "src/simulator.cpp:417-432",
+        "src/devices.cpp:119-124"
+      ],
+      "supportLevel": "implemented",
+      "evidence": "L1",
+      "findings": [
+        "R1"
+      ],
+      "gaps": [
+        "门铰链 getHinge 不建模",
+        "栅栏门 IN_WALL 不随邻居更新"
+      ]
+    },
+    {
+      "id": "rails",
+      "area": "铁轨系",
+      "java": [
+        "BaseRailBlock.java:63-132",
+        "RailBlock.java:29-33",
+        "DetectorRailBlock.java:55-159",
+        "RailState.java"
+      ],
+      "cpp": [
+        "src/rails.cpp"
+      ],
+      "supportLevel": "implemented/externalStimulus",
+      "evidence": "L1+L2",
+      "fixtures": [
+        "tests/fixtures/java26_2Rails.json"
+      ],
+      "findings": [
+        "R1"
+      ],
+      "gaps": [
+        "命令方块矿车读数缺失",
+        "无真实矿车运动",
+        "激活轨对矿车的作用不建模",
+        "RailState.place 细节仅定位"
+      ]
+    },
+    {
+      "id": "tripwire",
+      "area": "绊线",
+      "java": [
+        "TripWireBlock.java",
+        "TripWireHookBlock.java"
+      ],
+      "cpp": [
+        "src/tripwire.cpp"
+      ],
+      "supportLevel": "externalStimulus",
+      "evidence": "L2",
+      "fixtures": [
+        "tests/fixtures/java26_2Tripwire.json"
+      ],
+      "findings": [],
+      "gaps": [
+        "实体数量由外部输入提供",
+        "本次仅定位未逐句核对"
+      ]
+    },
+    {
+      "id": "daylight",
+      "area": "阳光探测器",
+      "java": [
+        "DaylightDetectorBlock.java:54-116",
+        "Mth.java:35-56"
+      ],
+      "cpp": [
+        "src/devices.cpp:18-27",
+        "src/devices.cpp:97-113"
+      ],
+      "supportLevel": "externalStimulus",
+      "evidence": "L1+L2",
+      "fixtures": [
+        "tests/fixtures/java26_2Daylight.json"
+      ],
+      "findings": [
+        "R6",
+        "R15"
+      ],
+      "gaps": [
+        "天空亮度与太阳角由外部输入",
+        "EnvironmentAttributes.SUN_ANGLE 不建模"
+      ]
+    },
+    {
+      "id": "target",
+      "area": "标靶",
+      "java": [
+        "TargetBlock.java:42-113"
+      ],
+      "cpp": [
+        "src/devices.cpp:167-189",
+        "src/simulator.cpp:219",
+        "src/simulator.cpp:487"
+      ],
+      "supportLevel": "externalStimulus",
+      "evidence": "L1+L2",
+      "fixtures": [
+        "tests/fixtures/java26_2Targets.json",
+        "tests/fixtures/java26_2TargetStrength.json"
+      ],
+      "findings": [],
+      "gaps": [
+        "投射物轨迹不建模"
+      ]
+    },
+    {
+      "id": "lightningRod",
+      "area": "避雷针",
+      "java": [
+        "LightningRodBlock.java:74-125"
+      ],
+      "cpp": [
+        "src/devices.cpp:227-232",
+        "src/simulator.cpp:245",
+        "src/simulator.cpp:489"
+      ],
+      "supportLevel": "externalStimulus",
+      "evidence": "L1",
+      "findings": [
+        "R2"
+      ],
+      "gaps": [
+        "雷击与天气不建模"
+      ]
+    },
+    {
+      "id": "lectern",
+      "area": "讲台",
+      "java": [
+        "LecternBlock.java:155-208",
+        "LecternBlockEntity.java:159-175"
+      ],
+      "cpp": [
+        "src/devices.cpp:242-265",
+        "src/simulator.cpp:51-56",
+        "src/simulator.cpp:246",
+        "src/simulator.cpp:490"
+      ],
+      "supportLevel": "externalStimulus",
+      "evidence": "L1",
+      "findings": [],
+      "gaps": [
+        "书本内容与玩家界面不建模"
+      ]
+    },
+    {
+      "id": "vibration",
+      "area": "振动与幽匿感测体",
+      "java": [
+        "VibrationSystem.java:118-430",
+        "VibrationSelector.java",
+        "EuclideanGameEventListenerRegistry.java:76-124",
+        "SculkSensorBlock.java:83-243"
+      ],
+      "cpp": [
+        "src/vibrations.cpp"
+      ],
+      "supportLevel": "partial",
+      "evidence": "L1+L2",
+      "fixtures": [
+        "tests/fixtures/java26_2Vibrations.json",
+        "tests/fixtures/java26_2DeviceVibrations.json"
+      ],
+      "findings": [
+        "R12"
+      ],
+      "gaps": [
+        "实体监听器缺失",
+        "SculkShrieker 未实现",
+        "潜行/旁观由外部 source 字段提供"
+      ]
+    },
+    {
+      "id": "noteBell",
+      "area": "音符盒与钟",
+      "java": [
+        "NoteBlock.java",
+        "BellBlock.java",
+        "BellBlockEntity.java"
+      ],
+      "cpp": [
+        "src/notes.cpp",
+        "src/bells.cpp"
+      ],
+      "supportLevel": "partial",
+      "evidence": "L2",
+      "fixtures": [
+        "tests/fixtures/java26_2Notes.json",
+        "tests/fixtures/java26_2NoteRandom.json",
+        "tests/fixtures/java26_2Bells.json",
+        "tests/fixtures/java26_2BellHits.json"
+      ],
+      "findings": [],
+      "gaps": [
+        "无生物 AI",
+        "本次仅定位未逐句核对"
+      ]
+    },
+    {
+      "id": "staticAnalog",
+      "area": "静态比较器读数器件",
+      "java": [
+        "RespawnAnchorBlock.java",
+        "BeehiveBlock.java",
+        "AbstractCauldronBlock.java",
+        "CakeBlock.java",
+        "EndPortalFrameBlock.java",
+        "CopperGolemStatueBlock.java"
+      ],
+      "cpp": [
+        "src/blockRegistry.cpp:143-152",
+        "src/simulator.cpp:50"
+      ],
+      "supportLevel": "externalStimulus",
+      "evidence": "L0",
+      "findings": [],
+      "gaps": [
+        "本体行为（充能、蜂蜜量、水位）不建模"
+      ]
+    },
+    {
+      "id": "structuralShape",
+      "area": "结构连接属性（楼梯等）",
+      "java": [
+        "StairBlock.java:111-128",
+        "Block.java:200-210"
+      ],
+      "cpp": [
+        "src/simulator.cpp:321-355",
+        "src/simulator.cpp:174-207",
+        "src/pistons.cpp:170-175"
+      ],
+      "supportLevel": "implemented(调色板可放置)",
+      "evidence": "L1",
+      "findings": [
+        "R7",
+        "R8"
+      ],
+      "gaps": [
+        "楼梯 shape 从不计算，直接影响 supportMask/rigidMask/centerMask"
+      ]
+    },
+    {
+      "id": "unmodelledDevices",
+      "area": "26.2 注册表存在但完全未建模的红石相关方块",
+      "java": [
+        "ShelfBlock.java:49-133",
+        "CrafterBlock.java",
+        "DispenserBlock.java",
+        "SculkShriekerBlock.java",
+        "TntBlock.java",
+        "BigDripleafBlock.java",
+        "CreakingHeartBlock.java",
+        "CommandBlock.java",
+        "StructureBlock.java"
+      ],
+      "cpp": [
+        "src/blockRegistry.cpp:9-41"
+      ],
+      "supportLevel": "unimplemented",
+      "evidence": "L0",
+      "findings": [
+        "R14"
+      ],
+      "gaps": [
+        "classify() 返回 unsupported，Simulator::place 拒绝放置"
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "id": "R1",
+      "kind": "confirmedStatic",
+      "title": "邻居通知携带的触发方块取值与原版不一致",
+      "java": [
+        "DefaultRedstoneWireEvaluator.java:34-36",
+        "RedStoneWireBlock.java:294",
+        "RedstoneTorchBlock.java:48-53",
+        "PistonBaseBlock.java:352-365",
+        "DoorBlock.java:230",
+        "RailBlock.java:29-33"
+      ],
+      "cpp": [
+        "src/simulator.cpp:105",
+        "src/simulator.cpp:303",
+        "src/pistons.cpp:129-131"
+      ],
+      "userImpact": "三向普通铁轨不自动改向；双开门少收供电判定",
+      "repro": "wireAdjacentRailThenThreeWayRail"
+    },
+    {
+      "id": "R2",
+      "kind": "confirmedStatic",
+      "title": "活塞移动路径完全跳过 affectNeighborsAfterRemoval",
+      "java": [
+        "LevelChunk.java:320-322",
+        "ObserverBlock.java:126-130",
+        "LightningRodBlock.java:112-116"
+      ],
+      "cpp": [
+        "src/simulator.cpp:133",
+        "src/pistons.cpp:114",
+        "src/pistons.cpp:124"
+      ],
+      "userImpact": "推动脉冲中的侦测器/带电避雷针时少一次输出侧通知",
+      "repro": "pushPoweredObserver"
+    },
+    {
+      "id": "R3",
+      "kind": "confirmedStatic",
+      "title": "二极管 neighborChanged 缺少 canSurvive 掉落分支",
+      "java": [
+        "DiodeBlock.java:69-86"
+      ],
+      "cpp": [
+        "src/simulator.cpp:408-414",
+        "src/simulator.cpp:341"
+      ],
+      "userImpact": "断支撑时移除时刻从邻居阶段推迟到形状阶段，且缺 6 次多向通知",
+      "repro": "breakRepeaterSupport"
+    },
+    {
+      "id": "R4",
+      "kind": "confirmedStatic",
+      "title": "侦测器移除缺少 hasScheduledTick 条件",
+      "java": [
+        "ObserverBlock.java:126-130"
+      ],
+      "cpp": [
+        "src/simulator.cpp:243"
+      ],
+      "userImpact": "同刻竞争下多发一次输出侧更新",
+      "repro": "removeObserverInSameBatchAsItsOffTick",
+      "rootCorrection": "修复须按 oldState.type 查询队列；onRemove 时 world.get(pos) 已是新类型"
+    },
+    {
+      "id": "R5",
+      "kind": "confirmedStatic",
+      "title": "中继器 locked 不在竖直形状更新中刷新",
+      "java": [
+        "RepeaterBlock.java:62-80"
+      ],
+      "cpp": [
+        "src/simulator.cpp:343"
+      ],
+      "userImpact": "仅状态 ID 差异，信号行为不受影响",
+      "repro": "placeBlockAboveStaleLockedRepeater",
+      "rootCorrection": "分支条件不同，但原建议错误认为 flag 2 不会产生形状更新；可达反例尚待构造"
+    },
+    {
+      "id": "R6",
+      "kind": "confirmedDynamic",
+      "title": "阳光探测器切换 inverted 缺 BLOCK_CHANGE 游戏事件",
+      "java": [
+        "DaylightDetectorBlock.java:80-85",
+        "VibrationSystem.java:86"
+      ],
+      "cpp": [
+        "src/devices.cpp:130-134"
+      ],
+      "userImpact": "相邻幽匿感测体不触发（原版频率 11）",
+      "repro": "sculkSensorNextToDaylightDetectorToggle",
+      "dynamicEvidence": {
+        "file": "confirmedCounterexamples.json",
+        "scenario": "simulator/tests/scenarios/daylightVibration.json",
+        "firstDifference": {
+          "actual": 27164,
+          "actualBlock": {
+            "name": "minecraft:sculk_sensor",
+            "properties": {
+              "power": "0",
+              "sculk_sensor_phase": "inactive",
+              "waterlogged": "false"
+            },
+            "stateId": 27164
+          },
+          "expected": 27226,
+          "expectedBlock": {
+            "name": "minecraft:sculk_sensor",
+            "properties": {
+              "power": "10",
+              "sculk_sensor_phase": "active",
+              "waterlogged": "false"
+            },
+            "stateId": 27226
+          },
+          "field": "states",
+          "relativePos": [
+            5,
+            2,
+            2
+          ],
+          "tick": 13
+        }
+      }
+    },
+    {
+      "id": "R7",
+      "kind": "confirmedDynamic",
+      "title": "楼梯 shape 从不计算，直接影响支撑掩码",
+      "java": [
+        "StairBlock.java:111-128"
+      ],
+      "cpp": [
+        "src/simulator.cpp:321-355",
+        "src/simulator.cpp:174-207"
+      ],
+      "userImpact": "内角楼梯侧面不 sturdy：墙上火把无法存活、粉线不连接、中继器无法承托",
+      "repro": "twoStairsInnerCornerThenWallTorch",
+      "dynamicEvidence": {
+        "file": "confirmedCounterexamples.json",
+        "scenario": "simulator/tests/scenarios/stairShape.json",
+        "firstDifference": {
+          "actual": 3918,
+          "actualBlock": {
+            "name": "minecraft:oak_stairs",
+            "properties": {
+              "facing": "north",
+              "half": "bottom",
+              "shape": "straight",
+              "waterlogged": "false"
+            },
+            "stateId": 3918
+          },
+          "expected": 3922,
+          "expectedBlock": {
+            "name": "minecraft:oak_stairs",
+            "properties": {
+              "facing": "north",
+              "half": "bottom",
+              "shape": "inner_right",
+              "waterlogged": "false"
+            },
+            "stateId": 3922
+          },
+          "field": "states",
+          "relativePos": [
+            2,
+            2,
+            2
+          ],
+          "tick": 0
+        }
+      }
+    },
+    {
+      "id": "R8",
+      "kind": "confirmedStatic",
+      "title": "活塞落地状态用 survives() 近似 updateFromNeighbourShapes",
+      "java": [
+        "PistonMovingBlockEntity.java:286",
+        "PistonMovingBlockEntity.java:317",
+        "Block.java:200-210"
+      ],
+      "cpp": [
+        "src/pistons.cpp:170-175"
+      ],
+      "userImpact": "被推楼梯保持旧 shape；未来连接类方块同样不重算",
+      "repro": "pushStairGroup"
+    },
+    {
+      "id": "R9",
+      "kind": "confirmedStatic",
+      "title": "红石粉点/十字右键切换的邻居更新条件与原版不同",
+      "java": [
+        "RedStoneWireBlock.java:490-524"
+      ],
+      "cpp": [
+        "src/simulator.cpp:582-587"
+      ],
+      "userImpact": "手动切换粉线形状时多发邻居更新，可能提前触发准连接活塞",
+      "repro": "toggleWireShapeWithUpConnection"
+    },
+    {
+      "id": "R10",
+      "kind": "confirmedDynamic",
+      "title": "pushable 用方块名白名单代替 getDestroySpeed==-1，PUSH_ONLY 分支多一次方块实体判定",
+      "java": [
+        "PistonBaseBlock.java:240",
+        "PistonBaseBlock.java:252-264"
+      ],
+      "cpp": [
+        "src/pistons.cpp:19",
+        "src/pistons.cpp:25-27"
+      ],
+      "userImpact": "当前已支持的末地传送门框会被 C++ 活塞错误推动；釉面陶瓦也可放置，但无方块实体，附加条件尚无反例",
+      "repro": "tests/scenarios/endPortalFramePush.json",
+      "dynamicEvidence": {
+        "file": "confirmedCounterexamples.json",
+        "scenario": "simulator/tests/scenarios/endPortalFramePush.json",
+        "firstDifference": {
+          "actual": 2258,
+          "actualBlock": {
+            "name": "minecraft:piston",
+            "properties": {
+              "extended": "true",
+              "facing": "east"
+            },
+            "stateId": 2258
+          },
+          "expected": 2264,
+          "expectedBlock": {
+            "name": "minecraft:piston",
+            "properties": {
+              "extended": "false",
+              "facing": "east"
+            },
+            "stateId": 2264
+          },
+          "field": "states",
+          "relativePos": [
+            2,
+            2,
+            2
+          ],
+          "tick": 2
+        }
+      }
+    },
+    {
+      "id": "R11",
+      "kind": "intentionalDeviation",
+      "title": "更新预算耗尽后原版丢弃继续、C++ 报错中止",
+      "java": [
+        "CollectingNeighborUpdater.java:68-85"
+      ],
+      "cpp": [
+        "src/simulator.cpp:74-78"
+      ],
+      "userImpact": "超长更新链电路行为必然不同，不能声称兼容",
+      "repro": null
+    },
+    {
+      "id": "R12",
+      "kind": "intentionalDeviation",
+      "title": "振动监听器不每游戏刻空转",
+      "java": [
+        "SculkSensorBlock.java:156-165",
+        "VibrationSystem.java:278-298"
+      ],
+      "cpp": [
+        "src/vibrations.cpp:95-99",
+        "src/vibrations.cpp:142"
+      ],
+      "userImpact": "静态核对认为空闲刻无可观测副作用",
+      "repro": null
+    },
+    {
+      "id": "R13",
+      "kind": "hypothesis",
+      "title": "FullNeighborUpdate 状态快照 vs 仿真重新读世界",
+      "java": [
+        "CollectingNeighborUpdater.java:114-120",
+        "DiodeBlock.java:73-75",
+        "Level.java:1010"
+      ],
+      "cpp": [
+        "src/simulator.cpp:385-395",
+        "src/devices.cpp:30-39"
+      ],
+      "userImpact": "极端同刻竞争下比较器排刻结果可能不同",
+      "repro": null
+    },
+    {
+      "id": "R14",
+      "kind": "hypothesis",
+      "title": "未实现器件在 Device 枚举与容量表中的占位耦合风险",
+      "java": [
+        "CrafterBlock.java",
+        "DispenserBlock.java",
+        "AbstractFurnaceBlock.java"
+      ],
+      "cpp": [
+        "include/simulator/types.hpp:57",
+        "src/containers.cpp:21-22",
+        "src/blockRegistry.cpp:92"
+      ],
+      "userImpact": "若 supportLevel 被改为 implemented，会静默按普通容器处理",
+      "repro": null
+    },
+    {
+      "id": "R15",
+      "kind": "hypothesis",
+      "title": "Mth.SIN 表构造式与 C++ 不同（1/10430.378… vs 2π/65536）",
+      "java": [
+        "Mth.java:35-56"
+      ],
+      "cpp": [
+        "src/devices.cpp:18-27"
+      ],
+      "userImpact": "个别表项可能差 1 ULP；需确认 java26_2Daylight.json 覆盖范围",
+      "repro": null
+    }
+  ],
+  "staticDelegateRanReferenceGame": false,
+  "rootValidation": {
+    "passedResults": "differentialResults.json",
+    "counterexamples": "confirmedCounterexamples.json",
+    "passedScenarioCount": 22,
+    "counterexampleCount": 3,
+    "reviewScope": "35 grouped entries include explicitly located-only regions; not a complete semantic equivalence proof"
+  }
+}

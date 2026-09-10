@@ -51,7 +51,14 @@ void Simulator::bellEvent(const ScheduledEvent& event) {
 }
 void Simulator::finishBell(const ScheduledEvent& event) {
     auto found=runtime.find(event.pos);if(found==runtime.end() || found->second.values.value("bellGeneration",UINT64_MAX)!=event.data)return;
-    auto& values=found->second.values;values["ringing"]=false;values.erase("bellWakeAt");values.erase("bellGeneration");
+    auto& values=found->second.values;
+    // 停摆期间事件被放回当前刻，恢复后会提前触发一次；而 bellWakeAt 已被
+    // shiftBlockEntityTimers 按停摆时长后移。这里按新的结束时刻重排，等价于
+    // 原版「区块不 ticking 时钟根本不 tick」——与漏斗 readyAt 的处理方式一致。
+    if(values.value("bellWakeAt",Tick{})>currentTick) {
+        schedulePhase(event.pos,values.at("bellWakeAt").get<Tick>(),2,event.data);return;
+    }
+    values["ringing"]=false;values.erase("bellWakeAt");values.erase("bellGeneration");
     changes[event.pos]=world.get(event.pos);++revision;
 }
 }

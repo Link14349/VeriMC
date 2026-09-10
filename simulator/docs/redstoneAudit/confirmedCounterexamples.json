@@ -1,0 +1,176 @@
+{
+  "counterexampleCount": 3,
+  "counterexamples": [
+    {
+      "simulationCommit": "cc6b156723fb68fc0131def99013315f3ff3b455",
+      "referenceGameSha256": "183c0499c5f855570ee487dd38e141a53f0121f83a0b07a3bac2d8b6698823e8",
+      "scenario": "simulator/tests/scenarios/daylightVibration.json",
+      "scenarioSha256": "57dd064a4d8c91bfd9b597c824651b930b723675b4652bc834b84dcb80b0455f",
+      "captureSha256": "f599a0440a655744e65a3e777bb087b15549b1a0f3ec0091cc85f49871622eaf",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "result": {
+        "firstDifference": {
+          "actual": 27164,
+          "actualBlock": {
+            "name": "minecraft:sculk_sensor",
+            "properties": {
+              "power": "0",
+              "sculk_sensor_phase": "inactive",
+              "waterlogged": "false"
+            },
+            "stateId": 27164
+          },
+          "expected": 27226,
+          "expectedBlock": {
+            "name": "minecraft:sculk_sensor",
+            "properties": {
+              "power": "10",
+              "sculk_sensor_phase": "active",
+              "waterlogged": "false"
+            },
+            "stateId": 27226
+          },
+          "field": "states",
+          "relativePos": [
+            5,
+            2,
+            2
+          ],
+          "tick": 13
+        },
+        "fixture": "daylightVibration/actual.json",
+        "frames": 26,
+        "origin": [
+          -3973975,
+          -58,
+          -9276736
+        ],
+        "status": "difference",
+        "watch": 2
+      },
+      "scope": "First differing observation only; later frames not asserted; genuine vanilla/C++ mismatch, not a mutated negative control",
+      "finding": "R6"
+    },
+    {
+      "finding": "R7",
+      "simulationCommit": "cc6b156723fb68fc0131def99013315f3ff3b455",
+      "referenceGameSha256": "183c0499c5f855570ee487dd38e141a53f0121f83a0b07a3bac2d8b6698823e8",
+      "scenario": "simulator/tests/scenarios/stairShape.json",
+      "scenarioSha256": "742c97b362f790e5a86d69d5e19e02e4b13d81047c2f818f9f2b14ca937442d5",
+      "captureSha256": "1d9946f29ba228dc4d0449d5d797606ea3a0b69e9caf25f155ea9e3a22fc3260",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "result": {
+        "firstDifference": {
+          "actual": 3918,
+          "actualBlock": {
+            "name": "minecraft:oak_stairs",
+            "properties": {
+              "facing": "north",
+              "half": "bottom",
+              "shape": "straight",
+              "waterlogged": "false"
+            },
+            "stateId": 3918
+          },
+          "expected": 3922,
+          "expectedBlock": {
+            "name": "minecraft:oak_stairs",
+            "properties": {
+              "facing": "north",
+              "half": "bottom",
+              "shape": "inner_right",
+              "waterlogged": "false"
+            },
+            "stateId": 3922
+          },
+          "field": "states",
+          "relativePos": [
+            2,
+            2,
+            2
+          ],
+          "tick": 0
+        },
+        "fixture": "stairShape/actual.json",
+        "frames": 5,
+        "origin": [
+          -7237128,
+          -58,
+          3011797
+        ],
+        "status": "difference",
+        "watch": 2
+      },
+      "scope": "First differing observation only; later frames not asserted; genuine vanilla/C++ mismatch, not a mutated negative control"
+    },
+    {
+      "finding": "R10",
+      "simulationCommit": "cc6b156723fb68fc0131def99013315f3ff3b455",
+      "referenceGameSha256": "183c0499c5f855570ee487dd38e141a53f0121f83a0b07a3bac2d8b6698823e8",
+      "scenario": "simulator/tests/scenarios/endPortalFramePush.json",
+      "scenarioSha256": "892a6cc2e55dd583bbc0cf00680bcfab1d5ddd17a30ff9da8eaec0c6bcc1d532",
+      "captureSha256": "3526bec058b8617ee7d410ae81270988f345278d58f4a45e8136ad00e2b0a13c",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "result": {
+        "firstDifference": {
+          "actual": 2258,
+          "actualBlock": {
+            "name": "minecraft:piston",
+            "properties": {
+              "extended": "true",
+              "facing": "east"
+            },
+            "stateId": 2258
+          },
+          "expected": 2264,
+          "expectedBlock": {
+            "name": "minecraft:piston",
+            "properties": {
+              "extended": "false",
+              "facing": "east"
+            },
+            "stateId": 2264
+          },
+          "field": "states",
+          "relativePos": [
+            2,
+            2,
+            2
+          ],
+          "tick": 2
+        },
+        "fixture": "endPortalFramePush/actual.json",
+        "frames": 9,
+        "origin": [
+          9355519,
+          -58,
+          6347026
+        ],
+        "status": "difference",
+        "watch": 3
+      },
+      "scope": "First differing observation only; later frames not asserted; genuine vanilla/C++ mismatch, not a mutated negative control"
+    }
+  ]
+}

@@ -3617,10 +3617,27 @@
   "discardDrops": true,
   "watchJukeboxes": true,
   "reference": "Minecraft Java 26.2 GameTest, nonexperimental redstone",
+  "referenceEnvironment": {
+    "javaVersion": "25.0.4.1",
+    "randomTickSpeed": 0,
+    "featureFlags": [
+      "minecraft:trade_rebalance",
+      "minecraft:vanilla"
+    ],
+    "dataPacks": [
+      "file/simulator",
+      "minecart_improvements",
+      "redstone_experiments",
+      "trade_rebalance",
+      "vanilla"
+    ],
+    "gameTime": 12,
+    "clockTicks": 12
+  },
   "origin": [
-    4619074,
+    -13392970,
     -58,
-    -9698208
+    -9615899
   ],
   "frames": [
     {

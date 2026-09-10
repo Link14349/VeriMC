@@ -1,0 +1,6223 @@
+{
+  "endTick": 30,
+  "commands": [
+    {
+      "tick": 0,
+      "pos": [
+        3,
+        0,
+        3
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        3,
+        0,
+        4
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        3,
+        0,
+        5
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        4,
+        0,
+        3
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        4,
+        0,
+        4
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        4,
+        0,
+        5
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        5,
+        0,
+        3
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        5,
+        0,
+        4
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        5,
+        0,
+        5
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        4,
+        1,
+        4
+      ],
+      "stateId": 11313
+    },
+    {
+      "tick": 2,
+      "pos": [
+        4,
+        1,
+        4
+      ],
+      "stimulus": {
+        "groundItems": [
+          {
+            "item": "minecraft:stone",
+            "count": 1,
+            "y": 2.05
+          },
+          {
+            "item": "minecraft:dirt",
+            "count": 1,
+            "y": 0.7
+          },
+          {
+            "item": "minecraft:gravel",
+            "count": 1,
+            "y": 1.99
+          },
+          {
+            "item": "minecraft:sand",
+            "count": 1,
+            "y": 2.3
+          }
+        ]
+      }
+    },
+    {
+      "tick": 0,
+      "pos": [
+        8,
+        0,
+        3
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        8,
+        0,
+        4
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        8,
+        0,
+        5
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        9,
+        0,
+        3
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        9,
+        0,
+        4
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        9,
+        0,
+        5
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        10,
+        0,
+        3
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        10,
+        0,
+        4
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        10,
+        0,
+        5
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        9,
+        1,
+        4
+      ],
+      "stateId": 11313
+    },
+    {
+      "tick": 2,
+      "pos": [
+        9,
+        1,
+        4
+      ],
+      "stimulus": {
+        "groundItems": [
+          {
+            "item": "minecraft:stone",
+            "count": 1,
+            "x": -0.2,
+            "y": 1.0
+          },
+          {
+            "item": "minecraft:dirt",
+            "count": 1,
+            "x": -0.1,
+            "y": 1.0
+          },
+          {
+            "item": "minecraft:gravel",
+            "count": 1,
+            "z": 1.2,
+            "y": 1.0
+          },
+          {
+            "item": "minecraft:sand",
+            "count": 1,
+            "z": 1.1,
+            "y": 1.0
+          }
+        ]
+      }
+    },
+    {
+      "tick": 0,
+      "pos": [
+        13,
+        0,
+        3
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        13,
+        0,
+        4
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        13,
+        0,
+        5
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        14,
+        0,
+        3
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        14,
+        0,
+        4
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        14,
+        0,
+        5
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        15,
+        0,
+        3
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        15,
+        0,
+        4
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        15,
+        0,
+        5
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        14,
+        1,
+        4
+      ],
+      "stateId": 11313
+    },
+    {
+      "tick": 0,
+      "pos": [
+        14,
+        2,
+        4
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 2,
+      "pos": [
+        14,
+        1,
+        4
+      ],
+      "stimulus": {
+        "groundItems": [
+          {
+            "item": "minecraft:stone",
+            "count": 1,
+            "y": 0.72
+          }
+        ]
+      }
+    },
+    {
+      "tick": 0,
+      "pos": [
+        18,
+        0,
+        3
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        18,
+        0,
+        4
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        18,
+        0,
+        5
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        19,
+        0,
+        3
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        19,
+        0,
+        4
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        19,
+        0,
+        5
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        20,
+        0,
+        3
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        20,
+        0,
+        4
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        20,
+        0,
+        5
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        19,
+        1,
+        4
+      ],
+      "stateId": 11313
+    },
+    {
+      "tick": 0,
+      "pos": [
+        19,
+        2,
+        4
+      ],
+      "stateId": 21768
+    },
+    {
+      "tick": 2,
+      "pos": [
+        19,
+        1,
+        4
+      ],
+      "stimulus": {
+        "groundItems": [
+          {
+            "item": "minecraft:dirt",
+            "count": 1,
+            "y": 0.72
+          }
+        ]
+      }
+    },
+    {
+      "tick": 0,
+      "pos": [
+        23,
+        0,
+        3
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        23,
+        0,
+        4
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        23,
+        0,
+        5
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        24,
+        0,
+        3
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        24,
+        0,
+        4
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        24,
+        0,
+        5
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        25,
+        0,
+        3
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        25,
+        0,
+        4
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        25,
+        0,
+        5
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        24,
+        1,
+        4
+      ],
+      "stateId": 11313
+    },
+    {
+      "tick": 0,
+      "pos": [
+        24,
+        2,
+        4
+      ],
+      "stateId": 13333
+    },
+    {
+      "tick": 2,
+      "pos": [
+        24,
+        1,
+        4
+      ],
+      "stimulus": {
+        "groundItems": [
+          {
+            "item": "minecraft:gravel",
+            "count": 1,
+            "y": 0.72
+          }
+        ]
+      }
+    },
+    {
+      "tick": 0,
+      "pos": [
+        28,
+        0,
+        3
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        28,
+        0,
+        4
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        28,
+        0,
+        5
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        29,
+        0,
+        3
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        29,
+        0,
+        4
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        29,
+        0,
+        5
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        30,
+        0,
+        3
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        30,
+        0,
+        4
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        30,
+        0,
+        5
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        29,
+        1,
+        4
+      ],
+      "stateId": 11313
+    },
+    {
+      "tick": 2,
+      "pos": [
+        29,
+        1,
+        4
+      ],
+      "stimulus": {
+        "groundItems": [
+          {
+            "item": "minecraft:stone",
+            "count": 1,
+            "y": 1.0
+          },
+          {
+            "item": "minecraft:dirt",
+            "count": 1,
+            "y": 1.2
+          },
+          {
+            "item": "minecraft:gravel",
+            "count": 1,
+            "y": 1.4
+          }
+        ]
+      }
+    },
+    {
+      "tick": 0,
+      "pos": [
+        33,
+        0,
+        3
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        33,
+        0,
+        4
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        33,
+        0,
+        5
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        34,
+        0,
+        3
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        34,
+        0,
+        4
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        34,
+        0,
+        5
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        35,
+        0,
+        3
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        35,
+        0,
+        4
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        35,
+        0,
+        5
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        34,
+        1,
+        4
+      ],
+      "stateId": 11313
+    },
+    {
+      "tick": 0,
+      "pos": [
+        34,
+        1,
+        4
+      ],
+      "stimulus": {
+        "inventory": [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 60
+          }
+        ]
+      }
+    },
+    {
+      "tick": 2,
+      "pos": [
+        34,
+        1,
+        4
+      ],
+      "stimulus": {
+        "groundItems": [
+          {
+            "item": "minecraft:stone",
+            "count": 20,
+            "y": 1.0
+          }
+        ]
+      }
+    },
+    {
+      "tick": 0,
+      "pos": [
+        38,
+        0,
+        3
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        38,
+        0,
+        4
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        38,
+        0,
+        5
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        39,
+        0,
+        3
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        39,
+        0,
+        4
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        39,
+        0,
+        5
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        40,
+        0,
+        3
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        40,
+        0,
+        4
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        40,
+        0,
+        5
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        39,
+        1,
+        4
+      ],
+      "stateId": 11313
+    },
+    {
+      "tick": 0,
+      "pos": [
+        39,
+        2,
+        4
+      ],
+      "stateId": 3988
+    },
+    {
+      "tick": 2,
+      "pos": [
+        39,
+        1,
+        4
+      ],
+      "stimulus": {
+        "groundItems": [
+          {
+            "item": "minecraft:stone",
+            "count": 1,
+            "y": 0.72
+          }
+        ]
+      }
+    },
+    {
+      "tick": 0,
+      "pos": [
+        43,
+        0,
+        3
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        43,
+        0,
+        4
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        43,
+        0,
+        5
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        44,
+        0,
+        3
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        44,
+        0,
+        4
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        44,
+        0,
+        5
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        45,
+        0,
+        3
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        45,
+        0,
+        4
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        45,
+        0,
+        5
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        44,
+        1,
+        4
+      ],
+      "stateId": 11313
+    },
+    {
+      "tick": 0,
+      "pos": [
+        44,
+        2,
+        4
+      ],
+      "stateId": 11311
+    },
+    {
+      "tick": 2,
+      "pos": [
+        44,
+        1,
+        4
+      ],
+      "stimulus": {
+        "groundItems": [
+          {
+            "item": "minecraft:stone",
+            "count": 1,
+            "y": 0.72
+          }
+        ]
+      }
+    },
+    {
+      "tick": 10,
+      "pos": [
+        44,
+        2,
+        4
+      ],
+      "stateId": 0
+    },
+    {
+      "tick": 0,
+      "pos": [
+        3,
+        0,
+        9
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        3,
+        0,
+        10
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        3,
+        0,
+        11
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        4,
+        0,
+        9
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        4,
+        0,
+        10
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        4,
+        0,
+        11
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        5,
+        0,
+        9
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        5,
+        0,
+        10
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        5,
+        0,
+        11
+      ],
+      "stateId": 1
+    },
+    {
+      "tick": 0,
+      "pos": [
+        4,
+        1,
+        10
+      ],
+      "stateId": 11313
+    },
+    {
+      "tick": 2,
+      "pos": [
+        4,
+        1,
+        10
+      ],
+      "stimulus": {
+        "groundItems": [
+          {
+            "item": "minecraft:stone",
+            "count": 1,
+            "y": 1.0
+          }
+        ]
+      }
+    },
+    {
+      "tick": 3,
+      "pos": [
+        4,
+        1,
+        10
+      ],
+      "stimulus": {
+        "groundItems": [
+          {
+            "item": "minecraft:dirt",
+            "count": 2,
+            "y": 1.0
+          }
+        ]
+      }
+    }
+  ],
+  "watch": [
+    [
+      4,
+      1,
+      4
+    ],
+    [
+      9,
+      1,
+      4
+    ],
+    [
+      14,
+      1,
+      4
+    ],
+    [
+      19,
+      1,
+      4
+    ],
+    [
+      24,
+      1,
+      4
+    ],
+    [
+      29,
+      1,
+      4
+    ],
+    [
+      34,
+      1,
+      4
+    ],
+    [
+      39,
+      1,
+      4
+    ],
+    [
+      39,
+      2,
+      4
+    ],
+    [
+      44,
+      1,
+      4
+    ],
+    [
+      4,
+      1,
+      10
+    ]
+  ],
+  "watchGroundItems": true,
+  "reference": "Minecraft Java 26.2 GameTest, nonexperimental redstone",
+  "referenceEnvironment": {
+    "javaVersion": "25.0.4.1",
+    "randomTickSpeed": 0,
+    "featureFlags": [
+      "minecraft:trade_rebalance",
+      "minecraft:vanilla"
+    ],
+    "dataPacks": [
+      "file/simulator",
+      "minecart_improvements",
+      "redstone_experiments",
+      "trade_rebalance",
+      "vanilla"
+    ],
+    "gameTime": 5,
+    "clockTicks": 5
+  },
+  "origin": [
+    307216,
+    -58,
+    5454477
+  ],
+  "frames": [
+    {
+      "tick": 0,
+      "states": [
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        3988,
+        11318,
+        11313
+      ],
+      "analogs": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        14,
+        0,
+        0,
+        0,
+        0
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 60
+          }
+        ],
+        [],
+        [],
+        [],
+        []
+      ],
+      "groundItems": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        null,
+        [],
+        []
+      ]
+    },
+    {
+      "tick": 1,
+      "states": [
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        3988,
+        11318,
+        11313
+      ],
+      "analogs": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        14,
+        0,
+        0,
+        0,
+        0
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 60
+          }
+        ],
+        [],
+        [],
+        [],
+        []
+      ],
+      "groundItems": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        null,
+        [],
+        []
+      ]
+    },
+    {
+      "tick": 2,
+      "states": [
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        3988,
+        11318,
+        11313
+      ],
+      "analogs": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        14,
+        0,
+        0,
+        0,
+        0
+      ],
+      "inventories": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 60
+          }
+        ],
+        [],
+        [],
+        [],
+        []
+      ],
+      "groundItems": [
+        [
+          {
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "item": "minecraft:sand",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "item": "minecraft:stone",
+            "count": 1
+          },
+          {
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "item": "minecraft:stone",
+            "count": 20
+          }
+        ],
+        [
+          {
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        null,
+        [
+          {
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 3,
+      "states": [
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        3988,
+        11318,
+        11313
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        15,
+        1,
+        0,
+        0,
+        1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ]
+      ],
+      "groundItems": [
+        [
+          {
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "item": "minecraft:sand",
+            "count": 1
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "item": "minecraft:stone",
+            "count": 16
+          }
+        ],
+        [],
+        null,
+        [
+          {
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "item": "minecraft:dirt",
+            "count": 2
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 4,
+      "states": [
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        3988,
+        11318,
+        11313
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        15,
+        1,
+        0,
+        0,
+        1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ]
+      ],
+      "groundItems": [
+        [
+          {
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "item": "minecraft:sand",
+            "count": 1
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "item": "minecraft:stone",
+            "count": 16
+          }
+        ],
+        [],
+        null,
+        [
+          {
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "item": "minecraft:dirt",
+            "count": 2
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 5,
+      "states": [
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        3988,
+        11318,
+        11313
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        15,
+        1,
+        0,
+        0,
+        1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ]
+      ],
+      "groundItems": [
+        [
+          {
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "item": "minecraft:sand",
+            "count": 1
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "item": "minecraft:stone",
+            "count": 16
+          }
+        ],
+        [],
+        null,
+        [
+          {
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "item": "minecraft:dirt",
+            "count": 2
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 6,
+      "states": [
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        3988,
+        11318,
+        11313
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        15,
+        1,
+        0,
+        0,
+        1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ]
+      ],
+      "groundItems": [
+        [
+          {
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "item": "minecraft:sand",
+            "count": 1
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "item": "minecraft:stone",
+            "count": 16
+          }
+        ],
+        [],
+        null,
+        [
+          {
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "item": "minecraft:dirt",
+            "count": 2
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 7,
+      "states": [
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        3988,
+        11318,
+        11313
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        15,
+        1,
+        0,
+        0,
+        1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ]
+      ],
+      "groundItems": [
+        [
+          {
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "item": "minecraft:sand",
+            "count": 1
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "item": "minecraft:stone",
+            "count": 16
+          }
+        ],
+        [],
+        null,
+        [
+          {
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "item": "minecraft:dirt",
+            "count": 2
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 8,
+      "states": [
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        3988,
+        11318,
+        11313
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        15,
+        1,
+        0,
+        0,
+        1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ]
+      ],
+      "groundItems": [
+        [
+          {
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "item": "minecraft:sand",
+            "count": 1
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "item": "minecraft:stone",
+            "count": 16
+          }
+        ],
+        [],
+        null,
+        [
+          {
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "item": "minecraft:dirt",
+            "count": 2
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 9,
+      "states": [
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        3988,
+        11318,
+        11313
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        15,
+        1,
+        0,
+        0,
+        1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ]
+      ],
+      "groundItems": [
+        [
+          {
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "item": "minecraft:sand",
+            "count": 1
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "item": "minecraft:stone",
+            "count": 16
+          }
+        ],
+        [],
+        null,
+        [
+          {
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "item": "minecraft:dirt",
+            "count": 2
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 10,
+      "states": [
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        3988,
+        11313,
+        11313
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        15,
+        1,
+        0,
+        0,
+        1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ]
+      ],
+      "groundItems": [
+        [],
+        [
+          {
+            "item": "minecraft:sand",
+            "count": 1
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "item": "minecraft:stone",
+            "count": 16
+          }
+        ],
+        [],
+        null,
+        [
+          {
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "item": "minecraft:dirt",
+            "count": 2
+          }
+        ]
+      ]
+    },
+    {
+      "tick": 11,
+      "states": [
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        3988,
+        11313,
+        11313
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        15,
+        1,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:sand",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:dirt",
+            "count": 2
+          }
+        ]
+      ],
+      "groundItems": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [
+          {
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "item": "minecraft:stone",
+            "count": 16
+          }
+        ],
+        [],
+        null,
+        [],
+        []
+      ]
+    },
+    {
+      "tick": 12,
+      "states": [
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        3988,
+        11313,
+        11313
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        15,
+        1,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:sand",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:dirt",
+            "count": 2
+          }
+        ]
+      ],
+      "groundItems": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [
+          {
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "item": "minecraft:stone",
+            "count": 16
+          }
+        ],
+        [],
+        null,
+        [],
+        []
+      ]
+    },
+    {
+      "tick": 13,
+      "states": [
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        3988,
+        11313,
+        11313
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        15,
+        1,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:sand",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:dirt",
+            "count": 2
+          }
+        ]
+      ],
+      "groundItems": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [
+          {
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "item": "minecraft:stone",
+            "count": 16
+          }
+        ],
+        [],
+        null,
+        [],
+        []
+      ]
+    },
+    {
+      "tick": 14,
+      "states": [
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        3988,
+        11313,
+        11313
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        15,
+        1,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:sand",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:dirt",
+            "count": 2
+          }
+        ]
+      ],
+      "groundItems": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [
+          {
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "item": "minecraft:stone",
+            "count": 16
+          }
+        ],
+        [],
+        null,
+        [],
+        []
+      ]
+    },
+    {
+      "tick": 15,
+      "states": [
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        3988,
+        11313,
+        11313
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        15,
+        1,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:sand",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:dirt",
+            "count": 2
+          }
+        ]
+      ],
+      "groundItems": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [
+          {
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "item": "minecraft:stone",
+            "count": 16
+          }
+        ],
+        [],
+        null,
+        [],
+        []
+      ]
+    },
+    {
+      "tick": 16,
+      "states": [
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        3988,
+        11313,
+        11313
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        15,
+        1,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:sand",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:dirt",
+            "count": 2
+          }
+        ]
+      ],
+      "groundItems": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [
+          {
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "item": "minecraft:stone",
+            "count": 16
+          }
+        ],
+        [],
+        null,
+        [],
+        []
+      ]
+    },
+    {
+      "tick": 17,
+      "states": [
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        3988,
+        11313,
+        11313
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        15,
+        1,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:sand",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:dirt",
+            "count": 2
+          }
+        ]
+      ],
+      "groundItems": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [
+          {
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "item": "minecraft:stone",
+            "count": 16
+          }
+        ],
+        [],
+        null,
+        [],
+        []
+      ]
+    },
+    {
+      "tick": 18,
+      "states": [
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        3988,
+        11313,
+        11313
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        15,
+        1,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:sand",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:dirt",
+            "count": 2
+          }
+        ]
+      ],
+      "groundItems": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [
+          {
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "item": "minecraft:stone",
+            "count": 16
+          }
+        ],
+        [],
+        null,
+        [],
+        []
+      ]
+    },
+    {
+      "tick": 19,
+      "states": [
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        3988,
+        11313,
+        11313
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        15,
+        1,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:sand",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:dirt",
+            "count": 2
+          }
+        ]
+      ],
+      "groundItems": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [
+          {
+            "item": "minecraft:stone",
+            "count": 16
+          }
+        ],
+        [],
+        null,
+        [],
+        []
+      ]
+    },
+    {
+      "tick": 20,
+      "states": [
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        3988,
+        11313,
+        11313
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        15,
+        1,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:sand",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:dirt",
+            "count": 2
+          }
+        ]
+      ],
+      "groundItems": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [
+          {
+            "item": "minecraft:stone",
+            "count": 16
+          }
+        ],
+        [],
+        null,
+        [],
+        []
+      ]
+    },
+    {
+      "tick": 21,
+      "states": [
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        3988,
+        11313,
+        11313
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        15,
+        1,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:sand",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:dirt",
+            "count": 2
+          }
+        ]
+      ],
+      "groundItems": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [
+          {
+            "item": "minecraft:stone",
+            "count": 16
+          }
+        ],
+        [],
+        null,
+        [],
+        []
+      ]
+    },
+    {
+      "tick": 22,
+      "states": [
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        3988,
+        11313,
+        11313
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        15,
+        1,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:sand",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:dirt",
+            "count": 2
+          }
+        ]
+      ],
+      "groundItems": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [
+          {
+            "item": "minecraft:stone",
+            "count": 16
+          }
+        ],
+        [],
+        null,
+        [],
+        []
+      ]
+    },
+    {
+      "tick": 23,
+      "states": [
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        3988,
+        11313,
+        11313
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        15,
+        1,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:sand",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:dirt",
+            "count": 2
+          }
+        ]
+      ],
+      "groundItems": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [
+          {
+            "item": "minecraft:stone",
+            "count": 16
+          }
+        ],
+        [],
+        null,
+        [],
+        []
+      ]
+    },
+    {
+      "tick": 24,
+      "states": [
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        3988,
+        11313,
+        11313
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        15,
+        1,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:sand",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:dirt",
+            "count": 2
+          }
+        ]
+      ],
+      "groundItems": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [
+          {
+            "item": "minecraft:stone",
+            "count": 16
+          }
+        ],
+        [],
+        null,
+        [],
+        []
+      ]
+    },
+    {
+      "tick": 25,
+      "states": [
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        3988,
+        11313,
+        11313
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        15,
+        1,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:sand",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:dirt",
+            "count": 2
+          }
+        ]
+      ],
+      "groundItems": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [
+          {
+            "item": "minecraft:stone",
+            "count": 16
+          }
+        ],
+        [],
+        null,
+        [],
+        []
+      ]
+    },
+    {
+      "tick": 26,
+      "states": [
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        3988,
+        11313,
+        11313
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        15,
+        1,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:sand",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:dirt",
+            "count": 2
+          }
+        ]
+      ],
+      "groundItems": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [
+          {
+            "item": "minecraft:stone",
+            "count": 16
+          }
+        ],
+        [],
+        null,
+        [],
+        []
+      ]
+    },
+    {
+      "tick": 27,
+      "states": [
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        3988,
+        11313,
+        11313
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        15,
+        1,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:sand",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:dirt",
+            "count": 2
+          }
+        ]
+      ],
+      "groundItems": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [
+          {
+            "item": "minecraft:stone",
+            "count": 16
+          }
+        ],
+        [],
+        null,
+        [],
+        []
+      ]
+    },
+    {
+      "tick": 28,
+      "states": [
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        3988,
+        11313,
+        11313
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        15,
+        1,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:sand",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:dirt",
+            "count": 2
+          }
+        ]
+      ],
+      "groundItems": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [
+          {
+            "item": "minecraft:stone",
+            "count": 16
+          }
+        ],
+        [],
+        null,
+        [],
+        []
+      ]
+    },
+    {
+      "tick": 29,
+      "states": [
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        3988,
+        11313,
+        11313
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        15,
+        1,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:sand",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:dirt",
+            "count": 2
+          }
+        ]
+      ],
+      "groundItems": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [
+          {
+            "item": "minecraft:stone",
+            "count": 16
+          }
+        ],
+        [],
+        null,
+        [],
+        []
+      ]
+    },
+    {
+      "tick": 30,
+      "states": [
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        11313,
+        3988,
+        11313,
+        11313
+      ],
+      "analogs": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        15,
+        1,
+        0,
+        1,
+        1
+      ],
+      "inventories": [
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:sand",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:dirt",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:dirt",
+            "count": 1
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:gravel",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 2,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 3,
+            "item": "minecraft:stone",
+            "count": 64
+          },
+          {
+            "slot": 4,
+            "item": "minecraft:stone",
+            "count": 64
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "slot": 0,
+            "item": "minecraft:stone",
+            "count": 1
+          },
+          {
+            "slot": 1,
+            "item": "minecraft:dirt",
+            "count": 2
+          }
+        ]
+      ],
+      "groundItems": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [
+          {
+            "item": "minecraft:stone",
+            "count": 16
+          }
+        ],
+        [],
+        null,
+        [],
+        []
+      ]
+    }
+  ]
+}

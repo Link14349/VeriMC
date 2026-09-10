@@ -22,6 +22,8 @@ struct HopperState {
 };
 using Vec3 = std::array<double,3>;
 struct VibrationContext { bool spectator{}, sneaking{}, dampens{}; StateId affectedState{UINT32_MAX}; };
+// 26.2 Mth.SIN 的等价重建，导出用于与原版逐项对照。
+const std::array<float, 65536>& daylightSineTable();
 struct VibrationInfo { std::uint16_t event{}; Vec3 origin{}; float distance{}; VibrationContext context; };
 struct SensorState {
     std::optional<VibrationInfo> candidate, current;
@@ -38,6 +40,8 @@ public:
     World world;
     Tick currentTick{};
     void setRandomSeed(std::uint64_t seed) { randomSeed = seed; worldRandom.setSeed(seed); }
+    // 世界随机源的 48 位内部状态，用于与原版逐帧对照消耗次数。
+    std::uint64_t randomState() const { return worldRandom.state(); }
     bool hasPendingActions() const { return !pendingActionIds.empty(); }
     Json pendingActionsJson() const;
     const std::deque<Json>& actionHistory() const { return environmentActions; }
@@ -48,6 +52,13 @@ public:
     bool faulted{};
     std::string pauseReason;
     std::size_t updateBudget{1000000};
+    // 刻内更新轨迹：对应原版 CollectingNeighborUpdater 的 debugListener，
+    // 每次从栈顶取出一个更新对象时记录它的受影响坐标。容量为 0 表示关闭。
+    // 容量耗尽时置 updateTraceTruncated 并停止记录，截断的轨迹不得判为通过。
+    std::size_t updateTraceLimit{};
+    bool updateTraceTruncated{};
+    Json updateTrace = Json::array();
+    void markUpdateTrace(Tick tick) { if (updateTraceLimit) appendUpdateTrace(Json(tick)); }
     std::size_t traceCapacity{500000};
     std::uint64_t traceDropped{};
     // History is trimmed only after consumers acknowledge it. A single atomic
@@ -60,7 +71,7 @@ public:
     const BlockState& at(BlockPos p) const { return registry[world.get(p)]; }
     void setBlock(BlockPos pos, StateId state, unsigned flags = 3, int depth = 512);
     void place(BlockPos pos, StateId state);
-    void interact(BlockPos pos);
+    void interact(BlockPos pos, std::optional<Direction> playerFacing = std::nullopt);
     void stimulate(BlockPos pos, const Json& stimulus);
     int signal(BlockPos emitter, Direction direction, bool includeWire = true) const;
     int directSignal(BlockPos emitter, Direction direction, bool includeWire = true) const;
@@ -69,6 +80,10 @@ public:
     int displayValue(BlockPos pos) const;
     int viewerCount(BlockPos pos) const { auto found = runtime.find(pos); return found == runtime.end() ? 0 : found->second.values.value("viewers", 0); }
     bool bellRinging(BlockPos pos) const { auto found=runtime.find(pos);return found!=runtime.end() && found->second.values.value("ringing",false); }
+    // 漏斗吸取范围内、按声明顺序排列的掉落物；与原版 getItemsAtAndAbove 的结果对照。
+    Json suckableItems(BlockPos pos) const;
+    // 声明在某一格里的容器实体（运输/漏斗矿车）及其库存，按声明顺序排列。
+    Json containerEntitiesJson(BlockPos pos) const;
     bool jukeboxPlaying(BlockPos pos) const { auto found=jukeboxes.find(pos);return found!=jukeboxes.end() && found->second.song>=0; }
     std::size_t cartCount(BlockPos pos) const {
         auto found = runtime.find(pos);
@@ -76,9 +91,53 @@ public:
         auto carts = found->second.values.find("carts");
         return carts == found->second.values.end() ? 0 : carts->size();
     }
+    // 区块生命周期（issue #14 第五条）。原版的判据是票据等级；本项目**不模拟票据传播**，
+    // 区块状态是显式输入。默认整张图 entityTicking，与历史行为完全一致。
+    enum class ChunkState : std::uint8_t { unloaded, loaded, blockTicking, entityTicking };
+    static BlockPos chunkOf(BlockPos pos);
+    ChunkState chunkState(BlockPos pos) const;
+    // stalledSince 只在从工程文件恢复时显式给出；正常调用由当前刻自动记录。
+    void setChunkState(int chunkX, int chunkZ, ChunkState state, std::optional<Tick> stalledSince = std::nullopt);
+    Json chunkStatesJson() const;
+    // 待执行的方块计划刻与方块事件，按原版 DRAIN_ORDER / 插入顺序排列，
+    // 用于与原版队列逐项对照。坐标是绝对坐标，比较时再换算成相对。
+    // 方块实体的执行顺序：按注册序号排列，对应原版 Level.blockEntityTickers 的列表顺序。
+    Json blockEntityOrderJson() const;
+    Json pendingBlockTicksJson() const;
+    Json pendingBlockEventsJson() const;
+    // 是否还有可以执行的事件；只剩不可 ticking 区块里的事件时返回 false。
+    bool runnable() const;
+    // 区块不 ticking 时方块实体根本不执行，它们的倒计时也不会递减。事件被延后一刻时
+    // 把「绝对唤醒时刻」一起后移，等价于原版的冷却与计时在停摆期间冻结。
+    void shiftBlockEntityTimers(BlockPos chunk, Tick delta);
+    // 恢复执行时把停在过去的事件抬到当前刻，保持「队列事件不早于当前刻」的快照不变量。
+    void liftStaleEvents(BlockPos chunk);
+    TickCheck blockTickCheck() const {
+        if (chunkStates.empty()) return {};
+        return {[](const void* owner, BlockPos chunk) {
+            return static_cast<const Simulator*>(owner)->chunkBlockTicking({chunk.x * 16, 0, chunk.z * 16});
+        }, this};  // chunk 是区块坐标，乘 16 回到方块坐标
+    }
+    bool chunkBlockTicking(BlockPos pos) const { return chunkStates.empty() || chunkState(pos) >= ChunkState::blockTicking; }
+    bool chunkEntityTicking(BlockPos pos) const { return chunkStates.empty() || chunkState(pos) == ChunkState::entityTicking; }
+    bool chunkLoaded(BlockPos pos) const { return chunkStates.empty() || chunkState(pos) != ChunkState::unloaded; }
+    // 原版 VibrationSystem.Ticker.areAdjacentChunksTicking：监听者所在区块的 3×3 全部要
+    // shouldTickBlocksAt 且 getChunkNow 非空。本模型里 blockTicking 已蕴含已加载，
+    // 因此一个 chunkBlockTicking 判断即可。幽匿感测体（含校准）的 VibrationUser
+    // requiresAdjacentChunksToBeTicking 返回 true，投递振动前必须先过这一关。
+    bool adjacentChunksTicking(BlockPos listener) const {
+        if (chunkStates.empty()) return true;  // 缺省整图 entityTicking，热路径零额外开销
+        const auto chunk = chunkOf(listener);
+        for (int dx = -1; dx <= 1; ++dx) for (int dz = -1; dz <= 1; ++dz)
+            if (!chunkBlockTicking({(chunk.x + dx) * 16, 0, (chunk.z + dz) * 16})) return false;
+        return true;
+    }
     void updateNeighbors(BlockPos pos, int skip = -1, StateId source = UINT32_MAX);
     void neighborChanged(BlockPos pos, StateId source = 0);
-    void schedule(BlockPos pos, Tick delay, int priority = 0);
+    // 原版 FullNeighborUpdate：带入队时的目标状态快照，执行时不再重新读世界。
+    void neighborChangedSnapshot(BlockPos pos, StateId snapshot, StateId source, bool movedByPiston = false);
+    // type 默认取世界当前方块；活塞落地路径必须显式传入被移动方块的类型。
+    void schedule(BlockPos pos, Tick delay, int priority = 0, std::uint16_t type = 0xFFFFu);
     bool hasScheduled(BlockPos pos) const;
     bool stepEvent();
     std::size_t advanceTo(Tick target, std::size_t eventBudget = 1000000, std::chrono::microseconds wallBudget = std::chrono::seconds(10));
@@ -106,7 +165,7 @@ public:
     // storage so a successful file import can retain the previous world as undo.
     void exchangeProject(Simulator& other);
     std::size_t estimatedBytes() const {
-        auto bytes = world.storageBytes() + trace.size() * sizeof(TraceEdge) + runtime.size() * 512 + scheduled.size() * 128 + hoppers.size() * 96 + entityOrders.size() * 64 + blockTicks.estimatedBytes();
+        auto bytes = world.storageBytes() + trace.size() * sizeof(TraceEdge) + runtime.size() * 512 + scheduled.size() * 128 + hoppers.size() * 96 + cartCells.size() * 48 + entityCells.size() * 48 + entityOrders.size() * 64 + blockTicks.estimatedBytes();
         for (const auto& [pos, data] : runtime) { (void)pos; bytes += data.inventory.capacity() * sizeof(ItemStack); }
         return bytes + recentTorchToggles.size() * sizeof(TorchToggle) + torchToggleCounts.size() * 64 + environmentActions.size() * 2048 + sensors.size() * 384 + sensorSections.size() * 96 + jukeboxes.size() * 128;
     }
@@ -118,7 +177,6 @@ private:
     bool addCompost(BlockPos pos, std::uint32_t item);
     bool insertCompost(BlockPos from, BlockPos into, ItemStack stack);
     void emptyComposter(BlockPos pos, StateId state);
-    bool transferComposter(BlockPos from, BlockPos into, bool pulling);
     StateId noteInstrument(BlockPos pos, StateId state) const;
     void playNote(BlockPos pos, StateId state);
     void noteEvent(BlockPos pos);
@@ -156,19 +214,36 @@ private:
     void loadActions(const Json& data);
     std::size_t advance(Tick target, std::size_t eventBudget, std::chrono::microseconds wallBudget, bool fillIdle);
     enum class UpdateKind { neighbor, shape, multi };
-    struct Update { UpdateKind kind; BlockPos pos; Direction direction{Direction::down}; StateId neighborState{}; int index{}, skip{-1}, depth{512}; unsigned flags{2}; };
+    // 原版把邻居更新分成两种：SimpleNeighborUpdate 执行时才读目标状态，
+    // FullNeighborUpdate 带入队时的状态快照。snapshot == noSnapshot 表示前者。
+    static constexpr StateId noSnapshot = static_cast<StateId>(-1);
+    struct Update { UpdateKind kind; BlockPos pos; Direction direction{Direction::down}; StateId neighborState{}; int index{}, skip{-1}, depth{512}; unsigned flags{2}; StateId snapshot{noSnapshot}; bool movedByPiston{}; };
     void updateBellShape(const Update& update);
+    void appendUpdateTrace(Json entry);
+    void recordUpdateTrace(const Update& update);
     std::vector<Update> updateStack, addedUpdates;
     bool updating{};
     std::size_t updateCount{};
     BlockTicks blockTicks;
     std::priority_queue<ScheduledEvent, std::vector<ScheduledEvent>, EventLater> scheduled;
     std::unordered_set<EventKey, EventKeyHash> scheduledKeys;
+    // 缺省不建条目：空表示整张图 entityTicking，热路径只多一次 empty() 判断。
+    // stalledSince 记录该区块停止执行方块实体的时刻，恢复时用它把冻结的倒计时补回去。
+    struct ChunkRecord { ChunkState state{ChunkState::entityTicking}; Tick stalledSince{}; };
+    std::unordered_map<BlockPos, ChunkRecord, PosHash> chunkStates;
     std::unordered_map<BlockPos, RuntimeData, PosHash> runtime;
     std::deque<TorchToggle> recentTorchToggles;
     std::unordered_map<BlockPos, unsigned, PosHash> torchToggleCounts;
     std::unordered_map<BlockPos, PistonMotion, PosHash> motions;
     std::unordered_map<BlockPos, HopperState, PosHash> hoppers;
+    // 声明了至少一辆漏斗矿车的格子。完全由 runtime 的 containerEntities 推导，
+    // 不进快照；整体替换 runtime 的地方（loadProject / restore / exchange / clear）负责同步。
+    // 存在的唯一理由是给「每次方块或器件数据变化都要唤醒下方两格的矿车」这条热路径一个便宜的守卫。
+    std::unordered_set<BlockPos, PosHash> cartCells;
+    // 声明了至少一个容器实体的格子。同样完全由 runtime 推导、不进快照，与 cartCells 同步维护。
+    // 跨格可见性让「哪一格能看到这个实体」不再是一次哈希查表，候选枚举必须遍历所有声明格；
+    // 这个集合让「世界里根本没有容器实体」这个绝大多数情况保持零开销。
+    std::unordered_set<BlockPos, PosHash> entityCells;
     std::unordered_map<BlockPos, std::uint64_t, PosHash> entityOrders;
     std::unordered_map<BlockPos, StateId, PosHash> changes;
     std::vector<Probe> probes;
@@ -183,18 +258,23 @@ private:
     std::uint8_t currentPhase{4};
     bool beforeBlockEntities() const { return currentPhase < 2 || currentPhase == 3; }
     void enqueue(Update update);
-    void executeNeighbor(BlockPos pos, StateId source = 0);
+    void executeNeighbor(BlockPos pos, StateId source = 0, StateId snapshot = noSnapshot);
     void executeReactiveNeighbor(BlockPos pos, StateId state, StateId source);
     void executeShape(const Update& update);
+    bool supportChecked(StateId state, Direction direction) const;
+    StateId shapeUpdated(BlockPos pos, StateId state, Direction direction, StateId neighborState);
+    StateId updateFromNeighborShapes(BlockPos pos, StateId state);
     void executeTick(const ScheduledEvent& event);
     void onPlace(BlockPos pos, StateId state, StateId oldState);
-    void onRemove(BlockPos pos, StateId oldState);
+    void onRemove(BlockPos pos, StateId oldState, bool movedByPiston = false);
     bool survives(BlockPos pos, StateId state) const;
     void indirectShapes(BlockPos pos, StateId state, unsigned flags, int depth);
-    void notifyFront(BlockPos pos, Direction facing);
-    void notifyAttached(BlockPos pos, Direction connected);
+    // source 默认取世界当前方块；移除回调里世界已经写入新方块，必须显式传被移除的状态。
+    void notifyFront(BlockPos pos, Direction facing, StateId source = UINT32_MAX);
+    void notifyAttached(BlockPos pos, Direction connected, StateId source = UINT32_MAX);
     void updateWire(BlockPos pos, StateId state);
     StateId wireConnections(BlockPos pos, StateId state) const;
+    StateId stairsShape(BlockPos pos, StateId state) const;
     std::array<std::uint8_t, 4> connectionSides(BlockPos pos, StateId state) const;
     std::uint8_t wireSide(BlockPos pos, Direction direction) const;
     bool connectsWire(StateId state, int direction) const;
@@ -204,6 +284,9 @@ private:
     bool prioritizeDiode(BlockPos pos) const;
     bool torchInput(BlockPos pos) const;
     int comparatorInput(BlockPos pos) const;
+    // 受限的物品展示框输入：按“挂在哪一格的哪一面”记录，不是完整实体世界。
+    std::optional<int> itemFrameSignal(BlockPos mount, Direction facing) const;
+    void stimulateItemFrames(BlockPos pos, const Json& input);
     void refreshComparator(BlockPos pos);
     void sampleAffected(BlockPos pos);
     void sampleProbe(Probe& probe);
@@ -222,23 +305,82 @@ private:
     void schedulePhase(BlockPos pos, Tick when, std::uint8_t phase, std::uint64_t data);
     std::uint64_t registerEntity(BlockPos pos);
     void pruneEvents();
-    void updateComparatorNeighbors(BlockPos pos);
+    void updateComparatorNeighbors(BlockPos pos, StateId source = noSnapshot);
+    // 器件层实体物品输入（issue #12 第一阶段）：漏斗吸取声明在其吸取范围内的掉落物。
+    // 不模拟掉落物的运动、碰撞或合并，只执行原版 suckInItems 的方块侧逻辑。
+    void stimulateGroundItems(BlockPos pos, const Json& input);
+    bool itemInSuckRange(BlockPos pos, const Json& entry) const;
+    bool itemInsideHopperBlock(BlockPos pos, const Json& entry) const;
+    bool suckItemEntities(BlockPos pos);
+    void insertStack(BlockPos pos, ItemStack& stack, Tick cooldown);
+    // 原版 HopperBlock.entityInside：掉落物停在漏斗自己那一格时，每刻每个实体各触发一次
+    // tryMoveItems。这条路径在实体阶段执行，早于方块实体阶段，而且不受上方方块阻挡。
+    void hopperEntityContact(BlockPos pos);
+    bool hopperHasContact(BlockPos pos) const;
     void runtimeChanged(BlockPos pos, bool notifyComparators = true);
     void updatePressurePlate(BlockPos pos);
     void updateButton(BlockPos pos);
     void buttonContact(BlockPos pos);
     void updateDaylight(BlockPos pos);
-    bool interactDevice(BlockPos pos);
+    bool interactDevice(BlockPos pos, std::optional<Direction> playerFacing = std::nullopt);
     bool stimulateDevice(BlockPos pos, const Json& stimulus);
     void validateRuntime(BlockPos pos) const;
-    struct InventorySlot { BlockPos pos; std::size_t index; };
+    // entity >= 0 表示这一格里第 entity 个**声明的容器实体**（运输/漏斗矿车）的槽位，
+    // 它的库存存在 runtime[pos].values["containerEntities"][entity]["inventory"] 里；
+    // -1 表示方块自身的库存。
+    struct InventorySlot { BlockPos pos; std::size_t index; int entity = -1; };
     std::size_t inventorySize(StateId state) const;
     bool isBookshelf(StateId state) const;
     bool isDecoratedPot(StateId state) const;
     bool canInsertStack(const InventorySlot& slot, ItemStack stack) const;
-    bool canExtractStack(const InventorySlot& slot, BlockPos into) const;
+    // into 是**目标槽位表**而不是坐标：漏斗矿车的目标是实体库存，那一格上可能根本没有方块。
+    bool canExtractStack(const InventorySlot& slot, const std::vector<InventorySlot>& into) const;
     void updateBookshelfSlot(const InventorySlot& slot);
     std::vector<InventorySlot> containerSlots(BlockPos pos, bool ignoreBlockage = true) const;
+    // 器件层实体容器（issue #12）：声明在某一格里的运输/漏斗矿车、运输船/运输竹筏。
+    // 原版 getEntityContainer 在候选里用 level.random.nextInt(size) 随机选一个，会消耗随机数。
+    // 运输船/竹筏分支目前**只有单元回归，尚无原版差分**。
+    static constexpr std::size_t containerEntityLimit = 16;
+    void stimulateContainerEntities(BlockPos pos, const Json& input);
+    void validateContainerEntities(const Json& entities) const;
+    static std::size_t containerEntitySize(const std::string& type);
+    std::size_t containerEntityCount(BlockPos pos) const;
+    std::vector<InventorySlot> entityContainerSlots(BlockPos pos, int entity) const;
+    // ---- 跨格实体身份（issue #12）----
+    // 容器实体**不属于**它被声明的那一格：声明格只决定它的位置（协议约定停在格中心，
+    // 脚 y = 格底 + 0.5），能不能被看见完全由 EntityType 注册尺寸算出的包围盒
+    // 与查询盒是否相交决定（AABB.java:245-247，严格不等号，相切不算）。
+    // 因此 getEntityContainer 的入口是**一个盒子**，不是一格坐标。
+    struct EntityBox { double minX, minY, minZ, maxX, maxY, maxZ; };
+    // 候选是「哪一格声明的第几个实体」这一对，因为库存仍然按声明格存放。
+    struct EntityCandidate { BlockPos pos; int entity; };
+    static EntityBox containerEntityBox(BlockPos cell, const std::string& type);
+    // 原版 getContainerAt(level,pos) 走的那条：中心在格心、边长 1 的盒子，正好是这一格。
+    static EntityBox cellQueryBox(BlockPos pos);
+    static bool boxesOverlap(const EntityBox& a, const EntityBox& b);
+    std::vector<EntityCandidate> containerEntityCandidates(const EntityBox& query) const;
+    std::optional<EntityCandidate> chooseContainerEntity(const EntityBox& query);
+    // 新声明的容器实体可能被相当远的漏斗看见（船横向覆盖九格），把这些读者全部唤醒。
+    void wakeEntityReaders(BlockPos cell);
+    // ---- 漏斗矿车主动吸取（issue #12 最后一条）----
+    // 这条路径**尚无原版差分**：本轮参考捕获资源被别的 agent 独占，
+    // 下面的实现全部由 26.2 反编译源码推导，只有上一轮一次原版探针实测作为旁证。
+    // 事件挂在「矿车所在的那一格」上，data 用这个常量与其他阶段 3 接触事件区分，
+    // 事件里的方块类型固定记 0：矿车不是方块，那一格的方块可以随便换。
+    static constexpr std::uint64_t cartSuctionEvent = 1;
+    bool cellHasCartHopper(BlockPos pos) const;
+    void rebuildEntityCells();
+    void scheduleCartSuction(BlockPos cell, Tick when);
+    void wakeCartHopper(BlockPos cell);
+    void wakeCartHoppers(BlockPos changed);
+    void tickCartHoppers(BlockPos cell);
+    // source 是**方块容器**那一格（BlockPos.containing(levelX, levelY+1, levelZ)）；
+    // 实体容器那一侧用的是矿车自己的查询盒，与 source 不是同一块地方，见 cartEntityQueryBox。
+    bool cartHopperSuck(BlockPos cell, int entity, BlockPos source);
+    static EntityBox cartEntityQueryBox(BlockPos cell);
+    // 原版 getContainerAt 先看 getBlockContainer；这里为真表示该格有方块容器，
+    // 实体容器只在为假时才会被查询。堆肥桶是 WorldlyContainerHolder，也算方块容器。
+    bool hasBlockContainer(BlockPos pos) const;
     Direction chestConnection(StateId state) const;
     bool isCopperChest(StateId state) const;
     bool chestsConnect(StateId first, StateId second) const;
@@ -253,13 +395,21 @@ private:
     void containerChanged(BlockPos pos);
     bool inventoryEmpty(BlockPos pos) const;
     bool inventoryFull(BlockPos pos) const;
+    // targetSlots 非空时表示目标是实体容器（漏斗矿车），此时不要求「取用者正好在堆肥桶正下方」：
+    // 原版 OutputContainer.canTakeItemThroughFace 只看方向 DOWN，与取用者的位置无关。
+    bool transferComposter(BlockPos from, BlockPos into, bool pulling, const std::vector<InventorySlot>* targetSlots = nullptr);
     bool transferItem(BlockPos from, BlockPos to, bool pulling = false);
+    bool transferSlots(const std::vector<InventorySlot>& sourceSlots, const std::vector<InventorySlot>& targetSlots,
+                       BlockPos from, BlockPos to, bool pulling);
+    // 原版 ejectItems：先 getAttachedContainer（方块容器优先、实体容器兜底），再推出一件。
+    // drew 回报这一次是否消耗了 getEntityContainer 的 nextInt，供空转重试判断使用。
+    bool hopperEject(BlockPos pos, bool* drew = nullptr);
     void wakeHopper(BlockPos pos);
     void wakeHoppers(BlockPos changed);
     void tickHopper(const ScheduledEvent& event);
     void startHopper(BlockPos pos);
     void placeRail(BlockPos pos);
-    void updateRail(BlockPos pos, StateId source);
+    void updateRail(BlockPos pos, StateId state, StateId source);
     void removeRail(BlockPos pos, StateId state);
     bool poweredRailPath(BlockPos pos, StateId state, bool forward, int depth) const;
     void updateDetectorRail(BlockPos pos);

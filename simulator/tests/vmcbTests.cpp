@@ -76,6 +76,50 @@ int main(int argc, char** argv) {
         std::vector<Cell> ordered;sim.world.forEachCellXyz([&](Cell cell){ordered.push_back(cell);});auto cells=sim.world.cells();expect(ordered.size()==cells.size(),"XYZ size");for(std::size_t i=0;i<cells.size();++i)expect(ordered[i].pos==cells[i].pos&&ordered[i].state==cells[i].state,"XYZ order differs");
         Simulator json(registry),binary(registry);json.loadProject(sim.saveProject("design"));load(binary,save(sim,false));expect(json.saveProject("design",true)==binary.saveProject("design",true),"initialization diverged");roundTrip(sim,12);
     });
+    test("binary chunk states and frozen queue survive reopening", [&] {
+        Simulator sim(registry);base(sim);
+        sim.place({0,1,0},registry.state("stone_button",{{"face","floor"}}));sim.interact({0,1,0});
+        sim.advanceTo(3);sim.setChunkState(0,0,Simulator::ChunkState::loaded);sim.advanceTo(40);
+        for(bool checkpoint:{false,true}) {
+            Simulator restored(registry);load(restored,save(sim,checkpoint));
+            expect(restored.chunkStatesJson()==sim.chunkStatesJson(),"VMCB dropped chunk states");
+            if(checkpoint) {
+                expect(restored.saveProject("test",true)==sim.saveProject("test",true),"frozen checkpoint changed");
+                Simulator control(registry);control.loadProject(sim.saveProject("test",true));
+                for(auto* world:{&control,&restored}) {world->setChunkState(0,0,Simulator::ChunkState::entityTicking);world->advanceTo(45);}
+                expect(restored.saveProject("test",true)==control.saveProject("test",true),"resumed binary queue diverged");
+                expect(!restored.at({0,1,0}).powered,"restored button did not release");
+            }
+        }
+    });
+    test("rule digest covers block tags", [&] {
+        auto path=std::filesystem::path(SIMULATOR_DATA_DIR);
+        const auto dir=std::filesystem::temp_directory_path()/ ("verimcTagDigest"+std::to_string(std::random_device{}()));
+        std::filesystem::create_directory(dir);
+        for(auto& item:std::filesystem::directory_iterator(path))if(item.is_regular_file())std::filesystem::copy_file(item.path(),dir/item.path().filename());
+        auto before=rulesDigest((dir/"blockStates.json").string());
+        { std::ofstream output(dir/"blockTags.json",std::ios::app); output << '\n'; }
+        expect(before!=rulesDigest((dir/"blockStates.json").string()),"tag change did not change rules digest");
+    });
+    test("binary chunk metadata and old checkpoint ABI reject atomically", [&] {
+        Simulator sim(registry);base(sim);sim.place({0,1,0},registry.state("stone"));
+        const auto before=sim.saveProject("unchanged",true);
+        for(bool checkpoint:{false,true})for(auto problem:{"missing","duplicate","invalid","oldAbi"}) {
+            if(!checkpoint && std::string(problem)=="oldAbi")continue;
+            auto bytes=mutate(save(sim,checkpoint),[&](std::string& tag,Bytes& raw){
+                if(tag!="META")return;
+                auto meta=decodeCbor(raw);
+                Json row={{"chunk",Json::array({0,0})},{"state","loaded"},{"stalledSince",std::uint64_t{0}}};
+                if(std::string(problem)=="missing")meta.erase("chunkStates");
+                else if(std::string(problem)=="duplicate")meta["chunkStates"]=Json::array({row,row});
+                else if(std::string(problem)=="invalid") {row["state"]="unloaded";meta["chunkStates"]=Json::array({row});}
+                else meta["snapshot"]["checkpointAbi"]="simulatorCheckpoint1";
+                raw=encodeCbor(meta);
+            });
+            bool rejected=false;try{load(sim,bytes);}catch(...){rejected=true;}
+            expect(rejected && sim.saveProject("unchanged",true)==before,"corrupt chunk metadata changed live world");
+        }
+    });
     test("button phase, history budgets and big counters", [&] {
         Simulator sim(registry);base(sim);sim.traceCapacity=10;sim.traceAtomicReserve=20;sim.updateBudget=99999;sim.place({0,1,0},registry.state("stone_button",{{"face","floor"}}));sim.addProbe({0,1,0},"button");sim.interact({0,1,0});sim.advanceTo(7);Simulator restored(registry);load(restored,save(sim));expect(restored.traceCapacity==10&&restored.traceAtomicReserve==20&&restored.updateBudget==99999,"budgets not restored");roundTrip(sim,22);
     });

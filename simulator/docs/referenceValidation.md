@@ -2,6 +2,8 @@
 
 参考版本固定为 Java Edition 26.2 正式版，非实验性红石。官方版本清单、服务端下载地址和 SHA-1 记录于 `data/referenceVersion.json`；原版 DataVersion 为 4903。
 
+2026-09-08 的源码区域索引、逐项核对、新鲜原版对照和环境限制见 [红石审计报告](redstoneAudit/auditReport.md)。新增 `auditReference.py --output <新目录> --checker <checkReference>` 可在不覆盖既有 fixture 的情况下复跑。参考捕获器现显式关闭自然随机刻，并记录实际功能开关；官方 GameTest 的 `trade_rebalance` 开关仍开启，不能称为严格 vanilla-only 专用服务器验证。
+
 ## 可重现流程
 
 1. 安装 Java 25 或更高版本。
@@ -61,3 +63,58 @@
 `exportJukebox.py` 导出 22 张默认唱片定义。`captureJukeboxes.py` 顺序生成第十九、二十组 GameTest，151 刻 / 68 点与 1,456 刻 / 11 点，逐刻比较播放进度、输出及库存，覆盖首次注册、重新注册、曲终解锁和漏斗空槽条件。`ExportJukeboxPlayback` 使用与 `ExportDropperMotion` 相同的四路径参数，22 张唱片完整播放共 4,265 个隔离样本，详见[唱片机说明](jukeboxes.md)。
 
 `ExportComposting` 在通常四路径参数之后，追加 `data/compostingRules.json` 的绝对输出路径，导出 115 种材料和 4,176 次隔离插入记录。`captureComposters.py` 增加第二十一组 GameTest，111 刻 / 26 点，验证临时输入/输出容器及失败抽取副作用，见 [堆肥桶说明](composters.md)。
+
+`fuzzRedstone.py --seed S --rounds N --output <新目录>` 生成随机小电路与随机输入历史，逐轮从原版捕获并对照；出现差异时先按格子隔离，再贪心删命令自动缩减，报告保留坐标、种子与存活命令。默认整轮的每一次捕获（本轮、格子隔离、每一步缩减、末次确认）都用**同一个从种子取出的固定原点**，经严格 vanilla-only 服务器进行，因此缩减候选在**原始绝对坐标**上确认；`--gameTest` 可退回旧路径（GameTest 每次自选原点，候选只在自己的原点上确认）。缩减是有预算的贪心删除，不是最小性证明。`captureSupportDirection.py` 是它找到的前两个差异的固定回归：14 刻，覆盖各方块类各自检查支撑的方向，以及从背面开栅栏门时的朝向翻转（含一次不带 `playerFacing` 的交互）。`captureFenceGateInWall.py` 是第三个差异的回归：14 刻，覆盖 `IN_WALL` 只跟随垂直于朝向那条轴。墙本身仍未实现，只有栅栏门与普通方块进入 `watch`，该组因此不开刻内轨迹。
+
+`captureHopperPickup.py` → `java26_2HopperPickup`：30 刻 / 8 组，覆盖漏斗吸取掉落物的两条原版路径（方块实体阶段的 `suckInItems` 与实体阶段的 `HopperBlock.entityInside`）、吸取体积边界、上方方块阻挡与 `DOES_NOT_BLOCK_HOPPERS`、8 gt 冷却、部分吸入、上方容器优先级与受电禁用。场景新增 `watchGroundItems` 观测项，原版侧直接调用 `HopperBlockEntity.getItemsAtAndAbove`。协议见 [器件层实体输入/输出协议](redstoneAudit/entityIoProtocol.md)。
+
+`exportBlockTags.py` 从固定 JAR 的 `data/minecraft/tags/block/` 递归解析内置方块标签写入 `data/blockTags.json`：`Bootstrap.bootStrap()` 不加载数据包标签，`BlockTags.WALLS` 在注册表导出器里是空的，必须另走这条路径。
+
+`captureChunkLifecycle.py` 用严格 vanilla-only 服务器在**按区块对齐的选定原点**上生成
+`java26_2ChunkLifecycle` 与 `java26_2ChunkLifecycleNegative`：60 刻 / 40 点，
+覆盖一个区块停止 ticking 时的方块计划刻、方块事件与方块实体三类待办，
+以及恢复后过期计划刻的一次性执行，与漏斗冷却、唱片机播放计时、幽匿感测体倒计时、运动中活塞进度四种冻结。捕获逐帧记录原版自己的
+`shouldTickBlocksAt` / `isPositionEntityTicking` / `hasChunkAt`。这两个 fixture 带
+`requiresAlignedOrigin`，`auditReference.py` 会跳过（GameTest 自选随机原点）。
+详见 [区块生命周期模型](redstoneAudit/chunkLifecyclePlan.md)。
+
+`captureVanillaScenario.py` 提供 `runVanillaCapture(commands, watch, endTick, name, origin, ...)`，
+在指定原点上用 vanilla-only 服务器直接生成 fixture，供需要已知区块边界的场景使用。
+
+`CaptureRedstoneVanilla` 是第二个参考入口：它自建 `MinecraftServer`，启用的功能开关正好是 `FeatureFlags.VANILLA_SET`、数据包只有 `vanilla`，用来把 GameTest 环境固有的 `trade_rebalance` 区分出来（`GameTestServer.ENABLED_FEATURES` 是 `private static final`，无法降级）。`vanillaReplay.py <fixture|all> <新目录>` 在 fixture 记录的**绝对原点与时钟**上复跑同一条时间线，逐字段对照 GameTest 捕获、再交给 `checkReference`，并对带轨迹的场景额外跑一次关掉轨迹的同原点同环境对照。捕获里的 `referenceEnvironment` 现在记录 `dataPacks`、`gameTime` 与 `clockTicks`。详见 [严格 vanilla-only 参考服务器](redstoneAudit/vanillaOnlyReference.md)。
+
+`captureMachineMatrix.py` 增加准连接机器矩阵组：14 刻 / 88 点，同一台机器 22 份，覆盖四个 x 偏移 × 四个 z 偏移的位置相关桶序、活塞六个朝向与两种放置顺序，另逐条对照 31,740 条更新轨迹；实测捕获原点 x、z 均为负值。
+
+`captureBlockEntityOrder.py` → `java26_2BlockEntityOrder`：18 刻 / 9 点，逐帧比较原版 `Level.blockEntityTickers` 的列表顺序（即 `tickBlockEntities` 的执行顺序）与内核的注册序号。覆盖放置顺序、稍后追加、移除后重新放置回到末尾、同格换类型、同刻放置两个，以及「空唱片机没有 ticker 所以不入列」这一反例。该场景不能放阳光探测器：它的读数取决于世界时钟，每次捕获不同。
+
+`captureRandomState.py` → `java26_2RandomState`：20 刻 / 7 点，两侧在第 0 刻设同一个种子后逐帧比较 `Level.random` 的 48 位内部状态（时间线上变化 7 次），从而检验随机**消耗次数**一致。只在这类场景里关掉六条生成规则与 `advance_weather`，把器件随机与世界随机分开。投掷器必须朝向容器：向空气抛出会产生外部动作，重放无法继续。
+
+`captureScheduledQueue.py` → `java26_2ScheduledQueue`：24 刻 / 21 点，逐帧比较原版 `LevelTicks` 里**整份待执行的方块计划刻队列**（按 `ScheduledTick.DRAIN_ORDER` 排序的坐标、方块、相对触发刻、优先级，共 108 条）与 `ServerLevel.blockEvents`。原版侧只读地反射容器，不修改游戏代码；子刻序号本身不记录，只记录它产生的顺序。
+
+`captureUpdateTrace.py` 增加刻内更新轨迹组：14 刻 / 9 点，另逐条对照 3,327 条邻居/形状更新坐标。原版侧使用 `CollectingNeighborUpdater.setDebugListener` 这一公开钩子，不修改游戏代码；截断不判为通过。加 `--no-trace` 可用同一时间线复跑以验证跟踪不改变执行语义。详见 [刻内更新轨迹](redstoneAudit/updateTrace.md)。
+
+`runReferenceTool.py ExportBlockCapabilities <绝对输出路径>` 用反射记录固定版每个方块实际重写的红石相关回调。构建 `exportSupportInventory` 目标导出内核逐方块支持等级，再运行 `python3 tools/buildSupportInventory.py <导出的 JSON>` 生成 [逐方块支持清单](redstoneAudit/supportInventory.md)。核心测试 “26.2 redstone capability coverage gate” 对已开放集合和 243 个仍拒绝放置的红石相关方块设门禁。
+
+`captureItemFrameComparator.py` 增加比较器展示框组：17 刻 / 12 点，覆盖旋转与物品开关、重复候选、朝向过滤、第一格导体要求、直接输入 15 短路，以及与第二格模拟量取较大者。捕获器直接生成真实 `ItemFrame` 实体；独立内核用受限实体输入表达，见 [环境输入](environmentInputs.md)。
+
+`runReferenceTool.py ExportSineTable <绝对输出路径>` 用反射导出原版 `Mth.SIN` 全部 65,536 项与 1,079 组日光临界角度；核心回归逐项比较 float 位模式，全部相同。`captureRepeaterLockRefresh.py` 增加中继器锁定刷新组：13 刻 / 7 点，覆盖竖直形状更新刷新 `LOCKED`、水平对照与真实锁定对照。
+
+`captureRemovalNotifySource.py` 增加移除回调来源组：17 刻 / 20 点，拉杆、中继器、比较器被移除时的通知来源方块，用被通知位置再外一格的三向普通铁轨读取。
+
+`captureWireShapeToggle.py` 增加粉线点/十字切换组：21 刻 / 6 点，用准连接未通知的活塞检测右键切换发出的邻居通知；捕获器的 `interact` 相应支持红石粉。
+
+`capturePistonLandingShape.py` 增加活塞落地形状组：21 刻 / 12 点，被推动的楼梯重算内角、音符盒重读乐器、侦测器落地即排脉冲。
+
+`captureObserverRemoval.py` 增加侦测器移除组：21 刻 / 11 点，用准连接但未被通知的活塞检测移除时是否发出输出侧通知，覆盖过时供电状态、计划刻仍排队、探测器后放置以及移除后立即重放置四种情形。
+
+`captureDiodeSupportBreak.py` 增加二极管断支撑组：21 刻 / 34 点，中继器与比较器在供电与不供电两种状态下失去支撑，用二极管正南两格的三向普通铁轨读取原版移除时额外发出的六向通知。
+
+`capturePistonRemovalCallback.py` 增加活塞移除回调组：31 刻 / 14 点，把带电避雷针推走，用三向普通铁轨读取移除时刻的通知；含一组不供电的对照。
+
+`captureRailNotificationSource.py` 增加邻居通知来源组：41 刻 / 29 点，用三向普通铁轨读取通知来源方块，覆盖红石粉隔 0/1/2 个导体、红石火把放置与移除、活塞推走铁轨上方红石块，另含一组红石粉旁双层门的对照。
+
+`captureStairShapes.py` 增加楼梯连接形状组：17 刻 / 153 点，覆盖四朝向 × 上下半 × 内外角、`canTakeShape` 阻断、原版玩家放置、拆除回到 `straight`，以及内角侧面变 sturdy 后红石墙火把的存活与消失。`ExportReference` 同时逐方块导出 `stairs`（`block instanceof StairBlock`）。`CaptureRedstone` 的 `playerPlace` 对楼梯按其 `getStateForPlacement` 语义设置玩家朝向与点击面；箱子路径不变。
+
+`captureDaylightVibration.py` 增加日光传感器振动组：81 刻 / 6 点，覆盖右键切换 `inverted` 发出的 `block_change`，包括两个切换方向、距离 3 与 5 格的行进刻数，以及背面滤波为 11（接受）和 9（拒绝）的校频感测体。场景不观察传感器自身 `power`，天空亮度仍是外部刺激。
+
+`capturePistonPushability.py` 增加活塞可推性组：25 刻 / 36 点，覆盖普通方块、按原版 `getDestroySpeed()==-1` 拒绝的基岩与末地传送门框，以及釉面陶瓦 `PUSH_ONLY` 的推出、不可拉回和侧向分支留置。`ExportReference` 同时导出每个方块状态的 `destroySpeed`，注册表数据指纹随之变化，旧 `.vmcb` 需要显式迁移。详见 [修复进度](redstoneAudit/fixProgress.md)。

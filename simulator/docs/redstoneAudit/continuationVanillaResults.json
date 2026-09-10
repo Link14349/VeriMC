@@ -1,0 +1,41 @@
+[
+  {
+    "fixture": "java26_2FullUpdateSnapshot",
+    "origin": [
+      64,
+      -59,
+      64
+    ],
+    "gameTestEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "vanilla"
+      ],
+      "gameTime": 22,
+      "clockTicks": 22
+    },
+    "vanillaEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "vanilla"
+      ],
+      "gameTime": 22,
+      "clockTicks": 22
+    },
+    "clockAligned": true,
+    "firstDifferenceAgainstGameTest": null,
+    "sha256": "3cd6eb3a3173f3e2cff476af7d39b9ff596fcc11fd1626e7afdbbdfd49d0dc04",
+    "checkerExitCode": 0,
+    "checkerStatus": "match",
+    "traceFreeRerunDifference": null,
+    "traceFreeRerunSameOrigin": true
+  }
+]

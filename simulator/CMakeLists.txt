@@ -56,6 +56,8 @@ endif()
 
 include(CTest)
 if(BUILD_TESTING)
+  add_executable(checkReference tools/checkReference.cpp)
+  target_link_libraries(checkReference PRIVATE simulatorCore)
   # Run before and after core optimizations, then compare the canonical stream.
   add_executable(checkWorldReplay tools/checkWorldReplay.cpp)
   target_link_libraries(checkWorldReplay PRIVATE simulatorCore)
@@ -70,4 +72,7 @@ if(BUILD_TESTING)
   add_test(NAME vmcbTests COMMAND vmcbTests)
   add_executable(vmcbBenchmark tools/vmcbBenchmark.cpp)
   target_link_libraries(vmcbBenchmark PRIVATE simulatorCore zstd::libzstd_shared)
+  # Generates the per-block coverage inventory from the registry itself.
+  add_executable(exportSupportInventory tools/exportSupportInventory.cpp)
+  target_link_libraries(exportSupportInventory PRIVATE simulatorCore)
 endif()

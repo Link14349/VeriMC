@@ -37,6 +37,16 @@ struct EventKeyHash {
     }
 };
 
+// 原版 LevelTicks 的 tickCheck：区块不可 ticking 时，它的计划刻既不执行也不丢弃，
+// 而是留在容器里，每刻重试到区块恢复为止。这里用同一个谓词表达，
+// 但直接跳过不可 ticking 的容器头，避免每刻空转（可观测行为相同）。
+using ChunkCheck = bool (*)(const void*, BlockPos);
+struct TickCheck {
+    ChunkCheck check{};
+    const void* owner{};
+    bool operator()(BlockPos chunk) const { return !check || check(owner, chunk); }
+};
+
 // Java 26.2 LevelTicks / LevelChunkTicks. A collected batch is separate from
 // future ticks: hasScheduledTick and willTickThisTick observe different sets.
 class BlockTicks {
@@ -45,10 +55,10 @@ public:
     bool schedule(const ScheduledEvent& event);
     bool hasScheduled(BlockPos pos, std::uint16_t type) const { return queuedKeys.contains({pos, type}); }
     bool willTick(BlockPos pos, std::uint16_t type) const;
-    std::optional<Tick> nextTick() const;
-    void collect(Tick tick, std::size_t limit = vanillaBatchLimit);
+    std::optional<Tick> nextTick(TickCheck tickable = {}) const;
+    void collect(Tick tick, TickCheck tickable = {}, std::size_t limit = vanillaBatchLimit);
     ScheduledEvent pop();
-    void finishThrough(Tick tick);
+    void finishThrough(Tick tick, TickCheck tickable = {});
     std::size_t size() const { return queuedKeys.size() + batch.size(); }
     bool hasBatch() const { return !batch.empty(); }
     Tick batchTick() const { return earliestCollection - 1; }
@@ -72,6 +82,7 @@ private:
     mutable std::unordered_set<EventKey, EventKeyHash> batchKeys;
     // Commands at tick zero occur after its block-tick phase, like GameTest.
     Tick earliestCollection{1};
+public:
     static BlockPos chunkAt(BlockPos pos);
 };
 }

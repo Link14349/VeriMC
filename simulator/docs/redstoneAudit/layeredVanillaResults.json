@@ -1,0 +1,44 @@
+[
+  {
+    "fixture": "java26_2EntityContainers",
+    "origin": [
+      5924788,
+      -58,
+      -4808652
+    ],
+    "gameTestEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:trade_rebalance",
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "file/simulator",
+        "minecart_improvements",
+        "redstone_experiments",
+        "trade_rebalance",
+        "vanilla"
+      ],
+      "gameTime": 11,
+      "clockTicks": 11
+    },
+    "vanillaEnvironment": {
+      "javaVersion": "25.0.4.1",
+      "randomTickSpeed": 0,
+      "featureFlags": [
+        "minecraft:vanilla"
+      ],
+      "dataPacks": [
+        "vanilla"
+      ],
+      "gameTime": 11,
+      "clockTicks": 11
+    },
+    "clockAligned": true,
+    "firstDifferenceAgainstGameTest": null,
+    "sha256": "930746773e389ad459edfbc7eb0886d0afc0ba439f57ecec57b5eda617adcfae",
+    "checkerExitCode": 0,
+    "checkerStatus": "match"
+  }
+]

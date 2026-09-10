@@ -13,27 +13,90 @@ int integerInRange(const Json& values, const char* key, int fallback, int maximu
     return value.get<int>();
 }
 
-// 26.2 Mth.cos takes a double, indexes a 65536-entry float sine table, then
-// daylight arithmetic returns to float before Java's round-to-positive-infinity.
-float daylightCos(float angle) {
+}
+// 26.2 Mth.SIN。原版用 (float)Math.sin(i / 10430.378350470453) 构造，这里用等价的
+// i * 2π / 65536；两种写法的 double 参数在 9,570 个索引上不同，是否影响 float 结果由
+// java26_2SineTable.json 的逐项对照回归证明，不靠推断。
+const std::array<float, 65536>& daylightSineTable() {
     static const auto table = [] {
         std::array<float, 65536> values{};
         for (std::size_t i = 0; i < values.size(); ++i)
             values[i] = static_cast<float>(std::sin(static_cast<double>(i) * std::numbers::pi * 2.0 / 65536.0));
         return values;
     }();
+    return table;
+}
+namespace {
+// 26.2 Mth.cos takes a double, indexes a 65536-entry float sine table, then
+// daylight arithmetic returns to float before Java's round-to-positive-infinity.
+float daylightCos(float angle) {
     auto index = static_cast<std::int64_t>(static_cast<double>(angle) * 10430.378350470453 + 16384.0);
-    return table[static_cast<std::uint64_t>(index) & 65535u];
+    return daylightSineTable()[static_cast<std::uint64_t>(index) & 65535u];
 }
 }
 
-void Simulator::updateComparatorNeighbors(BlockPos pos) {
+// 对应 ComparatorBlock.getItemFrame：只有恰好一个朝向匹配的展示框才被采纳，
+// 0 个或多个都返回空。读数为 ItemFrame.getAnalogOutput()：空框 0，否则 rotation % 8 + 1。
+std::optional<int> Simulator::itemFrameSignal(BlockPos mount, Direction facing) const {
+    auto found = runtime.find(mount);
+    if (found == runtime.end() || !found->second.values.contains("itemFrames")) return std::nullopt;
+    const auto& frames = found->second.values.at("itemFrames");
+    const char* name = directionNames[static_cast<unsigned>(facing)];
+    std::optional<int> result;
+    for (const auto& frame : frames) {
+        if (frame.at("facing") != name) continue;
+        if (result) return std::nullopt;
+        result = frame.value("hasItem", false) ? frame.at("rotation").get<int>() % 8 + 1 : 0;
+    }
+    return result;
+}
+void Simulator::stimulateItemFrames(BlockPos pos, const Json& input) {
+    if (input.size() != 1) throw std::invalid_argument("物品展示框输入不能与其他刺激字段混用");
+    const auto& frames = input.at("itemFrames");
+    if (!frames.is_array() || frames.size() > 12) throw std::invalid_argument("物品展示框列表最多 12 个");
+    if (world.get(pos) == 0) throw std::invalid_argument("物品展示框必须挂在一个方块上");
+    Json stored = Json::array();
+    std::vector<Direction> touched;
+    for (const auto& frame : frames) {
+        if (!frame.is_object()) throw std::invalid_argument("每个物品展示框必须是对象");
+        for (const auto& field : frame.items())
+            if (field.key() != "facing" && field.key() != "rotation" && field.key() != "hasItem")
+                throw std::invalid_argument("物品展示框只接受 facing、rotation 和 hasItem");
+        auto facing = parseDirection(frame.at("facing"));
+        int rotation = integerInRange(frame, "rotation", 0, 7);
+        if (frame.contains("hasItem") && !frame.at("hasItem").is_boolean()) throw std::invalid_argument("hasItem 必须为布尔值");
+        stored.push_back({{"facing", directionNames[static_cast<unsigned>(facing)]}, {"rotation", rotation}, {"hasItem", frame.value("hasItem", false)}});
+        if (std::find(touched.begin(), touched.end(), facing) == touched.end()) touched.push_back(facing);
+    }
+    auto& values = runtime[pos].values;
+    if (values.contains("itemFrames"))
+        for (const auto& frame : values.at("itemFrames")) {
+            auto facing = parseDirection(frame.at("facing"));
+            if (std::find(touched.begin(), touched.end(), facing) == touched.end()) touched.push_back(facing);
+        }
+    if (stored.empty()) values.erase("itemFrames"); else values["itemFrames"] = std::move(stored);
+    // Inventory and analog output share this record with stimulus fields.
+    // Removing the last frame must not remove its host container's contents.
+    if (values.empty() && runtime.at(pos).inventory.empty() && runtime.at(pos).output == 0) runtime.erase(pos);
+    runtimeChanged(pos, false);
+    // 原版 ItemFrame.setItem / setRotation 从展示框自身所在格发出 updateNeighbourForOutputSignal。
+    // 原版 ItemFrame 传的 changedBlock 是 Blocks.AIR，不是展示框挂靠的方块。
+    for (auto facing : touched) updateComparatorNeighbors(pos.relative(facing), 0);
+}
+
+// 原版 Level.updateNeighbourForOutputSignal 对每个命中的比较器发 FullNeighborUpdate，
+// 目标状态是**入队那一刻**的比较器状态；来源方块由调用方给出，默认是变化格自己的方块。
+void Simulator::updateComparatorNeighbors(BlockPos pos, StateId source) {
+    const auto changed = source == noSnapshot ? world.get(pos) : source;
     for (auto direction : horizontal) {
         auto neighbor = pos.relative(direction);
-        if (at(neighbor).device == Device::comparator) neighborChanged(neighbor, world.get(pos));
+        // 原版这里有 hasChunkAt 守卫：未加载的位置直接跳过。
+        if (!chunkLoaded(neighbor)) continue;
+        if (at(neighbor).device == Device::comparator) neighborChangedSnapshot(neighbor, world.get(neighbor), changed);
         else if (at(neighbor).conductor) {
             neighbor = neighbor.relative(direction);
-            if (at(neighbor).device == Device::comparator) neighborChanged(neighbor, world.get(pos));
+            if (!chunkLoaded(neighbor)) continue;
+            if (at(neighbor).device == Device::comparator) neighborChangedSnapshot(neighbor, world.get(neighbor), changed);
         }
     }
 }
@@ -45,6 +108,7 @@ void Simulator::runtimeChanged(BlockPos pos, bool notifyComparators) {
     sampleAffected(pos);
     if (notifyComparators) updateComparatorNeighbors(pos);
     if (!hoppers.empty()) wakeHoppers(pos);
+    wakeCartHoppers(pos);
 }
 
 void Simulator::updatePressurePlate(BlockPos pos) {
@@ -112,13 +176,18 @@ void Simulator::updateDaylight(BlockPos pos) {
     // A new stimulus invalidates this shortcut and schedules the next boundary.
 }
 
-bool Simulator::interactDevice(BlockPos pos) {
+bool Simulator::interactDevice(BlockPos pos, std::optional<Direction> playerFacing) {
     auto id = world.get(pos);
     const auto& state = registry[id];
     const auto& name = registry.type(id).name;
     if (state.device == Device::door || state.device == Device::trapdoor || state.device == Device::fenceGate) {
         if (name == "minecraft:iron_door" || name == "minecraft:iron_trapdoor") throw std::invalid_argument("铁门和铁活板门需要红石信号驱动");
-        setBlock(pos, registry.withBool(id, "open", registry.property(id, "open") != "true"), state.device == Device::trapdoor ? 2 : 10);
+        const bool opening = registry.property(id, "open") != "true";
+        auto next = registry.withBool(id, "open", opening);
+        // 原版 FenceGateBlock：从背面打开时会把朝向翻到玩家的朝向。没有给玩家朝向时不翻转。
+        if (opening && state.device == Device::fenceGate && playerFacing && state.facing == opposite(*playerFacing))
+            next = registry.withBool(registry.with(id, "facing", std::string(directionNames[static_cast<unsigned>(*playerFacing)])), "open", true);
+        setBlock(pos, next, state.device == Device::trapdoor ? 2 : 10);
         (void)worldRandom.nextFloat();emitGameEvent(registry.property(id,"open")=="true"?"block_close":"block_open",pos);
         return true;
     }
@@ -128,7 +197,10 @@ bool Simulator::interactDevice(BlockPos pos) {
         return true;
     }
     if (state.device == Device::daylight) {
-        setBlock(pos, registry.withBool(id, "inverted", registry.property(id, "inverted") != "true"), 2);
+        auto inverted = registry.withBool(id, "inverted", registry.property(id, "inverted") != "true");
+        setBlock(pos, inverted, 2);
+        // 原版在写入新状态后、刷新强度前发出 BLOCK_CHANGE，上下文携带新状态。
+        emitGameEvent("block_change", pos, {false, false, false, inverted});
         updateDaylight(pos);
         return true;
     }
@@ -151,6 +223,8 @@ bool Simulator::interactDevice(BlockPos pos) {
 
 bool Simulator::stimulateDevice(BlockPos pos, const Json& stimulus) {
     if (!stimulus.is_object()) throw std::invalid_argument("环境输入必须是对象");
+    // 容器实体声明与这一格是什么方块无关，空气格也接受，所以放在器件分派之前。
+    if (stimulus.contains("containerEntities")) { stimulateContainerEntities(pos, stimulus); return true; }
     auto id = world.get(pos);
     const auto& state = registry[id];
     if (state.device == Device::button) {
@@ -209,6 +283,7 @@ bool Simulator::stimulateDevice(BlockPos pos, const Json& stimulus) {
         }
         return true;
     }
+    if (state.device == Device::hopper && stimulus.contains("groundItems")) { stimulateGroundItems(pos, stimulus); return true; }
     if (state.device == Device::jukebox || state.device == Device::container || state.device == Device::hopper || state.device == Device::dropper || isBookshelf(id) || isDecoratedPot(id)) {
         if (stimulus.contains("inventory")) setInventory(pos, stimulus.at("inventory"));
         else if (state.device == Device::container && stimulus.contains("viewers")) setViewers(pos, integerInRange(stimulus, "viewers", 0, 1000000));
@@ -283,6 +358,22 @@ void Simulator::validateRuntime(BlockPos pos) const {
         if(!last.is_number_integer() || last < -1 || last > 5) throw std::invalid_argument("无效雕纹书架最后操作槽位");
     }
     if (device == Device::detectorRail) normalizeCarts(data.values.value("carts", Json::array()));
+    if (data.values.contains("containerEntities")) validateContainerEntities(data.values.at("containerEntities"));
+    if (data.values.contains("groundItems")) {
+        if (device != Device::hopper) throw std::invalid_argument("只有漏斗可以持有掉落物输入");
+        const auto& items = data.values.at("groundItems");
+        if (!items.is_array() || items.size() > 32) throw std::invalid_argument("无效掉落物列表");
+        for (const auto& entry : items) {
+            if (!entry.is_object() || entry.size() != 5) throw std::invalid_argument("无效掉落物记录");
+            const auto item = registry.itemId(entry.at("item"));
+            integerInRange(entry, "count", 1, registry.item(item).maxStack);
+            for (const char* axis : {"x", "y", "z"}) {
+                if (!entry.at(axis).is_number()) throw std::invalid_argument("无效掉落物坐标");
+                const double value = entry.at(axis).get<double>();
+                if (!std::isfinite(value) || value < -2.0 || value > 4.0) throw std::invalid_argument("无效掉落物坐标");
+            }
+        }
+    }
     if (device == Device::tripwire) integerInRange(data.values, "entities", 0, 1000000);
     if (device == Device::button) {
         int arrows = integerInRange(data.values, "arrows", 0, 1000000);
@@ -301,6 +392,16 @@ void Simulator::validateRuntime(BlockPos pos) const {
     if (device == Device::lectern) {
         int pages = integerInRange(data.values, "pages", 0, 100);
         integerInRange(data.values, "page", 0, std::max(0, pages - 1));
+    }
+    if (data.values.contains("itemFrames")) {
+        const auto& frames = data.values.at("itemFrames");
+        if (!frames.is_array() || frames.empty() || frames.size() > 12) throw std::invalid_argument("无效物品展示框列表");
+        for (const auto& frame : frames) {
+            if (!frame.is_object() || frame.size() != 3) throw std::invalid_argument("无效物品展示框记录");
+            parseDirection(frame.at("facing"));
+            integerInRange(frame, "rotation", 0, 7);
+            if (!frame.at("hasItem").is_boolean()) throw std::invalid_argument("无效物品展示框物品标记");
+        }
     }
 }
 }

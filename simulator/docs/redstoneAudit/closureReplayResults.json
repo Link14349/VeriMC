@@ -1,0 +1,1312 @@
+{
+  "simulationCommit": "a56569771ba6dc1abae41c7a2866e9b4ae4b4d6e",
+  "method": "Codex replay of Claude original captures, not a new Java capture",
+  "results": [
+    {
+      "capture": "fuzz7/round0.json",
+      "captureSha256": "fb029277e654dd050e70c553a23fcda5cea9873b07c9ce971812e2076b1853b8",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "commands": 1155,
+      "comparison": {
+        "frames": 13,
+        "origin": [
+          7953834,
+          -58,
+          -1323103
+        ],
+        "status": "match",
+        "watch": 191
+      }
+    },
+    {
+      "capture": "fuzz7/round1.json",
+      "captureSha256": "1c6cdefb73556af5edb80e90b239d939e6b018fac822bbadaec4eb289bbdb941",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "commands": 1157,
+      "comparison": {
+        "frames": 13,
+        "origin": [
+          6902770,
+          -58,
+          8316843
+        ],
+        "status": "match",
+        "watch": 198
+      }
+    },
+    {
+      "capture": "fuzz7/round2.json",
+      "captureSha256": "bef5b0c9a202cf576ea34efeb65a0d94b2511e582d32c45c246af0887c5daeb9",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "commands": 1175,
+      "comparison": {
+        "frames": 13,
+        "origin": [
+          1585877,
+          -58,
+          -7759184
+        ],
+        "status": "match",
+        "watch": 196
+      }
+    },
+    {
+      "capture": "fuzz7/round3.json",
+      "captureSha256": "8f9ee642aec85ad029c87db4a8f33ef28a107568eed8d674b8316c772ce520a9",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "commands": 1194,
+      "comparison": {
+        "frames": 13,
+        "origin": [
+          -2618861,
+          -58,
+          -502249
+        ],
+        "status": "match",
+        "watch": 206
+      }
+    },
+    {
+      "capture": "fuzz7/round4.json",
+      "captureSha256": "6f68973efb33f1a307cb42c360e17d6456419ac6f0c5c5684b6db8bf9530e769",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "commands": 1182,
+      "comparison": {
+        "frames": 13,
+        "origin": [
+          7773847,
+          -58,
+          -2582053
+        ],
+        "status": "match",
+        "watch": 199
+      }
+    },
+    {
+      "capture": "fuzz7/round5.json",
+      "captureSha256": "780fb15694a7ed0caeba498fce1869f64bceff0d009030b47dca52d5d59e49f6",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "commands": 1165,
+      "comparison": {
+        "frames": 13,
+        "origin": [
+          10158097,
+          -58,
+          -7224875
+        ],
+        "status": "match",
+        "watch": 181
+      }
+    },
+    {
+      "capture": "fuzz7/round6.json",
+      "captureSha256": "eca531e93111cb4218b51db4582a31be2d48bd0db756331737df86e2dd6bdeb1",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "commands": 1162,
+      "comparison": {
+        "frames": 13,
+        "origin": [
+          11410414,
+          -58,
+          12280240
+        ],
+        "status": "match",
+        "watch": 185
+      }
+    },
+    {
+      "capture": "fuzz7/round7.json",
+      "captureSha256": "65a036b2ade01976926df1e177bd532e0010e4766f5676dba999f5e26d98bf30",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "commands": 1186,
+      "comparison": {
+        "frames": 13,
+        "origin": [
+          426158,
+          -58,
+          98761
+        ],
+        "status": "match",
+        "watch": 202
+      }
+    },
+    {
+      "capture": "fuzz8/round0.json",
+      "captureSha256": "1591d69c04d6f1f10e7bd1ac96f7830d24288fd1a0eef3adc7b26cbfcac2f52d",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "commands": 1165,
+      "comparison": {
+        "frames": 13,
+        "origin": [
+          -5794133,
+          -58,
+          2897476
+        ],
+        "status": "match",
+        "watch": 188
+      }
+    },
+    {
+      "capture": "fuzz8/round1.json",
+      "captureSha256": "7238f8fc19e6636629dbdb213ff637ba27df7b3306e05e2484bb733dfdd5626b",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "commands": 1162,
+      "comparison": {
+        "frames": 13,
+        "origin": [
+          -12714542,
+          -58,
+          5563196
+        ],
+        "status": "match",
+        "watch": 201
+      }
+    },
+    {
+      "capture": "fuzz8/round2.json",
+      "captureSha256": "88453cadbd4eaf87945efdf6c80a1a08815435ff3aee65a820cfe84bdedd3c00",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "commands": 1168,
+      "comparison": {
+        "frames": 13,
+        "origin": [
+          -12031181,
+          -58,
+          7095210
+        ],
+        "status": "match",
+        "watch": 190
+      }
+    },
+    {
+      "capture": "fuzz8/round3.json",
+      "captureSha256": "a1a3a0f01bd150a3d250aaf104cd4a8a3284213e1c98d7eb4c9b33a82afea0c7",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "commands": 1171,
+      "comparison": {
+        "frames": 13,
+        "origin": [
+          12253762,
+          -58,
+          2327290
+        ],
+        "status": "match",
+        "watch": 196
+      }
+    },
+    {
+      "capture": "fuzz8/round4.json",
+      "captureSha256": "2bdf15a1814ab10e8335e27a3f016f3ba0287e033324a7a886c4c9f7d3527ed7",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "commands": 1162,
+      "comparison": {
+        "frames": 13,
+        "origin": [
+          14584134,
+          -58,
+          285912
+        ],
+        "status": "match",
+        "watch": 190
+      }
+    },
+    {
+      "capture": "fuzz8/round5.json",
+      "captureSha256": "c48a506ad411212d79bfb7e558d85bcbe1a086e9ea853c847e3ca748cc0cbfb9",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "commands": 1169,
+      "comparison": {
+        "frames": 13,
+        "origin": [
+          -3808463,
+          -58,
+          4714935
+        ],
+        "status": "match",
+        "watch": 191
+      }
+    },
+    {
+      "capture": "fuzz8/round6.json",
+      "captureSha256": "6e36c523480864aa37fd3944e53c963b515e762b5503ee6cd06684afc1d6b4c3",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "commands": 1168,
+      "comparison": {
+        "frames": 13,
+        "origin": [
+          -956952,
+          -58,
+          757366
+        ],
+        "status": "match",
+        "watch": 183
+      }
+    },
+    {
+      "capture": "fuzz8/round7.json",
+      "captureSha256": "819fa34da3e45bd7312237b3843633d7b53612fb5a2fda2d65c79c86353d324e",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "commands": 1185,
+      "comparison": {
+        "frames": 13,
+        "origin": [
+          -13599339,
+          -58,
+          -7310453
+        ],
+        "status": "match",
+        "watch": 220
+      }
+    },
+    {
+      "capture": "fullAudit15/java26_2Bells/actual.json",
+      "captureSha256": "8ac04c60de11db9f07e47c9a83114f7ca658ef4779f830b227dcfb9a744282f7",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "commands": 200,
+      "comparison": {
+        "frames": 123,
+        "origin": [
+          -5878561,
+          -58,
+          3840506
+        ],
+        "status": "match",
+        "watch": 34
+      }
+    },
+    {
+      "capture": "fullAudit15/java26_2Bookshelves/actual.json",
+      "captureSha256": "d87e03f35a72dcc694541fed998d17dbe5ea8334020bda72b4e841d65114af95",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "commands": 31,
+      "comparison": {
+        "frames": 57,
+        "origin": [
+          11198187,
+          -58,
+          -10485489
+        ],
+        "status": "match",
+        "watch": 11
+      }
+    },
+    {
+      "capture": "fullAudit15/java26_2Buttons/actual.json",
+      "captureSha256": "68610b9a9fa4beb29501a8fe77b3f03ecf207c0e1e6691a5ce9d82751cf26ad4",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "commands": 77,
+      "comparison": {
+        "frames": 101,
+        "origin": [
+          -14654875,
+          -58,
+          5087216
+        ],
+        "status": "match",
+        "watch": 16
+      }
+    },
+    {
+      "capture": "fullAudit15/java26_2Composters/actual.json",
+      "captureSha256": "0f98531381ccc5128a7f880468e51c9285c4efe81bd7749f39e61b4055a622e1",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "commands": 70,
+      "comparison": {
+        "frames": 111,
+        "origin": [
+          9460838,
+          -58,
+          -14508711
+        ],
+        "status": "match",
+        "watch": 26
+      }
+    },
+    {
+      "capture": "fullAudit15/java26_2Containers/actual.json",
+      "captureSha256": "38ced3de9df375c2402afb8bc6395724049aa7aba273e87700b829f6fe7950af",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "commands": 853,
+      "comparison": {
+        "frames": 17,
+        "origin": [
+          -10114969,
+          -58,
+          4939251
+        ],
+        "status": "match",
+        "watch": 14
+      }
+    },
+    {
+      "capture": "fullAudit15/java26_2CopperChests/actual.json",
+      "captureSha256": "3c1ca8655a359f5fd3309b91fbb70d5b4b7a7ba8fa100aaec482e726b797cc3a",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "commands": 583,
+      "comparison": {
+        "frames": 25,
+        "origin": [
+          -2552902,
+          -58,
+          -14352421
+        ],
+        "status": "match",
+        "watch": 132
+      }
+    },
+    {
+      "capture": "fullAudit15/java26_2DaylightVibration/actual.json",
+      "captureSha256": "1e77b106ae86e917e692900876591fcd03e0160574e1bcdc6980c158cbbb59f0",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "commands": 74,
+      "comparison": {
+        "frames": 81,
+        "origin": [
+          -1243760,
+          -58,
+          -2380394
+        ],
+        "status": "match",
+        "watch": 6
+      }
+    },
+    {
+      "capture": "fullAudit15/java26_2DeviceVibrations/actual.json",
+      "captureSha256": "1460b50a5c2880df6be146efec64b64df495c0cc29a1ef51b5f219818b8214ab",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "commands": 90,
+      "comparison": {
+        "frames": 155,
+        "origin": [
+          2397412,
+          -58,
+          6100107
+        ],
+        "status": "match",
+        "watch": 31
+      }
+    },
+    {
+      "capture": "fullAudit15/java26_2Devices/actual.json",
+      "captureSha256": "6fdc498e87c8e7a6e69da90116fc513a6fb8759e216ca29e5b019a7f94fd7d19",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "commands": 1330,
+      "comparison": {
+        "frames": 29,
+        "origin": [
+          -11918846,
+          -58,
+          -1393061
+        ],
+        "status": "match",
+        "watch": 32
+      }
+    },
+    {
+      "capture": "fullAudit15/java26_2DiodeSupportBreak/actual.json",
+      "captureSha256": "370490ee43704b6e0decb9fe48512eccc55374f0631f44245f916e9ce07f39bf",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "commands": 424,
+      "comparison": {
+        "frames": 21,
+        "origin": [
+          1334540,
+          -58,
+          -5319170
+        ],
+        "status": "match",
+        "watch": 34
+      }
+    },
+    {
+      "capture": "fullAudit15/java26_2Droppers/actual.json",
+      "captureSha256": "04c549f53307eb6b2134641916acaba58e58d1bd76689dfc4566aa363e577611",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "commands": 76,
+      "comparison": {
+        "frames": 31,
+        "origin": [
+          13450771,
+          -58,
+          -14695441
+        ],
+        "status": "match",
+        "watch": 19
+      }
+    },
+    {
+      "capture": "fullAudit15/java26_2FenceGateInWall/actual.json",
+      "captureSha256": "26a6762b39224c851cfa846bb0b7c385b6cf6ecbcdcd241ff4cf2516121eb349",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "commands": 58,
+      "comparison": {
+        "frames": 15,
+        "origin": [
+          838690,
+          -58,
+          12415465
+        ],
+        "status": "match",
+        "watch": 4
+      }
+    },
+    {
+      "capture": "fullAudit15/java26_2Hoppers/actual.json",
+      "captureSha256": "25f5f212bdc7e4f01af5ca82b6e848673a240609b95a1dd6c26e5d800cee09ac",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "commands": 48,
+      "comparison": {
+        "frames": 65,
+        "origin": [
+          -3945195,
+          -58,
+          4392458
+        ],
+        "status": "match",
+        "watch": 25
+      }
+    },
+    {
+      "capture": "fullAudit15/java26_2ItemFrameComparator/actual.json",
+      "captureSha256": "0f69b0245b116b94ec1ded5aec8b933cc7a11f24546d4960844194fb64892944",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "commands": 275,
+      "comparison": {
+        "frames": 17,
+        "origin": [
+          8172204,
+          -58,
+          9801097
+        ],
+        "status": "match",
+        "watch": 12
+      }
+    },
+    {
+      "capture": "fullAudit15/java26_2JukeboxHoppers/actual.json",
+      "captureSha256": "602c47dbbcb9c2b7e2a8151a8d65e50a13f87f57212a05c888d4fb1035e95afa",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "commands": 35,
+      "comparison": {
+        "frames": 1456,
+        "origin": [
+          -3884990,
+          -58,
+          10255725
+        ],
+        "status": "match",
+        "watch": 11
+      }
+    },
+    {
+      "capture": "fullAudit15/java26_2Jukeboxes/actual.json",
+      "captureSha256": "ca52b9943961a445a89795365526d9d70aea38a0690f0cf335743b6741e35f03",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "commands": 245,
+      "comparison": {
+        "frames": 151,
+        "origin": [
+          -8651590,
+          -58,
+          4222488
+        ],
+        "status": "match",
+        "watch": 68
+      }
+    },
+    {
+      "capture": "fullAudit15/java26_2MachineMatrix/actual.json",
+      "captureSha256": "eba605d0f6027e34e86881d713fd4d48b177821d84bf1a24900c843f7d82a197",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "commands": 616,
+      "comparison": {
+        "frames": 15,
+        "origin": [
+          4103205,
+          -58,
+          -4624517
+        ],
+        "status": "match",
+        "traceEntries": 31740,
+        "watch": 88
+      }
+    },
+    {
+      "capture": "fullAudit15/java26_2Notes/actual.json",
+      "captureSha256": "a4d7095e07979d31743a7df9b74d3a149ac46763cf6b64d68e9b638a541ef0f0",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "commands": 237,
+      "comparison": {
+        "frames": 100,
+        "origin": [
+          -10277442,
+          -58,
+          8784890
+        ],
+        "status": "match",
+        "watch": 32
+      }
+    },
+    {
+      "capture": "fullAudit15/java26_2ObserverRemoval/actual.json",
+      "captureSha256": "b8f522a707fe99681c4272cafed580ec57aebe254c8752ee43360e8c5587c9ff",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "commands": 122,
+      "comparison": {
+        "frames": 21,
+        "origin": [
+          -7983373,
+          -58,
+          -9942192
+        ],
+        "status": "match",
+        "watch": 11
+      }
+    },
+    {
+      "capture": "fullAudit15/java26_2PistonLandingShape/actual.json",
+      "captureSha256": "634ee5ce909d1f6c8d294684f65b5288da568a3552230a9c4c40fc2d69c90474",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "commands": 122,
+      "comparison": {
+        "frames": 21,
+        "origin": [
+          4707193,
+          -58,
+          -13797906
+        ],
+        "status": "match",
+        "watch": 12
+      }
+    },
+    {
+      "capture": "fullAudit15/java26_2PistonPushability/actual.json",
+      "captureSha256": "1aa79a19458c608d9bbabc9a5dc868230571a2eb84cd965a69d062d8131cc510",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "commands": 82,
+      "comparison": {
+        "frames": 25,
+        "origin": [
+          -7129181,
+          -58,
+          655074
+        ],
+        "status": "match",
+        "watch": 36
+      }
+    },
+    {
+      "capture": "fullAudit15/java26_2PistonRemovalCallback/actual.json",
+      "captureSha256": "24e58f13ef86f2317a6551f9a7ff6d3b1fe35dccc500a94dc4b651ec928c0778",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "commands": 113,
+      "comparison": {
+        "frames": 31,
+        "origin": [
+          -4903499,
+          -58,
+          -12470261
+        ],
+        "status": "match",
+        "watch": 14
+      }
+    },
+    {
+      "capture": "fullAudit15/java26_2Pots/actual.json",
+      "captureSha256": "7a1057a1e768046aeb5d791a7d88a7b7937ad682bae582ad7c19e09b9d3aa622",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "commands": 346,
+      "comparison": {
+        "frames": 73,
+        "origin": [
+          -10857370,
+          -58,
+          14342070
+        ],
+        "status": "match",
+        "watch": 26
+      }
+    },
+    {
+      "capture": "fullAudit15/java26_2RailNotificationSource/actual.json",
+      "captureSha256": "f9f2dbf94f7e4158aceacc2f10c0df85f93c2909d43fc2f403b6e6782c4a9a87",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "commands": 256,
+      "comparison": {
+        "frames": 41,
+        "origin": [
+          717089,
+          -58,
+          -10997809
+        ],
+        "status": "match",
+        "watch": 29
+      }
+    },
+    {
+      "capture": "fullAudit15/java26_2Rails/actual.json",
+      "captureSha256": "dff8b7b9b6aa03101e6678032e0a21d5b6662a8b0a8b661ef82b88ad1be622b6",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "commands": 1831,
+      "comparison": {
+        "frames": 45,
+        "origin": [
+          9946891,
+          -58,
+          894908
+        ],
+        "status": "match",
+        "watch": 93
+      }
+    },
+    {
+      "capture": "fullAudit15/java26_2Redstone/actual.json",
+      "captureSha256": "51d4cb48af9b319992670eb1ff964a7e81b2408814caeee610e778d0725079ad",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "commands": 206,
+      "comparison": {
+        "frames": 25,
+        "origin": [
+          -2318155,
+          -58,
+          -12566101
+        ],
+        "status": "match",
+        "watch": 47
+      }
+    },
+    {
+      "capture": "fullAudit15/java26_2RemovalNotifySource/actual.json",
+      "captureSha256": "5d0b56ef12ad1e23f8184aab04152f14550d58b1df57523576c38de00539c16d",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "commands": 188,
+      "comparison": {
+        "frames": 17,
+        "origin": [
+          -12326854,
+          -58,
+          -3935317
+        ],
+        "status": "match",
+        "watch": 20
+      }
+    },
+    {
+      "capture": "fullAudit15/java26_2RepeaterLockRefresh/actual.json",
+      "captureSha256": "419819b4684dbe2331106f9b6530e59ae62976985cdd3b9ca765bf501df98714",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "commands": 116,
+      "comparison": {
+        "frames": 13,
+        "origin": [
+          6005317,
+          -58,
+          750589
+        ],
+        "status": "match",
+        "watch": 7
+      }
+    },
+    {
+      "capture": "fullAudit15/java26_2StairShapes/actual.json",
+      "captureSha256": "57c6b06f373bb2923953260b30e10d038fabe5d268ec8b9325d552ad532801c5",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "commands": 823,
+      "comparison": {
+        "frames": 17,
+        "origin": [
+          -8566921,
+          -58,
+          7223300
+        ],
+        "status": "match",
+        "watch": 153
+      }
+    },
+    {
+      "capture": "fullAudit15/java26_2SupportDirection/actual.json",
+      "captureSha256": "bfcdf487e49753207c8224bed231c8cd92451b1ee8bc8b8106d986745ad9a2fb",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "commands": 476,
+      "comparison": {
+        "frames": 15,
+        "origin": [
+          6071263,
+          -58,
+          -2689614
+        ],
+        "status": "match",
+        "traceEntries": 6039,
+        "watch": 40
+      }
+    },
+    {
+      "capture": "fullAudit15/java26_2Targets/actual.json",
+      "captureSha256": "83fc232275a69cb442fc77774bf357d7a5d08897655c9f252e2b0a919716db15",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "commands": 73,
+      "comparison": {
+        "frames": 53,
+        "origin": [
+          -13992056,
+          -58,
+          6839752
+        ],
+        "status": "match",
+        "watch": 26
+      }
+    },
+    {
+      "capture": "fullAudit15/java26_2TickBatches/actual.json",
+      "captureSha256": "55c2ee1a77f2b9e8fc46db8f2bc7edcb4753fe7f62a4d4b4fb54bf1c0b4e4b3d",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "commands": 16,
+      "comparison": {
+        "frames": 25,
+        "origin": [
+          -12357081,
+          -58,
+          12153880
+        ],
+        "status": "match",
+        "watch": 8
+      }
+    },
+    {
+      "capture": "fullAudit15/java26_2Torches/actual.json",
+      "captureSha256": "907c1eec15e5b072adc363c500c2de9f322fd4f650f676500cf9b3c32966180d",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "commands": 42,
+      "comparison": {
+        "frames": 195,
+        "origin": [
+          -5283784,
+          -58,
+          13648571
+        ],
+        "status": "match",
+        "watch": 5
+      }
+    },
+    {
+      "capture": "fullAudit15/java26_2Tripwire/actual.json",
+      "captureSha256": "d31a097429aaf3cd8043c9b22296ad1a06488b34fa02c60663327134a3af829a",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "commands": 155,
+      "comparison": {
+        "frames": 70,
+        "origin": [
+          -8078978,
+          -58,
+          8468125
+        ],
+        "status": "match",
+        "watch": 121
+      }
+    },
+    {
+      "capture": "fullAudit15/java26_2UpdateTrace/actual.json",
+      "captureSha256": "1e31ccadb33e2ba200a1ff112794b79682081a49866280e9a054b6fe71bae3c8",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "commands": 99,
+      "comparison": {
+        "frames": 15,
+        "origin": [
+          -8463739,
+          -58,
+          -5292086
+        ],
+        "status": "match",
+        "traceEntries": 3327,
+        "watch": 9
+      }
+    },
+    {
+      "capture": "fullAudit15/java26_2Vibrations/actual.json",
+      "captureSha256": "ee49ac27d0b52ee19e53e5fd490adaa47adce852f4aa093f1cd6d95fcf695ade",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "commands": 61,
+      "comparison": {
+        "frames": 161,
+        "origin": [
+          -4318584,
+          -58,
+          -13904715
+        ],
+        "status": "match",
+        "watch": 13
+      }
+    },
+    {
+      "capture": "fullAudit15/java26_2WireGeometry/actual.json",
+      "captureSha256": "71aeb1de5909a7f6d2f8e7a6a74cb3e2b46f9edffbb93609eed135280cf44788",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "commands": 256,
+      "comparison": {
+        "frames": 37,
+        "origin": [
+          8088338,
+          -58,
+          -5390233
+        ],
+        "status": "match",
+        "watch": 80
+      }
+    },
+    {
+      "capture": "fullAudit15/java26_2WireShapeToggle/actual.json",
+      "captureSha256": "45761a20dd391c6fb3933d14eafa7216bd50f4156d81c91f706fb009bde5cd95",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "commands": 137,
+      "comparison": {
+        "frames": 21,
+        "origin": [
+          -704867,
+          -58,
+          4567231
+        ],
+        "status": "match",
+        "watch": 6
+      }
+    }
+  ],
+  "newCaptureVerification": {
+    "seed": 20260909,
+    "rounds": 2,
+    "ticks": 12,
+    "reductionScope": "budgeted; recaptures use new origins; no minimality or fixed-origin guarantee",
+    "results": [
+      {
+        "round": 0,
+        "cells": 25,
+        "commands": 1164,
+        "watch": 193,
+        "status": "match",
+        "origin": [
+          -12751213,
+          -58,
+          -5706100
+        ],
+        "captureSha256": "e232a4af6c83539bc55242bdd6b45bade46d37a843e694706b3489d6e2f8cf6f",
+        "referenceEnvironment": {
+          "javaVersion": "25.0.4.1",
+          "randomTickSpeed": 0,
+          "featureFlags": [
+            "minecraft:trade_rebalance",
+            "minecraft:vanilla"
+          ]
+        }
+      },
+      {
+        "round": 1,
+        "cells": 25,
+        "commands": 1155,
+        "watch": 180,
+        "status": "match",
+        "origin": [
+          -4827341,
+          -58,
+          -1076139
+        ],
+        "captureSha256": "8ad48d288d682a0e8efed1f5dc971fb07fa9af1e98952a8449e6e1f07fd101d4",
+        "referenceEnvironment": {
+          "javaVersion": "25.0.4.1",
+          "randomTickSpeed": 0,
+          "featureFlags": [
+            "minecraft:trade_rebalance",
+            "minecraft:vanilla"
+          ]
+        }
+      }
+    ]
+  },
+  "referenceFuzzTests": {
+    "passed": 4,
+    "total": 4
+  },
+  "ctest": {
+    "passed": 3,
+    "total": 3,
+    "release": true
+  },
+  "checkerSha256": "dd304dfe170424d80614f9314756d8cdcfa5cc54b0654add7667342bd6d11611",
+  "fuzzToolSha256": "2bb2bb49e046b9ac0ec795ed1cab587caeb4476023d9911dbaee36fe74dedea9"
+}

@@ -64,14 +64,15 @@ setBlock(0, (1,2,42), 'redstone_block'); setBlock(10, (1,2,42), 'air'); watch +=
 setBlock(0, (2,2,46), 'piston', facing='east')
 for x in range(3,16): setBlock(0, (x,2,46), 'stone')
 setBlock(0, (1,2,46), 'redstone_block'); watch += [[2,2,46],[3,2,46],[15,2,46]]
-def runCapture(commands, watch, endTick=24, fixtureName='java26_2Redstone', **scenarioOptions):
+def runCapture(commands, watch, endTick=24, fixtureName='java26_2Redstone', capturePath=None, **scenarioOptions):
     instancePath = packDir / 'data/simulator/test_instance/capture.json'
     instance = json.loads(instancePath.read_text())
     instance['max_ticks'] = max(100, endTick + 20)
     instancePath.write_text(json.dumps(instance))
     scenarioPath = cacheDir / 'redstoneScenario.json'
     scenarioPath.write_text(json.dumps({'endTick': endTick, 'commands': commands, 'watch': watch, **scenarioOptions}, indent=2))
-    outputPath = rootDir / ('tests/fixtures/' + fixtureName + '.json')
+    # Fuzzing writes outside the checked-in fixture directory.
+    outputPath = Path(capturePath) if capturePath else rootDir / ('tests/fixtures/' + fixtureName + '.json')
     outputPath.parent.mkdir(parents=True, exist_ok=True)
     subprocess.run(['python3', str(Path(__file__).with_name('runReferenceTool.py')), 'CaptureRedstone', str(scenarioPath), str(outputPath), str(cacheDir / 'captureWorld'), str(packDir.parent), str(cacheDir / 'gameTestReport.xml')], check=True)
 

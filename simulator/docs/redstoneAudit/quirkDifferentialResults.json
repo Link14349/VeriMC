@@ -1,0 +1,58 @@
+{
+  "referenceVersion": "26.2",
+  "serverSha1": "823e2250d24b3ddac457a60c92a6a941943fcd6a",
+  "gameSha256": "183c0499c5f855570ee487dd38e141a53f0121f83a0b07a3bac2d8b6698823e8",
+  "javaVersion": "openjdk version \"25.0.4.1\" 2026-08-18 LTS\nOpenJDK Runtime Environment Temurin-25.0.4.1+1 (build 25.0.4.1+1-LTS)\nOpenJDK 64-Bit Server VM Temurin-25.0.4.1+1 (build 25.0.4.1+1-LTS, mixed mode, sharing)\n",
+  "simulationCommit": "cc6b156723fb68fc0131def99013315f3ff3b455",
+  "scope": "30 layouts, end-of-game-tick observations only; not all zero-tick machines or BUD histories",
+  "scenarios": [
+    {
+      "scenario": "simulator/tests/scenarios/stickyPulseMatrix.json",
+      "scenarioSha256": "06d6161511777dbf8009e8ea9d04dfa11a428b3ea7edfc9c4e0559d5f0b98d8e",
+      "captureSha256": "64773b6cd2af9656d0a1939013741b5b8522e5d7f5df0be5961c5be0e57b3ff7",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "result": {
+        "fixture": "stickyPulseMatrix/actual.json",
+        "frames": 15,
+        "origin": [
+          -4294601,
+          -58,
+          -12484581
+        ],
+        "status": "match",
+        "watch": 72
+      }
+    },
+    {
+      "scenario": "simulator/tests/scenarios/quasiConnectivityMatrix.json",
+      "scenarioSha256": "e9736095df1aa93f5cd6a7029a188aef8fea32907e928ee43343c5f352329aa7",
+      "captureSha256": "11bbcaaa31a70389097a1d856e9c4d2f8c4924aac7f45178b61a09ee1b59b22f",
+      "referenceEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ]
+      },
+      "result": {
+        "fixture": "quasiConnectivityMatrix/actual.json",
+        "frames": 17,
+        "origin": [
+          -10313621,
+          -58,
+          6315149
+        ],
+        "status": "match",
+        "watch": 12
+      }
+    }
+  ]
+}

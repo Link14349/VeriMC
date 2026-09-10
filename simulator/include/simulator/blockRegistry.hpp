@@ -17,6 +17,12 @@ struct BlockType {
     std::map<std::string, PropertyInfo> properties;
     std::string supportLevel{"unimplemented"};
     bool occludesVibrations{}, dampensVibrations{}, vibrationResonator{};
+    // 原版 StairBlock.isStairs 的判据：block instanceof StairBlock，由注册表导出。
+    bool stairs{};
+    // 原版 BlockTags.WALLS，栅栏门的 IN_WALL 判据。
+    bool wall{};
+    // 原版 BlockTags.DOES_NOT_BLOCK_HOPPERS：完整碰撞方块也不挡住漏斗吸取掉落物。
+    bool doesNotBlockHoppers{};
     std::uint8_t instrument{};
 };
 // A power-of-two stride avoids division by 40 in each checked vector lookup.
@@ -28,6 +34,8 @@ struct alignas(64) BlockState {
     std::uint8_t power{}, delay{1}, supportMask{}, rigidMask{}, centerMask{}, staticAnalog{};
     bool conductor{}, fullCube{}, analogSource{}, blockEntity{}, replaceable{}, signalSource{};
     bool powered{}, lit{}, locked{}, extended{}, subtract{}, sticky{};
+    // 原版 getDestroySpeed() == -1.0F 的不可破坏方块，活塞据此拒绝推动。
+    bool indestructible{};
     std::uint8_t pushReaction{};
     std::array<std::uint8_t, 6> weak{}, strong{};
     std::array<std::uint8_t, 4> wireSides{};
@@ -48,6 +56,8 @@ public:
     bool has(StateId id, const std::string& property) const { return type(id).properties.contains(property); }
     std::size_t stateCount() const { return states.size(); }
     std::size_t typeCount() const { return types.size(); }
+    // 计划刻只记录方块类型编号，回查名字时用这个。
+    const BlockType& typeAt(std::uint16_t index) const { return types.at(index); }
     const BlockType& blockType(std::uint16_t id) const { return types.at(id); }
     const std::vector<std::uint8_t>& ruleFingerprint() const { return rulesHash; }
     std::uint32_t itemId(const std::string& name) const;
