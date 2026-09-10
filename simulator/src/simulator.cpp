@@ -80,6 +80,8 @@ Simulator::ChunkState Simulator::chunkState(BlockPos pos) const {
 // 逻辑永远读不到未加载的方块。这里把它作为**输入约束**强制执行，读路径因此不需要额外判断。
 void Simulator::setChunkState(int chunkX, int chunkZ, ChunkState state, std::optional<Tick> stalledSince) {
     if (faulted) throw std::runtime_error("当前执行已中止，请从有效快照恢复");
+    if (chunkX < INT32_MIN / 16 || chunkX > INT32_MAX / 16 || chunkZ < INT32_MIN / 16 || chunkZ > INT32_MAX / 16)
+        throw std::invalid_argument("区块坐标越界");
     const BlockPos chunk{chunkX, 0, chunkZ};
     auto previous = chunkStates;
     const bool wasTicking = chunkBlockTicking({chunkX * 16, 0, chunkZ * 16});

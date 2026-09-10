@@ -121,12 +121,13 @@ origin: [i32, i32, i32]
 initialization: "canonicalXYZ1" 或 "checkpoint1"
 randomSource: {algorithm: "javaLegacy48", seed: u64}
 nextEntityOrder: u64
+chunkStates: [{chunk: [i32, i32], state: string, stalledSince: u64}]  // 无覆盖时写 []
 snapshot: { ... }  // 仅快照
 ```
 
-参考版本来自仓库的 [referenceVersion.json](../data/referenceVersion.json)，固定为 Java 26.2。`rulesDigest` 的输入是本实现实际使用的七个规则文件：`blockStates.json`、`compostingRules.json`、`itemDefinitions.json`、`jukeboxRules.json`、`noteRules.json`、`referenceVersion.json`、`vibrationRules.json`。按上述文件名字节升序，对每个文件连接 `string 文件名 + SHA-256(原始文件字节)`，再计算整个串的 SHA-256。文件清单的变化需要新的规则身份；不能漏掉影响行为的数据。
+参考版本来自仓库的 [referenceVersion.json](../data/referenceVersion.json)，固定为 Java 26.2。`rulesDigest` 的输入是本实现实际使用的八个规则文件：`blockStates.json`、`blockTags.json`、`compostingRules.json`、`itemDefinitions.json`、`jukeboxRules.json`、`noteRules.json`、`referenceVersion.json`、`vibrationRules.json`。按上述文件名字节升序，对每个文件连接 `string 文件名 + SHA-256(原始文件字节)`，再计算整个串的 SHA-256。文件清单的变化需要新的规则身份；不能漏掉影响行为的数据。
 
-`rulesDigest` 约束数据，不能替代引擎行为版本。快照的 `snapshot` map 必须包含 `checkpointAbi: "simulatorCheckpoint1"` 和 `engineBuild: string`：前者标识经过续跑验证的执行语义/快照结构，后者记录实际构建。改变可观察执行语义必须更新 ABI；同 ABI 的构建只有通过续跑对照才允许互读。当前读取器检查 ABI；构建指纹由实际核心源码、头文件及编译器身份计算，供追溯使用，不要求指纹逐字相同。
+`rulesDigest` 约束数据，不能替代引擎行为版本。快照的 `snapshot` map 必须包含 `checkpointAbi: "simulatorCheckpoint2"` 和 `engineBuild: string`：前者标识经过续跑验证的执行语义/快照结构，后者记录实际构建。改变可观察执行语义必须更新 ABI；同 ABI 的构建只有通过续跑对照才允许互读。当前读取器检查 ABI；构建指纹由实际核心源码、头文件及编译器身份计算，供追溯使用，不要求指纹逐字相同。
 
 版本、参考构建、规则设置或 rulesDigest 不匹配时，不自动运行；返回明确的迁移错误。快照还必须匹配 checkpointAbi。迁移工具需要单独做兼容验证，不能通过忽略检查强行加载。
 
@@ -351,3 +352,7 @@ World 增加只读分区遍历入口，导出只需 O(状态表 + 分区索引 +
 当前证据：83 项既有核心测试与 11 组 VMCB 测试通过 Release 和 ASan/UBSan；固定字节向量和独立 Python 读取器交叉验证。VMCB 测试覆盖四种编码、负坐标、CBOR 数值、旧 JSON 大整数、初始化对照、按钮、部分执行批次、移动活塞、火把历史、库存/漏斗、外部动作、振动、钟/音符/唱片快照及损坏/取消原子性；部分执行批次逐事件对照，其余场景比较完整状态与续跑终点。250 次位翻转属于小规模确定性变异检查，不等同于持续覆盖率引导模糊测试。
 
 文件协议测试覆盖两种格式、撤销/重做、损坏、空电路、取消、截断上传、8 GiB 上限、长文件名和会话检查；浏览器实操验证快照导入与默认下载，控制台无错误。已记录稠密 10 万/约 105 万/200 万方块、稀疏约 105 万方块及 1 万有库存容器的 Release 单次往返，并对较小样本比较紧凑/缩进/压缩 JSON。大型动态快照、持续模糊测试、磁盘故障注入、取消延迟和百万方块浏览器刷新仍待专项测量，不据当前文件测试宣称完成。
+
+### 2026-09-10 区块恢复修订
+
+电路与快照的 META 均必须写入 chunkStates；缺失字段报错，不能静默恢复成全区块 entityTicking。加载先建立完整表，再验证邻接约束和重复坐标。规则清单加入 blockTags.json，因此旧指纹文件要求显式迁移；快照 ABI 更新为 simulatorCheckpoint2，旧 ABI 同样拒绝。没有自动迁移或从旧文件重建已丢失区块状态的能力；原始 JSON 导入仍按其显式内容解析。

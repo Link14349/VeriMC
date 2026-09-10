@@ -17,7 +17,7 @@ namespace {
 using namespace vmcb;
 constexpr std::array<std::uint8_t, 8> magic{0x56, 0x4d, 0x43, 0x42, 13, 10, 26, 10};
 constexpr const char* referenceSha = "823e2250d24b3ddac457a60c92a6a941943fcd6a";
-constexpr const char* checkpointAbi = "simulatorCheckpoint1";
+constexpr const char* checkpointAbi = "simulatorCheckpoint2";
 constexpr std::array<const char*, 8> runtimeTables{"blockTickBatch", "environmentActions", "events", "hoppers", "jukeboxes", "motions", "sensors", "torchToggles"};
 void require(bool condition, const std::string& message) { if (!condition) throw std::invalid_argument("VMCB：" + message); }
 std::uint32_t narrow(std::uint64_t value) { require(value <= UINT32_MAX, "32 位整数溢出"); return static_cast<std::uint32_t>(value); }
@@ -121,6 +121,7 @@ public:
         require(info.name.size() <= 16384, "工程名称超过 16 KiB"); validUtf8(info.name); (void)Json(info.origin).get<BlockPos>();
         output.seekp(0); writeBytes(output, Bytes(64));
         Json meta{{"name", info.name}, {"edition", "java"}, {"minecraftVersion", "26.2"}, {"referenceServerSha1", referenceSha}, {"writerVersion", "simulator-0.1.0"}, {"rulesDigest", Json::binary(registry.ruleFingerprint())}, {"profile", data.at("profile")}, {"origin", info.origin}, {"initialization", checkpoint ? "checkpoint1" : "canonicalXYZ1"}, {"randomSource", {{"algorithm", "javaLegacy48"}, {"seed", decimal(data.at("randomSource").at("seed"))}}}, {"nextEntityOrder", data.at("nextEntityOrder")}};
+        meta["chunkStates"] = data.value("chunkStates", Json::array());
         if (checkpoint) {
             Json snapshot{{"checkpointAbi", checkpointAbi}, {"engineBuild", SIMULATOR_BUILD_ID}, {"randomState", data.at("randomSource").at("state")}, {"randomDraws", decimal(data.at("randomSource").at("draws"))}, {"blockTickEarliestCollection", data.at("blockTickState").at("earliestCollection")}};
             for (const auto* field : {"tick", "nextOrder", "sequence", "nextProbeId", "nextActionId", "actionsDropped", "traceDropped", "faulted"}) snapshot[field] = data.at(field);
@@ -225,6 +226,7 @@ class VmcbSource final : public ProjectSource {
         require(meta.at("writerVersion").is_string(), "缺少写入器版本"); info.name = meta.at("name").get<std::string>(); require(info.name.size() <= 16384, "工程名称超过 16 KiB"); info.origin = meta.at("origin").get<BlockPos>();
         const auto& random = meta.at("randomSource"); require(random.at("algorithm") == "javaLegacy48", "不支持的随机源");
         data = {{"format", "verimc.simulator"}, {"formatVersion", 1}, {"edition", "java"}, {"minecraftVersion", "26.2"}, {"name", info.name}, {"kind", checkpoint ? "checkpoint" : "circuit"}, {"profile", meta.at("profile")}, {"nextEntityOrder", unsignedValue(meta.at("nextEntityOrder"))}, {"randomSource", {{"algorithm", "javaLegacy48"}, {"seed", std::to_string(unsignedValue(random.at("seed")))}}}};
+        data["chunkStates"] = meta.at("chunkStates");
         require(meta.contains("snapshot") == checkpoint, "快照元数据与文件类型不符");
         if (checkpoint) {
             const auto& snapshot = meta.at("snapshot"); require(snapshot.at("checkpointAbi") == checkpointAbi && snapshot.at("engineBuild").is_string(), "快照执行版本不兼容，需要显式迁移");

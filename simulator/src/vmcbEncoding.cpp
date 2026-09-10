@@ -206,7 +206,7 @@ std::array<StateId, 4096> decodeSection(std::span<const std::uint8_t> bytes, std
 Bytes rulesDigest(const std::string& blockStatesPath) {
     auto digest = [](std::span<const std::uint8_t> bytes) { Bytes result(32); unsigned size = 0; require(EVP_Digest(bytes.data(), bytes.size(), result.data(), &size, EVP_sha256(), nullptr) == 1 && size == 32, "无法计算规则指纹"); return result; };
     Bytes manifest;
-    for (const auto* name : {"blockStates.json", "compostingRules.json", "itemDefinitions.json", "jukeboxRules.json", "noteRules.json", "referenceVersion.json", "vibrationRules.json"}) {
+    for (const auto* name : {"blockStates.json", "blockTags.json", "compostingRules.json", "itemDefinitions.json", "jukeboxRules.json", "noteRules.json", "referenceVersion.json", "vibrationRules.json"}) {
         auto path = std::string(name) == "blockStates.json" ? std::filesystem::path(blockStatesPath) : std::filesystem::path(blockStatesPath).parent_path() / name;
         std::ifstream input(path, std::ios::binary); require(static_cast<bool>(input), "无法读取规则文件");
         Bytes bytes((std::istreambuf_iterator<char>(input)), {}); string(manifest, name); auto hash = digest(bytes); manifest.insert(manifest.end(), hash.begin(), hash.end());

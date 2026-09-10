@@ -330,7 +330,7 @@ int main() {
         try { restored.loadProject(invalid); } catch (...) { threw = true; }
         expect(threw && before == restored.saveProject("before", true), "invalid batch import changed world");
     });
-    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers", "java26_2Hoppers", "java26_2Torches", "java26_2Rails", "java26_2FullUpdateSnapshot", "java26_2TickBatches", "java26_2Tripwire", "java26_2Buttons", "java26_2Droppers", "java26_2Targets", "java26_2CopperChests", "java26_2Bookshelves", "java26_2Pots", "java26_2Vibrations", "java26_2DeviceVibrations", "java26_2Notes", "java26_2Bells", "java26_2Jukeboxes", "java26_2JukeboxHoppers", "java26_2Composters", "java26_2WireGeometry", "java26_2PistonPushability", "java26_2DaylightVibration", "java26_2StairShapes", "java26_2RailNotificationSource", "java26_2PistonRemovalCallback", "java26_2DiodeSupportBreak", "java26_2ObserverRemoval", "java26_2PistonLandingShape", "java26_2WireShapeToggle", "java26_2RemovalNotifySource", "java26_2RepeaterLockRefresh", "java26_2ItemFrameComparator", "java26_2UpdateTrace", "java26_2MachineMatrix", "java26_2SupportDirection", "java26_2FenceGateInWall", "java26_2UpdateSource", "java26_2HopperPickup", "java26_2ChunkLifecycle", "java26_2ChunkLifecycleNegative", "java26_2ScheduledQueue", "java26_2RandomState", "java26_2BlockEntityOrder", "java26_2EntityContainers", "java26_2BlockTicking", "java26_2SensorEdgeChunks", "java26_2SensorEdgeDiagonal", "java26_2SensorEdgeNegative", "java26_2BoatContainers", "java26_2EjectHopper"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
+    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers", "java26_2Hoppers", "java26_2Torches", "java26_2Rails", "java26_2FullUpdateSnapshot", "java26_2TickBatches", "java26_2Tripwire", "java26_2Buttons", "java26_2Droppers", "java26_2Targets", "java26_2CopperChests", "java26_2Bookshelves", "java26_2Pots", "java26_2Vibrations", "java26_2DeviceVibrations", "java26_2Notes", "java26_2Bells", "java26_2Jukeboxes", "java26_2JukeboxHoppers", "java26_2Composters", "java26_2WireGeometry", "java26_2PistonPushability", "java26_2DaylightVibration", "java26_2StairShapes", "java26_2RailNotificationSource", "java26_2PistonRemovalCallback", "java26_2DiodeSupportBreak", "java26_2ObserverRemoval", "java26_2PistonLandingShape", "java26_2WireShapeToggle", "java26_2RemovalNotifySource", "java26_2RepeaterLockRefresh", "java26_2ItemFrameComparator", "java26_2UpdateTrace", "java26_2MachineMatrix", "java26_2SupportDirection", "java26_2FenceGateInWall", "java26_2UpdateSource", "java26_2HopperPickup", "java26_2ChunkLifecycle", "java26_2ChunkLifecycleNegative", "java26_2ScheduledQueue", "java26_2RandomState", "java26_2BlockEntityOrder", "java26_2EntityContainers", "java26_2BlockTicking", "java26_2SensorEdgeChunks", "java26_2SensorEdgeDiagonal", "java26_2SensorEdgeNegative", "java26_2BoatContainers", "java26_2EjectHopper", "java26_2CrossChunkContact"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
         std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/../tests/fixtures/" + fixtureName + ".json"); expect(static_cast<bool>(file), "missing vanilla reference fixture");
         const auto fixture = Json::parse(file); Simulator s(r);
         // 差分重放循环与 checkReference 工具共用 referenceReplay.hpp 里的同一份实现，
@@ -912,6 +912,40 @@ int main() {
             expect(s.world.get(rail) == beforeCell,
                    std::string("stale ") + which + " snapshot rewrote a cell that is no longer that block: "
                    + r.describe(s.world.get(rail)).dump());
+        }
+    });
+    test("removing item frames preserves host inventory and runtime", [&] {
+        for (auto name : {"chest", "hopper"}) {
+            Simulator s(r); floor(s); const BlockPos p{0,1,0};
+            s.place(p,r.state(name));
+            s.stimulate(p, {{"inventory",Json::array({{{"slot",0},{"item","minecraft:stone"},{"count",10}}})}});
+            auto inventory=s.inventoryJson(p,false);
+            s.stimulate(p,{{"itemFrames",Json::array({{{"facing","east"},{"rotation",5},{"hasItem",true}}})}});
+            s.stimulate(p,{{"itemFrames",Json::array()}});
+            expect(s.inventoryJson(p,false)==inventory,"removing frame erased host inventory");
+            Simulator copy(r); copy.loadProject(s.saveProject("frames",true));
+            expect(copy.inventoryJson(p,false)==inventory,"frame removal broke checkpoint");
+        }
+    });
+    test("chunk table restore is independent of row order and atomic", [&] {
+        Simulator s(r);
+        for(int x=-1;x<=1;++x)for(int z=-1;z<=1;++z)s.setChunkState(x,z,Simulator::ChunkState::loaded);
+        s.setChunkState(0,0,Simulator::ChunkState::unloaded);
+        for(bool checkpoint:{false,true}) {
+            auto saved=s.saveProject("chunks",checkpoint);
+            Simulator copy(r); copy.loadProject(saved);
+            expect(copy.chunkStatesJson()==s.chunkStatesJson(),"chunk table lost");
+            std::reverse(saved["chunkStates"].begin(),saved["chunkStates"].end());
+            copy.loadProject(saved);
+            expect(copy.chunkStatesJson()==s.chunkStatesJson(),"chunk order changed result");
+            const auto before=copy.saveProject("before",true);
+            auto invalid=saved;
+            invalid["chunkStates"]=Json::array({{{"chunk",Json::array({0,0})},{"state","unloaded"},{"stalledSince",std::uint64_t{0}}}});
+            bool invalidRejected=false;try{copy.loadProject(invalid);}catch(...){invalidRejected=true;}
+            expect(invalidRejected && copy.saveProject("before",true)==before,"invalid complete topology was accepted");
+            saved["chunkStates"].push_back(saved["chunkStates"][0]);
+            bool rejected=false;try{copy.loadProject(saved);}catch(...){rejected=true;}
+            expect(rejected && copy.saveProject("before",true)==before,"duplicate chunk was not atomically rejected");
         }
     });
     test("stale diode snapshots respect live block identity", [&] {

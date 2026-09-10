@@ -1,0 +1,502 @@
+{
+  "baseline": "8cf3533",
+  "ctest": "3/3",
+  "coreTests": "140/140",
+  "vmcbTests": "14/14",
+  "timelineMatches": "54/54",
+  "referenceToolTests": "5/5",
+  "pausedCheckerTests": "1/1",
+  "independentVmcbReader": "PASS independent reader: simulator/testResults/pr2Fixes/final/newCheckpoint.vmcb, 181 blocks, 21 pages, 2621 bytes",
+  "strictVanillaReruns": [
+    {
+      "fixture": "java26_2ItemFrameComparator",
+      "origin": [
+        -5533787,
+        -58,
+        4412942
+      ],
+      "gameTestEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ],
+        "dataPacks": [
+          "file/simulator",
+          "minecart_improvements",
+          "redstone_experiments",
+          "trade_rebalance",
+          "vanilla"
+        ],
+        "gameTime": 8,
+        "clockTicks": 8
+      },
+      "vanillaEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:vanilla"
+        ],
+        "dataPacks": [
+          "vanilla"
+        ],
+        "gameTime": 8,
+        "clockTicks": 8
+      },
+      "clockAligned": true,
+      "firstDifferenceAgainstGameTest": null,
+      "sha256": "acaf3fd16504f155f02c34624a9c3ffc045fdb5dcb33e26ceee7ff87f7d1f98c",
+      "checkerExitCode": 0,
+      "checkerStatus": "match"
+    },
+    {
+      "fixture": "java26_2HopperPickup",
+      "origin": [
+        307216,
+        -58,
+        5454477
+      ],
+      "gameTestEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ],
+        "dataPacks": [
+          "file/simulator",
+          "minecart_improvements",
+          "redstone_experiments",
+          "trade_rebalance",
+          "vanilla"
+        ],
+        "gameTime": 5,
+        "clockTicks": 5
+      },
+      "vanillaEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:vanilla"
+        ],
+        "dataPacks": [
+          "vanilla"
+        ],
+        "gameTime": 5,
+        "clockTicks": 5
+      },
+      "clockAligned": true,
+      "firstDifferenceAgainstGameTest": null,
+      "sha256": "110346a3d723c831d8309b413e32c088c1ba6e74690e27fbabf6a72a54b70a32",
+      "checkerExitCode": 0,
+      "checkerStatus": "match"
+    },
+    {
+      "fixture": "java26_2BlockTicking",
+      "origin": [
+        16,
+        -59,
+        32
+      ],
+      "gameTestEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:vanilla"
+        ],
+        "dataPacks": [
+          "vanilla"
+        ],
+        "gameTime": 22,
+        "clockTicks": 22
+      },
+      "vanillaEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:vanilla"
+        ],
+        "dataPacks": [
+          "vanilla"
+        ],
+        "gameTime": 22,
+        "clockTicks": 22
+      },
+      "clockAligned": true,
+      "firstDifferenceAgainstGameTest": null,
+      "sha256": "0b47f4ef0c6beb3e292425be111c9d071599c432412b80384ad384712605e3eb",
+      "checkerExitCode": 0,
+      "checkerStatus": "match"
+    },
+    {
+      "fixture": "java26_2EjectHopper",
+      "origin": [
+        -1614656,
+        -58,
+        -1691741
+      ],
+      "gameTestEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:trade_rebalance",
+          "minecraft:vanilla"
+        ],
+        "dataPacks": [
+          "file/simulator",
+          "minecart_improvements",
+          "redstone_experiments",
+          "trade_rebalance",
+          "vanilla"
+        ],
+        "gameTime": 6,
+        "clockTicks": 6
+      },
+      "vanillaEnvironment": {
+        "javaVersion": "25.0.4.1",
+        "randomTickSpeed": 0,
+        "featureFlags": [
+          "minecraft:vanilla"
+        ],
+        "dataPacks": [
+          "vanilla"
+        ],
+        "gameTime": 6,
+        "clockTicks": 6
+      },
+      "clockAligned": true,
+      "firstDifferenceAgainstGameTest": null,
+      "sha256": "091522622560fd55dae4bcb0da5712155f1a971ad88781e889766868646a45f5",
+      "checkerExitCode": 0,
+      "checkerStatus": "match"
+    }
+  ],
+  "crossChunkProbe": {
+    "unprobedAndProbedFramesEqual": true,
+    "origin": [
+      16,
+      -59,
+      32
+    ],
+    "frame6Item": {
+      "id": 1,
+      "item": "minecraft:stone",
+      "count": 1,
+      "position": [
+        16.224728864431384,
+        1.75,
+        4.5
+      ],
+      "velocity": [
+        0.26923429238279084,
+        0.0,
+        0.0
+      ],
+      "velocityBits": [
+        "3fd13b22782fbb00",
+        "0",
+        "0"
+      ],
+      "onGround": false,
+      "noPhysics": true
+    },
+    "retainedSchedulerStatus": "match",
+    "rejectedSchedulerStatus": {
+      "firstDifference": {
+        "actual": 1,
+        "expected": 0,
+        "field": "analogs",
+        "relativePos": [
+          16,
+          1,
+          4
+        ],
+        "tick": 6
+      },
+      "fixture": "/mnt/f/学习和研究/VeriMC/simulator/testResults/pr2Fixes/crossContact/java26_2CrossChunkContact.vanilla.json",
+      "frames": 17,
+      "origin": [
+        16,
+        -59,
+        32
+      ],
+      "status": "difference",
+      "watch": 2
+    },
+    "claim": "This collision configuration is not picked up in vanilla. Other cross-chunk trajectories remain unverified."
+  },
+  "canonicalHashDefinition": "SHA256 of UTF-8 json.dumps(data, sort_keys=True, ensure_ascii=False, separators=(comma, colon)); ignores whitespace and line endings",
+  "fixtures": [
+    {
+      "name": "java26_2Bells.json",
+      "status": "match",
+      "canonicalSha256": "24d1e37d9647f9ad6e5e423acc85a39722a9d298a9ccbf1caefaa9a28c945a49"
+    },
+    {
+      "name": "java26_2BlockEntityOrder.json",
+      "status": "match",
+      "canonicalSha256": "8e53a1bc5563c39b4d5f90bfc579ce8955054a7d166877be6f2fee70c161e1dd"
+    },
+    {
+      "name": "java26_2BlockTicking.json",
+      "status": "match",
+      "canonicalSha256": "a4c2e4fdebefed9cd7da61c5b9f36b22465936c70d703961b14335d39ce9a7e5"
+    },
+    {
+      "name": "java26_2BoatContainers.json",
+      "status": "match",
+      "canonicalSha256": "16ec36731546039eed34c72758e3d160e7b3607ee7932b7c0a7048156c853e91"
+    },
+    {
+      "name": "java26_2Bookshelves.json",
+      "status": "match",
+      "canonicalSha256": "bfe6f0337c16092255fbf9795c2bbc30045cbcade9e36721339e338442805f9a"
+    },
+    {
+      "name": "java26_2Buttons.json",
+      "status": "match",
+      "canonicalSha256": "eb30bb228abea486c077e448f5fd54c702b368de752b61faae15097e07884b99"
+    },
+    {
+      "name": "java26_2ChunkLifecycle.json",
+      "status": "match",
+      "canonicalSha256": "2ab63434fa7191ce5d63f8df4abb5be58b7074600301c9f836457cc9b53912ab"
+    },
+    {
+      "name": "java26_2ChunkLifecycleNegative.json",
+      "status": "match",
+      "canonicalSha256": "41de1453aa77917e56f32632af8bbd9979b7f7d1edd3d8b924fb507fc080c65a"
+    },
+    {
+      "name": "java26_2Composters.json",
+      "status": "match",
+      "canonicalSha256": "ef78e62622fe2df0ed5e363e5debe830ec0b8e104b8a816b4b61398287dba153"
+    },
+    {
+      "name": "java26_2Containers.json",
+      "status": "match",
+      "canonicalSha256": "941f8fa6680d9a9cc7b6f3b13f63f9e80c3d167262356bfb7c68b6213f1193f7"
+    },
+    {
+      "name": "java26_2CopperChests.json",
+      "status": "match",
+      "canonicalSha256": "0d23dfdefd2eed1cc0d0465e500d7912c8e0787e9c211861440f6621dea0fb5e"
+    },
+    {
+      "name": "java26_2CrossChunkContact.json",
+      "status": "match",
+      "canonicalSha256": "9fbd96d682d11af4a5e1b2422c8549576d14e7e37adbab804a2cd73cb64215f9"
+    },
+    {
+      "name": "java26_2DaylightVibration.json",
+      "status": "match",
+      "canonicalSha256": "e1cb1394d6b4a00720e1bdf2d946649f27131a674b67a0c34803faad9ea1149b"
+    },
+    {
+      "name": "java26_2DeviceVibrations.json",
+      "status": "match",
+      "canonicalSha256": "2ea268c43c879c1550b53a7ef248d05e328364f6526707a91e723c589a245e0a"
+    },
+    {
+      "name": "java26_2Devices.json",
+      "status": "match",
+      "canonicalSha256": "2ac63014acca7508252f02cad7f6f0863bae9588b70496e9b9148bcbedd96839"
+    },
+    {
+      "name": "java26_2DiodeSupportBreak.json",
+      "status": "match",
+      "canonicalSha256": "8212aab62885dcbca5bd8f3fb079f10684ea716a91c7749d4633d2a119002551"
+    },
+    {
+      "name": "java26_2Droppers.json",
+      "status": "match",
+      "canonicalSha256": "660ee9c283af7d8e6aebfae108e50998e75c1468d161cadc0e6961df465b2854"
+    },
+    {
+      "name": "java26_2EjectHopper.json",
+      "status": "match",
+      "canonicalSha256": "e1d8e97f04a2241107da2b79942c174eef674fb839ba6b890bb22a7d67cd54f7"
+    },
+    {
+      "name": "java26_2EntityContainers.json",
+      "status": "match",
+      "canonicalSha256": "1bf476a7ab087885faeaa8b696c422f0dc3b8dfca3e107384e5a991aa6419efb"
+    },
+    {
+      "name": "java26_2FenceGateInWall.json",
+      "status": "match",
+      "canonicalSha256": "7f60eff899ac0c82d932ef663c08a8bcc388d75356a3583a256a085b5bbe75e0"
+    },
+    {
+      "name": "java26_2FullUpdateSnapshot.json",
+      "status": "match",
+      "canonicalSha256": "9ecad8c762919a7658ab4298cb2b99ee83f4fb5a314e066943dd39f744f7710e"
+    },
+    {
+      "name": "java26_2HopperPickup.json",
+      "status": "match",
+      "canonicalSha256": "ea41cfdf2068ee989d3be4caf485a37a2fd96efd202b46cd38470faec3334b5d"
+    },
+    {
+      "name": "java26_2Hoppers.json",
+      "status": "match",
+      "canonicalSha256": "3e6413b07a7a2bc75f19876db1bffd8036c81590a7fb870418b6f2d711d1ccec"
+    },
+    {
+      "name": "java26_2ItemFrameComparator.json",
+      "status": "match",
+      "canonicalSha256": "1bc261701792f2d0310c3b95fe4e9db0126d90dc79e162c617be86cd92bc12d8"
+    },
+    {
+      "name": "java26_2JukeboxHoppers.json",
+      "status": "match",
+      "canonicalSha256": "5c877323985fdef10efe3b54bad3fe0ee69a855aa43fc022f0050e0f2bee7506"
+    },
+    {
+      "name": "java26_2Jukeboxes.json",
+      "status": "match",
+      "canonicalSha256": "a895cd3cb6f22ee9f28412fea68565871d8103f8d53c0fe9f489d53ca1faa742"
+    },
+    {
+      "name": "java26_2MachineMatrix.json",
+      "status": "match",
+      "canonicalSha256": "450a3f61c6c860eedd519b48e68b073073a8d7883157c44f979e9e313ba907db"
+    },
+    {
+      "name": "java26_2Notes.json",
+      "status": "match",
+      "canonicalSha256": "8ed01847d7760eb7eb6e54f1243c143059d927e0f7e99bc03506fb412d5703d5"
+    },
+    {
+      "name": "java26_2ObserverRemoval.json",
+      "status": "match",
+      "canonicalSha256": "9ee596ac0179e2e21a7eaa838af28cbfb5bee6c40a80c0da9ed8ab3699bf5c7e"
+    },
+    {
+      "name": "java26_2PistonLandingShape.json",
+      "status": "match",
+      "canonicalSha256": "d5f25c52395747ec019fa181a94fa4574bb84184c9eb0a17b86f9a66dacbcbee"
+    },
+    {
+      "name": "java26_2PistonPushability.json",
+      "status": "match",
+      "canonicalSha256": "4247d6400c65bfdc86a8e292fd89e24a9d2c53600ed9f45d0cc74966442e6b27"
+    },
+    {
+      "name": "java26_2PistonRemovalCallback.json",
+      "status": "match",
+      "canonicalSha256": "e1a4bbd75d7ea3642954c9a2f452efefdff161ea265469c45dd74368d2a30532"
+    },
+    {
+      "name": "java26_2Pots.json",
+      "status": "match",
+      "canonicalSha256": "570148203fb4408fbfc7d773115d19ad1e55b915b8b9012b254e2442d74aa2f1"
+    },
+    {
+      "name": "java26_2RailNotificationSource.json",
+      "status": "match",
+      "canonicalSha256": "8d92e1dce580a870c87624eba00ae927fadcb0c32d126f29939701551cf44ef2"
+    },
+    {
+      "name": "java26_2Rails.json",
+      "status": "match",
+      "canonicalSha256": "ed99bd839ab56038224df024821290c954b73bac6bc2836c261c5da64f61014c"
+    },
+    {
+      "name": "java26_2RandomState.json",
+      "status": "match",
+      "canonicalSha256": "541a379fd37913c953bba7a2fcd8be5c8ff549358ce1575d9551fa75df4f168e"
+    },
+    {
+      "name": "java26_2Redstone.json",
+      "status": "match",
+      "canonicalSha256": "96de02a096e1bed6a194628f0bc6f66158c9e3e4c7b03305c309e4348c4f1b35"
+    },
+    {
+      "name": "java26_2RemovalNotifySource.json",
+      "status": "match",
+      "canonicalSha256": "f77cbf7297696fd9f21cbad8a6c335234f49b7809a1bb0133339428c9684cbc5"
+    },
+    {
+      "name": "java26_2RepeaterLockRefresh.json",
+      "status": "match",
+      "canonicalSha256": "132d3a5badf31e2f2b7331b8d0e1bd81ce1b78e7ecfabfe89d49c8d1513a1bb9"
+    },
+    {
+      "name": "java26_2ScheduledQueue.json",
+      "status": "match",
+      "canonicalSha256": "4f0086bf031877cb5230013d79b130f538b3b10487d2185da3e68182fc44460e"
+    },
+    {
+      "name": "java26_2SensorEdgeChunks.json",
+      "status": "match",
+      "canonicalSha256": "ac553e3a38a9bd396dbb311bd14813e710c976f7261ecd025950dde1bfa1e5e9"
+    },
+    {
+      "name": "java26_2SensorEdgeDiagonal.json",
+      "status": "match",
+      "canonicalSha256": "dd8163c14f397de285ad67fa7a8f1a08c0de0181c5735c4ae42d197eb6010311"
+    },
+    {
+      "name": "java26_2SensorEdgeNegative.json",
+      "status": "match",
+      "canonicalSha256": "c8ed6fe9efd2161793b9c4faa64b22b139d1ab7612e45fd625cff3d748e90bdf"
+    },
+    {
+      "name": "java26_2StairShapes.json",
+      "status": "match",
+      "canonicalSha256": "aa94510d61da71b7bba56b7978bf46adcf8fdfbb9e247e5e35dd439e87d33d4d"
+    },
+    {
+      "name": "java26_2SupportDirection.json",
+      "status": "match",
+      "canonicalSha256": "47758870a6e260cb66972f133ac7b757f3eeab1193dbd1ab9361a21e39a751b8"
+    },
+    {
+      "name": "java26_2Targets.json",
+      "status": "match",
+      "canonicalSha256": "646aff1e7bc739e1a0b1b4a5a2e3c237191d59441deca03b1824b7dfa9622e44"
+    },
+    {
+      "name": "java26_2TickBatches.json",
+      "status": "match",
+      "canonicalSha256": "678665cd3aba0dd68a3e0b2426390c0e20cb999b27d5f183d1021fdd3a6225de"
+    },
+    {
+      "name": "java26_2Torches.json",
+      "status": "match",
+      "canonicalSha256": "5fa9ee44ffc36e134659cbc812187c569939f6d0aff78b94d0af7de115631c3b"
+    },
+    {
+      "name": "java26_2Tripwire.json",
+      "status": "match",
+      "canonicalSha256": "205e082a0ecdc2ac53fc7df1dd41e6c939002551823dae43f09c299c34be9f3c"
+    },
+    {
+      "name": "java26_2UpdateSource.json",
+      "status": "match",
+      "canonicalSha256": "cc32331d52456be2e6adf8243aade24062a86328f8e1cbe9bb3809f9e2ba6dc2"
+    },
+    {
+      "name": "java26_2UpdateTrace.json",
+      "status": "match",
+      "canonicalSha256": "81d4f02471696657098f2ef206967d7e2b9f4ccd0ca0dd59e5f71d8099640340"
+    },
+    {
+      "name": "java26_2Vibrations.json",
+      "status": "match",
+      "canonicalSha256": "270f082c5489ce6b351e3cdc9eeb07803fd5fe7d01908a27959c175d6a10e140"
+    },
+    {
+      "name": "java26_2WireGeometry.json",
+      "status": "match",
+      "canonicalSha256": "ab904cc0f12c0a1aec8d19f267a0aac37f81624c72d679cc7a7655bd8a429965"
+    },
+    {
+      "name": "java26_2WireShapeToggle.json",
+      "status": "match",
+      "canonicalSha256": "63618a1f90bd9ffc30820c51ee208b696172b6f35416928c69f3588766a830c0"
+    }
+  ]
+}

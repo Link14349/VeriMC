@@ -267,8 +267,22 @@ void Simulator::loadProject(ProjectSource& source) {
                 throw std::invalid_argument("无效区块坐标");
             auto found = names.find(row.at("state").get<std::string>());
             if (found == names.end()) throw std::invalid_argument("无效区块状态");
-            // 复用 setChunkState 的校验，可 ticking 区块周围八格不能是未加载区块。
-            candidate.setChunkState(chunk.at(0).get<int>(), chunk.at(1).get<int>(), found->second, row.at("stalledSince").get<Tick>());
+            if (chunk.at(0) < INT32_MIN / 16 || chunk.at(0) > INT32_MAX / 16 || chunk.at(1) < INT32_MIN / 16 || chunk.at(1) > INT32_MAX / 16)
+                throw std::invalid_argument("区块坐标越界");
+            const auto x = chunk.at(0).get<int>(), z = chunk.at(1).get<int>();
+            // Restore the table atomically; validating partial rows would treat
+            // not-yet-restored neighbours as default entity-ticking chunks.
+            if (!candidate.chunkStates.emplace(BlockPos{static_cast<int>(x),0,static_cast<int>(z)},
+                    Simulator::ChunkRecord{found->second,row.at("stalledSince").get<Tick>()}).second)
+                throw std::invalid_argument("重复区块状态");
+        }
+        for (const auto& [chunk, record] : candidate.chunkStates) {
+            if (record.state != Simulator::ChunkState::unloaded) continue;
+            for (int dx=-1;dx<=1;++dx) for (int dz=-1;dz<=1;++dz) {
+                const auto neighbor=candidate.chunkStates.find({chunk.x+dx,0,chunk.z+dz});
+                if (neighbor==candidate.chunkStates.end() || neighbor->second.state>=Simulator::ChunkState::blockTicking)
+                    throw std::invalid_argument("可 ticking 的区块周围八格不能是未加载区块");
+            }
         }
     }
     std::unordered_set<std::uint64_t> usedRanks;

@@ -75,7 +75,10 @@ void Simulator::stimulateItemFrames(BlockPos pos, const Json& input) {
             if (std::find(touched.begin(), touched.end(), facing) == touched.end()) touched.push_back(facing);
         }
     if (stored.empty()) values.erase("itemFrames"); else values["itemFrames"] = std::move(stored);
-    if (values.empty()) runtime.erase(pos); else runtimeChanged(pos, false);
+    // Inventory and analog output share this record with stimulus fields.
+    // Removing the last frame must not remove its host container's contents.
+    if (values.empty() && runtime.at(pos).inventory.empty() && runtime.at(pos).output == 0) runtime.erase(pos);
+    runtimeChanged(pos, false);
     // 原版 ItemFrame.setItem / setRotation 从展示框自身所在格发出 updateNeighbourForOutputSignal。
     // 原版 ItemFrame 传的 changedBlock 是 Blocks.AIR，不是展示框挂靠的方块。
     for (auto facing : touched) updateComparatorNeighbors(pos.relative(facing), 0);

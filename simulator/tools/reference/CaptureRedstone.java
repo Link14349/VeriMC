@@ -830,6 +830,7 @@ public class CaptureRedstone extends TestFunctionLoader {
                         row.add("velocity", vector(velocity.x, velocity.y, velocity.z));
                         row.add("velocityBits", vectorBits(velocity.x, velocity.y, velocity.z));
                         row.addProperty("onGround", drop.onGround());
+                        row.addProperty("noPhysics", drop.noPhysics);
                         rows.add(row);
                     }
                     frame.add("itemEntities", rows);
