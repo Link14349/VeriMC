@@ -317,7 +317,11 @@ void Simulator::setBlock(BlockPos p, StateId id, unsigned flags, int depth) {
         if(oldState.device==Device::bell && runtime.contains(p) && runtime.at(p).values.contains("bellGeneration"))scheduledKeys.erase({p,oldState.type,2,runtime.at(p).values.at("bellGeneration")});
         if(oldState.device==Device::jukebox)removeJukebox(p,oldState.type);
         if(isSensor(oldState.device)) removeSensor(p,oldState.type);
-        if (!(oldState.device==Device::container && state.device==Device::container && isCopperChest(old) && isCopperChest(id))) runtime.erase(p);
+        if (!(oldState.device==Device::container && state.device==Device::container && isCopperChest(old) && isCopperChest(id))) {
+            runtime.erase(p);
+            entityCells.erase(p);
+            cartCells.erase(p);
+        }
         scheduledKeys.erase({p, oldState.type, 3, 0});
         if (auto motion = motions.find(p); motion != motions.end()) {
             scheduledKeys.erase({p, oldState.type, 2, motion->second.generation});
@@ -674,6 +678,9 @@ void Simulator::executeNeighbor(BlockPos p, StateId source, StateId snapshot) {
 }
 void Simulator::executeReactiveNeighbor(BlockPos p, StateId id, StateId source) {
     const auto& s = registry[id];
+    // DiodeBlock.neighborChanged first checks the live block identity, even
+    // when FullNeighborUpdate supplies an older state of that block.
+    if (isDiode(s.device) && at(p).type != s.type) return;
     if (isDiode(s.device) && !survives(p, id)) {
         // 原版 DiodeBlock.neighborChanged 在邻居通知阶段就掉落并移除二极管，
         // 随后对六个邻居各发一次 updateNeighborsAt(pos.relative(d), this)。

@@ -268,14 +268,17 @@ public class CaptureRedstone extends TestFunctionLoader {
     }
     static void recordEjection(ItemEntity item) {
         BlockPos source = null; double best = Double.MAX_VALUE;
+        int nearbySources = 0;
         for (var candidate : ejectors) {
             double distance = item.position().distanceToSqr(candidate.getX() + 0.5, candidate.getY() + 0.5, candidate.getZ() + 0.5);
+            if (distance <= 1.0) ++nearbySources;
             if (distance < best) { best = distance; source = candidate; }
         }
         // 归属只用来填 source。抛出点离抛出器方块中心是水平 0.7 加上竖直 0.125/0.15625，
         // 最远约 0.72，声明的抛出器互相离开一格以上时归属唯一。找不到就直接失败，不做猜测；
         // 归属错了内核那边的逐字段比对也会立刻报出来。
         if (source == null || best > 1.0) throw new IllegalStateException("Ejected item has no declared source: " + item.position());
+        if (nearbySources != 1) throw new IllegalStateException("Ejected item has ambiguous declared sources: " + item.position());
         int order = 0;
         for (var previous : ejections) if (previous.getAsJsonObject().get("tick").getAsInt() == spawnTick) ++order;
         var row = new JsonObject();

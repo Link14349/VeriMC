@@ -146,7 +146,8 @@ const std::array<const char*, 10> chestBoatTypes{{
 // MinecartChest.getContainerSize()=27、MinecartHopper.getContainerSize()=5、
 // AbstractChestBoat.getContainerSize()=27（ChestBoat 与 ChestRaft 都不覆写）。
 // 运输船/竹筏这一支已有原版差分 java26_2BoatContainers（89 帧，严格 vanilla-only）：
-// 单候选也抽、空候选不抽、方块容器短路、失败不设冷却四条都是实测到的。
+// 实测覆盖单候选抽取、候选顺序和失败逐刻重试；方块容器短路来自源码核对，
+// 该船场景没有方块容器与实体同时存在，不能单独证明短路规则。
 // 仍未实测的是木头种类：只捕获了 oak_chest_boat，其余八种共用 chestBoatFactory 是静态论证。
 // 与矿车同一个约定：船的运动、浮力、乘骑一律不建模，位置是输入，视作停在格中心。
 std::size_t Simulator::containerEntitySize(const std::string& type) {

@@ -111,7 +111,8 @@ def replay(name, outputDir):
 
 
 def main():
-    name, outputDir = sys.argv[1], Path(sys.argv[2])
+    # runReferenceTool launches Java from its cache directory.
+    name, outputDir = sys.argv[1], Path(sys.argv[2]).resolve()
     outputDir.mkdir(parents=True, exist_ok=True)
     if name == 'all':
         # Only the timeline fixtures can be replayed; the rest are exported tables (sine, registry

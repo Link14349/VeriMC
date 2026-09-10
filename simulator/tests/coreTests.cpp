@@ -330,7 +330,7 @@ int main() {
         try { restored.loadProject(invalid); } catch (...) { threw = true; }
         expect(threw && before == restored.saveProject("before", true), "invalid batch import changed world");
     });
-    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers", "java26_2Hoppers", "java26_2Torches", "java26_2Rails", "java26_2FullUpdateSnapshot", "java26_2TickBatches", "java26_2Tripwire", "java26_2Buttons", "java26_2Droppers", "java26_2Targets", "java26_2CopperChests", "java26_2Bookshelves", "java26_2Pots", "java26_2Vibrations", "java26_2DeviceVibrations", "java26_2Notes", "java26_2Bells", "java26_2Jukeboxes", "java26_2JukeboxHoppers", "java26_2Composters", "java26_2WireGeometry", "java26_2PistonPushability", "java26_2DaylightVibration", "java26_2StairShapes", "java26_2RailNotificationSource", "java26_2PistonRemovalCallback", "java26_2DiodeSupportBreak", "java26_2ObserverRemoval", "java26_2PistonLandingShape", "java26_2WireShapeToggle", "java26_2RemovalNotifySource", "java26_2RepeaterLockRefresh", "java26_2ItemFrameComparator", "java26_2UpdateTrace", "java26_2MachineMatrix", "java26_2SupportDirection", "java26_2FenceGateInWall", "java26_2UpdateSource", "java26_2HopperPickup", "java26_2ChunkLifecycle", "java26_2ChunkLifecycleNegative", "java26_2ScheduledQueue", "java26_2RandomState", "java26_2BlockEntityOrder", "java26_2EntityContainers", "java26_2BlockTicking", "java26_2SensorEdgeChunks", "java26_2SensorEdgeDiagonal", "java26_2SensorEdgeNegative", "java26_2BoatContainers"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
+    for (const auto* fixtureName : {"java26_2Redstone", "java26_2Devices", "java26_2Containers", "java26_2Hoppers", "java26_2Torches", "java26_2Rails", "java26_2FullUpdateSnapshot", "java26_2TickBatches", "java26_2Tripwire", "java26_2Buttons", "java26_2Droppers", "java26_2Targets", "java26_2CopperChests", "java26_2Bookshelves", "java26_2Pots", "java26_2Vibrations", "java26_2DeviceVibrations", "java26_2Notes", "java26_2Bells", "java26_2Jukeboxes", "java26_2JukeboxHoppers", "java26_2Composters", "java26_2WireGeometry", "java26_2PistonPushability", "java26_2DaylightVibration", "java26_2StairShapes", "java26_2RailNotificationSource", "java26_2PistonRemovalCallback", "java26_2DiodeSupportBreak", "java26_2ObserverRemoval", "java26_2PistonLandingShape", "java26_2WireShapeToggle", "java26_2RemovalNotifySource", "java26_2RepeaterLockRefresh", "java26_2ItemFrameComparator", "java26_2UpdateTrace", "java26_2MachineMatrix", "java26_2SupportDirection", "java26_2FenceGateInWall", "java26_2UpdateSource", "java26_2HopperPickup", "java26_2ChunkLifecycle", "java26_2ChunkLifecycleNegative", "java26_2ScheduledQueue", "java26_2RandomState", "java26_2BlockEntityOrder", "java26_2EntityContainers", "java26_2BlockTicking", "java26_2SensorEdgeChunks", "java26_2SensorEdgeDiagonal", "java26_2SensorEdgeNegative", "java26_2BoatContainers", "java26_2EjectHopper"}) test(std::string("Java 26.2 differential: ") + fixtureName, [&] {
         std::ifstream file(std::string(SIMULATOR_DATA_DIR) + "/../tests/fixtures/" + fixtureName + ".json"); expect(static_cast<bool>(file), "missing vanilla reference fixture");
         const auto fixture = Json::parse(file); Simulator s(r);
         // 差分重放循环与 checkReference 工具共用 referenceReplay.hpp 里的同一份实现，
@@ -912,6 +912,19 @@ int main() {
             expect(s.world.get(rail) == beforeCell,
                    std::string("stale ") + which + " snapshot rewrote a cell that is no longer that block: "
                    + r.describe(s.world.get(rail)).dump());
+        }
+    });
+    test("stale diode snapshots respect live block identity", [&] {
+        const BlockPos pos{1, 1, 0};
+        for (auto* name : {"comparator", "repeater"}) {
+            Simulator s(r);
+            // No support: without the live identity guard, the stale diode
+            // callback removes the replacement stone as an unsupported diode.
+            s.setBlock(pos, r.state("stone"), 2);
+            const auto before = s.saveProject("identity", true);
+            s.neighborChangedSnapshot(pos, r.state(name), r.state("stone"));
+            expect(s.world.get(pos) == r.state("stone"), "stale diode removed replacement block");
+            expect(s.saveProject("identity", true) == before, "stale diode changed runtime or queues");
         }
     });
     test("实体接触按掉落物自己所在的区块判定，而不是漏斗所在的区块", [&] {
@@ -1660,6 +1673,20 @@ int main() {
         far.advanceTo(20);
         expect(draws(far) == farStart, "a chest boat two cells away became a candidate: "
                + std::to_string(draws(far) - farStart) + " draws");
+
+        // 声明之后在同一格换掉方块：原版 setBlock 换方块类型时会连带清掉这一格的器件数据
+        // （协议既有行为，与跨格无关），跨格索引必须跟着清干净，
+        // 否则候选枚举会去查一条已经不存在的运行时记录。
+        Simulator wiped(r); floor(wiped);
+        wiped.place(probe, r.state("hopper", {{"facing", "down"}}));
+        wiped.stimulate(queried, declare("oak_chest_boat", Json::array({stone(0, 1)})));
+        wiped.place(queried, r.state("stone"));
+        expect(wiped.containerEntitiesJson(queried).empty(), "replacing the block did not clear the declaration");
+        const auto wipedStart = draws(wiped);
+        wiped.advanceTo(20);
+        expect(draws(wiped) == wipedStart, "a wiped declaration was still a candidate: "
+               + std::to_string(draws(wiped) - wipedStart) + " draws");
+        expect(wiped.inventoryJson(probe, false).empty(), "the hopper pulled from a wiped declaration");
 
         // 两条隔一格声明的船进**同一张**候选表：nextInt 的参数是 2，不是各自那一格的 1。
         // nextInt(1) 与 nextInt(2) 消耗的随机数一样多（都只取一次 next(31)，
